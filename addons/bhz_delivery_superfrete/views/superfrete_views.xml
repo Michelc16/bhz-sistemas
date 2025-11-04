@@ -1,0 +1,37 @@
+<odoo>
+  <record id="bhz_superfrete_conf_form" model="ir.ui.view">
+    <field name="name">bhz.superfrete.config.form</field>
+    <field name="model">bhz.superfrete.config</field>
+    <field name="arch" type="xml">
+      <form>
+        <sheet>
+          <group>
+            <field name="name"/>
+            <field name="api_key" password="True"/>
+            <field name="sandbox"/>
+            <field name="base_url" placeholder="https://sandbox.superfrete.com"/>
+            <field name="user_agent" placeholder="BHZ-Odoo/19 (suporte@bhzsistemas.com.br)"/>
+            <field name="default_services" placeholder="1,2,17"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="bhz_superfrete_conf_action" model="ir.actions.act_window">
+    <field name="name">SuperFrete • Configuração</field>
+    <field name="res_model">bhz.superfrete.config</field>
+    <field name="view_mode">form</field>
+    <field name="target">current</field>
+  </record>
+
+  <menuitem id="bhz_superfrete_root"
+            name="SuperFrete"
+            parent="sale.menu_sales_config"
+            sequence="50"/>
+
+  <menuitem id="bhz_superfrete_conf_menu"
+            name="Configuração"
+            parent="bhz_superfrete_root"
+            action="bhz_superfrete_conf_action"/>
+</odoo>

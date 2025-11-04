@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Odoo 19 (debug)",
+      "type": "python",
+      "request": "launch",
+      "module": "odoo",
+      "args": ["-c", "odoo.conf", "-d", "bhz_dev", "--log-level=debug", "--dev=all"],
+      "console": "integratedTerminal",
+      "justMyCode": false
+    }
+  ]
+}

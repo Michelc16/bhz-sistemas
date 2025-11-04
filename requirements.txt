@@ -1,0 +1,30 @@
+# Requisitos adicionais para o Projeto BHZ - Odoo 19
+# Estes pacotes são instalados automaticamente no Odoo.sh
+
+# Requisições HTTP (APIs: SuperFrete, ID Control, Mercado Livre, Magalu)
+requests>=2.31.0
+
+# Manipulação de JSON e validações (padrão Python, mas mantido para compat)
+simplejson>=3.19.2
+
+# Banco de dados PostgreSQL
+psycopg2-binary>=2.9.9
+
+# Geração de relatórios e PDFs
+reportlab>=4.1.0
+
+# Tratamento de imagens (QWeb, etiquetas, etc.)
+Pillow>=10.2.0
+
+# Utilitários Odoo / Python
+werkzeug>=3.0.3
+Babel>=2.15.0
+lxml>=5.2.1
+
+# Segurança e autenticação OAuth (Mercado Livre e Magalu)
+authlib>=1.3.0
+
+# Opções adicionais úteis para integrações e debug
+python-dotenv>=1.0.1
+pytz>=2024.1
+dateutils>=0.6.12
