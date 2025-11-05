@@ -1,0 +1,23 @@
+<odoo>
+  <record id="view_partner_form_inherit_bhz_role" model="ir.ui.view">
+    <field name="name">res.partner.form.bhz.role</field>
+    <field name="model">res.partner</field>
+    <field name="inherit_id" ref="base.view_partner_form"/>
+    <field name="arch" type="xml">      
+      <xpath expr="//field[@name='company_type']" position="replace">
+        <field name="company_type" invisible="1"/>
+      </xpath>
+
+      <!-- exibe o campo unificado -->
+      <xpath expr="//field[@name='category_id']" position="before">
+        <field name="business_role"/>
+      </xpath>
+
+      <!-- auxiliares invisíveis -->
+      <xpath expr="//sheet" position="inside">
+        <field name="is_transporter" invisible="1"/>
+        <field name="supplier_rank" invisible="1"/>
+      </xpath>
+    </field>
+  </record>
+</odoo>

@@ -1,0 +1,10 @@
+<odoo>
+  <record id="ir_cron_bhz_queue" model="ir.cron">
+    <field name="name">BHZ Queue Runner</field>
+    <field name="model_id" ref="model_bhz_queue_job"/>
+    <field name="state">code</field>
+    <field name="code">model.cron_run_pending()</field>
+    <field name="interval_number">1</field>
+    <field name="interval_type">minutes</field>
+  </record>
+</odoo>
