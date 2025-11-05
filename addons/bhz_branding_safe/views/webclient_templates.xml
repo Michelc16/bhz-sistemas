@@ -2,14 +2,18 @@
     <!-- Layout do webclient -->
     <template id="bhz_webclient_layout" inherit_id="web.webclient_bootstrap" name="BHZ Webclient Layout (Safe)">
         <!-- título da aba -->
-        <xpath expr="//title" position="replace">
-            <title>BHZ SISTEMAS</title>
+        <xpath expr="//head" position="inside">
+            <t t-jquery="title" t-operation="replace">
+                <title>BHZ SISTEMAS</title>
+            </t>
         </xpath>
 
         <!-- favicon customizado -->
         <xpath expr="//head" position="inside">
-            <link rel="icon" type="image/x-icon"
-                  t-att-href="'/bhz_branding_safe/static/src/img/favicon.ico'"/>
+            <t t-jquery="link[rel*='icon']" t-operation="replace">
+                <link rel="icon" type="image/x-icon"
+                      t-att-href="'/bhz_branding_safe/static/src/img/favicon.ico'"/>
+            </t>
         </xpath>
     </template>
 
