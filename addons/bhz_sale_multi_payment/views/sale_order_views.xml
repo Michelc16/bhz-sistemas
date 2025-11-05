@@ -3,17 +3,15 @@
         <field name="name">sale.order.form.bhz.multi.payment</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
-        <field name="arch" type="xml">
-            <!-- colocar depois do total ou na aba 'Other Info' -->
-            <xpath expr="//notebook" position="inside">
+        <field name="arch" type="xml">            
+            <xpath expr="//sheet/notebook" position="inside">
                 <page string="Pagamentos">
                     <group>
                         <field name="amount_payment_total" readonly="1"/>
-                        <div class="o_form_label">A soma deve ser igual ao Total do Pedido.</div>
+                        <label string="A soma deve ser igual ao Total do Pedido."/>
                     </group>
                     <field name="payment_line_ids">
-                        <tree editable="bottom">
-                            <field name="sequence" invisible="1"/>
+                        <tree editable="bottom">                            
                             <field name="journal_id"/>
                             <field name="amount"/>
                             <field name="payment_date"/>
