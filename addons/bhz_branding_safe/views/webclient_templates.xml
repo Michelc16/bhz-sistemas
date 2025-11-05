@@ -1,0 +1,25 @@
+<odoo>
+    <!-- Layout do webclient -->
+    <template id="bhz_webclient_layout" inherit_id="web.webclient_bootstrap" name="BHZ Webclient Layout (Safe)">
+        <!-- título da aba -->
+        <xpath expr="//t[@t-set='title']" position="replace">
+            <t t-set="title">BHZ SISTEMAS</t>
+        </xpath>
+
+        <!-- favicon (opcional, só funciona se o arquivo existir) -->
+        <xpath expr="//link[@rel='shortcut icon']" position="replace">
+            <link rel="shortcut icon" type="image/x-icon"
+                  t-att-href="('/bhz_branding_safe/static/src/img/favicon.ico')"/>
+        </xpath>
+    </template>
+
+    <!-- Branding no rodapé do backend -->
+    <template id="bhz_backend_branding" inherit_id="web.branding" name="BHZ + Odoo Branding">
+        <xpath expr="//div" position="replace">
+            <div class="o_bhz_branding_footer">
+                <span>Customizado por <strong>BHZ SISTEMAS</strong></span>
+                <span class="text-muted" style="margin-left:8px;">Powered by Odoo Enterprise</span>
+            </div>
+        </xpath>
+    </template>
+</odoo>

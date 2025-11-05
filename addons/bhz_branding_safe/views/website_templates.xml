@@ -1,0 +1,20 @@
+<odoo>
+    <!-- Footer do website: põe BHZ na frente e mantém crédito Odoo -->
+    <template id="bhz_website_footer" inherit_id="website.footer_custom" name="BHZ Website Footer (Safe)">
+        <xpath expr="." position="inside">
+            <div class="mt-2 small text-muted">
+                Sistema personalizado por <strong>BHZ SISTEMAS</strong> • Powered by Odoo
+            </div>
+        </xpath>
+    </template>
+
+    <!-- Login do portal/website com logo da BHZ -->
+    <template id="bhz_auth_signup_login" inherit_id="auth_signup.login" name="BHZ Login Logo (Safe)">
+        <xpath expr="//img[contains(@src, '/web/static/img/')]" position="replace">
+            <img src="/bhz_branding_safe/static/src/img/bhz_logo.png"
+                 alt="BHZ SISTEMAS"
+                 class="img img-fluid mb-3"
+                 style="max-height: 90px;"/>
+        </xpath>
+    </template>
+</odoo>
