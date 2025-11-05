@@ -6,12 +6,12 @@
         <field name="name">sale.order.payment.line.tree</field>
         <field name="model">sale.order.payment.line</field>
         <field name="arch" type="xml">
-            <tree editable="bottom">
+            <list editable="bottom">
                 <field name="journal_id"/>
                 <field name="amount"/>
                 <field name="payment_date"/>
                 <field name="note"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -42,13 +42,13 @@
                 <page string="Pagamentos">
                     <group>
                         <field name="amount_payment_total" readonly="1"/>
-                        <label string="A soma deve ser igual ao Total do Pedido."/>
+                        <div class="o_form_label">A soma deve ser igual ao Total do Pedido.</div>
                     </group>
                     <!-- aqui só declaramos o o2m e apontamos as views -->
                     <field name="payment_line_ids"
                            context="{'default_sale_id': active_id}"
-                           mode="tree,form">
-                        <tree ref="view_sale_order_payment_line_tree"/>
+                           mode="list,form">
+                        <list ref="view_sale_order_payment_line_tree"/>
                         <form ref="view_sale_order_payment_line_form"/>
                     </field>
                 </page>
