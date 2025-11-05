@@ -8,7 +8,7 @@
                 <page string="Pagamentos">
                     <group>
                         <field name="amount_payment_total" readonly="1"/>
-                        <label string="A soma deve ser igual ao Total do Pedido."/>
+                        <div class="o_form_label">A soma deve ser igual ao Total do Pedido.</div>
                     </group>
                     <field name="payment_line_ids">
                         <tree editable="bottom">                            
