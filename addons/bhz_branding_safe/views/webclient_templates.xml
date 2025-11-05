@@ -2,14 +2,14 @@
     <!-- Layout do webclient -->
     <template id="bhz_webclient_layout" inherit_id="web.webclient_bootstrap" name="BHZ Webclient Layout (Safe)">
         <!-- título da aba -->
-        <xpath expr="//t[@t-set='title']" position="replace">
-            <t t-set="title">BHZ SISTEMAS</t>
+        <xpath expr="//title" position="replace">
+            <title>BHZ SISTEMAS</title>
         </xpath>
 
-        <!-- favicon (opcional, só funciona se o arquivo existir) -->
-        <xpath expr="//link[@rel='shortcut icon']" position="replace">
-            <link rel="shortcut icon" type="image/x-icon"
-                  t-att-href="('/bhz_branding_safe/static/src/img/favicon.ico')"/>
+        <!-- favicon customizado -->
+        <xpath expr="//head" position="inside">
+            <link rel="icon" type="image/x-icon"
+                  t-att-href="'/bhz_branding_safe/static/src/img/favicon.ico'"/>
         </xpath>
     </template>
 
