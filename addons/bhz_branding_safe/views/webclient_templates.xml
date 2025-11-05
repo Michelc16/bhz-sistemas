@@ -1,16 +1,14 @@
 <odoo>
     <!-- Layout do webclient -->
     <template id="bhz_webclient_layout" inherit_id="web.webclient_bootstrap" name="BHZ Webclient Layout (Safe)">
-        <!-- título da aba -->
-        <xpath expr="//head" position="inside">
+        <xpath expr="//t[@t-call='web.layout']" position="inside">
+            <!-- título da aba -->
             <t t-jquery="title" t-operation="replace">
                 <title>BHZ SISTEMAS</title>
             </t>
-        </xpath>
-
-        <!-- favicon customizado -->
-        <xpath expr="//head" position="inside">
-            <t t-jquery="link[rel*='icon']" t-operation="replace">
+            <!-- favicon customizado -->
+            <t t-jquery="link[rel*='icon']" t-operation="delete"/>
+            <t t-jquery="head" t-operation="append">
                 <link rel="icon" type="image/x-icon"
                       t-att-href="'/bhz_branding_safe/static/src/img/favicon.ico'"/>
             </t>
