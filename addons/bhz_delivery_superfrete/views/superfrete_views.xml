@@ -1,4 +1,5 @@
 <odoo>
+  <!-- Formulário da configuração do SuperFrete -->
   <record id="bhz_superfrete_conf_form" model="ir.ui.view">
     <field name="name">bhz.superfrete.config.form</field>
     <field name="model">bhz.superfrete.config</field>
@@ -7,6 +8,8 @@
         <sheet>
           <group>
             <field name="name"/>
+            <!-- empresa da configuração -->
+            <field name="company_id" groups="base.group_multi_company"/>
             <field name="api_key" password="True"/>
             <field name="sandbox"/>
             <field name="base_url" placeholder="https://sandbox.superfrete.com"/>
@@ -18,18 +21,23 @@
     </field>
   </record>
 
+  <!-- Ação para abrir a configuração -->
   <record id="bhz_superfrete_conf_action" model="ir.actions.act_window">
     <field name="name">SuperFrete • Configuração</field>
     <field name="res_model">bhz.superfrete.config</field>
     <field name="view_mode">form</field>
+    <!-- contexto para já propor a empresa atual -->
+    <field name="context">{'default_company_id': company_id}</field>
     <field name="target">current</field>
   </record>
 
+  <!-- Menu raiz -->
   <menuitem id="bhz_superfrete_root"
             name="SuperFrete"
             parent="sale.menu_sales_config"
             sequence="50"/>
 
+  <!-- Menu da configuração -->
   <menuitem id="bhz_superfrete_conf_menu"
             name="Configuração"
             parent="bhz_superfrete_root"

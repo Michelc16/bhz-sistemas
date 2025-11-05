@@ -4,11 +4,15 @@
     <field name="model">delivery.carrier</field>
     <field name="inherit_id" ref="delivery.view_delivery_carrier_form"/>
     <field name="arch" type="xml">
+      <!-- mantemos a customização do delivery_type -->
       <xpath expr="//field[@name='delivery_type']" position="attributes">
         <attribute name="options">{'no_create': False}</attribute>
       </xpath>
+
       <xpath expr="//field[@name='delivery_type']" position="after">
+        <!-- filtra pela empresa do transportador -->
         <field name="superfrete_config_id"
+               domain="[('company_id', '=', company_id)]"
                invisible="delivery_type != 'superfrete'"
                required="delivery_type == 'superfrete'"/>
         <field name="superfrete_service"

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import logging
 import requests
 
@@ -12,6 +11,7 @@ class SuperFreteConfig(models.Model):
     _name = "bhz.superfrete.config"
     _description = "Config SuperFrete"
     _rec_name = "name"
+    _order = "company_id, name"
 
     name = fields.Char(default="Config SuperFrete", required=True)
     api_key = fields.Char("API Key", required=True)
@@ -30,11 +30,26 @@ class SuperFreteConfig(models.Model):
         help="String de serviços: ex. '1,2,17' (PAC, SEDEX, Mini Envios). Se vazio, usa '1,2'",
         default="1,2"
     )
+    # <- novo: empresa dona da configuração
+    company_id = fields.Many2one(
+        "res.company",
+        string="Empresa",
+        required=True,
+        default=lambda self: self.env.company,
+        index=True,
+    )
 
     @api.model
     def get_conf(self):
-        rec = self.search([], limit=1)
-        return rec or self.create({"name": "Config SuperFrete"})
+        """Retorna a config da empresa atual; se não existir, cria."""
+        company = self.env.company
+        rec = self.search([("company_id", "=", company.id)], limit=1)
+        if rec:
+            return rec
+        return self.create({
+            "name": "Config SuperFrete",
+            "company_id": company.id,
+        })
 
 
 class DeliveryCarrier(models.Model):
@@ -45,11 +60,14 @@ class DeliveryCarrier(models.Model):
         selection_add=[("superfrete", "SuperFrete")],
         ondelete={"superfrete": "set default"},
     )
+
     superfrete_config_id = fields.Many2one(
         "bhz.superfrete.config",
         string="Configuração SuperFrete",
         ondelete="set null",
+        domain="[('company_id', '=', company_id)]",
     )
+
     # serviço único quando gerar etiqueta
     superfrete_service = fields.Selection(
         selection=[
@@ -64,7 +82,15 @@ class DeliveryCarrier(models.Model):
 
     # ---------------- helpers de config/headers/urls ----------------
     def _sf_conf(self):
-        conf = (self.superfrete_config_id or self.env["bhz.superfrete.config"].get_conf())
+        """Sempre devolve a config da empresa do carrier."""
+        # empresa do método de entrega (cai na empresa atual se não tiver)
+        company = self.company_id or self.env.company
+
+        conf = self.superfrete_config_id
+        if not conf or conf.company_id != company:
+            # força usar o get_conf da empresa certa
+            conf = self.env["bhz.superfrete.config"].with_company(company).get_conf()
+
         if not conf.api_key:
             raise UserError(_("Configure a API Key do SuperFrete."))
         return conf
@@ -367,7 +393,6 @@ class DeliveryCarrier(models.Model):
             _logger.exception("Erro obtendo link de etiqueta no SuperFrete")
             return ""
 
-    # (Opcional) checkout (paga etiqueta com saldo)
     def action_superfrete_checkout(self, order_id):
         url = f"{self._sf_base()}/api/v0/checkout"
         res = requests.post(url, json={"id": order_id}, headers=self._sf_headers(), timeout=30)
