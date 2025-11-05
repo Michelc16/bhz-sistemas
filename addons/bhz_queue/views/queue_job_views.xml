@@ -1,0 +1,49 @@
+<odoo>
+  <record id="view_bhz_queue_job_tree" model="ir.ui.view">
+    <field name="name">bhz.queue.job.list</field>
+    <field name="model">bhz.queue.job</field>
+    <field name="arch" type="xml">
+      <list>
+        <field name="name"/>
+        <field name="state"/>
+        <field name="model"/>
+        <field name="method"/>
+        <field name="create_date"/>
+      </list>
+    </field>
+  </record>
+  <record id="view_bhz_queue_job_form" model="ir.ui.view">
+    <field name="name">bhz.queue.job.form</field>
+    <field name="model">bhz.queue.job</field>
+    <field name="arch" type="xml">
+      <form>
+        <sheet>
+          <group>
+            <field name="name"/>
+            <field name="state"/>
+            <field name="model"/>
+            <field name="method"/>
+            <field name="args_json" widget="text"/>
+            <field name="kwargs_json" widget="text"/>
+            <field name="last_error" widget="text"/>
+          </group>
+          <footer>
+            <button name="run_job"
+                    type="object"
+                    class="btn-primary"
+                    string="Run"
+                    invisible="state != 'error'"/>
+          </footer>
+        </sheet>
+      </form>
+    </field>
+  </record>
+  <record id="action_bhz_queue_jobs" model="ir.actions.act_window">
+    <field name="name">Queue Jobs</field>
+    <field name="res_model">bhz.queue.job</field>
+    <field name="view_mode">list,form</field>
+    <field name="view_id" ref="view_bhz_queue_job_tree"/>
+  </record>
+  <menuitem id="menu_bhz_queue_root" name="BHZ Queue" parent="base.menu_administration"/>
+  <menuitem id="menu_bhz_queue_jobs" name="Jobs" parent="menu_bhz_queue_root" action="action_bhz_queue_jobs"/>
+</odoo>
