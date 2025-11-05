@@ -6,12 +6,12 @@
         <field name="name">sale.order.payment.line.tree</field>
         <field name="model">sale.order.payment.line</field>
         <field name="arch" type="xml">
-            <list editable="bottom">
+            <tree editable="bottom">
                 <field name="journal_id"/>
                 <field name="amount"/>
                 <field name="payment_date"/>
                 <field name="note"/>
-            </list>
+            </tree>
         </field>
     </record>
 
@@ -37,18 +37,14 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <!-- coloca dentro do notebook principal -->
             <xpath expr="//sheet/notebook" position="inside">
                 <page string="Pagamentos">
                     <group>
                         <field name="amount_payment_total" readonly="1"/>
-                        <div class="o_form_label">A soma deve ser igual ao Total do Pedido.</div>
+                        <label string="A soma deve ser igual ao Total do Pedido."/>
                     </group>
-                    <!-- aqui só declaramos o o2m e apontamos as views -->
-                    <field name="payment_line_ids"
-                           context="{'default_sale_id': active_id}"
-                           mode="list,form">
-                        <list ref="view_sale_order_payment_line_tree"/>
+                    <field name="payment_line_ids" mode="tree,form">
+                        <tree ref="view_sale_order_payment_line_tree"/>
                         <form ref="view_sale_order_payment_line_form"/>
                     </field>
                 </page>
