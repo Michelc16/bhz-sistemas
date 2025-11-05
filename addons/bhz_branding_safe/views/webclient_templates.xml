@@ -16,12 +16,14 @@
     </template>
 
     <!-- Branding no rodapé do backend -->
-    <template id="bhz_backend_branding" inherit_id="web.branding" name="BHZ + Odoo Branding">
-        <xpath expr="//div" position="replace">
-            <div class="o_bhz_branding_footer">
-                <span>Customizado por <strong>BHZ SISTEMAS</strong></span>
-                <span class="text-muted" style="margin-left:8px;">Powered by Odoo Enterprise</span>
-            </div>
+    <template id="bhz_backend_branding" inherit_id="web.webclient_bootstrap" name="BHZ + Odoo Branding">
+        <xpath expr="//t[@t-call='web.layout']" position="inside">
+            <t t-jquery="body" t-operation="append">
+                <div class="o_bhz_branding_footer">
+                    <span>Customizado por <strong>BHZ SISTEMAS</strong></span>
+                    <span class="text-muted" style="margin-left:8px;">Powered by Odoo</span>
+                </div>
+            </t>
         </xpath>
     </template>
 </odoo>
