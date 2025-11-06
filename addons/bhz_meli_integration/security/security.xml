@@ -1,5 +1,5 @@
 <odoo>
-    <!-- Cada empresa só vê suas próprias contas Mercado Livre -->
+    <!-- Contas Mercado Livre por empresa -->
     <record id="meli_account_rule_company" model="ir.rule">
         <field name="name">Restrição multiempresa (Contas Mercado Livre)</field>
         <field name="model_id" ref="model_meli_account"/>
@@ -7,7 +7,7 @@
         <field name="groups" eval="[(4, ref('base.group_user'))]"/>
     </record>
 
-    <!-- Cada empresa só vê seus próprios pedidos Mercado Livre -->
+    <!-- Pedidos Mercado Livre por empresa -->
     <record id="meli_order_rule_company" model="ir.rule">
         <field name="name">Restrição multiempresa (Pedidos Mercado Livre)</field>
         <field name="model_id" ref="model_meli_order"/>
@@ -15,7 +15,7 @@
         <field name="groups" eval="[(4, ref('base.group_user'))]"/>
     </record>
 
-    <!-- Cada empresa só vê seus próprios produtos Mercado Livre -->
+    <!-- Produtos Mercado Livre por empresa -->
     <record id="meli_product_rule_company" model="ir.rule">
         <field name="name">Restrição multiempresa (Produtos Mercado Livre)</field>
         <field name="model_id" ref="model_meli_product"/>

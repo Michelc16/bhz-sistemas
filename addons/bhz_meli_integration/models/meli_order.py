@@ -1,3 +1,4 @@
+# bhz_meli_integration/models/meli_order.py
 import logging
 import requests
 from odoo import api, fields, models, _
@@ -10,9 +11,18 @@ class MeliOrder(models.Model):
     _name = "meli.order"
     _description = "Pedido Mercado Livre"
     _order = "date_created desc"
+    _check_company_auto = True
 
     name = fields.Char("Número ML", required=True, index=True)
     account_id = fields.Many2one("meli.account", string="Conta ML", required=True)
+    company_id = fields.Many2one(
+        "res.company",
+        string="Empresa",
+        related="account_id.company_id",
+        store=True,
+        readonly=True,
+    )
+
     buyer_name = fields.Char("Comprador")
     buyer_email = fields.Char("E-mail")
     date_created = fields.Datetime("Data do pedido")
@@ -75,7 +85,7 @@ class MeliOrder(models.Model):
         so_vals = {
             "partner_id": partner.id,
             "origin": f"Mercado Livre {meli_order.name}",
+            "company_id": meli_order.company_id.id if meli_order.company_id else False,
         }
         so = self.env["sale.order"].create(so_vals)
-        # aqui você pode mapear itens depois
         meli_order.sale_order_id = so.id
