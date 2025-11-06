@@ -6,16 +6,15 @@
     <field name="arch" type="xml">
       <form string="Configuração Magalu (BHZ)">
         <header>
-          <!-- botão que abre o OAuth do Magalu -->
+          <!-- botão para abrir o OAuth do Magalu -->
           <button name="action_get_authorization_url"
                   type="object"
                   string="Conectar Magalu"
                   class="btn-primary"/>
-          <!-- botão pra renovar token se já tiver -->
+          <!-- botão para renovar o token (deixamos sempre visível pra não usar attrs) -->
           <button name="action_refresh_token"
                   type="object"
-                  string="Renovar Token"
-                  attrs="{'invisible': [('refresh_token','=',False)]}"/>
+                  string="Renovar Token"/>
         </header>
         <sheet>
           <group>
