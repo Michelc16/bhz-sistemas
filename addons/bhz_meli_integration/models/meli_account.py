@@ -13,7 +13,7 @@ MELI_CLIENT_ID = "3010146478781244"
 MELI_CLIENT_SECRET = "nRamhrvhMZvrgS5XB4DQ2tr04oXz7Wrg"
 
 # Mesma URL que você cadastrou no Mercado Livre Developers
-REDIRECT_URI = "https://www.bhzsistemas.com.br/meli/auth/callback"
+REDIRECT_URI = "https://michelc16-bhz-sistemas.odoo.com/meli/auth/callback"
 # ===========================================================
 
 TOKEN_URL = "https://api.mercadolibre.com/oauth/token"
