@@ -1,0 +1,20 @@
+{
+    "name": "BHZ Magalu Connector",
+    "summary": "Integração BHZ Magalu plug and play (Odoo 19)",
+    "version": "19.0.1.0.0",
+    "author": "BHZ Sistemas",
+    "website": "https://bhzsistemas.com.br",
+    "category": "Sales",
+    "license": "LGPL-3",
+    "depends": ["base", "sale_management", "stock", "product", "contacts", "web"],
+    "data": [
+        "security/ir.model.access.csv",
+        "data/magalu_params.xml",
+        "data/magalu_cron.xml",
+        "views/magalu_config_views.xml",
+        "views/magalu_product_views.xml",
+        "views/magalu_order_views.xml",
+    ],
+    "application": True,
+    "installable": True,
+}
