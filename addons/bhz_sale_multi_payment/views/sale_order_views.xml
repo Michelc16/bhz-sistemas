@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
     <!-- 1) LIST da linha de pagamento -->
@@ -39,10 +40,9 @@
             <xpath expr="//sheet/notebook" position="inside">
                 <page string="Pagamentos">
                     <group>
+                        <!-- mostra o total dos pagamentos -->
                         <field name="amount_payment_total" readonly="1"/>
-                        <label string="A soma deve ser igual ao Total do Pedido."/>
                     </group>
-                    <!-- sem context com active_id -->
                     <field name="payment_line_ids" mode="list,form">
                         <list ref="view_sale_order_payment_line_list"/>
                         <form ref="view_sale_order_payment_line_form"/>
