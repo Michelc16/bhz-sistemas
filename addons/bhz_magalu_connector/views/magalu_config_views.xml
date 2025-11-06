@@ -5,6 +5,18 @@
     <field name="model">bhz.magalu.config</field>
     <field name="arch" type="xml">
       <form string="Configuração Magalu (BHZ)">
+        <header>
+          <!-- botão que abre o OAuth do Magalu -->
+          <button name="action_get_authorization_url"
+                  type="object"
+                  string="Conectar Magalu"
+                  class="btn-primary"/>
+          <!-- botão pra renovar token se já tiver -->
+          <button name="action_refresh_token"
+                  type="object"
+                  string="Renovar Token"
+                  attrs="{'invisible': [('refresh_token','=',False)]}"/>
+        </header>
         <sheet>
           <group>
             <field name="name" readonly="1"/>
@@ -20,15 +32,6 @@
             <field name="refresh_token" readonly="1"/>
             <field name="token_expires_at" readonly="1"/>
           </group>
-          <footer>
-            <button name="action_get_authorization_url"
-                    type="object"
-                    string="Conectar Magalu"
-                    class="btn btn-primary"/>
-            <button name="action_refresh_token"
-                    type="object"
-                    string="Renovar Token"/>
-          </footer>
         </sheet>
       </form>
     </field>
@@ -41,7 +44,7 @@
     <field name="view_mode">list,form</field>
   </record>
 
-  <!-- ROOT MENU (sem depender de vendas) -->
+  <!-- ROOT MENU -->
   <menuitem id="menu_bhz_magalu_root"
             name="Magalu"
             sequence="90"/>
