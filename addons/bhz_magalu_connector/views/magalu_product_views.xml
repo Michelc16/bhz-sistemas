@@ -1,5 +1,5 @@
 <odoo>
-  <!-- LIST VIEW (antes era "tree") -->
+  <!-- LIST VIEW -->
   <record id="view_bhz_magalu_product_list" model="ir.ui.view">
     <field name="name">bhz.magalu.product.list</field>
     <field name="model">bhz.magalu.product</field>
@@ -40,7 +40,7 @@
     </field>
   </record>
 
-  <!-- ACTION -->
+  <!-- ACTION (AQUI TAMBÉM) -->
   <record id="action_bhz_magalu_product" model="ir.actions.act_window">
     <field name="name">Produtos Magalu</field>
     <field name="res_model">bhz.magalu.product</field>
