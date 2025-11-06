@@ -1,0 +1,40 @@
+<odoo>
+  <record id="view_bhz_magalu_config_form" model="ir.ui.view">
+    <field name="name">bhz.magalu.config.form</field>
+    <field name="model">bhz.magalu.config</field>
+    <field name="arch" type="xml">
+      <form string="Configuração Magalu (BHZ)">
+        <sheet>
+          <group>
+            <field name="name" readonly="1"/>
+            <field name="environment" readonly="1"/>
+          </group>
+          <group string="Dados BHZ">
+            <field name="client_id_display" readonly="1"/>
+            <field name="redirect_uri_display" readonly="1"/>
+          </group>
+          <group string="Tokens">
+            <field name="access_token" readonly="1"/>
+            <field name="refresh_token" readonly="1"/>
+            <field name="token_expires_at" readonly="1"/>
+          </group>
+          <footer>
+            <button name="action_get_authorization_url" type="object" string="Conectar Magalu" class="btn-primary"/>
+            <button name="action_refresh_token" type="object" string="Renovar Token"/>
+          </footer>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_bhz_magalu_config" model="ir.actions.act_window">
+    <field name="name">Magalu</field>
+    <field name="res_model">bhz.magalu.config</field>
+    <field name="view_mode">tree,form</field>
+  </record>
+
+  <menuitem id="menu_bhz_magalu_root" name="Magalu" parent="sales_team.menu_sale_root" sequence="90"/>
+  <menuitem id="menu_bhz_magalu_config" name="Configuração"
+            parent="menu_bhz_magalu_root"
+            action="action_bhz_magalu_config"/>
+</odoo>
