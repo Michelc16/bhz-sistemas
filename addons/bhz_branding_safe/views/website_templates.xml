@@ -1,5 +1,5 @@
 <odoo>
-    <!-- Footer do website: põe BHZ na frente e mantém crédito Odoo -->
+    <!-- 1) Footer do website: põe BHZ na frente e mantém crédito Odoo -->
     <template id="bhz_website_footer" inherit_id="website.footer_custom" name="BHZ Website Footer (Safe)">
         <xpath expr="." position="inside">
             <div class="mt-2 small text-muted">
@@ -8,13 +8,15 @@
         </xpath>
     </template>
 
-    <!-- Login do portal/website com logo da BHZ -->
-    <template id="bhz_auth_signup_login" inherit_id="auth_signup.login" name="BHZ Login Logo (Safe)">
-        <xpath expr="//img[contains(@src, '/web/static/img/')]" position="replace">
-            <img src="/bhz_branding_safe/static/src/img/bhz_logo.png"
-                 alt="BHZ SISTEMAS"
-                 class="img img-fluid mb-3"
-                 style="max-height: 90px;"/>
+    <!-- 2) Login web (padrão do Odoo) com logo da BHZ -->
+    <template id="bhz_web_login" inherit_id="web.login" name="BHZ Web Login (Safe)">
+        <!-- antes do formulário de login, mostra a logo -->
+        <xpath expr="//div[contains(@class,'oe_login_form')]" position="before">
+            <div class="text-center mb-3">
+                <img src="/bhz_branding_safe/static/src/img/bhz_logo.png"
+                     alt="BHZ SISTEMAS"
+                     style="max-height: 90px;"/>
+            </div>
         </xpath>
     </template>
 </odoo>
