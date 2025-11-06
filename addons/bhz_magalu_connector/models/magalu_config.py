@@ -64,18 +64,19 @@ class BhzMagaluConfig(models.Model):
         """Botão 'Conectar Magalu'."""
         self.ensure_one()
         ICP = self.env["ir.config_parameter"].sudo()
-        client_id = ICP.get_param(CLIENT_ID_PARAM)
-        redirect_uri = ICP.get_param(REDIRECT_PARAM)
+        client_id = ICP.get_param("bhz_magalu.client_id")
+        redirect_uri = ICP.get_param("bhz_magalu.redirect_uri")
         if not client_id or not redirect_uri:
             raise UserError(_("Parâmetros BHZ Magalu não configurados (client_id/redirect)."))
-
-        # escopo que você liberou no CLI
+       
         scope = "apiin:all"
         authorize_url = (
-            "https://id.magalu.com/oauth/authorize"
-            f"?response_type=code&client_id={client_id}"
+            "https://id.magalu.com/login"
+            f"?client_id={client_id}"
             f"&redirect_uri={redirect_uri}"
             f"&scope={scope}"
+            f"&response_type=code"
+            f"&choose_tenants=true"
         )
         return {
             "type": "ir.actions.act_url",
