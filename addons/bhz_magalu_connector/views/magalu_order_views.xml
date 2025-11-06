@@ -30,7 +30,7 @@
     </field>
   </record>
 
-  <!-- ACTION -->
+  <!-- ACTION (TROCADO) -->
   <record id="action_bhz_magalu_order" model="ir.actions.act_window">
     <field name="name">Pedidos Magalu</field>
     <field name="res_model">bhz.magalu.order</field>
