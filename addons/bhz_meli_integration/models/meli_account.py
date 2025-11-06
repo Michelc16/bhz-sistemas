@@ -23,6 +23,7 @@ API_ME_URL = "https://api.mercadolibre.com/users/me"
 class MeliAccount(models.Model):
     _name = "meli.account"
     _description = "Conta Mercado Livre (BHZ)"
+    _check_company_auto = True 
 
     name = fields.Char("Nome da conta", required=True)
     company_id = fields.Many2one("res.company", string="Empresa", default=lambda self: self.env.company.id)

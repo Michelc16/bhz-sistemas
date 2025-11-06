@@ -1,4 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_meli_account,bhz.meli.account,model_meli_account,base.group_system,1,1,1,1
-access_meli_product,bhz.meli.product,model_meli_product,base.group_user,1,1,1,1
-access_meli_order,bhz.meli.order,model_meli_order,base.group_user,1,1,1,1
+access_meli_account_user,meli.account.user,model_meli_account,base.group_user,1,1,1,1
+access_meli_order_user,meli.order.user,model_meli_order,base.group_user,1,1,1,1
+access_meli_product_user,meli.product.user,model_meli_product,base.group_user,1,1,1,1
