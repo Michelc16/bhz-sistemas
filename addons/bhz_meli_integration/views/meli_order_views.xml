@@ -1,9 +1,9 @@
 <odoo>
-    <record id="view_meli_order_tree" model="ir.ui.view">
-        <field name="name">meli.order.tree</field>
+    <record id="view_meli_order_list" model="ir.ui.view">
+        <field name="name">meli.order.list</field>
         <field name="model">meli.order</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name"/>
                 <field name="account_id"/>
                 <field name="buyer_name"/>
@@ -11,7 +11,7 @@
                 <field name="total_amount"/>
                 <field name="status"/>
                 <field name="sale_order_id"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -42,6 +42,6 @@
     <record id="action_meli_order" model="ir.actions.act_window">
         <field name="name">Pedidos ML</field>
         <field name="res_model">meli.order</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 </odoo>
