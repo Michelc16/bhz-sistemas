@@ -11,7 +11,7 @@
     <!-- 2) Login web (padrão do Odoo) com logo da BHZ -->
     <template id="bhz_web_login" inherit_id="web.login" name="BHZ Web Login (Safe)">
         <!-- antes do formulário de login, mostra a logo -->
-        <xpath expr="//div[contains(@class,'oe_login_form')]" position="before">
+        <xpath expr="//div[contains(@class,'o_login_form')]" position="before">
             <div class="text-center mb-3">
                 <img src="/bhz_branding_safe/static/src/img/bhz_logo.png"
                      alt="BHZ SISTEMAS"
