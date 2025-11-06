@@ -1,22 +1,24 @@
 <odoo>
-  <record id="view_bhz_magalu_product_tree" model="ir.ui.view">
-    <field name="name">bhz.magalu.product.tree</field>
+  <!-- LIST VIEW (antes era "tree") -->
+  <record id="view_bhz_magalu_product_list" model="ir.ui.view">
+    <field name="name">bhz.magalu.product.list</field>
     <field name="model">bhz.magalu.product</field>
     <field name="arch" type="xml">
-      <tree>
+      <list>
         <field name="name"/>
         <field name="product_id"/>
         <field name="magalu_sku"/>
         <field name="config_id"/>
-      </tree>
+      </list>
     </field>
   </record>
 
+  <!-- FORM VIEW -->
   <record id="view_bhz_magalu_product_form" model="ir.ui.view">
     <field name="name">bhz.magalu.product.form</field>
     <field name="model">bhz.magalu.product</field>
     <field name="arch" type="xml">
-      <form>
+      <form string="Produto Magalu">
         <sheet>
           <group>
             <field name="name"/>
@@ -25,21 +27,29 @@
             <field name="config_id"/>
           </group>
           <footer>
-            <button name="action_push_to_magalu" type="object" string="Enviar Produto" class="btn-primary"/>
-            <button name="action_sync_stock" type="object" string="Atualizar Estoque"/>
+            <button name="action_push_to_magalu"
+                    type="object"
+                    string="Enviar Produto"
+                    class="btn-primary"/>
+            <button name="action_sync_stock"
+                    type="object"
+                    string="Atualizar Estoque"/>
           </footer>
         </sheet>
       </form>
     </field>
   </record>
 
+  <!-- ACTION -->
   <record id="action_bhz_magalu_product" model="ir.actions.act_window">
     <field name="name">Produtos Magalu</field>
     <field name="res_model">bhz.magalu.product</field>
-    <field name="view_mode">tree,form</field>
+    <field name="view_mode">list,form</field>
   </record>
 
-  <menuitem id="menu_bhz_magalu_product" name="Produtos"
+  <!-- MENU -->
+  <menuitem id="menu_bhz_magalu_product"
+            name="Produtos"
             parent="menu_bhz_magalu_root"
             action="action_bhz_magalu_product"
             sequence="95"/>
