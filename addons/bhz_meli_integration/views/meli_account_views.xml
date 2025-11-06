@@ -4,6 +4,12 @@
         <field name="model">meli.account</field>
         <field name="arch" type="xml">
             <form string="Conta Mercado Livre">
+                <header>
+                    <button name="action_open_authorize"
+                            string="Conectar Mercado Livre"
+                            type="object"
+                            class="btn-primary"/>
+                </header>
                 <sheet>
                     <group>
                         <field name="name"/>
@@ -16,13 +22,6 @@
                         <field name="access_token" readonly="1"/>
                         <field name="refresh_token" readonly="1"/>
                     </group>
-                    <footer>
-                        <button name="action_open_authorize"
-                                string="Conectar Mercado Livre"
-                                type="object"
-                                class="btn-primary"/>
-                        <button string="Fechar" special="cancel" class="btn-secondary"/>
-                    </footer>
                 </sheet>
             </form>
         </field>
