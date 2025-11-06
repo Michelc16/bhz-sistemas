@@ -1,6 +1,5 @@
 <odoo noupdate="1">
   <data>
-    <!-- coloque aqui os valores reais vindos do CLI -->
     <record id="bhz_magalu_param_client_id" model="ir.config_parameter">
       <field name="key">bhz_magalu.client_id</field>
       <field name="value">PASTE_YOUR_CLIENT_ID_HERE</field>
@@ -11,7 +10,6 @@
       <field name="value">PASTE_YOUR_CLIENT_SECRET_HERE</field>
     </record>
 
-    <!-- como você registrou os 2 redirects no Magalu, escolhi o sem www -->
     <record id="bhz_magalu_param_redirect" model="ir.config_parameter">
       <field name="key">bhz_magalu.redirect_uri</field>
       <field name="value">https://bhzsistemas.com.br/magalu/oauth/callback</field>

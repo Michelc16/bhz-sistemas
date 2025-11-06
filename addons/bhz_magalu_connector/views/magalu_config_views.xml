@@ -8,13 +8,14 @@
         <sheet>
           <group>
             <field name="name" readonly="1"/>
+            <field name="company_id"/>
             <field name="environment" readonly="1"/>
           </group>
-          <group string="Dados BHZ">
+          <group string="DADOS BHZ">
             <field name="client_id_display" readonly="1"/>
             <field name="redirect_uri_display" readonly="1"/>
           </group>
-          <group string="Tokens">
+          <group string="TOKENS">
             <field name="access_token" readonly="1"/>
             <field name="refresh_token" readonly="1"/>
             <field name="token_expires_at" readonly="1"/>
@@ -23,7 +24,7 @@
             <button name="action_get_authorization_url"
                     type="object"
                     string="Conectar Magalu"
-                    class="btn-primary"/>
+                    class="btn btn-primary"/>
             <button name="action_refresh_token"
                     type="object"
                     string="Renovar Token"/>
@@ -33,14 +34,14 @@
     </field>
   </record>
 
-  <!-- ACTION (AQUI QUE ESTAVA tree,form) -->
+  <!-- ACTION -->
   <record id="action_bhz_magalu_config" model="ir.actions.act_window">
     <field name="name">Configuração Magalu</field>
     <field name="res_model">bhz.magalu.config</field>
     <field name="view_mode">list,form</field>
   </record>
 
-  <!-- ROOT MENU -->
+  <!-- ROOT MENU (sem depender de vendas) -->
   <menuitem id="menu_bhz_magalu_root"
             name="Magalu"
             sequence="90"/>

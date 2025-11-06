@@ -6,7 +6,13 @@
     "website": "https://bhzsistemas.com.br",
     "category": "Sales",
     "license": "LGPL-3",
-    "depends": ["base", "sale_management", "stock", "product", "contacts", "web"],
+    "depends": [
+        "base",
+        "sale",
+        "stock",
+        "product",
+        "mail",
+    ],
     "data": [
         "security/ir.model.access.csv",
         "data/magalu_params.xml",

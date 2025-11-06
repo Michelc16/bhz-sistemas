@@ -4,10 +4,8 @@
     <field name="model_id" ref="model_bhz_magalu_order"/>
     <field name="state">code</field>
     <field name="code">model.cron_fetch_orders()</field>
-    <!-- roda a cada 15 minutos -->
     <field name="interval_type">minutes</field>
     <field name="interval_number">15</field>
-    <!-- próxima execução: agora -->
     <field name="active">True</field>
   </record>
 </odoo>
