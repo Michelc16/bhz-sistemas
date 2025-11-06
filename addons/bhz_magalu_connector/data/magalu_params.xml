@@ -2,12 +2,12 @@
   <data>
     <record id="bhz_magalu_param_client_id" model="ir.config_parameter">
       <field name="key">bhz_magalu.client_id</field>
-      <field name="value">PASTE_YOUR_CLIENT_ID_HERE</field>
+      <field name="value">W4pC52oRbcDRBPgFp9NoclkR_uHNL7uxxOOrBQOGCWA</field>
     </record>
 
     <record id="bhz_magalu_param_client_secret" model="ir.config_parameter">
       <field name="key">bhz_magalu.client_secret</field>
-      <field name="value">PASTE_YOUR_CLIENT_SECRET_HERE</field>
+      <field name="value">FCnycNsSICA7O2GgH7MZ7y_YGDpyak0lkYVuScVEglM</field>
     </record>
 
     <record id="bhz_magalu_param_redirect" model="ir.config_parameter">
