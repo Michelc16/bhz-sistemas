@@ -9,7 +9,8 @@
     "depends": ["base", "product", "sale", "contacts"],
     "data": [
         "security/security.xml"
-        "security/ir.model.access.csv",        
+        "security/ir.model.access.csv", 
+               
         "views/meli_account_views.xml",
         "views/meli_product_views.xml",
         "views/meli_order_views.xml",        
