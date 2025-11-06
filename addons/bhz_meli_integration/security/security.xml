@@ -1,4 +1,4 @@
-<odoo>  
+<odoo>
     <!-- Cada empresa só vê suas próprias contas Mercado Livre -->
     <record id="meli_account_rule_company" model="ir.rule">
         <field name="name">Restrição multiempresa (Contas Mercado Livre)</field>
@@ -22,5 +22,4 @@
         <field name="domain_force">[('company_id', 'in', company_ids)]</field>
         <field name="groups" eval="[(4, ref('base.group_user'))]"/>
     </record>
-
 </odoo>
