@@ -1,5 +1,6 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
+from urllib.parse import quote
 import datetime
 
 # nomes dos parâmetros globais
@@ -73,7 +74,7 @@ class BhzMagaluConfig(models.Model):
         authorize_url = (
             "https://id.magalu.com/login"
             f"?client_id={client_id}"
-            f"&redirect_uri={redirect_uri}"
+            f"&redirect_uri={redirect_encoded}"
             f"&scope={scope}"
             f"&response_type=code"
             f"&choose_tenants=true"
