@@ -17,15 +17,14 @@ odoo.define('bhz_branding_dom.backend', function (require) {
         }
         link.href = bhzFavicon;
 
-        // 3) tentar colocar logo na navbar (depende do tema, então é defensivo)
+        // 3) logo na navbar do backend
         const navbarBrand = document.querySelector('.o_main_navbar .o_navbar_brand, .o_main_navbar .o_menu_brand');
         if (navbarBrand) {
-            // esconde texto e coloca bg
             navbarBrand.style.backgroundImage = "url('/bhz_branding_dom/static/src/img/bhz_logo.png')";
             navbarBrand.style.backgroundRepeat = "no-repeat";
             navbarBrand.style.backgroundSize = "contain";
             navbarBrand.style.width = "170px";
-            navbarBrand.style.textIndent = "-9999px";
+            navbarBrand.style.textIndent = "-9999px";  // esconde texto
             navbarBrand.textContent = "BHZ SISTEMAS";
         }
     });
