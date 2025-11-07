@@ -62,37 +62,40 @@ class BhzMagaluConfig(models.Model):
         })
 
     def action_get_authorization_url(self):
-        """Botão 'Conectar Magalu'."""
         self.ensure_one()
         ICP = self.env["ir.config_parameter"].sudo()
-        client_id = ICP.get_param(CLIENT_ID_PARAM)
-        redirect_uri = ICP.get_param(REDIRECT_PARAM)
+        client_id = ICP.get_param("bhz_magalu.client_id")
+        redirect_uri = ICP.get_param("bhz_magalu.redirect_uri")
 
         if not client_id or not redirect_uri:
             raise UserError(_("Parâmetros BHZ Magalu não configurados (client_id/redirect)."))
 
-        # MUITO importante: o Magalu compara o redirect exatamente, então mandamos codificado
+        # mesmo redirect que está no IDP, mas codificado
         redirect_encoded = quote(redirect_uri, safe="")
 
-        # escopo que você cadastrou no client
+        # escopo que você criou no client
         scope = "apiin:all"
 
-        # endpoint correto do Magalu para pedir consentimento
-        authorize_url = (
+        # AUDIENCE: pega exatamente o que apareceu no teu `idm client list`
+        # você cadastrou dois, então vamos mandar os dois separados por espaço
+        audience_raw = "https://api.magalu.com https://services.magalu.com"
+        audience_encoded = quote(audience_raw, safe="")
+
+        url = (
             "https://id.magalu.com/login"
             f"?client_id={client_id}"
             f"&redirect_uri={redirect_encoded}"
             f"&scope={scope}"
             f"&response_type=code"
+            f"&audience={audience_encoded}"
             f"&choose_tenants=true"
         )
 
         return {
             "type": "ir.actions.act_url",
-            "url": authorize_url,
+            "url": url,
             "target": "self",
         }
-
     def action_refresh_token(self):
         self.ensure_one()
         self.env["bhz.magalu.api"].refresh_token(self)
