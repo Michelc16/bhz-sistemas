@@ -34,7 +34,7 @@ class BhzMagaluConfig(models.Model):
         default=lambda self: self.env.company,
     )
 
-    # só exibimos, não editamos
+    # exibimos o que veio do ir.config_parameter
     client_id_display = fields.Char(string="Client ID (BHZ)", compute="_compute_display_params", readonly=True)
     redirect_uri_display = fields.Char(string="Redirect URI", compute="_compute_display_params", readonly=True)
 
@@ -51,9 +51,10 @@ class BhzMagaluConfig(models.Model):
             rec.client_id_display = client_id
             rec.redirect_uri_display = redirect_uri
 
-    # grava tokens obtidos pelo controller
+    # helper pra salvar tokens vindo do callback
     def write_tokens(self, token_data):
         expires_in = token_data.get("expires_in", 3600)
+        # grava um pouco antes de expirar
         expire_dt = fields.Datetime.now() + datetime.timedelta(seconds=expires_in - 60)
         self.write({
             "access_token": token_data.get("access_token"),
@@ -62,26 +63,29 @@ class BhzMagaluConfig(models.Model):
         })
 
     def action_get_authorization_url(self):
+        """Botão 'Conectar Magalu' que monta a URL de login do ID Magalu."""
         self.ensure_one()
         ICP = self.env["ir.config_parameter"].sudo()
-        client_id = ICP.get_param("bhz_magalu.client_id")
-        redirect_uri = ICP.get_param("bhz_magalu.redirect_uri")
+        client_id = ICP.get_param(CLIENT_ID_PARAM)
+        redirect_uri = ICP.get_param(REDIRECT_PARAM)
 
         if not client_id or not redirect_uri:
             raise UserError(_("Parâmetros BHZ Magalu não configurados (client_id/redirect)."))
 
-        # mesmo redirect que está no IDP, mas codificado
+        # o Magalu compara o redirect exatamente; mandamos codificado
         redirect_encoded = quote(redirect_uri, safe="")
-
-        # escopo que você criou no client
         scope = "apiin:all"
 
-        # AUDIENCE: pega exatamente o que apareceu no teu `idm client list`
-        # você cadastrou dois, então vamos mandar os dois separados por espaço
+        # AUDIENCE: são os que apareceram quando você listou o client no CLI
         audience_raw = "https://api.magalu.com https://services.magalu.com"
         audience_encoded = quote(audience_raw, safe="")
 
-        url = (
+        # usamos state pra saber de qual config/odoo veio
+        base_url = ICP.get_param("web.base.url") or self.env["ir.config_parameter"].sudo().get_param("web.base.url")
+        state_raw = f"cfg:{self.id}|url:{base_url}"
+        state_encoded = quote(state_raw, safe="")
+
+        authorize_url = (
             "https://id.magalu.com/login"
             f"?client_id={client_id}"
             f"&redirect_uri={redirect_encoded}"
@@ -89,13 +93,18 @@ class BhzMagaluConfig(models.Model):
             f"&response_type=code"
             f"&audience={audience_encoded}"
             f"&choose_tenants=true"
+            f"&state={state_encoded}"
         )
 
         return {
             "type": "ir.actions.act_url",
-            "url": url,
+            "url": authorize_url,
             "target": "self",
         }
+
     def action_refresh_token(self):
+        """opcional: renovar token se já houver refresh salvo."""
         self.ensure_one()
-        self.env["bhz.magalu.api"].refresh_token(self)
+        # só chama se você tiver o models/bhz_magalu_api.py implementado
+        api = self.env["bhz.magalu.api"]
+        api.refresh_token(self)
