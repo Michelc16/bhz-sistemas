@@ -1,0 +1,37 @@
+<odoo>
+    <!-- 1) Muda o título da aba e o favicon -->
+    <template id="bhz_webclient_bootstrap" inherit_id="web.webclient_bootstrap" name="BHZ Webclient Bootstrap">
+        <!-- título -->
+        <xpath expr="//t[@t-set='title']" position="replace">
+            <t t-set="title">BHZ SISTEMAS</t>
+        </xpath>
+
+        <!-- favicon (só funciona se o arquivo existir na pasta) -->
+        <xpath expr="//link[@rel='shortcut icon']" position="replace">
+            <link rel="shortcut icon" type="image/x-icon"
+                  t-att-href="'/bhz_branding_official/static/src/img/favicon.ico'"/>
+        </xpath>
+    </template>
+
+    <!-- 2) Substitui mensagem de promoção do backend (web.brand_promotion_message) -->
+    <template id="bhz_backend_branding_message"
+              inherit_id="web.brand_promotion_message"
+              name="BHZ Backend Branding Message">
+        <xpath expr="." position="replace">
+            <div class="text-muted small">
+                Sistema personalizado por <strong>BHZ SISTEMAS</strong>
+            </div>
+        </xpath>
+    </template>
+
+    <!-- 3) Substitui bloco de promoção do backend (web.brand_promotion) -->
+    <template id="bhz_backend_branding"
+              inherit_id="web.brand_promotion"
+              name="BHZ Backend Branding">
+        <xpath expr="." position="replace">
+            <div class="text-muted small">
+                BHZ SISTEMAS
+            </div>
+        </xpath>
+    </template>
+</odoo>
