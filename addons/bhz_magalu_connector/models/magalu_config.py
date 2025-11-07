@@ -63,7 +63,6 @@ class BhzMagaluConfig(models.Model):
         })
 
     def action_get_authorization_url(self):
-        """Botão 'Conectar Magalu' que monta a URL de login do ID Magalu."""
         self.ensure_one()
         ICP = self.env["ir.config_parameter"].sudo()
         client_id = ICP.get_param(CLIENT_ID_PARAM)
@@ -72,18 +71,18 @@ class BhzMagaluConfig(models.Model):
         if not client_id or not redirect_uri:
             raise UserError(_("Parâmetros BHZ Magalu não configurados (client_id/redirect)."))
 
-        # o Magalu compara o redirect exatamente; mandamos codificado
         redirect_encoded = quote(redirect_uri, safe="")
         scope = "apiin:all"
 
-        # AUDIENCE: são os que apareceram quando você listou o client no CLI
         audience_raw = "https://api.magalu.com https://services.magalu.com"
         audience_encoded = quote(audience_raw, safe="")
 
-        # usamos state pra saber de qual config/odoo veio
         base_url = ICP.get_param("web.base.url") or self.env["ir.config_parameter"].sudo().get_param("web.base.url")
         state_raw = f"cfg:{self.id}|url:{base_url}"
         state_encoded = quote(state_raw, safe="")
+
+        # 👉 AQUI: força o tenant de organização
+        tenant_id = "39111185-d768-43f0-9ce9-ee5fcaa767e8"  # coloque aqui o UUID da org que criou o client
 
         authorize_url = (
             "https://id.magalu.com/login"
@@ -94,6 +93,7 @@ class BhzMagaluConfig(models.Model):
             f"&audience={audience_encoded}"
             f"&choose_tenants=true"
             f"&state={state_encoded}"
+            f"&tenant_id={tenant_id}"
         )
 
         return {
