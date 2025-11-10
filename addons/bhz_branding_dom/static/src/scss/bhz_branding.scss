@@ -1,0 +1,61 @@
+// BHZ global overrides
+// Ajuste as variáveis aqui conforme quiser
+
+// Exemplo: barra superior (neutralizar vermelho/azul padrão do Odoo.sh)
+.o_notification_manager .o_notification {
+  // manter; apenas exemplo
+}
+
+// Esconde promoções / placeholders de marca no website
+.o_brand_promotion,
+.website_brand_promotion,
+.placeholder_header_brand,
+.o_header_brand_logo,
+.header_brand_logo,
+.o_brand_promotion_message {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+// Remove (oculta) logo pequena da Odoo no canto (aplica ao web client)
+.o_main_navbar .o_app_brand,
+.o_main_navbar .o_brand {
+  display: none !important;
+}
+
+// Podemos inserir um título personalizado ao lado superior esquerdo
+.bhz-header-title {
+  display: inline-block;
+  color: #ffffff;
+  font-weight: 600;
+  margin-left: 10px;
+  font-size: 14px;
+  vertical-align: middle;
+}
+
+// Ajustes do tema - exemplo de cor do topbar
+.o_main_navbar {
+  background-color: #0b3b63 !important; /* azul escuro BHZ - ajuste */
+  border-bottom: 0 !important;
+}
+
+// Ajusta o breadcrumb / header background
+.o_main_content {
+  background-color: transparent !important;
+}
+
+// Ícones do app grid: opcional, deixa um contraste maior para dark
+.o_app_panel .o_app_icon {
+  box-shadow: none !important;
+  background-color: rgba(255,255,255,0.02) !important;
+}
+
+/* Força cor do botão principal para combinar */
+.btn-primary, .o_primary {
+  background-color: #1f6fb5 !important;
+  border-color: #1f6fb5 !important;
+}
+

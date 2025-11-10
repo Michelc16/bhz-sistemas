@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <!-- Adiciona nossos assets ao backend -->
+  <template id="assets_backend" name="bhz branding backend" inherit_id="web.assets_backend">
+    <xpath expr="." position="inside">
+      <!-- SCSS primeiro -->
+      <link rel="stylesheet/scss" href="/bhz_branding_dom/static/src/scss/bhz_branding.scss"/>
+      <!-- JS que força title / favicon etc -->
+      <script type="text/javascript" src="/bhz_branding_dom/static/src/js/bhz_branding.js"></script>
+    </xpath>
+  </template>
+
+  <!-- Adiciona também aos assets do frontend (website) -->
+  <template id="assets_frontend" name="bhz branding frontend" inherit_id="web.assets_frontend">
+    <xpath expr="." position="inside">
+      <link rel="stylesheet/scss" href="/bhz_branding_dom/static/src/scss/bhz_branding.scss"/>
+      <script type="text/javascript" src="/bhz_branding_dom/static/src/js/bhz_branding.js"></script>
+    </xpath>
+  </template>
+</odoo>
