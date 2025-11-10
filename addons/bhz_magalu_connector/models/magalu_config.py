@@ -1,4 +1,4 @@
-from odoo import models, fields, _
+from odoo import models, fields
 from odoo.exceptions import UserError
 from urllib.parse import quote
 import datetime
@@ -19,7 +19,7 @@ class BhzMagaluConfig(models.Model):
     access_token = fields.Char(readonly=True)
     refresh_token = fields.Char(readonly=True)
     token_expires_at = fields.Datetime(readonly=True)
-
+    
     def write_tokens(self, token_data):
         expires_in = token_data.get("expires_in", 3600)
         expire_dt = fields.Datetime.now() + datetime.timedelta(seconds=expires_in - 60)
@@ -28,7 +28,7 @@ class BhzMagaluConfig(models.Model):
             "refresh_token": token_data.get("refresh_token"),
             "token_expires_at": expire_dt,
         })
-
+   
     def action_get_authorization_url(self):
         self.ensure_one()
         ICP = self.env["ir.config_parameter"].sudo()
@@ -57,7 +57,7 @@ class BhzMagaluConfig(models.Model):
 
         base_url = ICP.get_param("web.base.url") or self.env["ir.config_parameter"].sudo().get_param("web.base.url")
         state_raw = f"cfg:{self.id}|url:{base_url}"
-        state_encoded = quote(state_raw, safe="")      
+        state_encoded = quote(state_raw, safe="")
 
         authorize_url = (
             "https://id.magalu.com/login"
@@ -75,3 +75,9 @@ class BhzMagaluConfig(models.Model):
             "url": authorize_url,
             "target": "self",
         }
+  
+    def action_refresh_token(self):
+        self.ensure_one()
+        api = self.env["bhz.magalu.api"]
+        api.refresh_token(self)
+        return True
