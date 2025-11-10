@@ -6,12 +6,10 @@
     <field name="arch" type="xml">
       <form string="Configuração Magalu (BHZ)">
         <header>
-          <!-- botão para abrir o OAuth do Magalu -->
           <button name="action_get_authorization_url"
                   type="object"
                   string="Conectar Magalu"
                   class="btn-primary"/>
-          <!-- botão para renovar o token (deixamos sempre visível pra não usar attrs) -->
           <button name="action_refresh_token"
                   type="object"
                   string="Renovar Token"/>
@@ -22,13 +20,13 @@
             <field name="company_id"/>
             <field name="environment" readonly="1"/>
           </group>
-          <group string="DADOS BHZ">
+          <group string="Dados BHZ">
             <field name="client_id_display" readonly="1"/>
             <field name="redirect_uri_display" readonly="1"/>
           </group>
-          <group string="TOKENS">
+          <group string="Tokens">
             <field name="access_token" readonly="1"/>
-            <field name="refresh_token" readonly="1"/>
+            <field name="refresh_token" readonly="1"/>            
             <field name="token_expires_at" readonly="1"/>
           </group>
         </sheet>
