@@ -7,7 +7,9 @@
     "website": "https://www.bhzsistemas.com.br",
     "license": "LGPL-3",
     "depends": ["web", "website"],
-    "data": [],
+    "data": [
+        "views/assets.xml",
+    ],
     "assets": {
         "web.assets_backend": [
             "bhz_branding_dom/static/src/scss/bhz_branding.scss",
