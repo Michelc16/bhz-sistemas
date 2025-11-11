@@ -1,5 +1,10 @@
 from odoo import http
-from odoo.addons.web.controllers.main import WebClient
+
+try:
+    # Odoo 16+ keeps WebClient in webclient module
+    from odoo.addons.web.controllers.webclient import WebClient
+except ImportError:  # pragma: no cover - fallback for older versions
+    from odoo.addons.web.controllers.main import WebClient
 
 class BHZWebClient(WebClient):
 
