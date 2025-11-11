@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_product_template_measurements_form" model="ir.ui.view">
+        <field name="name">product.template.measurements.form.bhz</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.view_product_template_form"/>
+        <field name="priority" eval="16"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/notebook" position="inside">
+                <page name="bhz_measurements" string="Medidas (Brasil)">
+                    <group>
+                        <group string="Dimensões (cm)">
+                            <field name="height_cm"/>
+                            <field name="length_cm"/>
+                            <field name="width_cm"/>
+                        </group>
+                        <group string="Conversão e Volume">
+                            <field name="length_m" readonly="1"/>
+                            <field name="height_m" readonly="1"/>
+                            <field name="width_m" readonly="1"/>
+                            <field name="volume_ml"/>
+                            <field name="volume" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="measurement_brl_display" readonly="1"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
