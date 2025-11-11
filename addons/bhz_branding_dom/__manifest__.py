@@ -7,9 +7,17 @@
     "website": "https://www.bhzsistemas.com.br",
     "license": "LGPL-3",
     "depends": ["web", "website"],
-    "data": [
-        "views/assets.xml",
-    ],
+    "data": [],
+    "assets": {
+        "web.assets_backend": [
+            "bhz_branding_dom/static/src/scss/bhz_branding.scss",
+            "bhz_branding_dom/static/src/js/bhz_branding.js",
+        ],
+        "web.assets_frontend": [
+            "bhz_branding_dom/static/src/scss/bhz_branding.scss",
+            "bhz_branding_dom/static/src/js/bhz_branding.js",
+        ],
+    },
     "installable": True,
     "application": False,
     "auto_install": False,
