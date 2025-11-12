@@ -4,8 +4,6 @@ import requests
 from odoo import _, models
 from odoo.exceptions import UserError
 
-from .magalu_config import EXPECTED_REDIRECT_URI
-
 _logger = logging.getLogger(__name__)
 
 MAGALU_TOKEN_URL = "https://id.magalu.com/oauth/token"
@@ -17,20 +15,7 @@ class BhzMagaluAPI(models.AbstractModel):
     _name = "bhz.magalu.api"
     _description = "Cliente API Magalu (BHZ)"
 
-    # ====== CONFIG ======
-    def _get_credentials(self, config_rec, require_secret=True):
-        client_id = (config_rec.client_id or "").strip()
-        client_secret = (config_rec.client_secret or "").strip()
-        redirect_uri = (config_rec.redirect_uri or "").strip()
-
-        if not client_id:
-            raise UserError(_("Configure o Client ID no formulário do Magalu."))
-        if redirect_uri != EXPECTED_REDIRECT_URI:
-            raise UserError(_("A Redirect URI deve ser exatamente %s.") % EXPECTED_REDIRECT_URI)
-        if require_secret and not client_secret:
-            raise UserError(_("Informe o Client Secret antes de concluir a autenticação."))
-        return client_id, client_secret, redirect_uri
-
+    # ====== HTTP helpers ======
     def _do_request(self, method, url, **kwargs):
         kwargs.setdefault("timeout", REQUEST_TIMEOUT)
         try:
@@ -40,7 +25,7 @@ class BhzMagaluAPI(models.AbstractModel):
             raise UserError(_("Erro de comunicação com a API Magalu: %s") % exc)
 
     def _format_response_error(self, resp):
-        content = resp.text.strip()
+        content = (resp.text or "").strip()
         if len(content) > 400:
             content = f"{content[:400]}..."
         return f"{resp.status_code} - {content or 'Sem corpo'}"
@@ -49,20 +34,22 @@ class BhzMagaluAPI(models.AbstractModel):
     def _request(self, config_rec, method, endpoint, **kwargs):
         """Executa requisição autenticada à API do Magalu."""
         if not config_rec.access_token:
-            raise UserError("Token Magalu não encontrado. Clique em Conectar Magalu.")
+            raise UserError(_("Token Magalu não encontrado. Clique em Conectar Magalu."))
+
         headers = kwargs.pop("headers", {})
-        headers.update({
-            "Authorization": f"Bearer {config_rec.access_token}",
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-        })
+        headers.update(
+            {
+                "Authorization": f"Bearer {config_rec.access_token}",
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            }
+        )
         url = f"{MAGALU_API_BASE}{endpoint}"
         _logger.info("Magalu %s %s", method, url)
 
         resp = self._do_request(method, url, headers=headers, **kwargs)
         if resp.status_code == 401:
-            # token expirado → tenta renovar
-            _logger.warning("Token expirado. Tentando renovar automaticamente.")
+            _logger.warning("Token Magalu expirado. Tentando renovar automaticamente.")
             self.refresh_token(config_rec)
             headers["Authorization"] = f"Bearer {config_rec.access_token}"
             resp = self._do_request(method, url, headers=headers, **kwargs)
@@ -77,7 +64,8 @@ class BhzMagaluAPI(models.AbstractModel):
     # ====== AUTH ======
     def exchange_code_for_token(self, config_rec, code):
         """Troca o authorization code pelo access_token/refresh_token."""
-        client_id, client_secret, redirect_uri = self._get_credentials(config_rec, require_secret=True)
+        client_id, client_secret = config_rec._get_client_credentials()
+        redirect_uri = config_rec._get_redirect_uri()
         data = {
             "grant_type": "authorization_code",
             "code": code,
@@ -91,19 +79,20 @@ class BhzMagaluAPI(models.AbstractModel):
 
     def refresh_token(self, config_rec):
         """Renova o access_token usando o refresh_token salvo."""
-        client_id, client_secret, _ = self._get_credentials(config_rec, require_secret=True)
         if not config_rec.refresh_token:
-            raise UserError("Sem refresh token salvo. Conecte novamente.")
+            raise UserError(_("Sem refresh token salvo. Conecte novamente."))
+        client_id, client_secret = config_rec._get_client_credentials()
         data = {
             "grant_type": "refresh_token",
             "refresh_token": config_rec.refresh_token,
             "client_id": client_id,
             "client_secret": client_secret,
         }
-        _logger.info("Renovando token Magalu...")
+        _logger.info("Renovando token Magalu (cfg %s)...", config_rec.id)
         token_data = self._post_token_payload(data, "refresh_token")
         config_rec.write_tokens(token_data)
-        _logger.info("Token Magalu renovado com sucesso.")
+        _logger.info("Token Magalu renovado (cfg %s).", config_rec.id)
+        return token_data
 
     def _post_token_payload(self, data, context):
         try:
@@ -120,7 +109,7 @@ class BhzMagaluAPI(models.AbstractModel):
         try:
             return resp.json()
         except ValueError:
-            _logger.error("ID Magalu retornou um payload não JSON em %s: %s", context, resp.text)
+            _logger.error("ID Magalu retornou payload não JSON (%s): %s", context, resp.text)
             raise UserError(_("Resposta inesperada do ID Magalu durante %s.") % context)
 
     # ====== PRODUTOS ======
