@@ -62,7 +62,7 @@ class BhzMagaluAPI(models.AbstractModel):
         return resp.json() if resp.text else {}
 
     # ====== AUTH ======
-    def exchange_code_for_token(self, config_rec, code):
+    def _exchange_code_for_token(self, config_rec, code):
         """Troca o authorization code pelo access_token/refresh_token."""
         client_id, client_secret = config_rec._get_client_credentials()
         redirect_uri = config_rec._get_redirect_uri()
@@ -76,6 +76,10 @@ class BhzMagaluAPI(models.AbstractModel):
         token_data = self._post_token_payload(data, "authorization_code")
         config_rec.write_tokens(token_data)
         return token_data
+
+    def exchange_code_for_token(self, config_rec, code):
+        """Compat wrapper for legacy callers."""
+        return self._exchange_code_for_token(config_rec, code)
 
     def refresh_token(self, config_rec):
         """Renova o access_token usando o refresh_token salvo."""
