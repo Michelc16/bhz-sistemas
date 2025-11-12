@@ -7,7 +7,7 @@
 
     <record id="bhz_magalu_param_client_secret" model="ir.config_parameter">
       <field name="key">bhz_magalu.client_secret</field>
-      <field name="value">wBI9y2hW604gkBpfxrTWoraU2UtVBC-BHWgVMn-XQE0</field>
+      <field name="value">SET_YOUR_MAGALU_CLIENT_SECRET_HERE</field>
     </record>
 
     <record id="bhz_magalu_param_redirect" model="ir.config_parameter">

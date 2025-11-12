@@ -1,3 +1,5 @@
+import json
+
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
@@ -35,7 +37,7 @@ class BhzMagaluOrder(models.Model):
                 "name": order_id,
                 "config_id": config.id,
                 "sale_id": sale.id,
-                "raw_json": o,
+                "raw_json": json.dumps(o, ensure_ascii=False),
             })
 
     def _get_or_create_partner(self, order_data, company_id):
