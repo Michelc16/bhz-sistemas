@@ -35,11 +35,11 @@ class MagaluOAuthController(http.Controller):
         except UserError as exc:
             message = exc.name or (exc.args and exc.args[0]) or "Configuração inválida."
             return f"Callback Magalu: {message}"
-        if state_base.rstrip("/") != expected_base.rstrip("/"):
+        if state_base != expected_base:
             return "Callback Magalu: state não corresponde a esta instância."
 
         try:
-            request.env["bhz.magalu.api"].sudo().exchange_code_for_token(config, code)
+            request.env["bhz.magalu.api"].sudo()._exchange_code_for_token(config, code)
         except UserError as exc:
             message = exc.name or (exc.args and exc.args[0]) or "Erro desconhecido."
             _logger.error("Falha ao finalizar OAuth Magalu (cfg %s): %s", cfg_id, message)
@@ -54,7 +54,7 @@ class MagaluOAuthController(http.Controller):
     def _parse_state(state):
         parts = dict(item.split(":", 1) for item in state.split("|") if ":" in item)
         cfg_id = parts.get("cfg")
-        base_url = parts.get("url")
+        base_url = (parts.get("url") or "").strip()
         if not cfg_id or not base_url:
             raise ValueError("State incompleto.")
-        return int(cfg_id), base_url
+        return int(cfg_id), base_url.rstrip("/")
