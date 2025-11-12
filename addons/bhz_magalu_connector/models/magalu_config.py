@@ -9,7 +9,7 @@ _logger = logging.getLogger(__name__)
 
 MAGALU_AUTHORIZE_BASE = "https://id.magalu.com/login"
 MAGALU_SCOPE = "openid apiin:all"
-EXPECTED_REDIRECT_URI = "https://michelc16-bhz-sistemas-bhz-payment-25328227.dev.odoo.com/magalu/oauth/callback"
+EXPECTED_REDIRECT_URI = "https://www.bhzsistemas.com.br/magalu/oauth/callback"
 DEFAULT_CLIENT_ID = "dZCVzEyLat_rtRfHvNAuulhBUZBlz_6Lj_NZghlU7Qw"
 
 CLIENT_ID_PARAM = "bhz_magalu.client_id"
