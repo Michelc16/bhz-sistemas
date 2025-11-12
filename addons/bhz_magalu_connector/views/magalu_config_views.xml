@@ -6,10 +6,10 @@
     <field name="arch" type="xml">
       <form string="Configuração Magalu (BHZ)">
         <header>
-          <button name="action_get_authorization_url"
+          <button name="action_connect_magalu"
                   type="object"
                   string="Conectar Magalu"
-                  class="btn-primary"/>
+                  class="oe_highlight"/>
           <button name="action_refresh_token"
                   type="object"
                   string="Renovar Token"/>
@@ -18,12 +18,6 @@
           <group>
             <field name="name" readonly="1"/>
             <field name="company_id"/>
-            <field name="environment" readonly="1"/>
-          </group>
-          <group string="Credenciais Magalu">
-            <field name="client_id"/>
-            <field name="client_secret" password="True"/>
-            <field name="redirect_uri"/>
           </group>
           <group string="Tokens">
             <field name="access_token" readonly="1"/>
