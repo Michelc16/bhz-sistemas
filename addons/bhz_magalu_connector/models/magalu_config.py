@@ -1,10 +1,18 @@
-from odoo import models, fields, _
-from odoo.exceptions import UserError
-from urllib.parse import quote
 import datetime
+import logging
+from urllib.parse import urlencode, quote
+
+from odoo import _, fields, models
+from odoo.exceptions import UserError
+
+_logger = logging.getLogger(__name__)
+
+MAGALU_AUTHORIZE_BASE = "https://id.magalu.com/login"
+MAGALU_SCOPE = "openid apiin:all"
+EXPECTED_REDIRECT_URI = "https://bhzsistemas.com.br/magalu/oauth/callback"
+DEFAULT_CLIENT_ID = "dZCVzEyLat_rtRfHvNAuulhBUZBlz_6Lj_NZghlU7Qw"
 
 CLIENT_ID_PARAM = "bhz_magalu.client_id"
-CLIENT_SECRET_PARAM = "bhz_magalu.client_secret"
 REDIRECT_PARAM = "bhz_magalu.redirect_uri"
 
 
@@ -26,99 +34,103 @@ class BhzMagaluConfig(models.Model):
         readonly=True,
     )
 
+    def _default_client_id(self):
+        return self.env["ir.config_parameter"].sudo().get_param(CLIENT_ID_PARAM) or DEFAULT_CLIENT_ID
+
+    def _default_redirect_uri(self):
+        return (
+            self.env["ir.config_parameter"].sudo().get_param(REDIRECT_PARAM)
+            or EXPECTED_REDIRECT_URI
+        )
+
     company_id = fields.Many2one(
         "res.company",
         string="Empresa",
         required=True,
         default=lambda self: self.env.company,
     )
-    
-    client_id_display = fields.Char(string="Client ID (BHZ)", compute="_compute_display_params", readonly=True)
-    redirect_uri_display = fields.Char(string="Redirect URI", compute="_compute_display_params", readonly=True)
-    
+
+    client_id = fields.Char(
+        string="Client ID",
+        required=True,
+        default=_default_client_id,
+        help="Identificador público fornecido pelo painel ID Magalu.",
+    )
+    client_secret = fields.Char(
+        string="Client Secret",
+        copy=False,
+        help="Segredo do aplicativo no ID Magalu (nunca compartilhe).",
+    )
+    redirect_uri = fields.Char(
+        string="Redirect URI",
+        required=True,
+        default=_default_redirect_uri,
+        help=f"Precisa ser exatamente {EXPECTED_REDIRECT_URI}.",
+    )
+
     access_token = fields.Char("Access Token", readonly=True)
-    refresh_token = fields.Char("Refresh Token", readonly=True)   
+    refresh_token = fields.Char("Refresh Token", readonly=True)
     token_expires_at = fields.Datetime("Token expira em", readonly=True)
-    
-    def _compute_display_params(self):
-        ICP = self.env["ir.config_parameter"].sudo()
-        client_id = ICP.get_param(CLIENT_ID_PARAM) or "PASTE_YOUR_CLIENT_ID_HERE"
-        redirect_uri = ICP.get_param(REDIRECT_PARAM) or "https://bhzsistemas.com.br/magalu/oauth/callback"
-        for rec in self:
-            rec.client_id_display = client_id
-            rec.redirect_uri_display = redirect_uri
-    
+
     def write_tokens(self, token_data):
-        expires_in = token_data.get("expires_in", 3600)        
-        expire_dt = fields.Datetime.now() + datetime.timedelta(seconds=expires_in - 60)
-        self.write({
+        expires_in = int(token_data.get("expires_in") or 0)
+        expires_margin = max(expires_in - 30, 0)
+        expire_dt = fields.Datetime.now() + datetime.timedelta(seconds=expires_margin)
+        refresh_token = token_data.get("refresh_token") or self.refresh_token
+        vals = {
             "access_token": token_data.get("access_token"),
-            "refresh_token": token_data.get("refresh_token"),
             "token_expires_at": expire_dt,
-        })
-    
+        }
+        if refresh_token:
+            vals["refresh_token"] = refresh_token
+        self.write(vals)
+
+    # === AUTH FLOW ===
+    def _get_base_url(self):
+        return self.env["ir.config_parameter"].sudo().get_param("web.base.url")
+
+    def _build_state_param(self):
+        base_url = self._get_base_url()
+        if not base_url:
+            raise UserError(_("Parâmetro 'web.base.url' não foi configurado."))
+        return f"cfg:{self.id}|url:{base_url}"
+
+    def _build_authorize_url(self):
+        self.ensure_one()
+        client_id = (self.client_id or "").strip()
+        redirect_uri = (self.redirect_uri or "").strip()
+
+        if not client_id:
+            raise UserError(_("Configure o Client ID antes de conectar ao Magalu."))
+        if redirect_uri != EXPECTED_REDIRECT_URI:
+            raise UserError(
+                _(
+                    "A Redirect URI precisa ser exatamente %(uri)s. Ajuste o campo antes de continuar.",
+                    uri=EXPECTED_REDIRECT_URI,
+                )
+            )
+
+        params = {
+            "client_id": client_id,
+            "response_type": "code",
+            "redirect_uri": redirect_uri,
+            "scope": MAGALU_SCOPE,
+            "choose_tenants": "true",
+            "state": self._build_state_param(),
+        }
+        url = f"{MAGALU_AUTHORIZE_BASE}?{urlencode(params, quote_via=quote, safe='')}"
+        _logger.debug("Magalu authorize URL (config %s): %s", self.id, url)
+        return url
+
     def action_get_authorization_url(self):
         self.ensure_one()
-        ICP = self.env["ir.config_parameter"].sudo()
-        client_id = ICP.get_param(CLIENT_ID_PARAM)
-        redirect_uri = ICP.get_param(REDIRECT_PARAM)
-
-        if not client_id or not redirect_uri:
-            raise UserError(_("Parâmetros BHZ Magalu não configurados (client_id/redirect)."))
-
-        redirect_encoded = quote(redirect_uri, safe="")
-        
-        scope = (
-            "openid "
-            "apiin:all "
-            "open:order-order-seller:read "
-            "open:order-delivery-seller:read "
-            "open:order-invoice-seller:read "
-            "open:portfolio-skus-seller:read "
-            "open:portfolio-stocks-seller:read "
-            "open:portfolio-stocks-seller:write "
-            "open:ticket-messages-seller:read "
-            "open:ticket-messages-seller:write "
-            "open:ticket-events-seller:read "
-            "open:ticket-events-seller:write "
-            "open:tickets-seller:read "
-            "services:questions-seller:read "
-            "services:questions-seller:write "
-            "services:conversations-seller:read "
-            "services:conversations-seller:write "
-            "open:sac-transaction-seller:read "
-            "open:trace:read "
-            "open:queue-history:read"
-        )
-        scope_encoded = quote(scope, safe="")
-
-        audience_raw = "https://api.magalu.com https://services.magalu.com"
-        audience_encoded = quote(audience_raw, safe="")
-        
-        base_url = ICP.get_param("web.base.url") or self.env["ir.config_parameter"].sudo().get_param("web.base.url")
-        state_raw = f"cfg:{self.id}|url:{base_url}"
-        state_encoded = quote(state_raw, safe="")
-        
-        tenant_id = "39111185-d768-43f0-9ce9-ee5fcaa767e8"
-
-        authorize_url = (
-            "https://id.magalu.com/login"
-            f"?client_id={client_id}"
-            f"&redirect_uri={redirect_encoded}"
-            f"&scope={scope_encoded}"
-            f"&response_type=code"
-            f"&audience={audience_encoded}"
-            f"&choose_tenants=true"
-            f"&state={state_encoded}"
-            f"&tenant_id={tenant_id}"
-        )
-
+        authorize_url = self._build_authorize_url()
         return {
             "type": "ir.actions.act_url",
             "url": authorize_url,
-            "target": "self",
+            "target": "new",
         }
-    
+
     def action_refresh_token(self):
         self.ensure_one()
         api = self.env["bhz.magalu.api"]

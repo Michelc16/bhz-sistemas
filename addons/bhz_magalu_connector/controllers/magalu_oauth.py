@@ -1,6 +1,10 @@
-import requests
+import logging
+
 from odoo import http
+from odoo.exceptions import UserError
 from odoo.http import request
+
+_logger = logging.getLogger(__name__)
 
 
 class MagaluOAuthController(http.Controller):
@@ -32,6 +36,7 @@ class MagaluOAuthController(http.Controller):
 
         # manda o usuário pro Odoo do cliente terminar a troca
         redirect_url = f"{target_url}/magalu/oauth/finish?code={code}&config_id={cfg_id}"
+        _logger.debug("Redirecting Magalu OAuth callback to %s", redirect_url)
         return request.redirect(redirect_url)
 
 
@@ -46,38 +51,23 @@ class MagaluOAuthFinishController(http.Controller):
         if not code or not config_id:
             return "Faltando parâmetros: code ou config_id."
 
-        config = request.env['bhz.magalu.config'].sudo().browse(int(config_id))
+        try:
+            cfg_id_int = int(config_id)
+        except (TypeError, ValueError):
+            return "Config ID inválido."
+
+        config = request.env['bhz.magalu.config'].sudo().browse(cfg_id_int)
         if not config.exists():
             return "Configuração Magalu não encontrada."
 
-        ICP = request.env["ir.config_parameter"].sudo()
-        client_id = ICP.get_param("bhz_magalu.client_id")
-        client_secret = ICP.get_param("bhz_magalu.client_secret")
-        redirect_uri = ICP.get_param("bhz_magalu.redirect_uri")
-
-        if not all([client_id, client_secret, redirect_uri]):
-            return "Parâmetros Magalu incompletos (client_id, client_secret ou redirect_uri)."
-
-        token_url = "https://id.magalu.com/oauth/token"
-        data = {
-            "grant_type": "authorization_code",
-            "code": code,
-            "redirect_uri": redirect_uri,
-            "client_id": client_id,
-            "client_secret": client_secret,
-        }
-
         try:
-            resp = requests.post(token_url, data=data, timeout=30)
-        except Exception as e:
-            return f"Erro ao conectar no Magalu: {str(e)}"
-
-        if resp.status_code != 200:
-            return f"Erro do Magalu ({resp.status_code}): {resp.text}"
-
-        token_data = resp.json()
-        # usa o helper do modelo pra gravar expiração como datetime
-        config.sudo().write_tokens(token_data)
+            request.env['bhz.magalu.api'].sudo().exchange_code_for_token(config, code)
+        except UserError as exc:
+            _logger.error("Falha ao finalizar OAuth Magalu: %s", exc.name or exc.args[0])
+            return f"Erro ao finalizar OAuth Magalu: {exc.name or exc.args[0]}"
+        except Exception as exc:  # pragma: no cover - proteção extra
+            _logger.exception("Erro inesperado ao finalizar OAuth Magalu")
+            return f"Erro inesperado ao finalizar OAuth Magalu: {str(exc)}"
 
         # volta pro formulário de configuração
         return request.redirect(f"/web#id={config.id}&model=bhz.magalu.config&view_type=form")
