@@ -7,7 +7,7 @@ from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
-MAGALU_AUTHORIZE_URL = "https://id.magalu.com/account/select"
+MAGALU_AUTHORIZE_URL = "https://id.magalu.com/login"
 MAGALU_SCOPES = [
     "open:portfolio-skus-seller:read",
     "open:portfolio-skus-seller:write",
@@ -135,7 +135,7 @@ class BhzMagaluConfig(models.Model):
             "choose_tenants": "true",
             "state": self._build_state_param(),
         }
-        authorize_url = f"{MAGALU_AUTHORIZE_URL}?{urlencode(params, quote_via=quote, safe=':/')}"
+        authorize_url = f"{MAGALU_AUTHORIZE_URL}?{urlencode(params, quote_via=quote, safe='')}"
         _logger.info("Magalu OAuth authorize URL: %s", authorize_url)
         return {
             "type": "ir.actions.act_url",
