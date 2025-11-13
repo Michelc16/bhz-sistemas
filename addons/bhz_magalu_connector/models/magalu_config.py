@@ -28,7 +28,7 @@ MAGALU_SCOPES = [
     "services:conversations-seller:read",
     "services:conversations-seller:write",
 ]
-MAGALU_SCOPE = " ".join(["openid"] + MAGALU_SCOPES)
+EXTRA_SCOPES_PARAM = "bhz_magalu.extra_scopes"
 CLIENT_ID_PARAM = "bhz_magalu.client_id"
 CLIENT_SECRET_PARAM = "bhz_magalu.client_secret"
 ALLOWED_REDIRECT_URIS = {
@@ -95,6 +95,14 @@ class BhzMagaluConfig(models.Model):
             )
         return redirect_uri
 
+    def _get_scope_string(self):
+        base_scopes = MAGALU_SCOPES[:]
+        extras = (self._get_system_param(EXTRA_SCOPES_PARAM) or "").split()
+        for scope in extras:
+            if scope not in base_scopes:
+                base_scopes.append(scope)
+        return " ".join(["openid"] + base_scopes)
+
     def _build_state_param(self):
         if not self.id:
             raise UserError(_("Salve o registro antes de iniciar a conexão."))
@@ -118,16 +126,17 @@ class BhzMagaluConfig(models.Model):
         self.ensure_one()
         client_id, _ = self._get_client_credentials()
         redirect_uri = self._get_redirect_uri()
+        scope = self._get_scope_string()
         params = {
             "client_id": client_id,
             "response_type": "code",
             "redirect_uri": redirect_uri,
-            "scope": MAGALU_SCOPE,
+            "scope": scope,
             "choose_tenants": "true",
             "state": self._build_state_param(),
         }
         authorize_url = f"{MAGALU_AUTHORIZE_URL}?{urlencode(params, quote_via=quote, safe=':/')}"
-        _logger.info("Magalu OAuth authorize URL (cfg %s): %s", self.id, authorize_url)
+        _logger.info("Magalu OAuth authorize URL: %s", authorize_url)
         return {
             "type": "ir.actions.act_url",
             "url": authorize_url,
