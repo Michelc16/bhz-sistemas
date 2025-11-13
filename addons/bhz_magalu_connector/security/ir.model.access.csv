@@ -1,4 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_bhz_magalu_config,bhz.magalu.config,model_bhz_magalu_config,base.group_system,1,1,1,1
-access_bhz_magalu_product,bhz.magalu.product,model_bhz_magalu_product,base.group_user,1,1,1,1
-access_bhz_magalu_order,bhz.magalu.order,model_bhz_magalu_order,base.group_user,1,1,1,1
