@@ -6,8 +6,8 @@
     <!-- ID correto da view de Settings no Odoo 19 -->
     <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
     <field name="arch" type="xml">
-      <!-- Insere dentro do bloco de integrações (Odoo 19 usa data-key) -->
-      <xpath expr="//div[@data-key='integration']" position="inside">
+      <!-- Insere dentro do container principal de settings -->
+      <xpath expr="//div[contains(@class, 'o_setting_container')]" position="inside">
         <div class="col-12 col-lg-6 o_setting_box" id="bhz_wa_settings">
           <div class="o_setting_left_pane">
             <field name="bhz_wa_public_base"/>
