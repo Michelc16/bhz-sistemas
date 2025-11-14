@@ -30,9 +30,14 @@
                 <field name="business_phone_number_id"/>
                 <field name="business_token" password="True"/>
                 <field name="business_verify_token"/>
-                <label string="Webhook URL"/>
+
+                <label class="o_form_label">URL do Webhook</label>
                 <div>
-                  <p>Use: <span t-esc="ir.config_parameter('bhz_wa.public_base')"/>/bhz_wa/business/webhook</p>
+                  <p>
+                    Use a URL pública do seu Odoo (configurada em
+                    <em>Configurações &gt; BHZ WhatsApp</em>) seguida de:
+                    <code>/bhz_wa/business/webhook</code>
+                  </p>
                 </div>
               </group>
             </page>
