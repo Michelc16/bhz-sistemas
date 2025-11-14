@@ -1,8 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
   <menuitem id="menu_bhz_wa_root" name="BHZ WhatsApp" sequence="10"/>
-  <menuitem id="menu_bhz_wa_account" name="Conta" parent="menu_bhz_wa_root" action="action_bhz_wa_account"/>
-  <menuitem id="menu_bhz_wa_session" name="Sessões (Starter)" parent="menu_bhz_wa_root" action="action_bhz_wa_session"/>
-  <menuitem id="menu_bhz_wa_messages" name="Mensagens (Inbox)" parent="menu_bhz_wa_root" action="action_bhz_wa_message"/>
-  <menuitem id="menu_bhz_wa_templates" name="Templates (Business)" parent="menu_bhz_wa_root" action="action_bhz_wa_template"/>
+
+  <menuitem id="menu_bhz_wa_account"
+            name="Conta"
+            parent="menu_bhz_wa_root"
+            action="action_bhz_wa_account"/>
+
+  <menuitem id="menu_bhz_wa_session"
+            name="Sessões (Starter)"
+            parent="menu_bhz_wa_root"
+            action="action_bhz_wa_session"/>
+
+  <menuitem id="menu_bhz_wa_messages"
+            name="Mensagens (Inbox)"
+            parent="menu_bhz_wa_root"
+            action="action_bhz_wa_message"/>
+
+  <menuitem id="menu_bhz_wa_templates"
+            name="Templates (Business)"
+            parent="menu_bhz_wa_root"
+            action="action_bhz_wa_template"/>
 </odoo>

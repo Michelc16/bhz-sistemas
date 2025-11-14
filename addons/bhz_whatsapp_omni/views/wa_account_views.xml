@@ -57,7 +57,6 @@
     </field>
   </record>
 
-  <!-- LIST ao invés de TREE -->
   <record id="view_bhz_wa_account_list" model="ir.ui.view">
     <field name="name">bhz.wa.account.list</field>
     <field name="model">bhz.wa.account</field>

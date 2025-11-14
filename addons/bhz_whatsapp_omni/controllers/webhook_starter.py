@@ -4,19 +4,26 @@ import logging
 
 _logger = logging.getLogger(__name__)
 
+
 class BHZWAStarterInbound(http.Controller):
 
     @http.route('/bhz_wa/starter/inbound', type='json', auth='public', csrf=False)
     def inbound(self, **payload):
         """
-        Espera: { session_id, from, jid, body, ts, signature? }
+        Payload esperado do serviço Starter (Node/Baileys):
+        {
+          "session_id": "default",
+          "from": "5531999999999",
+          "jid": "5531999999999@s.whatsapp.net",
+          "body": "texto da mensagem",
+          "ts": 1690000000,
+          "signature": "opcional"
+        }
         """
         try:
             acc = request.env['bhz.wa.account'].sudo().search([('mode', '=', 'starter')], limit=1)
             if not acc:
                 return {"ok": False, "error": "no_starter_account"}
-
-            # TODO: validar assinatura HMAC se usar webhook_secret
 
             session = request.env['bhz.wa.session'].sudo().search([
                 ('session_id', '=', payload.get('session_id'))
@@ -24,7 +31,7 @@ class BHZWAStarterInbound(http.Controller):
             if not session:
                 session = request.env['bhz.wa.session'].sudo().create({
                     "name": f"Auto-{payload.get('session_id')}",
-                    "session_id": payload.get('session_id'),
+                    "session_id": payload.get('session_id') or "default",
                     "external_base_url": acc.starter_base_url,
                     "account_id": acc.id,
                 })
@@ -50,7 +57,6 @@ class BHZWAStarterInbound(http.Controller):
 
             acc.with_context(bypass_limits=True).try_ai_autoreply(msg)
             return {"ok": True}
-
         except Exception as e:
             _logger.exception("Starter inbound error: %s", e)
             return {"ok": False, "error": str(e)}
