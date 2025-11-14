@@ -11,7 +11,7 @@
         "security/security.xml",
         "security/ir.model.access.csv",
         "data/mail_activity_type.xml",
-        "data/ir_cron.xml"        
+        "data/ir_cron.xml",      
         "views/wa_account_views.xml",
         "views/wa_session_views.xml",
         "views/wa_message_views.xml",
