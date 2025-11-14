@@ -25,13 +25,15 @@
                 <field name="webhook_secret"/>
               </group>
             </page>
+
             <page string="Business (Cloud API)">
               <group>
                 <field name="business_phone_number_id"/>
                 <field name="business_token" password="True"/>
                 <field name="business_verify_token"/>
 
-                <label class="o_form_label">URL do Webhook</label>
+                <separator string="URL do Webhook" colspan="2"/>
+
                 <div>
                   <p>
                     Use a URL pública do seu Odoo (configurada em
@@ -41,6 +43,7 @@
                 </div>
               </group>
             </page>
+
             <page string="IA Atendente">
               <group>
                 <field name="ai_enabled"/>
