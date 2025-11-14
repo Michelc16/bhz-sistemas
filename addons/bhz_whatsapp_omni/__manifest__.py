@@ -11,13 +11,13 @@
         "security/security.xml",
         "security/ir.model.access.csv",
         "data/mail_activity_type.xml",
-        "data/ir_cron.xml",
-        "views/wa_menus.xml",
+        "data/ir_cron.xml"        
         "views/wa_account_views.xml",
         "views/wa_session_views.xml",
         "views/wa_message_views.xml",
         "views/wa_template_views.xml",
         "views/res_config_views.xml",
-    ],
+        "views/menu_views.xml",
+        ],
     "installable": True,
 }
