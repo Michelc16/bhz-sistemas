@@ -2,6 +2,5 @@
 <odoo>
   <record id="group_bhz_wa_manager" model="res.groups">
     <field name="name">BHZ WhatsApp Manager</field>
-    <field name="category_id" ref="base.module_category_tools"/>
   </record>
 </odoo>
