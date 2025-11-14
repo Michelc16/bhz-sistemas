@@ -57,20 +57,21 @@
     </field>
   </record>
 
-  <record id="view_bhz_wa_account_tree" model="ir.ui.view">
-    <field name="name">bhz.wa.account.tree</field>
+  <!-- LIST ao invés de TREE -->
+  <record id="view_bhz_wa_account_list" model="ir.ui.view">
+    <field name="name">bhz.wa.account.list</field>
     <field name="model">bhz.wa.account</field>
     <field name="arch" type="xml">
-      <tree>
+      <list>
         <field name="name"/>
         <field name="mode"/>
-      </tree>
+      </list>
     </field>
   </record>
 
   <record id="action_bhz_wa_account" model="ir.actions.act_window">
     <field name="name">Contas WhatsApp</field>
     <field name="res_model">bhz.wa.account</field>
-    <field name="view_mode">tree,form</field>
+    <field name="view_mode">list,form</field>
   </record>
 </odoo>

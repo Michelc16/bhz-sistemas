@@ -21,22 +21,22 @@
     </field>
   </record>
 
-  <record id="view_bhz_wa_template_tree" model="ir.ui.view">
-    <field name="name">bhz.wa.template.tree</field>
+  <record id="view_bhz_wa_template_list" model="ir.ui.view">
+    <field name="name">bhz.wa.template.list</field>
     <field name="model">bhz.wa.template</field>
     <field name="arch" type="xml">
-      <tree>
+      <list>
         <field name="name"/>
         <field name="language"/>
         <field name="category"/>
         <field name="status"/>
-      </tree>
+      </list>
     </field>
   </record>
 
   <record id="action_bhz_wa_template" model="ir.actions.act_window">
     <field name="name">Templates (Business)</field>
     <field name="res_model">bhz.wa.template</field>
-    <field name="view_mode">tree,form</field>
+    <field name="view_mode">list,form</field>
   </record>
 </odoo>
