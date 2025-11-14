@@ -3,23 +3,30 @@
   <record id="res_config_bhz_wa" model="ir.ui.view">
     <field name="name">res.config.settings.view.form.bhz.wa</field>
     <field name="model">res.config.settings</field>
+    <!-- View pai correta no Odoo 19 -->
     <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
     <field name="arch" type="xml">
-      <div name="integration" position="inside">
-        <div class="col-12 col-lg-6 o_setting_box" id="bhz_wa_settings">
-          <div class="o_setting_left_pane">
-            <field name="bhz_wa_public_base"/>
-          </div>
-          <div class="o_setting_right_pane">
-            <label for="bhz_wa_public_base">URL pública BHZ WhatsApp</label>
-            <div class="text-muted">
-              Exemplo: <code>https://seu-dominio.odoo.com</code>.  
-              Será usada para montar o webhook:
-              <code>/bhz_wa/business/webhook</code>.
+      <!-- Insere dentro do container principal de settings -->
+      <xpath expr="//div[hasclass('settings')]" position="inside">
+        <div class="app_settings_block" string="BHZ WhatsApp" data-string="BHZ WhatsApp">
+          <h2>BHZ WhatsApp</h2>
+          <div class="row mt16 o_settings_container">
+            <div class="col-12 col-lg-6 o_setting_box" id="bhz_wa_settings">
+              <div class="o_setting_left_pane">
+                <field name="bhz_wa_public_base"/>
+              </div>
+              <div class="o_setting_right_pane">
+                <label for="bhz_wa_public_base">URL pública BHZ WhatsApp</label>
+                <div class="text-muted">
+                  Exemplo: <code>https://seu-dominio.odoo.com</code>.<br/>
+                  Essa URL será usada para montar o webhook:
+                  <code>/bhz_wa/business/webhook</code>.
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </xpath>
     </field>
   </record>
 </odoo>
