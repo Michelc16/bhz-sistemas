@@ -6,18 +6,20 @@
     <!-- ID correto da view de Settings no Odoo 19 -->
     <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
     <field name="arch" type="xml">
-      <!-- Insere dentro do container principal de settings -->
-      <xpath expr="//div[contains(@class, 'o_settings_container')]" position="inside">
-        <div class="col-12 col-lg-6 o_setting_box" id="bhz_wa_settings">
-          <div class="o_setting_left_pane">
-            <field name="bhz_wa_public_base"/>
-          </div>
-          <div class="o_setting_right_pane">
-            <label for="bhz_wa_public_base" string="URL pública BHZ WhatsApp"/>
-            <div class="text-muted">
-              Exemplo: <code>https://seu-dominio.odoo.com</code>. 
-              Será usada para montar o webhook:
-              <code>/bhz_wa/business/webhook</code>.
+      <!-- Adiciona bloco customizado ao formulário (dentro de sheet para evitar falhas em upgrades do core) -->
+      <xpath expr="//sheet" position="inside">
+        <div class="o_settings_container">
+          <div class="col-12 col-lg-6 o_setting_box" id="bhz_wa_settings">
+            <div class="o_setting_left_pane">
+              <field name="bhz_wa_public_base"/>
+            </div>
+            <div class="o_setting_right_pane">
+              <label for="bhz_wa_public_base" string="URL pública BHZ WhatsApp"/>
+              <div class="text-muted">
+                Exemplo: <code>https://seu-dominio.odoo.com</code>. 
+                Será usada para montar o webhook:
+                <code>/bhz_wa/business/webhook</code>.
+              </div>
             </div>
           </div>
         </div>
