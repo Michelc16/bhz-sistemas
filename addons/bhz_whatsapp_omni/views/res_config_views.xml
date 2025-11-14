@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <record id="res_config_bhz_wa" model="ir.ui.view">
+    <field name="name">res.config.settings.view.form.bhz.wa</field>
+    <field name="model">res.config.settings</field>
+    <field name="inherit_id" ref="base.view_res_config_settings"/>
+    <field name="arch" type="xml">
+      <xpath expr="//div[hasclass('settings')]" position="inside">
+        <div class="app_settings_block" data-string="BHZ WhatsApp" string="BHZ WhatsApp">
+          <h2>BHZ WhatsApp</h2>
+          <group>
+            <field name="bhz_wa_public_base" placeholder="https://seu-dominio.odoo.com"/>
+          </group>
+        </div>
+      </xpath>
+    </field>
+  </record>
+</odoo>

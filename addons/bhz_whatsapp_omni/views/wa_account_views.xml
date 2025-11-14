@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <record id="view_bhz_wa_account_form" model="ir.ui.view">
+    <field name="name">bhz.wa.account.form</field>
+    <field name="model">bhz.wa.account</field>
+    <field name="arch" type="xml">
+      <form string="Conta WhatsApp">
+        <sheet>
+          <group>
+            <group>
+              <field name="name"/>
+              <field name="mode"/>
+              <field name="quiet_hours" placeholder="22:00-07:59"/>
+            </group>
+            <group>
+              <field name="max_msgs_per_minute"/>
+              <field name="max_msgs_per_hour"/>
+              <field name="max_msgs_per_contact_per_hour"/>
+            </group>
+          </group>
+          <notebook>
+            <page string="Starter (QR)">
+              <group>
+                <field name="starter_base_url"/>
+                <field name="webhook_secret"/>
+              </group>
+            </page>
+            <page string="Business (Cloud API)">
+              <group>
+                <field name="business_phone_number_id"/>
+                <field name="business_token" password="True"/>
+                <field name="business_verify_token"/>
+                <label string="Webhook URL"/>
+                <div>
+                  <p>Use: <span t-esc="ir.config_parameter('bhz_wa.public_base')"/>/bhz_wa/business/webhook</p>
+                </div>
+              </group>
+            </page>
+            <page string="IA Atendente">
+              <group>
+                <field name="ai_enabled"/>
+                <field name="ai_endpoint"/>
+                <field name="ai_token" password="True"/>
+              </group>
+            </page>
+          </notebook>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="view_bhz_wa_account_tree" model="ir.ui.view">
+    <field name="name">bhz.wa.account.tree</field>
+    <field name="model">bhz.wa.account</field>
+    <field name="arch" type="xml">
+      <tree>
+        <field name="name"/>
+        <field name="mode"/>
+      </tree>
+    </field>
+  </record>
+
+  <record id="action_bhz_wa_account" model="ir.actions.act_window">
+    <field name="name">Contas WhatsApp</field>
+    <field name="res_model">bhz.wa.account</field>
+    <field name="view_mode">tree,form</field>
+  </record>
+</odoo>

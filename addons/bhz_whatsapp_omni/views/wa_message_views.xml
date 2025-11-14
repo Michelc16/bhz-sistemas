@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <record id="view_bhz_wa_message_tree" model="ir.ui.view">
+    <field name="name">bhz.wa.message.tree</field>
+    <field name="model">bhz.wa.message</field>
+    <field name="arch" type="xml">
+      <tree>
+        <field name="create_date"/>
+        <field name="provider"/>
+        <field name="direction"/>
+        <field name="state"/>
+        <field name="partner_id"/>
+        <field name="remote_phone"/>
+        <field name="body"/>
+      </tree>
+    </field>
+  </record>
+
+  <record id="view_bhz_wa_message_form" model="ir.ui.view">
+    <field name="name">bhz.wa.message.form</field>
+    <field name="model">bhz.wa.message</field>
+    <field name="arch" type="xml">
+      <form string="Mensagem WhatsApp">
+        <sheet>
+          <group>
+            <group>
+              <field name="account_id"/>
+              <field name="session_id"/>
+              <field name="partner_id"/>
+              <field name="provider"/>
+            </group>
+            <group>
+              <field name="direction"/>
+              <field name="state"/>
+            </group>
+          </group>
+          <group>
+            <field name="remote_jid"/>
+            <field name="remote_phone"/>
+          </group>
+          <group>
+            <field name="body" nolabel="1"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_bhz_wa_message" model="ir.actions.act_window">
+    <field name="name">Mensagens (Inbox)</field>
+    <field name="res_model">bhz.wa.message</field>
+    <field name="view_mode">tree,form</field>
+  </record>
+</odoo>
