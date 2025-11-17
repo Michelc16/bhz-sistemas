@@ -34,6 +34,14 @@ class BHZWASession(models.Model):
     last_qr_at = fields.Datetime(readonly=True)
     qr_image = fields.Binary(string='QR Code (PNG)', readonly=True)
 
+    @api.model
+    def create(self, vals):
+        if not vals.get('external_base_url') and vals.get('account_id'):
+            account = self.env['bhz.wa.account'].browse(vals['account_id'])
+            if account:
+                vals['external_base_url'] = account._get_starter_base_url()
+        return super().create(vals)
+
     # Helpers
     def _endpoint(self, path):
         return f"{(self.external_base_url or '').rstrip('/')}{path}"

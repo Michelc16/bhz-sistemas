@@ -3,7 +3,7 @@
   <menuitem id="menu_bhz_wa_root" name="BHZ WhatsApp" sequence="10"/>
 
   <menuitem id="menu_bhz_wa_account"
-            name="Conta"
+            name="Contas WhatsApp"
             parent="menu_bhz_wa_root"
             action="action_bhz_wa_account"/>
 

@@ -21,18 +21,29 @@ class BHZWAStarterInbound(http.Controller):
         }
         """
         try:
-            acc = request.env['bhz.wa.account'].sudo().search([('mode', '=', 'starter')], limit=1)
+            env = request.env
+            acc = env['bhz.wa.account'].sudo().search([('mode', '=', 'starter')], limit=1)
             if not acc:
                 return {"ok": False, "error": "no_starter_account"}
 
-            session = request.env['bhz.wa.session'].sudo().search([
+            expected_secret = env['ir.config_parameter'].sudo().get_param('bhz_wa.starter_webhook_secret') or ''
+            provided_secret = (
+                request.httprequest.headers.get('X-BHZ-WA-Secret')
+                or payload.get('secret')
+            )
+            if expected_secret and expected_secret != provided_secret:
+                _logger.warning("Starter webhook secret inválido para payload %s", payload)
+                return {"ok": False, "error": "invalid_secret"}
+
+            session = env['bhz.wa.session'].sudo().search([
                 ('session_id', '=', payload.get('session_id'))
             ], limit=1)
             if not session:
-                session = request.env['bhz.wa.session'].sudo().create({
+                base_url = acc._get_starter_base_url()
+                session = env['bhz.wa.session'].sudo().create({
                     "name": f"Auto-{payload.get('session_id')}",
                     "session_id": payload.get('session_id') or "default",
-                    "external_base_url": acc.starter_base_url,
+                    "external_base_url": base_url,
                     "account_id": acc.id,
                 })
 

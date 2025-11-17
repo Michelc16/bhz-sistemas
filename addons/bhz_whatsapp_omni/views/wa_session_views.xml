@@ -15,8 +15,8 @@
           <group>
             <group>
               <field name="name"/>
-              <field name="session_id"/>
-              <field name="external_base_url"/>
+              <field name="session_id" readonly="1"/>
+              <field name="external_base_url" readonly="1"/>
               <field name="account_id"/>
             </group>
             <group>

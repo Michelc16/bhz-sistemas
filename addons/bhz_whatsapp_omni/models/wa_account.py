@@ -1,4 +1,5 @@
 from odoo import api, fields, models
+from odoo.exceptions import UserError
 import requests
 import json
 
@@ -19,9 +20,17 @@ class BHZWAAccount(models.Model):
         tracking=True,
     )
 
-    # Starter
-    starter_base_url = fields.Char(string='Starter Base URL', help='URL do serviço Node/Baileys')
-    webhook_secret = fields.Char(string='Starter Webhook Secret')
+    # Starter (configurado globalmente via parâmetros do sistema)
+    starter_base_url = fields.Char(
+        string='Starter Base URL',
+        compute='_compute_starter_settings',
+        readonly=True,
+    )
+    webhook_secret = fields.Char(
+        string='Starter Webhook Secret',
+        compute='_compute_starter_settings',
+        readonly=True,
+    )
 
     # Business (Meta Cloud)
     business_phone_number_id = fields.Char(string="Phone Number ID")
@@ -48,7 +57,7 @@ class BHZWAAccount(models.Model):
 
     # ----------------- Envio unificado -----------------
 
-    def send_text(self, to_phone_or_jid, text, partner_id=False, session_id='default'):
+    def send_text(self, to_phone_or_jid, text, partner_id=False, session_id=None):
         """
         Envio unificado, respeitando limites:
         - global por minuto,
@@ -81,9 +90,10 @@ class BHZWAAccount(models.Model):
             return self._business_send_text(to_phone_or_jid, text, partner_id)
 
     def _starter_send_text(self, to, text, partner_id, session_id):
-        base = (self.starter_base_url or '').rstrip('/')
+        base = self._get_starter_base_url()
+        session_identifier = session_id or self._get_starter_session_identifier()
         payload = {
-            'session': session_id,
+            'session': session_identifier,
             'to': to,
             'text': text,
         }
@@ -248,3 +258,64 @@ class BHZWAAccount(models.Model):
         for rec in self.search([]):
             rec.sent_last_hour = 0
         return True
+
+    # ----------------- Starter helpers -----------------
+
+    def _compute_starter_settings(self):
+        IrConfig = self.env['ir.config_parameter'].sudo()
+        base_url = (IrConfig.get_param('bhz_wa.starter_base_url') or '').strip()
+        secret = IrConfig.get_param('bhz_wa.starter_webhook_secret') or ''
+        for account in self:
+            account.starter_base_url = base_url
+            account.webhook_secret = secret
+
+    def _get_starter_base_url(self):
+        self.ensure_one()
+        base_url = self.env['ir.config_parameter'].sudo().get_param('bhz_wa.starter_base_url')
+        if not base_url:
+            raise UserError(
+                "URL do serviço Starter não está configurada. "
+                "Peça ao administrador (BHZ) para configurar o parâmetro 'bhz_wa.starter_base_url'."
+            )
+        return base_url.rstrip('/')
+
+    def _get_starter_session_identifier(self):
+        self.ensure_one()
+        return f"acc-{self.id}"
+
+    def action_connect_starter(self):
+        """
+        Cria ou reutiliza a sessão Starter vinculada à conta e abre o QR Code.
+        """
+        self.ensure_one()
+        if self.mode != 'starter':
+            raise UserError("Essa ação só é válida para contas no modo Starter.")
+
+        base_url = self._get_starter_base_url()
+        session_identifier = self._get_starter_session_identifier()
+        Session = self.env['bhz.wa.session']
+
+        session = Session.search([
+            ('account_id', '=', self.id),
+            ('session_id', '=', session_identifier),
+        ], limit=1)
+
+        vals = {
+            'name': f"Sessão {self.name}",
+            'session_id': session_identifier,
+            'external_base_url': base_url,
+            'account_id': self.id,
+        }
+        if session:
+            session.write({'external_base_url': base_url})
+        else:
+            session = Session.create(vals)
+
+        session.action_get_qr()
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'bhz.wa.session',
+            'view_mode': 'form',
+            'res_id': session.id,
+            'target': 'current',
+        }

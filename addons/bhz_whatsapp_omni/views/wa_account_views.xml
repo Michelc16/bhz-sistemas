@@ -5,6 +5,13 @@
     <field name="model">bhz.wa.account</field>
     <field name="arch" type="xml">
       <form string="Conta WhatsApp">
+        <header>
+          <button name="action_connect_starter"
+                  type="object"
+                  string="Conectar via QR"
+                  class="oe_highlight"
+                  attrs="{'invisible': [('mode', '!=', 'starter')]}"/>
+        </header>
         <sheet>
           <group>
             <group>
@@ -21,8 +28,7 @@
           <notebook>
             <page string="Starter (QR)">
               <group>
-                <field name="starter_base_url"/>
-                <field name="webhook_secret"/>
+                <label string="Configuração feita pela BHZ Sistemas. Use o botão 'Conectar via QR' acima para gerar o código." colspan="2"/>
               </group>
             </page>
 
