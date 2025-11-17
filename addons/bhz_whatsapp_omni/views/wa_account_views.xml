@@ -28,7 +28,9 @@
           <notebook>
             <page string="Starter (QR)">
               <group>
-                <label string="Configuração feita pela BHZ Sistemas. Use o botão 'Conectar via QR' acima para gerar o código." colspan="2"/>
+                <div class="o_form_label" colspan="2">
+                  Configuração feita pela BHZ Sistemas. Use o botão "Conectar via QR" acima para gerar o código.
+                </div>
               </group>
             </page>
 
