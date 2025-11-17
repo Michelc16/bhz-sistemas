@@ -10,7 +10,7 @@
                   type="object"
                   string="Conectar via QR"
                   class="oe_highlight"
-                  attrs="{'invisible': [('mode', '!=', 'starter')]}"/>
+                  modifiers="{'invisible': [('mode', '!=', 'starter')]}"/>
         </header>
         <sheet>
           <group>
