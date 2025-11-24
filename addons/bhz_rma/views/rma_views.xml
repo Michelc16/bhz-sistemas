@@ -4,7 +4,7 @@
         <field name="name">bhz.rma.order.tree</field>
         <field name="model">bhz.rma.order</field>
         <field name="arch" type="xml">
-            <tree string="Pedidos de RMA">
+            <list string="Pedidos de RMA">
                 <field name="name"/>
                 <field name="date_rma"/>
                 <field name="partner_id"/>
@@ -13,7 +13,7 @@
                 <field name="state"/>
                 <field name="unit_cost"/>
                 <field name="total_cost"/>
-            </tree>
+            </list>
         </field>
     </record>
 
