@@ -27,27 +27,22 @@
                     <button name="action_set_waiting"
                             type="object"
                             string="Em espera"
-                            states="draft"
                             class="btn-primary"/>
                     <button name="action_set_with_supplier"
                             type="object"
                             string="Com fornecedor"
-                            states="waiting,no_warranty"
                             class="btn-secondary"/>
                     <button name="action_set_no_warranty"
                             type="object"
                             string="Sem garantia"
-                            states="waiting,with_supplier"
                             class="btn-secondary"/>
                     <button name="action_solved"
                             type="object"
                             string="Solucionado"
-                            states="waiting,with_supplier,no_warranty"
                             class="btn-success"/>
                     <button name="action_cancel"
                             type="object"
                             string="Cancelar"
-                            states="draft,waiting,with_supplier,no_warranty"
                             class="btn-secondary"/>
 
                     <field name="state" widget="statusbar"
