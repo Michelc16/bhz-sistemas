@@ -1,0 +1,169 @@
+<odoo>
+    <!-- Tree view -->
+    <record id="view_bhz_rma_order_tree" model="ir.ui.view">
+        <field name="name">bhz.rma.order.tree</field>
+        <field name="model">bhz.rma.order</field>
+        <field name="arch" type="xml">
+            <tree string="Pedidos de RMA">
+                <field name="name"/>
+                <field name="date_rma"/>
+                <field name="partner_id"/>
+                <field name="product_id"/>
+                <field name="quantity"/>
+                <field name="state"/>
+                <field name="unit_cost"/>
+                <field name="total_cost"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_bhz_rma_order_form" model="ir.ui.view">
+        <field name="name">bhz.rma.order.form</field>
+        <field name="model">bhz.rma.order</field>
+        <field name="arch" type="xml">
+            <form string="Pedido de RMA">
+                <header>
+                    <button name="action_set_waiting"
+                            type="object"
+                            string="Em espera"
+                            states="draft"
+                            class="btn-primary"/>
+                    <button name="action_set_with_supplier"
+                            type="object"
+                            string="Com fornecedor"
+                            states="waiting,no_warranty"
+                            class="btn-secondary"/>
+                    <button name="action_set_no_warranty"
+                            type="object"
+                            string="Sem garantia"
+                            states="waiting,with_supplier"
+                            class="btn-secondary"/>
+                    <button name="action_solved"
+                            type="object"
+                            string="Solucionado"
+                            states="waiting,with_supplier,no_warranty"
+                            class="btn-success"/>
+                    <button name="action_cancel"
+                            type="object"
+                            string="Cancelar"
+                            states="draft,waiting,with_supplier,no_warranty"
+                            class="btn-secondary"/>
+
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,waiting,with_supplier,no_warranty,solved,cancelled"/>
+                </header>
+
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="date_rma"/>
+                            <field name="company_id" readonly="1"/>
+                            <field name="partner_id"/>
+                        </group>
+                        <group>
+                            <field name="product_id"/>
+                            <field name="product_uom_id"/>
+                            <field name="quantity"/>
+                            <field name="lot_id"/>
+                        </group>
+                    </group>
+
+                    <group string="Locais de Estoque" colspan="4">
+                        <group>
+                            <field name="location_id"/>
+                        </group>
+                        <group>
+                            <field name="rma_location_id"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Custos">
+                            <group>
+                                <field name="unit_cost" readonly="1"/>
+                                <field name="total_cost" readonly="1"/>
+                            </group>
+                        </page>
+
+                        <page string="Movimentos de Estoque">
+                            <group>
+                                <field name="move_in_id" readonly="1"/>
+                                <field name="move_out_id" readonly="1"/>
+                            </group>
+                        </page>
+
+                        <page string="Observações">
+                            <group>
+                                <field name="note"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="view_bhz_rma_order_search" model="ir.ui.view">
+        <field name="name">bhz.rma.order.search</field>
+        <field name="model">bhz.rma.order</field>
+        <field name="arch" type="xml">
+            <search string="Pesquisar RMA">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="product_id"/>
+                <field name="state"/>
+
+                <filter string="Rascunho" name="draft" domain="[('state','=','draft')]"/>
+                <filter string="Em espera" name="waiting" domain="[('state','=','waiting')]"/>
+                <filter string="Com fornecedor" name="with_supplier" domain="[('state','=','with_supplier')]"/>
+                <filter string="Sem garantia" name="no_warranty" domain="[('state','=','no_warranty')]"/>
+                <filter string="Solucionado" name="solved" domain="[('state','=','solved')]"/>
+                <filter string="Cancelado" name="cancelled" domain="[('state','=','cancelled')]"/>
+
+                <group expand="0" string="Agrupar por">
+                    <filter string="Cliente" name="group_partner" context="{'group_by':'partner_id'}"/>
+                    <filter string="Produto" name="group_product" context="{'group_by':'product_id'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by':'state'}"/>
+                    <filter string="Data" name="group_date" context="{'group_by':'date_rma'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Pivot view para análise de prejuízo -->
+    <record id="view_bhz_rma_order_pivot" model="ir.ui.view">
+        <field name="name">bhz.rma.order.pivot</field>
+        <field name="model">bhz.rma.order</field>
+        <field name="arch" type="xml">
+            <pivot string="Análise de RMA">
+                <field name="total_cost" type="measure"/>
+                <field name="quantity" type="measure"/>
+                <field name="product_id" type="row"/>
+                <field name="partner_id" type="row"/>
+                <field name="state" type="col"/>
+                <field name="date_rma" interval="month" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph view para visualização rápida -->
+    <record id="view_bhz_rma_order_graph" model="ir.ui.view">
+        <field name="name">bhz.rma.order.graph</field>
+        <field name="model">bhz.rma.order</field>
+        <field name="arch" type="xml">
+            <graph string="RMA por custo" type="bar">
+                <field name="total_cost" type="measure"/>
+                <field name="state" type="row"/>
+            </graph>
+        </field>
+    </record>
+</odoo>
