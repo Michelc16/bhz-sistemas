@@ -1,4 +1,6 @@
-from odoo import http
+import json
+from datetime import datetime
+from odoo import fields, http
 from odoo.http import request
 import logging
 
@@ -7,67 +9,84 @@ _logger = logging.getLogger(__name__)
 
 class BHZWAStarterInbound(http.Controller):
 
-    @http.route('/bhz_wa/starter/inbound', type='json', auth='public', csrf=False)
+    @http.route('/bhz_wa/starter/inbound', type='json', auth='public', csrf=False, methods=['POST'])
     def inbound(self, **payload):
-        """
-        Payload esperado do serviço Starter (Node/Baileys):
-        {
-          "session_id": "default",
-          "from": "5531999999999",
-          "jid": "5531999999999@s.whatsapp.net",
-          "body": "texto da mensagem",
-          "ts": 1690000000,
-          "signature": "opcional"
-        }
-        """
+        payload = payload or request.jsonrequest or {}
         try:
-            env = request.env
-            acc = env['bhz.wa.account'].sudo().search([('mode', '=', 'starter')], limit=1)
-            if not acc:
-                return {"ok": False, "error": "no_starter_account"}
+            env = request.env.sudo()
+            expected_secret = env['ir.config_parameter'].get_param('bhz_wa.starter_webhook_secret') or ''
+            provided_secret = request.httprequest.headers.get('X-Webhook-Secret') or payload.get('secret')
+            if expected_secret and provided_secret != expected_secret:
+                _logger.warning("Starter webhook secret inválido.")
+                return {"status": "error", "message": "invalid_secret"}
 
-            expected_secret = env['ir.config_parameter'].sudo().get_param('bhz_wa.starter_webhook_secret') or ''
-            provided_secret = (
-                request.httprequest.headers.get('X-BHZ-WA-Secret')
-                or payload.get('secret')
-            )
-            if expected_secret and expected_secret != provided_secret:
-                _logger.warning("Starter webhook secret inválido para payload %s", payload)
-                return {"ok": False, "error": "invalid_secret"}
+            session_code = payload.get('session') or payload.get('session_id')
+            Account = env['bhz.wa.account']
+            account = False
+            if session_code:
+                account = Account.search([('starter_session_id', '=', session_code)], limit=1)
+            if not account:
+                account = Account.search([('mode', '=', 'starter')], limit=1)
+            if not account:
+                return {"status": "error", "message": "no_account"}
 
-            session = env['bhz.wa.session'].sudo().search([
-                ('session_id', '=', payload.get('session_id'))
-            ], limit=1)
-            if not session:
-                base_url = acc._get_starter_base_url()
-                session = env['bhz.wa.session'].sudo().create({
-                    "name": f"Auto-{payload.get('session_id')}",
-                    "session_id": payload.get('session_id') or "default",
-                    "external_base_url": base_url,
-                    "account_id": acc.id,
+            Session = env['bhz.wa.session']
+            session = False
+            if session_code:
+                session = Session.search([('session_id', '=', session_code)], limit=1)
+            if not session and session_code:
+                session = Session.create({
+                    "name": f"Sessão {session_code}",
+                    "session_id": session_code,
+                    "external_base_url": account._get_starter_base_url(),
+                    "account_id": account.id,
                 })
 
-            partner = request.env['res.partner'].sudo().search([
-                ('phone', 'ilike', payload.get('from'))
+            from_number = payload.get('from') or ''
+            remote_jid = payload.get('raw', {}).get('key', {}).get('remoteJid') if isinstance(payload.get('raw'), dict) else False
+            remote_jid = remote_jid or (from_number if '@' in from_number else f"{from_number}@s.whatsapp.net")
+            text = payload.get('message') or payload.get('body') or ''
+
+            partner = env['res.partner'].search([
+                '|',
+                ('phone', 'ilike', from_number),
+                ('mobile', 'ilike', from_number),
             ], limit=1)
 
-            msg = request.env['bhz.wa.message'].sudo().create({
-                "account_id": acc.id,
-                "session_id": session.id,
+            timestamp = payload.get('timestamp') or payload.get('ts')
+            wa_dt = fields.Datetime.now()
+            if timestamp:
+                try:
+                    wa_dt = fields.Datetime.to_string(datetime.utcfromtimestamp(float(timestamp)))
+                except Exception:
+                    wa_dt = fields.Datetime.now()
+
+            msg = env['bhz.wa.message'].create({
+                "account_id": account.id,
+                "session_id": session.id if session else False,
                 "direction": "in",
                 "partner_id": partner.id if partner else False,
-                "remote_jid": payload.get('jid'),
-                "remote_phone": payload.get('from'),
-                "body": payload.get('body') or "",
-                "state": "received",
+                "remote_jid": remote_jid,
+                "remote_phone": from_number,
+                "wa_from": from_number,
+                "wa_to": account.starter_session_id,
+                "body": text,
+                "state": "new",
                 "provider": "starter",
+                "wa_timestamp": wa_dt,
+                "payload_json": json.dumps(payload),
+            })
+
+            account.write({
+                'starter_status': 'connected',
+                'starter_last_number': from_number,
             })
 
             if partner:
                 partner.message_post(body=f"📲 WA Starter (IN): {msg.body}")
 
-            acc.with_context(bypass_limits=True).try_ai_autoreply(msg)
-            return {"ok": True}
+            account.with_context(bypass_limits=True).try_ai_autoreply(msg)
+            return {"status": "ok"}
         except Exception as e:
             _logger.exception("Starter inbound error: %s", e)
-            return {"ok": False, "error": str(e)}
+            return {"status": "error", "message": str(e)}

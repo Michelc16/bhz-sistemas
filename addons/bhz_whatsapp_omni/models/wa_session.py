@@ -1,6 +1,5 @@
 from odoo import api, fields, models
 import requests
-import base64
 
 
 class BHZWASession(models.Model):
@@ -51,13 +50,18 @@ class BHZWASession(models.Model):
     def action_get_qr(self):
         for rec in self:
             try:
-                resp = requests.get(rec._endpoint(f"/qr?session={rec.session_id}"), timeout=20)
-                if resp.status_code == 200 and resp.headers.get('Content-Type', '').startswith('image/'):
-                    rec.qr_image = base64.b64encode(resp.content)
+                resp = requests.get(
+                    rec._endpoint("/qr"),
+                    params={'session': rec.session_id, 'format': 'json'},
+                    timeout=20,
+                )
+                data = resp.json()
+                qrcode = data.get('qrcode')
+                if qrcode and 'base64,' in qrcode:
+                    rec.qr_image = qrcode.split('base64,', 1)[1]
                     rec.status = 'qr'
                     rec.last_qr_at = fields.Datetime.now()
-                else:
-                    rec.status = 'error'
+                rec._apply_status_payload(data)
             except Exception:
                 rec.status = 'error'
         return True
@@ -65,13 +69,13 @@ class BHZWASession(models.Model):
     def action_refresh_status(self):
         for rec in self:
             try:
-                j = requests.get(rec._endpoint(f"/status?session={rec.session_id}"), timeout=10).json()
-                if j.get('connected'):
-                    rec.status = 'connected'
-                    rec.paired_number = j.get('me')
-                    rec.qr_image = False
-                else:
-                    rec.status = 'qr' if j.get('awaiting_qr') else 'disconnected'
+                resp = requests.get(
+                    rec._endpoint("/status"),
+                    params={'session': rec.session_id},
+                    timeout=10,
+                )
+                data = resp.json()
+                rec._apply_status_payload(data)
             except Exception:
                 rec.status = 'error'
         return True
@@ -79,10 +83,29 @@ class BHZWASession(models.Model):
     def action_logout(self):
         for rec in self:
             try:
-                requests.post(rec._endpoint('/logout'), json={'session': rec.session_id}, timeout=10)
+                requests.post(
+                    rec._endpoint('/logout'),
+                    json={'session': rec.session_id},
+                    timeout=10,
+                )
                 rec.status = 'disconnected'
                 rec.paired_number = False
                 rec.qr_image = False
             except Exception:
                 rec.status = 'error'
         return True
+
+    def _apply_status_payload(self, data):
+        status = data.get('status')
+        number = data.get('number') or data.get('me')
+        if status == 'connected':
+            self.status = 'connected'
+            self.paired_number = number
+            self.qr_image = False
+        elif status in ('waiting_qr', 'loading'):
+            self.status = 'qr'
+        elif status in ('logged_out', 'disconnected'):
+            self.status = 'disconnected'
+            self.paired_number = False
+        elif status == 'error':
+            self.status = 'error'

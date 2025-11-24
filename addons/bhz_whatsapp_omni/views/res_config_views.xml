@@ -24,6 +24,39 @@
                 </div>
               </div>
             </div>
+            <div class="col-12 col-lg-6 o_setting_box">
+              <div class="o_setting_left_pane">
+                <field name="bhz_wa_starter_base_url"/>
+              </div>
+              <div class="o_setting_right_pane">
+                <label for="bhz_wa_starter_base_url">Starter Service URL</label>
+                <div class="text-muted">
+                  Endereço do serviço Node responsável pelo WhatsApp Starter (QR).
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-lg-6 o_setting_box">
+              <div class="o_setting_left_pane">
+                <field name="bhz_wa_starter_webhook_secret"/>
+              </div>
+              <div class="o_setting_right_pane">
+                <label for="bhz_wa_starter_webhook_secret">Starter Webhook Secret</label>
+                <div class="text-muted">
+                  Mesmo valor configurado na variável <code>ODOO_WEBHOOK_SECRET</code> do starter_service.
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-lg-6 o_setting_box">
+              <div class="o_setting_left_pane">
+                <field name="bhz_wa_business_verify_token"/>
+              </div>
+              <div class="o_setting_right_pane">
+                <label for="bhz_wa_business_verify_token">Business Verify Token (global)</label>
+                <div class="text-muted">
+                  Token usado na verificação do webhook da Meta. Pode ser individual por conta.
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </xpath>

@@ -6,11 +6,23 @@
     <field name="arch" type="xml">
       <form string="Conta WhatsApp">
         <header>
-          <button name="action_connect_starter"
+          <button name="button_starter_connect"
                   type="object"
                   string="Conectar via QR"
                   class="oe_highlight"
-                  modifiers="{'invisible': [('mode', '!=', 'starter')]}"/>
+                  attrs="{'invisible': [('mode', '!=', 'starter')]}"/>
+          <button name="button_starter_refresh_status"
+                  type="object"
+                  string="Atualizar Status"
+                  attrs="{'invisible': [('mode', '!=', 'starter')]}"/>
+          <button name="button_starter_disconnect"
+                  type="object"
+                  string="Desconectar"
+                  attrs="{'invisible': [('mode', '!=', 'starter')]}"/>
+          <button name="action_business_test_message"
+                  type="object"
+                  string="Enviar teste (Business)"
+                  attrs="{'invisible': [('mode', '!=', 'business')]}"/>
         </header>
         <sheet>
           <group>
@@ -18,11 +30,15 @@
               <field name="name"/>
               <field name="mode"/>
               <field name="quiet_hours" placeholder="22:00-07:59"/>
+              <field name="starter_status" attrs="{'invisible': [('mode', '!=', 'starter')]}"/>
+              <field name="starter_session_id" readonly="1" attrs="{'invisible': [('mode', '!=', 'starter')]}"/>
             </group>
             <group>
               <field name="max_msgs_per_minute"/>
               <field name="max_msgs_per_hour"/>
               <field name="max_msgs_per_contact_per_hour"/>
+              <field name="starter_last_qr_request" readonly="1" attrs="{'invisible': [('mode', '!=', 'starter')]}"/>
+              <field name="starter_last_number" readonly="1" attrs="{'invisible': [('mode', '!=', 'starter')]}"/>
             </group>
           </group>
           <notebook>
@@ -31,6 +47,8 @@
                 <div class="o_form_label" colspan="2">
                   Configuração feita pela BHZ Sistemas. Use o botão "Conectar via QR" acima para gerar o código.
                 </div>
+                <field name="starter_base_url" readonly="1"/>
+                <field name="webhook_secret" readonly="1"/>
               </group>
             </page>
 

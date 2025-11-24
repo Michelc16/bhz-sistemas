@@ -1,5 +1,6 @@
 from odoo import api, fields, models
 from odoo.exceptions import UserError
+from uuid import uuid4
 import requests
 import json
 
@@ -18,6 +19,34 @@ class BHZWAAccount(models.Model):
         required=True,
         default='starter',
         tracking=True,
+    )
+
+    starter_session_id = fields.Char(
+        string='Sessão Starter',
+        copy=False,
+        tracking=True,
+        help='Identificador usado pelo starter_service.',
+    )
+    starter_status = fields.Selection(
+        [
+            ('new', 'Nova'),
+            ('loading', 'Carregando'),
+            ('waiting_qr', 'Aguardando QR'),
+            ('connected', 'Conectada'),
+            ('logged_out', 'Desconectada'),
+            ('error', 'Erro'),
+        ],
+        default='new',
+        copy=False,
+        tracking=True,
+    )
+    starter_last_qr_request = fields.Datetime(
+        string='Último pedido de QR',
+        copy=False,
+    )
+    starter_last_number = fields.Char(
+        string='Número pareado',
+        copy=False,
     )
 
     # Starter (configurado globalmente via parâmetros do sistema)
@@ -95,12 +124,13 @@ class BHZWAAccount(models.Model):
         payload = {
             'session': session_identifier,
             'to': to,
-            'text': text,
+            'message': text,
         }
         try:
             r = requests.post(f"{base}/send", json=payload, timeout=20)
+            r.raise_for_status()
             j = r.json()
-            ok = bool(j.get('ok'))
+            ok = j.get('status') == 'sent'
         except Exception:
             ok = False
 
@@ -114,39 +144,51 @@ class BHZWAAccount(models.Model):
             'body': text,
             'state': state,
             'provider': 'starter',
+            'wa_from': self.starter_last_number,
+            'wa_to': to,
+            'payload_json': json.dumps(payload),
         })
         if ok and not self.env.context.get('bypass_limits'):
             self.sent_last_minute += 1
             self.sent_last_hour += 1
         return msg
 
-    def _business_send_text(self, to, text, partner_id):
-        phone_id = self.business_phone_number_id
-        token = self.business_token
-
-        headers = {
-            'Authorization': f'Bearer {token}',
-            'Content-Type': 'application/json',
-        }
+    def business_send_message(self, to, message):
+        self.ensure_one()
+        if not self.business_phone_number_id or not self.business_token:
+            raise UserError("Configure o Phone Number ID e o Token do Business para enviar mensagens.")
         dest = to
         if '@' in dest:
             dest = dest.replace('@s.whatsapp.net', '')
         dest = dest.replace('+', '').replace(' ', '')
-
+        url = f"https://graph.facebook.com/v20.0/{self.business_phone_number_id}/messages"
+        headers = {
+            'Authorization': f'Bearer {self.business_token}',
+            'Content-Type': 'application/json',
+        }
         payload = {
             'messaging_product': 'whatsapp',
             'to': dest,
             'type': 'text',
-            'text': {
-                'body': text,
-            },
+            'text': {'body': message},
         }
-        url = f"https://graph.facebook.com/v20.0/{phone_id}/messages"
         try:
-            r = requests.post(url, headers=headers, data=json.dumps(payload), timeout=20)
-            ok = r.status_code in (200, 201)
-        except Exception:
-            ok = False
+            resp = requests.post(url, headers=headers, json=payload, timeout=20)
+            data = resp.json()
+        except Exception as exc:
+            self.message_post(body=f"❌ Erro ao enviar via Business: {exc}")
+            return False, {}
+        if resp.status_code not in (200, 201):
+            self.message_post(body=f"❌ Erro Business ({resp.status_code}): {data}")
+            return False, data
+        return True, data
+
+    def _business_send_text(self, to, text, partner_id):
+        ok, payload_response = self.business_send_message(to, text)
+        dest = to
+        if '@' in dest:
+            dest = dest.replace('@s.whatsapp.net', '')
+        dest = dest.replace('+', '').replace(' ', '')
 
         state = 'sent' if ok else 'error'
         msg = self.env['bhz.wa.message'].create({
@@ -158,11 +200,28 @@ class BHZWAAccount(models.Model):
             'body': text,
             'state': state,
             'provider': 'business',
+            'wa_from': self.business_phone_number_id,
+            'wa_to': dest,
+            'payload_json': json.dumps(payload_response or {}),
         })
         if ok and not self.env.context.get('bypass_limits'):
             self.sent_last_minute += 1
             self.sent_last_hour += 1
         return msg
+
+    def action_business_test_message(self):
+        self.ensure_one()
+        if self.mode != 'business':
+            raise UserError("Disponível apenas para contas Business.")
+        partner = self.env.user.partner_id
+        dest = partner.mobile or partner.phone
+        if not dest:
+            raise UserError("Configure um telefone no seu usuário para enviar o teste.")
+        ok, _payload = self.business_send_message(dest, "Teste de envio via WhatsApp Business.")
+        if not ok:
+            raise UserError("Falha ao enviar a mensagem de teste. Verifique os logs.")
+        self.message_post(body=f"✅ Mensagem de teste enviada para {dest}")
+        return True
 
     # ----------------- IA Atendente -----------------
 
@@ -281,25 +340,18 @@ class BHZWAAccount(models.Model):
 
     def _get_starter_session_identifier(self):
         self.ensure_one()
-        return f"acc-{self.id}"
+        if self.starter_session_id:
+            return self.starter_session_id
+        session_code = f"acc-{self.id}" if self.id else f"tmp-{uuid4().hex[:6]}"
+        self.starter_session_id = session_code
+        return session_code
 
-    def action_connect_starter(self):
-        """
-        Cria ou reutiliza a sessão Starter vinculada à conta e abre o QR Code.
-        """
-        self.ensure_one()
-        if self.mode != 'starter':
-            raise UserError("Essa ação só é válida para contas no modo Starter.")
-
-        base_url = self._get_starter_base_url()
-        session_identifier = self._get_starter_session_identifier()
+    def _ensure_session_record(self, session_identifier, base_url):
         Session = self.env['bhz.wa.session']
-
         session = Session.search([
             ('account_id', '=', self.id),
             ('session_id', '=', session_identifier),
         ], limit=1)
-
         vals = {
             'name': f"Sessão {self.name}",
             'session_id': session_identifier,
@@ -310,12 +362,73 @@ class BHZWAAccount(models.Model):
             session.write({'external_base_url': base_url})
         else:
             session = Session.create(vals)
+        return session
 
-        session.action_get_qr()
+    def button_starter_connect(self):
+        """
+        Cria ou reutiliza a sessão Starter e abre o QR em nova janela.
+        """
+        self.ensure_one()
+        if self.mode != 'starter':
+            raise UserError("Essa ação só é válida para contas no modo Starter.")
+        base_url = self._get_starter_base_url()
+        session_identifier = self._get_starter_session_identifier()
+        self._ensure_session_record(session_identifier, base_url)
+        self.starter_last_qr_request = fields.Datetime.now()
+        self.starter_status = 'waiting_qr'
+        url = f"{base_url}/qr?session={session_identifier}&format=img"
         return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'bhz.wa.session',
-            'view_mode': 'form',
-            'res_id': session.id,
-            'target': 'current',
+            'type': 'ir.actions.act_url',
+            'url': url,
+            'target': 'new',
         }
+
+    def button_starter_disconnect(self):
+        self.ensure_one()
+        if self.mode != 'starter':
+            raise UserError("Disponível apenas para contas Starter.")
+        session_identifier = self._get_starter_session_identifier()
+        try:
+            base_url = self._get_starter_base_url()
+            requests.post(
+                f"{base_url}/logout",
+                json={'session': session_identifier},
+                timeout=15,
+            )
+        except Exception:
+            pass
+        self.write({
+            'starter_status': 'logged_out',
+            'starter_last_number': False,
+        })
+        return True
+
+    def button_starter_refresh_status(self):
+        for account in self.filtered(lambda a: a.mode == 'starter'):
+            session_identifier = account._get_starter_session_identifier()
+            try:
+                base_url = account._get_starter_base_url()
+                resp = requests.get(
+                    f"{base_url}/status",
+                    params={'session': session_identifier},
+                    timeout=10,
+                )
+                data = resp.json()
+                account._sync_starter_status(data)
+            except Exception:
+                account.starter_status = 'error'
+        return True
+
+    def action_connect_starter(self):
+        """Compatibilidade com chamadas antigas."""
+        return self.button_starter_connect()
+
+    def _sync_starter_status(self, data):
+        status = data.get('status') or 'error'
+        number = data.get('number')
+        vals = {
+            'starter_status': status,
+        }
+        if number:
+            vals['starter_last_number'] = number
+        self.write(vals)

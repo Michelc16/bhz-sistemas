@@ -139,7 +139,7 @@
         </field>
     </record>
 
-    <!-- Pivot view para análise de prejuízo -->
+    <!-- Pivot view -->
     <record id="view_bhz_rma_order_pivot" model="ir.ui.view">
         <field name="name">bhz.rma.order.pivot</field>
         <field name="model">bhz.rma.order</field>
@@ -155,7 +155,7 @@
         </field>
     </record>
 
-    <!-- Graph view para visualização rápida -->
+    <!-- Graph view -->
     <record id="view_bhz_rma_order_graph" model="ir.ui.view">
         <field name="name">bhz.rma.order.graph</field>
         <field name="model">bhz.rma.order</field>
