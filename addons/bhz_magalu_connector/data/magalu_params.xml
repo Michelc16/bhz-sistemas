@@ -1,0 +1,13 @@
+<odoo>
+  <data>
+    <record id="bhz_magalu_param_client_id" model="ir.config_parameter">
+      <field name="key">bhz_magalu.client_id</field>
+      <field name="value">dZCVzEyLat_rtRfHvNAuulhBUZBlz_6Lj_NZghlU7Qw</field>
+    </record>
+
+    <record id="bhz_magalu_param_client_secret" model="ir.config_parameter">
+      <field name="key">bhz_magalu.client_secret</field>
+      <field name="value">wBI9y2hW604gkBpfxrTWoraU2UtVBC-BHWgVMn-XQE0</field>
+    </record>
+  </data>
+</odoo>

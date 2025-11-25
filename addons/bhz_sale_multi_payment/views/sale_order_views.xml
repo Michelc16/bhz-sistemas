@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- 1) LIST da linha de pagamento -->
+    <record id="view_sale_order_payment_line_list" model="ir.ui.view">
+        <field name="name">sale.order.payment.line.list</field>
+        <field name="model">sale.order.payment.line</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="journal_id"/>
+                <field name="amount"/>
+                <field name="payment_date"/>
+                <field name="note"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- 2) FORM da linha de pagamento -->
+    <record id="view_sale_order_payment_line_form" model="ir.ui.view">
+        <field name="name">sale.order.payment.line.form</field>
+        <field name="model">sale.order.payment.line</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="journal_id"/>
+                    <field name="amount"/>
+                    <field name="payment_date"/>
+                    <field name="note"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <!-- 3) Herdar o formulário da venda e adicionar a aba -->
+    <record id="view_order_form_bhz_multi_payment" model="ir.ui.view">
+        <field name="name">sale.order.form.bhz.multi.payment</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/notebook" position="inside">
+                <page string="Pagamentos">
+                    <group>
+                        <!-- mostra o total dos pagamentos -->
+                        <field name="amount_payment_total" readonly="1"/>
+                    </group>
+                    <field name="payment_line_ids" mode="list,form">
+                        <list ref="view_sale_order_payment_line_list"/>
+                        <form ref="view_sale_order_payment_line_form"/>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

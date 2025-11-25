@@ -1,0 +1,28 @@
+<odoo>
+    <menuitem id="menu_meli_root" name="Mercado Livre" sequence="20"/>
+
+    <menuitem id="menu_meli_config"
+              name="Configuração"
+              parent="menu_meli_root"
+              sequence="10"/>
+
+    <menuitem id="menu_meli_account"
+              name="Contas"
+              parent="menu_meli_config"
+              action="action_meli_account"/>
+
+    <menuitem id="menu_meli_operations"
+              name="Operações"
+              parent="menu_meli_root"
+              sequence="20"/>
+
+    <menuitem id="menu_meli_products"
+              name="Produtos"
+              parent="menu_meli_operations"
+              action="action_meli_product"/>
+
+    <menuitem id="menu_meli_orders"
+              name="Pedidos"
+              parent="menu_meli_operations"
+              action="action_meli_order"/>
+</odoo>
