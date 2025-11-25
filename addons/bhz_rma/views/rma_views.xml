@@ -112,23 +112,23 @@
         <field name="model">bhz.rma.order</field>
         <field name="arch" type="xml">
             <search string="Pesquisar RMA">
-                <field name="name" filter_domain="[('name', 'ilike', self)]"/>
-                <field name="partner_id" filter_domain="[('partner_id', 'ilike', self)]"/>
-                <field name="product_id" filter_domain="[('product_id', 'ilike', self)]"/>
-                <field name="state" filter_domain="[('state', '=', self)]"/>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="product_id"/>
+                <field name="state"/>
 
-                <filter string="Rascunho" name="draft" domain="[('state','=','draft')]"/>
-                <filter string="Em espera" name="waiting" domain="[('state','=','waiting')]"/>
-                <filter string="Com fornecedor" name="with_supplier" domain="[('state','=','with_supplier')]"/>
-                <filter string="Sem garantia" name="no_warranty" domain="[('state','=','no_warranty')]"/>
-                <filter string="Solucionado" name="solved" domain="[('state','=','solved')]"/>
-                <filter string="Cancelado" name="cancelled" domain="[('state','=','cancelled')]"/>
+                <filter name="draft" string="Rascunho" domain="[('state','=','draft')]"/>
+                <filter name="waiting" string="Em espera" domain="[('state','=','waiting')]"/>
+                <filter name="with_supplier" string="Com fornecedor" domain="[('state','=','with_supplier')]"/>
+                <filter name="no_warranty" string="Sem garantia" domain="[('state','=','no_warranty')]"/>
+                <filter name="solved" string="Solucionado" domain="[('state','=','solved')]"/>
+                <filter name="cancelled" string="Cancelado" domain="[('state','=','cancelled')]"/>
 
                 <group expand="0" string="Agrupar por">
-                    <filter string="Cliente" name="group_partner" context="{'group_by':'partner_id'}"/>
-                    <filter string="Produto" name="group_product" context="{'group_by':'product_id'}"/>
-                    <filter string="Status" name="group_state" context="{'group_by':'state'}"/>
-                    <filter string="Data" name="group_date" context="{'group_by':'date_rma'}"/>
+                    <filter name="group_partner" string="Cliente" context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_product" string="Produto" context="{'group_by': 'product_id'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_date" string="Data" context="{'group_by': 'date_rma'}"/>
                 </group>
             </search>
         </field>
