@@ -14,8 +14,7 @@
         "mail",
     ],
     "data": [
-        "security/ir.model.access.csv",
-        "data/magalu_params.xml",
+        "security/ir.model.access.csv",        
         "data/magalu_cron.xml",
         "views/magalu_config_views.xml",
         "views/magalu_product_views.xml",
