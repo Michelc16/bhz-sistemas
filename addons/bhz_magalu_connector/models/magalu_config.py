@@ -9,7 +9,6 @@ _logger = logging.getLogger(__name__)
 
 MAGALU_AUTHORIZE_URL = "https://id.magalu.com/login"
 MAGALU_SCOPES = [
-    "openid",
     "open:order-order-seller:read",
     "open:order-delivery-seller:read",
     "open:order-delivery-seller:write",
