@@ -23,3 +23,10 @@ class BhzWaConfigSync(models.AbstractModel):
         if secret:
             icp.set_param("starter_service.secret", secret)
             _logger.info("[bhz_whatsapp_omni][cron] starter_service.secret atualizado")
+
+        try:
+            cron = self.env.ref("bhz_whatsapp_omni.ir_cron_bhz_wa_sync_defaults", raise_if_not_found=False)
+            if cron and cron.active:
+                cron.active = False
+        except Exception:
+            pass
