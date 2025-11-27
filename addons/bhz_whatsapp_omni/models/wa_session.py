@@ -1,6 +1,10 @@
+import logging
+
+import requests
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
-import requests
+
+_logger = logging.getLogger(__name__)
 
 
 class BHZWASession(models.Model):
@@ -34,13 +38,30 @@ class BHZWASession(models.Model):
     last_qr_at = fields.Datetime(readonly=True)
     qr_image = fields.Binary(string='QR Code (PNG)', readonly=True)
 
-    @api.model
-    def create(self, vals):
-        if not vals.get('external_base_url') and vals.get('account_id'):
-            account = self.env['bhz.wa.account'].browse(vals['account_id'])
-            if account:
-                vals['external_base_url'] = account._get_starter_base_url()
-        return super().create(vals)
+    def _get_starter_base_url(self):
+        base_url = self.env['ir.config_parameter'].sudo().get_param('starter_service.base_url')
+        if not base_url:
+            raise UserError(_("Parâmetro 'starter_service.base_url' não encontrado."))
+        return base_url.rstrip('/')
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        if isinstance(vals_list, dict):
+            vals_list = [vals_list]
+
+        for vals in vals_list:
+            if not vals.get('external_base_url'):
+                base_url = None
+                account_id = vals.get('account_id')
+                if account_id:
+                    account = self.env['bhz.wa.account'].browse(account_id)
+                    if account:
+                        base_url = account._get_starter_base_url()
+                if not base_url:
+                    base_url = self._get_starter_base_url()
+                vals['external_base_url'] = base_url
+
+        return super().create(vals_list)
 
     # Helpers
     def _endpoint(self, path):
@@ -49,25 +70,30 @@ class BHZWASession(models.Model):
     # Actions
 
     def action_get_qr(self):
-        IrConfig = self.env['ir.config_parameter'].sudo()
-        base_url = IrConfig.get_param('starter_service.base_url')
-        if not base_url:
-            raise UserError(_("Parâmetro 'starter_service.base_url' não encontrado."))
-        base_url = base_url.rstrip('/')
-        url = f"{base_url}/api/whatsapp/qr"
         for rec in self:
+            base = (rec.external_base_url or rec._get_starter_base_url()).rstrip('/')
+            url = f"{base}/api/whatsapp/qr"
+            _logger.info("Solicitando QR do WhatsApp em %s", url)
             try:
                 resp = requests.get(url, timeout=60)
-                resp.raise_for_status()
+            except Exception as exc:
+                raise UserError(_("Falha ao conectar no servidor WhatsApp: %s") % exc)
+
+            if resp.status_code != 200:
+                raise UserError(_("Servidor retornou %s: %s") % (resp.status_code, resp.text))
+            try:
                 data = resp.json()
-                qrcode = data.get('qr_image')
-                if qrcode:
-                    rec.qr_image = qrcode
-                    rec.status = 'qr'
-                    rec.last_qr_at = fields.Datetime.now()
-                rec._apply_status_payload(data)
             except Exception:
-                rec.status = 'error'
+                raise UserError(_("Resposta não é JSON: %s") % resp.text)
+
+            qrcode = data.get('qr_image')
+            if not qrcode:
+                raise UserError(_("Campo 'qr_image' ausente na resposta."))
+
+            rec.qr_image = qrcode
+            rec.status = 'qr'
+            rec.last_qr_at = fields.Datetime.now()
+            rec._apply_status_payload(data)
         return True
 
     def action_refresh_status(self):

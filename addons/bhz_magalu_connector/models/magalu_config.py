@@ -35,6 +35,8 @@ ALLOWED_REDIRECT_URIS = {
     "https://bhzsistemas.com.br/magalu/oauth/callback",
     "https://www.bhzsistemas.com.br/magalu/oauth/callback",
     "https://michelc16-bhz-sistemas-bhz-payment-25328227.dev.odoo.com/magalu/oauth/callback",
+    "https://michelc16-bhz-sistemas-bhz-stock-25931562.dev.odoo.com/magalu/oauth/callback",
+    "https://michelc16-bhz-sistemas-bhz-rma-25937183.dev.odoo.com/magalu/oauth/callback",
 }
 
 
