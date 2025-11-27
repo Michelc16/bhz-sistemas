@@ -1,47 +1,59 @@
-from odoo import fields, models
+# -*- coding: utf-8 -*-
+from odoo import api, fields, models
 
 
-class BHZWAMessage(models.Model):
-    _name = 'bhz.wa.message'
-    _description = 'Mensagem WhatsApp (Starter/Business)'
-    _order = 'id desc'
-    _inherit = ['mail.thread']
+class BhzWaMessage(models.Model):
+    _name = "bhz.wa.message"
+    _description = "Mensagem WhatsApp"
+    _order = "id desc"
+    _rec_name = "body"
 
-    account_id = fields.Many2one('bhz.wa.account', required=True, ondelete='cascade')
-    session_id = fields.Many2one('bhz.wa.session', ondelete='set null')
+    conversation_id = fields.Many2one(
+        "bhz.wa.conversation", string="Conversa", index=True, ondelete="cascade"
+    )
+    partner_id = fields.Many2one("res.partner", string="Contato", index=True)
+    account_id = fields.Many2one("bhz.wa.account", string="Conta")
+    session_id = fields.Many2one("bhz.wa.session", string="Sessão")
 
-    direction = fields.Selection(
-        [('in', 'Entrada'), ('out', 'Saída')],
+    provider = fields.Selection(
+        [
+            ("starter", "Starter"),
+            ("business", "Business"),
+        ],
+        default="starter",
         required=True,
+    )
+    direction = fields.Selection(
+        [
+            ("in", "Entrada"),
+            ("out", "Saída"),
+        ],
+        required=True,
+        default="in",
     )
     state = fields.Selection(
         [
-            ('new', 'Nova'),
-            ('processed', 'Processada'),
-            ('queued', 'Fila'),
-            ('sent', 'Enviado'),
-            ('received', 'Recebido'),
-            ('error', 'Erro'),
+            ("queued", "Na fila"),
+            ("sent", "Enviada"),
+            ("delivered", "Entregue"),
+            ("read", "Lida"),
+            ("received", "Recebida"),
+            ("error", "Erro"),
         ],
-        default='new',
-    )
-    provider = fields.Selection(
-        [('starter', 'Starter'), ('business', 'Business')],
-        required=True,
+        default="received",
     )
 
-    partner_id = fields.Many2one('res.partner', string="Contato")
-    remote_jid = fields.Char(required=True)
-    remote_phone = fields.Char(string="Telefone")
-    wa_from = fields.Char(string='Remetente (wa_from)')
-    wa_to = fields.Char(string='Destinatário (wa_to)')
-    wa_timestamp = fields.Datetime(
-        string='Horário mensagem',
-        default=lambda self: fields.Datetime.now(),
-    )
-    body = fields.Text(string="Mensagem")
-    payload_json = fields.Text(string='Payload bruto')
+    body = fields.Text("Mensagem")
+    wa_from = fields.Char("De")
+    wa_to = fields.Char("Para")
+    is_group = fields.Boolean("Grupo?")
+    external_message_id = fields.Char("ID externo")
+    message_timestamp = fields.Float("Epoch")
+    payload_json = fields.Text("Payload bruto")
 
-    def process_with_ai(self):
-        """Hook futuro para orquestrar IA/assistentes."""
-        return True
+    is_me = fields.Boolean("Minha", compute="_compute_is_me", store=False)
+
+    @api.depends("direction")
+    def _compute_is_me(self):
+        for record in self:
+            record.is_me = record.direction == "out"

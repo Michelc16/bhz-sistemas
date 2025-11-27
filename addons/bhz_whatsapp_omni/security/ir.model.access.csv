@@ -1,5 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_bhz_wa_account,access_bhz_wa_account,model_bhz_wa_account,base.group_user,1,1,1,1
 access_bhz_wa_session,access_bhz_wa_session,model_bhz_wa_session,base.group_user,1,1,1,1
-access_bhz_wa_message,access_bhz_wa_message,model_bhz_wa_message,base.group_user,1,1,1,1
+access_bhz_wa_message_user,bhz_wa_message_user,model_bhz_wa_message,base.group_user,1,1,1,0
 access_bhz_wa_template,access_bhz_wa_template,model_bhz_wa_template,base.group_user,1,1,1,1
+access_bhz_wa_conversation_user,bhz_wa_conversation_user,model_bhz_wa_conversation,base.group_user,1,1,1,0

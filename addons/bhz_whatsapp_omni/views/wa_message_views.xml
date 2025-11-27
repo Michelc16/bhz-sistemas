@@ -6,12 +6,12 @@
     <field name="arch" type="xml">
       <list>
         <field name="create_date"/>
-        <field name="wa_timestamp"/>
         <field name="provider"/>
         <field name="direction"/>
         <field name="state"/>
         <field name="partner_id"/>
-        <field name="remote_phone"/>
+        <field name="wa_from"/>
+        <field name="wa_to"/>
         <field name="body"/>
       </list>
     </field>
@@ -25,22 +25,22 @@
         <sheet>
           <group>
             <group>
+              <field name="conversation_id"/>
               <field name="account_id"/>
               <field name="session_id"/>
               <field name="partner_id"/>
-              <field name="provider"/>
             </group>
             <group>
+              <field name="provider"/>
               <field name="direction"/>
               <field name="state"/>
-              <field name="wa_timestamp"/>
+              <field name="message_timestamp"/>
             </group>
           </group>
           <group>
-            <field name="remote_jid"/>
-            <field name="remote_phone"/>
             <field name="wa_from"/>
             <field name="wa_to"/>
+            <field name="is_group"/>
           </group>
           <group>
             <field name="body" nolabel="1"/>
@@ -54,7 +54,7 @@
   </record>
 
   <record id="action_bhz_wa_message" model="ir.actions.act_window">
-    <field name="name">Mensagens (Inbox)</field>
+    <field name="name">Log de Mensagens</field>
     <field name="res_model">bhz.wa.message</field>
     <field name="view_mode">list,form</field>
   </record>

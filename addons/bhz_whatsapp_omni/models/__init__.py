@@ -1,3 +1,4 @@
+from . import wa_conversation
 from . import wa_account
 from . import wa_session
 from . import wa_message

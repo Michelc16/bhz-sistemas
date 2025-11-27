@@ -1,8 +1,9 @@
 import json
+import logging
 from datetime import datetime
+
 from odoo import fields, http
 from odoo.http import request
-import logging
 
 _logger = logging.getLogger(__name__)
 
@@ -42,6 +43,9 @@ class BHZWABusinessWebhook(http.Controller):
         try:
             env = request.env.sudo()
             Account = env['bhz.wa.account']
+            Conversation = env['bhz.wa.conversation']
+            Message = env['bhz.wa.message']
+            Partner = env['res.partner']
             entries = payload.get('entry', []) or []
             for entry in entries:
                 for change in entry.get('changes', []):
@@ -64,11 +68,17 @@ class BHZWABusinessWebhook(http.Controller):
                             body = '[mensagem não-texto]'
                         from_phone = message.get('from')
                         to_phone = message.get('to')
-                        partner = env['res.partner'].search([
+                        partner = Partner.search([
                             '|',
-                            ('phone', 'ilike', from_phone),
-                            ('mobile', 'ilike', from_phone),
+                            ('phone', '=', from_phone),
+                            ('mobile', '=', from_phone),
                         ], limit=1)
+                        if not partner:
+                            partner = Partner.create({
+                                'name': from_phone,
+                                'mobile': from_phone,
+                                'phone': from_phone,
+                            })
 
                         timestamp = message.get('timestamp')
                         wa_dt = fields.Datetime.now()
@@ -78,23 +88,27 @@ class BHZWABusinessWebhook(http.Controller):
                             except Exception:
                                 pass
 
-                        record = env['bhz.wa.message'].create({
+                        conv = Conversation._get_or_create_from_partner(
+                            partner_id=partner.id,
+                            account_id=account.id,
+                        )
+                        record = Message.create({
+                            "conversation_id": conv.id,
+                            "partner_id": partner.id,
                             "account_id": account.id,
+                            "provider": "business",
                             "direction": "in",
-                            "partner_id": partner.id if partner else False,
-                            "remote_jid": f"{from_phone}@s.whatsapp.net",
-                            "remote_phone": from_phone,
+                            "state": "received",
+                            "body": body,
                             "wa_from": from_phone,
                             "wa_to": to_phone,
-                            "body": body,
-                            "state": "new",
-                            "provider": "business",
-                            "wa_timestamp": wa_dt,
+                            "external_message_id": message.get('id'),
+                            "message_timestamp": float(timestamp or 0.0),
                             "payload_json": json.dumps(message),
                         })
 
-                        if partner:
-                            partner.message_post(body=f"📲 WA Business (IN): {record.body}")
+                        conv._bump_last_message(body)
+                        conv._inc_unread()
 
                         account.with_context(bypass_limits=True).try_ai_autoreply(record)
 
