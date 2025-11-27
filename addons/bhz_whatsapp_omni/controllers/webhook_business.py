@@ -12,10 +12,6 @@ class BHZWABusinessWebhook(http.Controller):
 
     @http.route('/bhz_wa/business/webhook', type='http', auth='public', csrf=False, methods=['GET'])
     def verify(self, **params):
-        """
-        Verificação de webhook (GET) da Meta:
-        /bhz_wa/business/webhook?hub.mode=subscribe&hub.verify_token=...&hub.challenge=...
-        """
         mode = params.get('hub.mode')
         verify_token = params.get('hub.verify_token')
         challenge = params.get('hub.challenge', '')
@@ -36,14 +32,10 @@ class BHZWABusinessWebhook(http.Controller):
 
     @http.route('/bhz_wa/business/webhook', type='json', auth='public', csrf=False, methods=['POST'])
     def inbound(self, **payload):
-        """
-        Webhook de mensagens da Cloud API.
-        """
         payload = payload or request.jsonrequest or {}
         try:
             env = request.env.sudo()
             Account = env['bhz.wa.account']
-            Conversation = env['bhz.wa.conversation']
             Message = env['bhz.wa.message']
             Partner = env['res.partner']
             entries = payload.get('entry', []) or []
@@ -88,12 +80,7 @@ class BHZWABusinessWebhook(http.Controller):
                             except Exception:
                                 pass
 
-                        conv = Conversation._get_or_create_from_partner(
-                            partner_id=partner.id,
-                            account_id=account.id,
-                        )
                         record = Message.create({
-                            "conversation_id": conv.id,
                             "partner_id": partner.id,
                             "account_id": account.id,
                             "provider": "business",
@@ -107,8 +94,19 @@ class BHZWABusinessWebhook(http.Controller):
                             "payload_json": json.dumps(message),
                         })
 
-                        conv._bump_last_message(body)
-                        conv._inc_unread()
+                        try:
+                            partner.get_or_create_wa_channel()
+                            channel = partner.wa_channel_id
+                            if channel:
+                                body_html = (body or "").replace("\n", "<br/>")
+                                channel.with_context(mail_create_nosubscribe=True, bhz_wa_skip_outbound=True).message_post(
+                                    body=body_html,
+                                    author_id=partner.id,
+                                    message_type="comment",
+                                    subtype_xmlid="mail.mt_comment",
+                                )
+                        except Exception:
+                            _logger.exception("Falha ao publicar mensagem Business no Discuss")
 
                         account.with_context(bypass_limits=True).try_ai_autoreply(record)
 

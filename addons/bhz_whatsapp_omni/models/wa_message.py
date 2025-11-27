@@ -8,9 +8,6 @@ class BhzWaMessage(models.Model):
     _order = "id desc"
     _rec_name = "body"
 
-    conversation_id = fields.Many2one(
-        "bhz.wa.conversation", string="Conversa", index=True, ondelete="cascade"
-    )
     partner_id = fields.Many2one("res.partner", string="Contato", index=True)
     account_id = fields.Many2one("bhz.wa.account", string="Conta")
     session_id = fields.Many2one("bhz.wa.session", string="Sessão")

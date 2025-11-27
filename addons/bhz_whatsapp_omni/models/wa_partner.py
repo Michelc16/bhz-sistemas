@@ -12,12 +12,12 @@ class ResPartner(models.Model):
     )
 
     def get_or_create_wa_channel(self):
-        """Retorna (ou cria) um canal do Discuss vinculado ao contato."""
+        """Retorna um mail.channel do tipo chat vinculado ao partner para WhatsApp."""
         MailChannel = self.env["mail.channel"].sudo()
-        user_partner = self.env.user.partner_id
         for partner in self:
             if partner.wa_channel_id:
                 continue
+
             channel = MailChannel.search(
                 [
                     ("channel_type", "=", "chat"),
@@ -26,20 +26,12 @@ class ResPartner(models.Model):
                 limit=1,
             )
             if not channel:
-                commands = [(4, partner.id)]
-                if user_partner:
-                    commands.append((4, user_partner.id))
-                channel = MailChannel.create(
-                    {
-                        "name": partner.display_name
-                        or partner.name
-                        or partner.mobile
-                        or "WhatsApp",
-                        "channel_type": "chat",
-                        "channel_partner_ids": commands,
-                        "wa_partner_id": partner.id,
-                        "wa_is_whatsapp": True,
-                    }
-                )
+                channel = MailChannel.create({
+                    "name": partner.display_name or partner.name or partner.mobile or "WhatsApp",
+                    "channel_type": "chat",
+                    "channel_partner_ids": [(4, partner.id)],
+                    "wa_partner_id": partner.id,
+                    "wa_is_whatsapp": True,
+                })
             partner.wa_channel_id = channel.id
         return self.mapped("wa_channel_id")

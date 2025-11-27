@@ -11,27 +11,20 @@ class MailMessage(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
-        records = super().create(vals_list)
-        MailChannel = self.env["mail.channel"]
+        messages = super().create(vals_list)
 
-        for msg, vals in zip(records, vals_list):
-            model = vals.get("model") or msg.model
-            res_id = vals.get("res_id") or msg.res_id
-            message_type = vals.get("message_type") or msg.message_type
-
-            if model != "mail.channel" or not res_id:
+        for msg in messages:
+            if msg.model != "mail.channel":
                 continue
-            if message_type != "comment":
+            if msg.message_type != "comment":
                 continue
-
             if self.env.context.get("bhz_wa_skip_outbound"):
                 continue
 
-            channel = MailChannel.browse(res_id)
-            if not channel or not channel.wa_is_whatsapp:
-                continue
+            channel = self.env["mail.channel"].browse(msg.res_id)
             try:
-                channel._send_whatsapp_from_mail_message(msg)
-            except Exception as exc:
-                _logger.exception("Erro ao enviar msg WhatsApp a partir do Discuss: %s", exc)
-        return records
+                if channel.wa_is_whatsapp:
+                    channel._send_whatsapp_from_mail_message(msg)
+            except Exception as e:
+                _logger.exception("Erro ao enviar msg WhatsApp a partir do Discuss: %s", e)
+        return messages

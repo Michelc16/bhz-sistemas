@@ -25,7 +25,6 @@
         <sheet>
           <group>
             <group>
-              <field name="conversation_id"/>
               <field name="account_id"/>
               <field name="session_id"/>
               <field name="partner_id"/>

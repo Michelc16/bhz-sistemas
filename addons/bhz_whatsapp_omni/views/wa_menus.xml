@@ -12,12 +12,6 @@
             parent="menu_bhz_wa_root"
             action="action_bhz_wa_session"/>
 
-  <menuitem id="menu_bhz_wa_inbox"
-            name="Conversas (Inbox)"
-            parent="menu_bhz_wa_root"
-            action="action_bhz_wa_inbox"
-            sequence="15"/>
-
   <menuitem id="menu_bhz_wa_messages"
             name="Log de Mensagens"
             parent="menu_bhz_wa_root"
@@ -27,10 +21,4 @@
             name="Templates (Business)"
             parent="menu_bhz_wa_root"
             action="action_bhz_wa_template"/>
-
-  <menuitem id="menu_bhz_wa_discuss"
-            name="Atendimento (Chat)"
-            parent="menu_bhz_wa_root"
-            action="mail.mail_channel_action_client_chat"
-            sequence="30"/>
 </odoo>

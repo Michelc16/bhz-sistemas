@@ -34,22 +34,13 @@ class BhzWaWebhookStarter(http.Controller):
         env = request.env.sudo()
         Account = env['bhz.wa.account']
         Session = env['bhz.wa.session']
-        account = False
-        if session_identifier:
-            account = Account.search([('starter_session_id', '=', session_identifier)], limit=1)
-        if not account:
-            account = Account.search([('mode', '=', 'starter')], limit=1)
-
-        session = False
-        if session_identifier:
-            session = Session.search([('session_id', '=', session_identifier)], limit=1)
-
         Partner = env['res.partner']
-        partner = Partner.search([
-            '|',
-            ('mobile', '=', phone_from),
-            ('phone', '=', phone_from),
-        ], limit=1)
+        Message = env['bhz.wa.message']
+
+        account = Account.search([], limit=1)
+        session = Session.search([('name', '=', session_identifier)], limit=1) if session_identifier else Session.search([], limit=1)
+
+        partner = Partner.search([('mobile', '=', phone_from)], limit=1)
         if not partner:
             partner = Partner.create({
                 'name': contact_name or phone_from or 'Contato WhatsApp',
@@ -57,43 +48,33 @@ class BhzWaWebhookStarter(http.Controller):
                 'phone': phone_from or False,
             })
 
-        Conv = env['bhz.wa.conversation']
-        conv = Conv._get_or_create_from_partner(
-            partner_id=partner.id,
-            account_id=account.id if account else False,
-            session_id=session.id if session else False,
-        )
-
-        Message = env['bhz.wa.message']
-        message_rec = Message.create({
-            'conversation_id': conv.id,
+        Message.create({
             'partner_id': partner.id,
             'account_id': account.id if account else False,
             'session_id': session.id if session else False,
             'provider': 'starter',
             'direction': 'in',
-            'state': 'received',
             'body': text,
             'wa_from': phone_from,
             'wa_to': phone_to,
             'is_group': is_group,
             'external_message_id': msg.get('id'),
-            'message_timestamp': float(ts or 0.0),
-            'payload_json': request.jsonrequest and json.dumps(request.jsonrequest) or False,
+            'message_timestamp': ts,
+            'state': 'received',
         })
 
-        conv._bump_last_message(text)
-        conv._inc_unread()
-
-        partner.get_or_create_wa_channel()
-        channel = partner.wa_channel_id
-        if channel:
-            body_html = (text or "").replace("\n", "<br/>")
-            channel.with_context(mail_create_nosubscribe=True, bhz_wa_skip_outbound=True).message_post(
-                body=body_html,
-                author_id=partner.id,
-                message_type="comment",
-                subtype_xmlid="mail.mt_comment",
-            )
+        try:
+            partner.get_or_create_wa_channel()
+            channel = partner.wa_channel_id
+            if channel:
+                body_html = (text or '').replace('\n', '<br/>')
+                channel.with_context(mail_create_nosubscribe=True, bhz_wa_skip_outbound=True).message_post(
+                    body=body_html,
+                    author_id=partner.id,
+                    message_type='comment',
+                    subtype_xmlid='mail.mt_comment',
+                )
+        except Exception:
+            _logger.exception("Falha ao publicar mensagem WhatsApp no Discuss")
 
         return {'ok': True}
