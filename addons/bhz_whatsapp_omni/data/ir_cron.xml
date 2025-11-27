@@ -24,13 +24,12 @@
 
   <record id="ir_cron_bhz_wa_sync_defaults" model="ir.cron">
     <field name="name">BHZ WhatsApp Omni – Sync Starter Defaults</field>
-    <field name="model_id" ref="base.model_ir_cron"/>
     <field name="state">code</field>
     <field name="code">env['bhz.wa.config.sync'].action_sync_starter_defaults()</field>
     <field name="active">True</field>
     <field name="interval_number">12</field>
     <field name="interval_type">hours</field>
-    <field name="numbercall">-1</field>
-    <field name="doall">False</field>
+    <field name="user_id" ref="base.user_root"/>
+    <field name="catchup">False</field>
   </record>
 </odoo>
