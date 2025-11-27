@@ -4,6 +4,3 @@ from . import wa_session
 from . import wa_message
 from . import wa_template
 from . import wa_config_sync
-from . import wa_partner
-from . import wa_channel
-from . import wa_mail_message

@@ -1,4 +1,4 @@
-import json
+# -*- coding: utf-8 -*-
 import logging
 
 from odoo import http
@@ -25,20 +25,19 @@ class BhzWaWebhookStarter(http.Controller):
         msg = payload['message']
         phone_from = (msg.get('from') or '').strip()
         phone_to = (msg.get('to') or '').strip()
-        session_identifier = payload.get('session_id') or msg.get('session_id') or ''
         text = msg.get('body') or ''
-        ts = msg.get('timestamp') or 0.0
+        ts = msg.get('timestamp')
         is_group = bool(msg.get('is_group'))
         contact_name = msg.get('contact_name') or phone_from
 
         env = request.env.sudo()
+        Partner = env['res.partner']
         Account = env['bhz.wa.account']
         Session = env['bhz.wa.session']
-        Partner = env['res.partner']
         Message = env['bhz.wa.message']
 
         account = Account.search([], limit=1)
-        session = Session.search([('name', '=', session_identifier)], limit=1) if session_identifier else Session.search([], limit=1)
+        session = Session.search([], limit=1)
 
         partner = Partner.search([('mobile', '=', phone_from)], limit=1)
         if not partner:
@@ -62,19 +61,5 @@ class BhzWaWebhookStarter(http.Controller):
             'message_timestamp': ts,
             'state': 'received',
         })
-
-        try:
-            partner.get_or_create_wa_channel()
-            channel = partner.wa_channel_id
-            if channel:
-                body_html = (text or '').replace('\n', '<br/>')
-                channel.with_context(mail_create_nosubscribe=True, bhz_wa_skip_outbound=True).message_post(
-                    body=body_html,
-                    author_id=partner.id,
-                    message_type='comment',
-                    subtype_xmlid='mail.mt_comment',
-                )
-        except Exception:
-            _logger.exception("Falha ao publicar mensagem WhatsApp no Discuss")
 
         return {'ok': True}

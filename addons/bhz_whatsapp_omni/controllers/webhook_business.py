@@ -94,20 +94,6 @@ class BHZWABusinessWebhook(http.Controller):
                             "payload_json": json.dumps(message),
                         })
 
-                        try:
-                            partner.get_or_create_wa_channel()
-                            channel = partner.wa_channel_id
-                            if channel:
-                                body_html = (body or "").replace("\n", "<br/>")
-                                channel.with_context(mail_create_nosubscribe=True, bhz_wa_skip_outbound=True).message_post(
-                                    body=body_html,
-                                    author_id=partner.id,
-                                    message_type="comment",
-                                    subtype_xmlid="mail.mt_comment",
-                                )
-                        except Exception:
-                            _logger.exception("Falha ao publicar mensagem Business no Discuss")
-
                         account.with_context(bypass_limits=True).try_ai_autoreply(record)
 
             return {"status": "ok"}

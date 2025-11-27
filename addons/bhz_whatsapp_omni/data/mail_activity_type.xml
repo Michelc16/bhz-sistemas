@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<odoo>
-  <record id="mail_act_bhz_wa_followup" model="mail.activity.type">
-    <field name="name">WhatsApp Follow-up</field>
-    <field name="category">default</field>
-  </record>
-</odoo>
