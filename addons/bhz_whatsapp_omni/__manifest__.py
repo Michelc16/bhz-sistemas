@@ -15,6 +15,7 @@
     "data": [
         "security/security.xml",
         "security/ir.model.access.csv",
+        "views/wa_inbox_views.xml",
         "views/wa_menus.xml",
         "views/wa_session_views.xml",
         "views/wa_account_views.xml",

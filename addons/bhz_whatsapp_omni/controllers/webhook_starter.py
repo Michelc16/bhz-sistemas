@@ -65,7 +65,7 @@ class BhzWaWebhookStarter(http.Controller):
         )
 
         Message = env['bhz.wa.message']
-        Message.create({
+        message_rec = Message.create({
             'conversation_id': conv.id,
             'partner_id': partner.id,
             'account_id': account.id if account else False,
@@ -84,5 +84,16 @@ class BhzWaWebhookStarter(http.Controller):
 
         conv._bump_last_message(text)
         conv._inc_unread()
+
+        partner.get_or_create_wa_channel()
+        channel = partner.wa_channel_id
+        if channel:
+            body_html = (text or "").replace("\n", "<br/>")
+            channel.with_context(mail_create_nosubscribe=True, bhz_wa_skip_outbound=True).message_post(
+                body=body_html,
+                author_id=partner.id,
+                message_type="comment",
+                subtype_xmlid="mail.mt_comment",
+            )
 
         return {'ok': True}

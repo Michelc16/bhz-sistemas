@@ -8,7 +8,7 @@ from odoo.exceptions import UserError
 _logger = logging.getLogger(__name__)
 
 MAGALU_AUTHORIZE_URL = "https://id.magalu.com/login"
-MAGALU_SCOPES = [
+SCOPES = [
     "open:order-order-seller:read",
     "open:order-delivery-seller:read",
     "open:order-delivery-seller:write",
@@ -102,12 +102,15 @@ class BhzMagaluConfig(models.Model):
         return redirect_uri
 
     def _get_scope_string(self):
-        base_scopes = MAGALU_SCOPES[:]
+        scopes = ["openid"] + SCOPES[:]
         extras = (self._get_system_param(EXTRA_SCOPES_PARAM) or "").split()
         for scope in extras:
-            if scope not in base_scopes:
-                base_scopes.append(scope)
-        return " ".join(["openid"] + base_scopes)
+            scope = scope.strip()
+            if scope:
+                scopes.append(scope)
+        # remove duplicatas preservando a ordem
+        unique_scopes = list(dict.fromkeys(scopes))
+        return " ".join(unique_scopes)
 
     def _build_state_param(self):
         if not self.id:
