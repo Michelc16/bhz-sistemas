@@ -322,19 +322,21 @@ class BHZWAAccount(models.Model):
 
     def _compute_starter_settings(self):
         IrConfig = self.env['ir.config_parameter'].sudo()
-        base_url = (IrConfig.get_param('bhz_wa.starter_base_url') or '').strip()
-        secret = IrConfig.get_param('bhz_wa.starter_webhook_secret') or ''
+        base_url = (IrConfig.get_param('starter_service.base_url') or '').strip()
+        if base_url:
+            base_url = base_url.rstrip('/')
+        secret = IrConfig.get_param('starter_service.secret') or ''
         for account in self:
             account.starter_base_url = base_url
             account.webhook_secret = secret
 
     def _get_starter_base_url(self):
         self.ensure_one()
-        base_url = self.env['ir.config_parameter'].sudo().get_param('bhz_wa.starter_base_url')
+        base_url = self.env['ir.config_parameter'].sudo().get_param('starter_service.base_url')
         if not base_url:
             raise UserError(
                 "URL do serviço Starter não está configurada. "
-                "Peça ao administrador (BHZ) para configurar o parâmetro 'bhz_wa.starter_base_url'."
+                "Peça ao administrador (BHZ) para configurar o parâmetro 'starter_service.base_url'."
             )
         return base_url.rstrip('/')
 

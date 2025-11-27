@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="bhz_whatsapp_omni_update_starter_defaults" model="ir.actions.server">
+        <field name="name">BHZ WhatsApp Omni – Reaplicar Starter Defaults</field>
+        <field name="state">code</field>
+        <field name="model_id" ref="base.model_ir_actions_server"/>
+        <field name="code"><![CDATA[
+from odoo.addons.bhz_whatsapp_omni import hooks
+hooks.update_starter_defaults(env.cr, env.registry)
+        ]]></field>
+    </record>
+</odoo>

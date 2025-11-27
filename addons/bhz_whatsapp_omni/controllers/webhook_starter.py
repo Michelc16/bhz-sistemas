@@ -14,7 +14,7 @@ class BHZWAStarterInbound(http.Controller):
         payload = payload or request.jsonrequest or {}
         try:
             env = request.env.sudo()
-            expected_secret = env['ir.config_parameter'].get_param('bhz_wa.starter_webhook_secret') or ''
+            expected_secret = env['ir.config_parameter'].get_param('starter_service.secret') or ''
             provided_secret = request.httprequest.headers.get('X-Webhook-Secret') or payload.get('secret')
             if expected_secret and provided_secret != expected_secret:
                 _logger.warning("Starter webhook secret inválido.")

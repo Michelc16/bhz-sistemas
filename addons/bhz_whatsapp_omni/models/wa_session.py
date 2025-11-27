@@ -1,4 +1,5 @@
-from odoo import api, fields, models
+from odoo import _, api, fields, models
+from odoo.exceptions import UserError
 import requests
 
 
@@ -48,17 +49,20 @@ class BHZWASession(models.Model):
     # Actions
 
     def action_get_qr(self):
+        IrConfig = self.env['ir.config_parameter'].sudo()
+        base_url = IrConfig.get_param('starter_service.base_url')
+        if not base_url:
+            raise UserError(_("Parâmetro 'starter_service.base_url' não encontrado."))
+        base_url = base_url.rstrip('/')
+        url = f"{base_url}/api/whatsapp/qr"
         for rec in self:
             try:
-                resp = requests.get(
-                    rec._endpoint("/qr"),
-                    params={'session': rec.session_id, 'format': 'json'},
-                    timeout=20,
-                )
+                resp = requests.get(url, timeout=60)
+                resp.raise_for_status()
                 data = resp.json()
-                qrcode = data.get('qrcode')
-                if qrcode and 'base64,' in qrcode:
-                    rec.qr_image = qrcode.split('base64,', 1)[1]
+                qrcode = data.get('qr_image')
+                if qrcode:
+                    rec.qr_image = qrcode
                     rec.status = 'qr'
                     rec.last_qr_at = fields.Datetime.now()
                 rec._apply_status_payload(data)
