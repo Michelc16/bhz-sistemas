@@ -10,7 +10,7 @@
     "data": [],
     "assets": {
         "web.assets_backend": [
-            "bhz_assistente_bhz/static/src/scss/bhz_assistente_bhz.scss",
+            "bhz_mail_bot_name/static/src/scss/bhz_assistente_bhz.scss",
         ],
     },    
     "post_init_hook": "post_init_hook",

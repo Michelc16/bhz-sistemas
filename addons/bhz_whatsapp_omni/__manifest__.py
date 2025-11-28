@@ -10,6 +10,7 @@
         "base",
         "mail",
     ],
+    "post_init_hook": "post_init_set_starter_defaults",
     "data": [
         "security/security.xml",
         "security/ir.model.access.csv",
@@ -20,7 +21,6 @@
         "views/wa_template_views.xml",
         "data/ir_cron.xml",
     ],
-    "post_init_hook": "post_init_set_starter_defaults",
     "installable": True,
     "application": False,
     "description": """

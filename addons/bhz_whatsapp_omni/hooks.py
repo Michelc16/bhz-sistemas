@@ -1,34 +1,30 @@
-# -*- coding: utf-8 -*-
-import logging
 import os
-
-_logger = logging.getLogger(__name__)
-
-FALLBACK_STARTER_URL = "https://bhz-wa-starter.onrender.com"
-
-
-def _resolve_starter_url():
-    return (os.getenv("ODOO_STARTER_BASE_URL") or FALLBACK_STARTER_URL).rstrip("/")
-
-
-def _resolve_webhook_secret():
-    return os.getenv("ODOO_WEBHOOK_SECRET")
-
-
-def _set_param(env, key, value):
-    env["ir.config_parameter"].sudo().set_param(key, value)
 
 
 def post_init_set_starter_defaults(cr, registry):
-    """Executa na instalação do módulo: grava URL/secret."""
+    """
+    Configura automaticamente os parâmetros do serviço Starter
+    durante a instalação ou upgrade do módulo.
+    """
     from odoo.api import Environment
 
     env = Environment(cr, 1, {})
-    base_url = _resolve_starter_url()
-    _set_param(env, "starter_service.base_url", base_url)
-    _logger.info("[bhz_whatsapp_omni] starter_service.base_url => %s", base_url)
+    icp = env['ir.config_parameter'].sudo()
 
-    secret = _resolve_webhook_secret()
+    # Lê variáveis de ambiente enviadas pelo Render
+    base_url = (
+        os.getenv('STARTER_BASE_URL')
+        or os.getenv('RENDER_STARTER_URL')
+        or os.getenv('STARTER_SERVICE_URL')
+    )
+    secret = (
+        os.getenv('ODOO_WEBHOOK_SECRET')
+        or os.getenv('STARTER_WEBHOOK_SECRET')
+    )
+
+    # Aplica valores padrão somente se existirem
+    if base_url:
+        icp.set_param('starter_service.base_url', base_url.rstrip('/'))
+
     if secret:
-        _set_param(env, "starter_service.secret", secret)
-        _logger.info("[bhz_whatsapp_omni] starter_service.secret configurado")
+        icp.set_param('starter_service.secret', secret)
