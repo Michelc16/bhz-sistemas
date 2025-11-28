@@ -94,6 +94,15 @@ class BHZWABusinessWebhook(http.Controller):
                             "payload_json": json.dumps(message),
                         })
 
+                        try:
+                            request.env['bus.bus'].sudo().sendone('bhz_wa_inbox', {
+                                'type': 'new_message',
+                                'message_id': record.id,
+                                'conversation_id': record.conversation_id.id,
+                            })
+                        except Exception as exc:
+                            _logger.exception("Erro ao publicar mensagem Business no bus: %s", exc)
+
                         account.with_context(bypass_limits=True).try_ai_autoreply(record)
 
             return {"status": "ok"}

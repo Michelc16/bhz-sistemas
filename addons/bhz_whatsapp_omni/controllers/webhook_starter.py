@@ -47,7 +47,7 @@ class BhzWaWebhookStarter(http.Controller):
                 'phone': phone_from or False,
             })
 
-        Message.create({
+        message = Message.create({
             'partner_id': partner.id,
             'account_id': account.id if account else False,
             'session_id': session.id if session else False,
@@ -61,5 +61,14 @@ class BhzWaWebhookStarter(http.Controller):
             'message_timestamp': ts,
             'state': 'received',
         })
+
+        try:
+            request.env['bus.bus'].sudo().sendone('bhz_wa_inbox', {
+                'type': 'new_message',
+                'message_id': message.id,
+                'conversation_id': message.conversation_id.id,
+            })
+        except Exception as exc:
+            _logger.exception("Erro ao publicar mensagem no bus: %s", exc)
 
         return {'ok': True}

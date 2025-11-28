@@ -11,6 +11,11 @@ class BhzWaMessage(models.Model):
     partner_id = fields.Many2one("res.partner", string="Contato", index=True)
     account_id = fields.Many2one("bhz.wa.account", string="Conta")
     session_id = fields.Many2one("bhz.wa.session", string="Sessão")
+    conversation_id = fields.Many2one(
+        "bhz.wa.conversation",
+        string="Conversa",
+        ondelete="set null",
+    )
 
     provider = fields.Selection(
         [
@@ -54,3 +59,17 @@ class BhzWaMessage(models.Model):
     def _compute_is_me(self):
         for record in self:
             record.is_me = record.direction == "out"
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        records = super().create(vals_list)
+        Conversation = self.env["bhz.wa.conversation"].sudo()
+        for record in records:
+            try:
+                if record.partner_id and record.session_id:
+                    conv = Conversation.get_or_create_from_message(record)
+                    record.conversation_id = conv.id
+            except Exception:
+                # mantém silencioso, log no servidor padrão
+                continue
+        return records

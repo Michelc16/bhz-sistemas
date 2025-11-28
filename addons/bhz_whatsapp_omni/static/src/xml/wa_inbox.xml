@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="bhz_wa.InboxRoot" owl="1">
+        <div class="bhz-wa-inbox">
+            <div class="bhz-wa-inbox__sidebar">
+                <div class="bhz-wa-inbox__sidebar-header">
+                    <h4>Conversas</h4>
+                </div>
+                <div class="bhz-wa-inbox__conversation-list">
+                    <t t-foreach="state.conversations" t-as="conv" t-key="conv.id">
+                        <div class="conversation-item" t-on-click="() => this.setCurrentConversation(conv.id)" t-att-class="{'active': conv.id === state.currentConversationId}">
+                            <div class="conversation-item__name">
+                                <t t-esc="conv.name"/>
+                            </div>
+                            <div class="conversation-item__body">
+                                <t t-esc="conv.last_message_body"/>
+                            </div>
+                            <div class="conversation-item__meta">
+                                <span class="conversation-item__date">
+                                    <t t-esc="conv.last_message_date"/>
+                                </span>
+                                <t t-if="conv.unread_count">
+                                    <span class="badge">
+                                        <t t-esc="conv.unread_count"/>
+                                    </span>
+                                </t>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </div>
+            <div class="bhz-wa-inbox__chat">
+                <div class="bhz-wa-chat__header">
+                    <h4>
+                        <t t-esc="(state.conversations.find(c => c.id === state.currentConversationId) or {}).name"/>
+                    </h4>
+                </div>
+                <div class="bhz-wa-chat__messages">
+                    <t t-foreach="state.messages" t-as="msg" t-key="msg.id">
+                        <div class="message-bubble" t-att-class="{'message-bubble--out': msg.direction === 'out', 'message-bubble--in': msg.direction !== 'out'}">
+                            <t t-esc="msg.body"/>
+                        </div>
+                    </t>
+                </div>
+                <form class="bhz-wa-chat__composer" t-on-submit.prevent="sendMessage">
+                    <textarea t-model="state.composer" placeholder="Digite sua mensagem..."/>
+                    <button type="submit" class="btn btn-primary">Enviar</button>
+                </form>
+            </div>
+            <div class="bhz-wa-inbox__details">
+                <h4>Detalhes</h4>
+                <p>Selecione uma conversa para ver mais informações.</p>
+            </div>
+        </div>
+    </t>
+</templates>

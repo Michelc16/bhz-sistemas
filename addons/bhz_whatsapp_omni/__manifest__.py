@@ -10,6 +10,13 @@
         "base",
         "mail",
     ],
+    "assets": {
+        "web.assets_backend": [
+            "bhz_whatsapp_omni/static/src/js/wa_inbox.js",
+            "bhz_whatsapp_omni/static/src/xml/wa_inbox.xml",
+            "bhz_whatsapp_omni/static/src/scss/wa_inbox.scss",
+        ],
+    },
     "post_init_hook": "post_init_set_starter_defaults",
     "data": [
         "security/security.xml",
