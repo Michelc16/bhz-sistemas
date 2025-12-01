@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
 import logging
 
-from odoo import api, fields, models
+import logging
+
+from odoo import _, api, fields, models
+from odoo.exceptions import UserError
+
+_logger = logging.getLogger(__name__)
 
 _logger = logging.getLogger(__name__)
 
@@ -78,5 +83,7 @@ class BhzWaMessage(models.Model):
         return messages
 
     def action_rebuild_conversations(self):
+        if not self.env.user.has_group('base.group_system'):
+            raise UserError(_("Ação permitida apenas para administradores."))
         self.env["bhz.wa.conversation"].sudo().recompute_from_all_messages()
         return True
