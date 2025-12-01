@@ -68,7 +68,11 @@ class InboxComponent extends Component {
             return;
         }
         this.state.composer = "";
-        await this.loadMessages(this.state.currentConversationId);
+        if (result.message) {
+            this.state.messages.push(result.message);
+            setTimeout(() => this._scrollToBottom(), 30);
+        }
+        await this.loadConversations();
     }
 
     _scrollToBottom() {
@@ -83,14 +87,19 @@ class InboxComponent extends Component {
         this.bus.start();
         this.bus.addEventListener('notification', (notifications) => {
             for (const notif of notifications) {
-                if (notif.payload?.type === 'new_message') {
+                const payload = notif.payload;
+                if (payload?.type === 'new_message') {
                     this.loadConversations();
-                    if (notif.payload.conversation_id === this.state.currentConversationId) {
+                    if (payload.conversation_id === this.state.currentConversationId) {
                         this.loadMessages(this.state.currentConversationId);
                     }
                 }
             }
         });
+    }
+
+    get currentConversation() {
+        return this.state.conversations.find((conv) => conv.id === this.state.currentConversationId);
     }
 }
 

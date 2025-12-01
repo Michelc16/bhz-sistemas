@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
+import logging
+
 from odoo import api, fields, models
+
+_logger = logging.getLogger(__name__)
 
 
 class BhzWaMessage(models.Model):
@@ -62,14 +66,17 @@ class BhzWaMessage(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
-        records = super().create(vals_list)
+        messages = super().create(vals_list)
         Conversation = self.env["bhz.wa.conversation"].sudo()
-        for record in records:
+        for msg in messages:
             try:
-                if record.partner_id and record.session_id:
-                    conv = Conversation.get_or_create_from_message(record)
-                    record.conversation_id = conv.id
+                if msg.partner_id and msg.session_id:
+                    conv = Conversation.get_or_create_from_message(msg)
+                    msg.conversation_id = conv.id
             except Exception:
-                # mantém silencioso, log no servidor padrão
-                continue
-        return records
+                _logger.exception("Erro ao vincular mensagem à conversa WhatsApp")
+        return messages
+
+    def action_rebuild_conversations(self):
+        self.env["bhz.wa.conversation"].sudo().recompute_from_all_messages()
+        return True

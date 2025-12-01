@@ -32,7 +32,7 @@
             <div class="bhz-wa-inbox__chat">
                 <div class="bhz-wa-chat__header">
                     <h4>
-                        <t t-esc="(state.conversations.find(c => c.id === state.currentConversationId) or {}).name"/>
+                        <t t-esc="component.currentConversation and component.currentConversation.name or ''"/>
                     </h4>
                 </div>
                 <div class="bhz-wa-chat__messages">
@@ -41,6 +41,9 @@
                             <t t-esc="msg.body"/>
                         </div>
                     </t>
+                    <t t-if="!state.messages.length">
+                        <div class="bhz-wa-chat__placeholder">Selecione uma conversa para começar.</div>
+                    </t>
                 </div>
                 <form class="bhz-wa-chat__composer" t-on-submit.prevent="sendMessage">
                     <textarea t-model="state.composer" placeholder="Digite sua mensagem..."/>
@@ -48,8 +51,17 @@
                 </form>
             </div>
             <div class="bhz-wa-inbox__details">
-                <h4>Detalhes</h4>
-                <p>Selecione uma conversa para ver mais informações.</p>
+                <t t-if="component.currentConversation">
+                    <h4>Contato</h4>
+                    <p><t t-esc="component.currentConversation.partner_name"/></p>
+                    <h5>Última mensagem</h5>
+                    <p><t t-esc="component.currentConversation.last_message_body"/></p>
+                    <p><strong>Quando:</strong> <t t-esc="component.currentConversation.last_message_date"/></p>
+                    <p><strong>Não lidas:</strong> <t t-esc="component.currentConversation.unread_count"/></p>
+                </t>
+                <t t-else="">
+                    <p>Selecione uma conversa para ver mais informações.</p>
+                </t>
             </div>
         </div>
     </t>

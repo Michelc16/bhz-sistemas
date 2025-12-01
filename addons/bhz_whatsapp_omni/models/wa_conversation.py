@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from odoo import _, api, fields, models
-from odoo.exceptions import ValidationError
 
 
 class BhzWaConversation(models.Model):
@@ -51,13 +50,14 @@ class BhzWaConversation(models.Model):
     def get_or_create_from_message(self, message):
         conversation = self.search(self._get_conversation_domain(message), limit=1)
         if not conversation:
-            values = {
-                "name": message.partner_id.display_name or message.wa_from or _("Conversa"),
-                "partner_id": message.partner_id.id if message.partner_id else False,
+            partner = message.partner_id
+            name = partner.display_name if partner else (message.wa_from or _("Conversa"))
+            conversation = self.create({
+                "name": name,
+                "partner_id": partner.id if partner else False,
                 "session_id": message.session_id.id if message.session_id else False,
                 "account_id": message.account_id.id if message.account_id else False,
-            }
-            conversation = self.create(values)
+            })
         conversation._update_from_message(message)
         return conversation
 
@@ -74,4 +74,20 @@ class BhzWaConversation(models.Model):
         self.sudo().write(vals)
 
     def mark_read(self):
-        self.write({"unread_count": 0})
+        for conv in self:
+            conv.sudo().write({"unread_count": 0})
+
+    @api.model
+    def recompute_from_all_messages(self):
+        Message = self.env["bhz.wa.message"].sudo()
+        conversations = self
+        msgs = Message.search([
+            ("partner_id", "!=", False),
+            ("session_id", "!=", False),
+        ], order="create_date asc")
+        for msg in msgs:
+            try:
+                conv = self.get_or_create_from_message(msg)
+                msg.conversation_id = conv.id
+            except Exception:
+                continue
