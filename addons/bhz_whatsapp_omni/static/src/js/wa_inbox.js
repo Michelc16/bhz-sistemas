@@ -7,7 +7,7 @@ import { _t } from "@web/core/l10n/translation";
 class InboxComponent extends Component {
     setup() {
         super.setup?.();
-        this.rpc = this.env.services.rpc;
+        this._rpc = (route, params) => this.env.services.rpc.rpc(route, params || {});
         this.notification = this.env.services.notification;
         this.bus = this.env.services.bus_service;
         this.state = useState({
@@ -24,7 +24,7 @@ class InboxComponent extends Component {
     }
 
     async loadConversations() {
-        const result = await this.rpc("/bhz/wa/inbox/conversations", {});
+        const result = await this._rpc("/bhz/wa/inbox/conversations", {});
         this.state.conversations = result.conversations || [];
         if (!this.state.currentConversationId && this.state.conversations.length) {
             const firstId = this.state.conversations[0].id;
@@ -35,7 +35,7 @@ class InboxComponent extends Component {
     async setCurrentConversation(conversationId) {
         this.state.currentConversationId = conversationId;
         await this.loadMessages(conversationId);
-        await this.rpc("/bhz/wa/inbox/mark_read", { conversation_id: conversationId });
+        await this._rpc("/bhz/wa/inbox/mark_read", { conversation_id: conversationId });
     }
 
     async loadMessages(conversationId) {
@@ -43,7 +43,7 @@ class InboxComponent extends Component {
             this.state.messages = [];
             return;
         }
-        const result = await this.rpc("/bhz/wa/inbox/messages", {
+        const result = await this._rpc("/bhz/wa/inbox/messages", {
             conversation_id: conversationId,
             limit: 80,
             offset: 0,
@@ -61,7 +61,7 @@ class InboxComponent extends Component {
             conversation_id: this.state.currentConversationId,
             body: this.state.composer,
         };
-        const result = await this.rpc("/bhz/wa/inbox/send_message", payload);
+        const result = await this._rpc("/bhz/wa/inbox/send_message", payload);
         if (result.error) {
             this.notification.add(_t("Falha ao enviar mensagem"), { type: "danger" });
             return;
