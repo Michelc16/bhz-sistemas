@@ -105,6 +105,6 @@ class InboxComponent extends Component {
 
 InboxComponent.template = "bhz_wa.InboxRoot";
 
-registry.category("actions").add("bhz_wa_inbox_action", {
-    component: InboxComponent,
-});
+registry.category("actions").add("bhz_wa_inbox_action", InboxComponent);
+
+export default InboxComponent;
