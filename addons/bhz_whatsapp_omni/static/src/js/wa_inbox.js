@@ -2,15 +2,14 @@
 
 import { Component, onWillStart, useState } from "@odoo/owl";
 import { registry } from "@web/core/registry";
-import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 
 class InboxComponent extends Component {
     setup() {
-        super.setup();
-        this.rpc = useService("rpc");
-        this.notification = useService("notification");
-        this.bus = useService("bus_service");
+        super.setup?.();
+        this.rpc = this.env.services.rpc;
+        this.notification = this.env.services.notification;
+        this.bus = this.env.services.bus_service;
         this.state = useState({
             conversations: [],
             currentConversationId: null,
