@@ -14,8 +14,11 @@ class InboxComponent extends Component {
         this.state = useState({
             conversations: [],
             currentConversationId: null,
+            currentConversation: null,
             messages: [],
             composer: "",
+            loadingConversations: false,
+            loadingMessages: false,
         });
 
         onWillStart(async () => {
@@ -25,18 +28,43 @@ class InboxComponent extends Component {
     }
 
     async loadConversations() {
-        const result = await this._rpc("/bhz/wa/inbox/conversations", {});
-        this.state.conversations = result.conversations || [];
-        if (!this.state.currentConversationId && this.state.conversations.length) {
-            const firstId = this.state.conversations[0].id;
-            await this.setCurrentConversation(firstId);
+        this.state.loadingConversations = true;
+        try {
+            const result = await this._rpc("/bhz/wa/inbox/conversations", {});
+            const list = result.conversations || [];
+            this.state.conversations = list;
+            if (!list.length) {
+                this.state.currentConversationId = null;
+                this.state.currentConversation = null;
+                this.state.messages = [];
+                return;
+            }
+            const desiredId = this.state.currentConversationId;
+            let target = list.find((conv) => conv.id === desiredId);
+            if (!target) {
+                target = list[0];
+            }
+            await this.setCurrentConversation(target);
+        } finally {
+            this.state.loadingConversations = false;
         }
     }
 
-    async setCurrentConversation(conversationId) {
-        this.state.currentConversationId = conversationId;
-        await this.loadMessages(conversationId);
-        await this._rpc("/bhz/wa/inbox/mark_read", { conversation_id: conversationId });
+    async setCurrentConversation(convOrId) {
+        let conversation = convOrId;
+        if (!conversation || typeof conversation !== "object") {
+            conversation = this.state.conversations.find((c) => c.id === convOrId);
+        }
+        if (!conversation) {
+            this.state.currentConversationId = null;
+            this.state.currentConversation = null;
+            this.state.messages = [];
+            return;
+        }
+        this.state.currentConversationId = conversation.id;
+        this.state.currentConversation = conversation;
+        await this.loadMessages(conversation.id);
+        await this._rpc("/bhz/wa/inbox/mark_read", { conversation_id: conversation.id });
     }
 
     async loadMessages(conversationId) {
@@ -44,18 +72,23 @@ class InboxComponent extends Component {
             this.state.messages = [];
             return;
         }
-        const result = await this._rpc("/bhz/wa/inbox/messages", {
-            conversation_id: conversationId,
-            limit: 80,
-            offset: 0,
-        });
-        this.state.messages = result.messages || [];
-        setTimeout(() => this._scrollToBottom(), 50);
+        this.state.loadingMessages = true;
+        try {
+            const result = await this._rpc("/bhz/wa/inbox/messages", {
+                conversation_id: conversationId,
+                limit: 80,
+                offset: 0,
+            });
+            this.state.messages = result.messages || [];
+            setTimeout(() => this._scrollToBottom(), 50);
+        } finally {
+            this.state.loadingMessages = false;
+        }
     }
 
     async sendMessage(ev) {
         ev?.preventDefault();
-        if (!this.state.composer) {
+        if (!this.state.composer || !this.state.currentConversationId) {
             return;
         }
         const payload = {
@@ -99,7 +132,7 @@ class InboxComponent extends Component {
     }
 
     get currentConversation() {
-        return this.state.conversations.find((conv) => conv.id === this.state.currentConversationId);
+        return this.state.currentConversation;
     }
 }
 
