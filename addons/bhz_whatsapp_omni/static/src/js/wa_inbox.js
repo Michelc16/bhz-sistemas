@@ -3,11 +3,12 @@
 import { Component, onWillStart, useState } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { _t } from "@web/core/l10n/translation";
+import { rpc } from "@web/core/network/rpc";
 
 class InboxComponent extends Component {
     setup() {
         super.setup?.();
-        this._rpc = (route, params) => this.env.services.rpc.rpc(route, params || {});
+        this._rpc = (route, params) => rpc(route, params || {});
         this.notification = this.env.services.notification;
         this.bus = this.env.services.bus_service;
         this.state = useState({
