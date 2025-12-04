@@ -15,10 +15,10 @@ class BhzWaConversation(models.Model):
     ]
 
     name = fields.Char(string="Nome")
-    partner_id = fields.Many2one("res.partner", string="Contato")
-    session_id = fields.Many2one("bhz.wa.session", string="Sessão")
-    account_id = fields.Many2one("bhz.wa.account", string="Conta")
-    last_message_id = fields.Many2one("bhz.wa.message", string="Última mensagem")
+    partner_id = fields.Many2one("res.partner", string="Contato", ondelete="set null")
+    session_id = fields.Many2one("bhz.wa.session", string="Sessão", ondelete="cascade")
+    account_id = fields.Many2one("bhz.wa.account", string="Conta", ondelete="cascade")
+    last_message_id = fields.Many2one("bhz.wa.message", string="Última mensagem", ondelete="set null")
     last_message_body = fields.Char(string="Conteúdo da última mensagem")
     last_message_date = fields.Datetime(string="Data da última mensagem")
     last_direction = fields.Selection(

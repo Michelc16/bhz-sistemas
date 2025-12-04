@@ -17,13 +17,13 @@ class BhzWaMessage(models.Model):
     _order = "id desc"
     _rec_name = "body"
 
-    partner_id = fields.Many2one("res.partner", string="Contato", index=True)
-    account_id = fields.Many2one("bhz.wa.account", string="Conta")
-    session_id = fields.Many2one("bhz.wa.session", string="Sessão")
+    partner_id = fields.Many2one("res.partner", string="Contato", index=True, ondelete="set null")
+    account_id = fields.Many2one("bhz.wa.account", string="Conta", ondelete="cascade")
+    session_id = fields.Many2one("bhz.wa.session", string="Sessão", ondelete="cascade")
     conversation_id = fields.Many2one(
         "bhz.wa.conversation",
         string="Conversa",
-        ondelete="set null",
+        ondelete="cascade",
     )
 
     provider = fields.Selection(

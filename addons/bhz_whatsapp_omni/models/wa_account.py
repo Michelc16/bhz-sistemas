@@ -277,6 +277,13 @@ class BHZWAAccount(models.Model):
             return False
         return False
 
+    def unlink(self):
+        for account in self:
+            self.env['bhz.wa.session'].sudo().search([('account_id', '=', account.id)]).unlink()
+            self.env['bhz.wa.conversation'].sudo().search([('account_id', '=', account.id)]).unlink()
+            self.env['bhz.wa.message'].sudo().search([('account_id', '=', account.id)]).unlink()
+        return super().unlink()
+
     # ----------------- Quiet hours -----------------
 
     def _within_quiet_hours(self):

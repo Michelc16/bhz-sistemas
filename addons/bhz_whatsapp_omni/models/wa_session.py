@@ -20,6 +20,7 @@ class BHZWASession(models.Model):
         string="Conta",
         domain=[('mode', '=', 'starter')],
         required=True,
+        ondelete='cascade',
     )
 
     status = fields.Selection(
