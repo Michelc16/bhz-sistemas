@@ -10,7 +10,10 @@ _logger = logging.getLogger(__name__)
 
 class BhzWaWebhookStarter(http.Controller):
 
-    @http.route('/bhz/whatsapp/starter/inbound', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route([
+        '/bhz/whatsapp/starter/inbound',
+        '/bhz/wa/inbound',
+    ], type='json', auth='public', methods=['POST'], csrf=False)
     def inbound(self, **kwargs):
         icp = request.env['ir.config_parameter'].sudo()
         expected = (icp.get_param('starter_service.secret') or '').strip()
@@ -85,4 +88,4 @@ class BhzWaWebhookStarter(http.Controller):
         except Exception as exc:
             _logger.exception("Erro ao publicar mensagem no bus: %s", exc)
 
-        return {'status': 'ok'}
+        return {'ok': True}
