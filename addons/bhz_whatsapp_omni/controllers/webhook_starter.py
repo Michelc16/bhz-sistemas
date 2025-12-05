@@ -5,19 +5,15 @@ from odoo import http
 from odoo.http import request
 
 _logger = logging.getLogger(__name__)
+STARTER_WEBHOOK_SECRET = "BHZ-STARTER-123456"
 
 
 class BhzWaWebhookStarter(http.Controller):
 
-    @http.route([
-        '/bhz/whatsapp/starter/inbound',
-        '/bhz/wa/inbound',
-    ], type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/bhz/wa/inbound', type='json', auth='public', methods=['POST'], csrf=False)
     def inbound(self, **kwargs):
-        icp = request.env['ir.config_parameter'].sudo()
-        expected = (icp.get_param('starter_service.secret') or '').strip()
         got = (request.httprequest.headers.get('X-Webhook-Secret') or '').strip()
-        if expected and expected != got:
+        if STARTER_WEBHOOK_SECRET and STARTER_WEBHOOK_SECRET != got:
             _logger.warning("Starter inbound: secret inválido")
             return {'ok': False, 'error': 'unauthorized'}
 
