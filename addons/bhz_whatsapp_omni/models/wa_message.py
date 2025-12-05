@@ -1,12 +1,8 @@
 # -*- coding: utf-8 -*-
 import logging
 
-import logging
-
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
-
-_logger = logging.getLogger(__name__)
 
 _logger = logging.getLogger(__name__)
 
@@ -61,6 +57,8 @@ class BhzWaMessage(models.Model):
     external_message_id = fields.Char("ID externo")
     message_timestamp = fields.Float("Epoch")
     payload_json = fields.Text("Payload bruto")
+    remote_jid = fields.Char("Remoto (JID)")
+    remote_phone = fields.Char("Telefone remoto")
 
     is_me = fields.Boolean("Minha", compute="_compute_is_me", store=False)
 
@@ -75,7 +73,7 @@ class BhzWaMessage(models.Model):
         Conversation = self.env["bhz.wa.conversation"].sudo()
         for msg in messages:
             try:
-                if msg.partner_id and msg.session_id:
+                if msg.partner_id and (msg.session_id or msg.account_id):
                     conv = Conversation.get_or_create_from_message(msg)
                     msg.conversation_id = conv.id
             except Exception:

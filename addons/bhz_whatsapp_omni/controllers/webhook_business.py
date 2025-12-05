@@ -89,6 +89,8 @@ class BHZWABusinessWebhook(http.Controller):
                             "body": body,
                             "wa_from": from_phone,
                             "wa_to": to_phone,
+                            "remote_jid": f"{from_phone}@s.whatsapp.net" if from_phone else False,
+                            "remote_phone": from_phone,
                             "external_message_id": message.get('id'),
                             "message_timestamp": float(timestamp or 0.0),
                             "payload_json": json.dumps(message),

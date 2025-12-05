@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 import logging
 
 from odoo import http
@@ -16,59 +17,72 @@ class BhzWaWebhookStarter(http.Controller):
         got = (request.httprequest.headers.get('X-Webhook-Secret') or '').strip()
         if expected and expected != got:
             _logger.warning("Starter inbound: secret inválido")
-            return {'ok': False, 'error': 'forbidden'}
+            return {'error': 'forbidden'}
 
         payload = request.jsonrequest or {}
-        if payload.get('event') != 'message' or not payload.get('message'):
-            return {'ok': True}
+        _logger.info("Starter webhook payload: %s", payload)
 
-        msg = payload['message']
-        phone_from = (msg.get('from') or '').strip()
-        phone_to = (msg.get('to') or '').strip()
-        text = msg.get('body') or ''
-        ts = msg.get('timestamp')
-        is_group = bool(msg.get('is_group'))
-        contact_name = msg.get('contact_name') or phone_from
+        session_code = (payload.get('session') or payload.get('session_id') or '').strip()
+        phone_from = (payload.get('from') or '').strip()
+        text = (payload.get('message') or payload.get('body') or '').strip()
+        ts = payload.get('timestamp')
+        try:
+            ts = float(ts) if ts is not None else False
+        except Exception:
+            ts = False
+
+        if not session_code or not phone_from or not text:
+            _logger.warning("Starter inbound payload incompleto: %s", payload)
+            return {'error': 'invalid_payload'}
 
         env = request.env.sudo()
-        Partner = env['res.partner']
-        Account = env['bhz.wa.account']
         Session = env['bhz.wa.session']
-        Message = env['bhz.wa.message']
+        session = Session.search([('session_id', '=', session_code)], limit=1)
+        account = session.account_id if session else env['bhz.wa.account'].search([], limit=1)
 
-        account = Account.search([], limit=1)
-        session = Session.search([], limit=1)
-
-        partner = Partner.search([('mobile', '=', phone_from)], limit=1)
+        partner = env['res.partner'].search([
+            '|', ('mobile', '=', phone_from), ('phone', '=', phone_from)
+        ], limit=1)
         if not partner:
-            partner = Partner.create({
-                'name': contact_name or phone_from or 'Contato WhatsApp',
-                'mobile': phone_from or False,
-                'phone': phone_from or False,
+            partner = env['res.partner'].create({
+                'name': phone_from,
+                'mobile': phone_from,
+                'phone': phone_from,
             })
 
-        message = Message.create({
+        wa_to = ''
+        if session and session.account_id and session.account_id.starter_last_number:
+            wa_to = session.account_id.starter_last_number
+
+        remote_jid = f"{phone_from}@s.whatsapp.net"
+        message_vals = {
             'partner_id': partner.id,
             'account_id': account.id if account else False,
             'session_id': session.id if session else False,
             'provider': 'starter',
             'direction': 'in',
+            'state': 'received',
             'body': text,
             'wa_from': phone_from,
-            'wa_to': phone_to,
-            'is_group': is_group,
-            'external_message_id': msg.get('id'),
-            'message_timestamp': ts,
-            'state': 'received',
-        })
+            'wa_to': wa_to,
+            'remote_jid': remote_jid,
+            'remote_phone': phone_from,
+            'external_message_id': payload.get('message_id'),
+            'message_timestamp': ts or 0.0,
+            'payload_json': json.dumps(payload),
+        }
+
+        message = env['bhz.wa.message'].create(message_vals)
+        _logger.info("Mensagem WhatsApp registrada: %s", message.id)
 
         try:
-            request.env['bus.bus'].sudo().sendone('bhz_wa_inbox', {
-                'type': 'new_message',
-                'message_id': message.id,
-                'conversation_id': message.conversation_id.id,
-            })
+            if message.conversation_id:
+                request.env['bus.bus'].sudo().sendone('bhz_wa_inbox', {
+                    'type': 'new_message',
+                    'message_id': message.id,
+                    'conversation_id': message.conversation_id.id,
+                })
         except Exception as exc:
             _logger.exception("Erro ao publicar mensagem no bus: %s", exc)
 
-        return {'ok': True}
+        return {'status': 'ok'}

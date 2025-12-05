@@ -8,8 +8,8 @@ class BhzWaConversation(models.Model):
     _order = "is_pinned desc, last_message_date desc, id desc"
     _sql_constraints = [
         (
-            "partner_session_unique",
-            "unique(partner_id, session_id)",
+            "partner_session_account_unique",
+            "unique(partner_id, session_id, account_id)",
             "Já existe uma conversa para este contato e sessão.",
         )
     ]
@@ -44,6 +44,7 @@ class BhzWaConversation(models.Model):
         return [
             ("partner_id", "=", message.partner_id.id if message.partner_id else False),
             ("session_id", "=", message.session_id.id if message.session_id else False),
+            ("account_id", "=", message.account_id.id if message.account_id else False),
         ]
 
     @api.model
@@ -80,11 +81,14 @@ class BhzWaConversation(models.Model):
     @api.model
     def recompute_from_all_messages(self):
         Message = self.env["bhz.wa.message"].sudo()
-        conversations = self
-        msgs = Message.search([
-            ("partner_id", "!=", False),
-            ("session_id", "!=", False),
-        ], order="create_date asc")
+        self.sudo().search([]).write({
+            'last_message_id': False,
+            'last_message_body': False,
+            'last_message_date': False,
+            'last_direction': False,
+            'unread_count': 0,
+        })
+        msgs = Message.search([], order="create_date asc")
         for msg in msgs:
             try:
                 conv = self.get_or_create_from_message(msg)
