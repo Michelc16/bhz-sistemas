@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_lab_checklist_user,access_lab_checklist_user,model_lab_checklist,base.group_user,1,1,1,1
+access_lab_checklist_line_user,access_lab_checklist_line_user,model_lab_checklist_line,base.group_user,1,1,1,1
+access_lab_checklist_template_manager,access_lab_checklist_template_manager,model_lab_checklist_template,base.group_system,1,1,1,1
+access_lab_checklist_template_line_manager,access_lab_checklist_template_line_manager,model_lab_checklist_template_line,base.group_system,1,1,1,1

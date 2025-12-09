@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_product_template_form_lab_checklist" model="ir.ui.view">
+        <field name="name">product.template.lab.checklist.form</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/group/group" position="after">
+                <group string="Laboratório (Checklist)">
+                    <field name="is_lab_equipment"/>
+                    <field name="lab_checklist_template_id"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>
