@@ -10,12 +10,12 @@
         </field>
     </record>
 
-    <!-- Menu principal (dentro de Vendas) -->
+    <!-- Menu raiz (app própria, SEM parent para evitar erro de XMLID) -->
     <menuitem id="menu_lab_root"
               name="Laboratório"
-              parent="sale.menu_sale_root"
               sequence="50"/>
 
+    <!-- Submenu de checklists -->
     <menuitem id="menu_lab_checklist"
               name="Checklists"
               parent="menu_lab_root"
