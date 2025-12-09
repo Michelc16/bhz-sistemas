@@ -27,8 +27,8 @@
 <p>
     Produto: ${object.product_id.display_name}<br/>
     Quantidade: ${object.quantity}<br/>
-    Tipo de garantia: ${dict(object._fields['warranty_type'].selection).get(object.warranty_type, '')}<br/>
-    Situação: ${dict(object._fields['state'].selection).get(object.state, '')}
+    Tipo de garantia: ${object.warranty_type}<br/>
+    Situação: ${object.state}
 </p>
 
 <p>Em anexo, o PDF do pedido de RMA.</p>
