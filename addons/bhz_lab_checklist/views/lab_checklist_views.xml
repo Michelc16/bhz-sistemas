@@ -54,8 +54,8 @@
                             string="Concluído"
                             type="object"
                             class="btn-secondary"/>
-                    <!-- Botão de impressão (chama o report) -->
-                    <button name="bhz_lab_checklist.action_report_lab_checklist"
+                    <!-- Botão de impressão (chama o report em PDF) -->
+                    <button name="%(bhz_lab_checklist.action_report_lab_checklist)d"
                             string="Imprimir"
                             type="action"
                             class="btn-secondary"/>

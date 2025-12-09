@@ -1,24 +1,27 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="email_template_bhz_rma_order" model="mail.template" noupdate="1">
+    <record id="email_template_bhz_rma_order" model="mail.template">
         <field name="name">Pedido de RMA - BHZ</field>
-
-        <!-- modelo do pedido de RMA -->
+        <!-- Modelo do RMA -->
         <field name="model_id" ref="bhz_rma.model_bhz_rma_order"/>
 
-        <!-- Campos simples usando Jinja (texto puro, não afeta o XML) -->
+        <!-- Assunto e endereços usando Jinja2 -->
         <field name="subject">Pedido de RMA {{ object.name }}</field>
         <field name="email_from">{{ object.company_id.email or '' }}</field>
         <field name="email_to">{{ object.partner_id.email or '' }}</field>
-        <field name="auto_delete" eval="True"/>
+
+        <!-- Outras configurações -->
+        <field name="auto_delete">True</field>
         <field name="lang">{{ object.partner_id.lang or 'pt_BR' }}</field>
 
-        <!-- body_html precisa ser XML/QWeb bem formado -->
+        <!-- Corpo do e-mail em QWeb / HTML -->
         <field name="body_html" type="html">
-            <div>
+            <div style="font-family: Arial, sans-serif; font-size: 14px; color: #333;">
                 <p>
                     Olá
-                    <t t-out="object.partner_id.name or ''"/>
+                    <t t-if="object.partner_id">
+                        <strong><t t-out="object.partner_id.name"/></strong>
+                    </t>
                     ,
                 </p>
 
@@ -28,29 +31,28 @@
                 </p>
 
                 <p>
-                    Produto:
-                    <t t-out="object.product_id.display_name"/>
-                    <br/>
-                    Quantidade:
-                    <t t-out="object.quantity"/>
-                    <br/>
-                    Tipo de garantia:
-                    <t t-out="object.warranty_type"/>
-                    <br/>
-                    Situação:
+                    <strong>Produto:</strong>
+                    <t t-out="object.product_id.display_name"/><br/>
+                    <strong>Quantidade:</strong>
+                    <t t-out="object.quantity"/><br/>
+                    <strong>Tipo de garantia:</strong>
+                    <t t-out="object.warranty_type"/><br/>
+                    <strong>Situação:</strong>
                     <t t-out="object.state"/>
                 </p>
 
-                <p>Em anexo, o PDF do pedido de RMA.</p>
-
                 <p>
+                    O PDF do pedido de RMA segue em anexo.
+                </p>
+
+                <p style="margin-top: 16px;">
                     Atenciosamente,<br/>
                     <t t-out="object.company_id.name or ''"/>
                 </p>
             </div>
         </field>
 
-        <!-- Relatório em anexo -->
+        <!-- Anexo do relatório em PDF -->
         <field name="report_template" ref="bhz_rma.action_report_bhz_rma_order"/>
         <field name="report_name">RMA_{{ object.name }}</field>
     </record>
