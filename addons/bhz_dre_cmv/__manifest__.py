@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 {
     "name": "BHZ DRE e CMV",
-    "summary": "Demonstração do Resultado do Exercício com cálculo de CMV mensal",
+    "summary": "DRE (Demonstração do Resultado) com cálculo de CMV mensal",
     "description": """
 Módulo de DRE e CMV baseado no modelo utilizado pela BHZ / Ventura.
 
 - DRE configurável por linhas (template)
 - Cálculo de CMV por período (mês) usando valuation de estoque
-- Geração de relatório em formato parecido com a planilha enviada
+- Geração de relatório em formato parecido com planilha
     """,
     "author": "BHZ Sistemas",
     "website": "https://bhzsistemas.com.br",
