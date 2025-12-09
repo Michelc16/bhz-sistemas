@@ -5,7 +5,8 @@
         <field name="model">product.template</field>
         <field name="inherit_id" ref="product.product_template_only_form_view"/>
         <field name="arch" type="xml">
-            <xpath expr="//sheet/group/group" position="after">
+            <!-- Insere um grupo novo dentro do sheet, independente da estrutura interna -->
+            <xpath expr="//sheet" position="inside">
                 <group string="Laboratório (Checklist)">
                     <field name="is_lab_equipment"/>
                     <field name="lab_checklist_template_id"/>
