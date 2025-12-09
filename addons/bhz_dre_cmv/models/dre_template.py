@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import api, fields, models
+from odoo import fields, models
 
 
 class BhzDreTemplateLine(models.Model):
@@ -12,7 +12,7 @@ class BhzDreTemplateLine(models.Model):
     code = fields.Char(
         "Código técnico",
         required=True,
-        help="Identificador interno (ex: RECEITA_BRUTA, CMV_TOTAL, EBTIDA).",
+        help="Identificador interno (ex: RECEITA_BRUTA, CMV_TOTAL, EBITDA).",
     )
     sequence = fields.Integer("Ordem", default=10)
     level = fields.Selection(
@@ -50,23 +50,24 @@ class BhzDreTemplateLine(models.Model):
         "line_id",
         "account_id",
         string="Contas contábeis",
-        help="Contas usadas para somar / subtrair nesta linha."
+        help="Contas usadas para somar/subtrair nesta linha.",
     )
 
+    # CORRIGIDO: valores da selection como string (Odoo 19 exige str)
     sign = fields.Selection(
         [
-            (1, "Positivo (Receita)"),
-            (-1, "Negativo (Custo/Despesa)"),
+            ("1", "Positivo (Receita)"),
+            ("-1", "Negativo (Custo/Despesa)"),
         ],
         string="Sinal",
-        default=-1,
+        default="-1",
         help="Define se o valor desta linha entra como positivo ou negativo na DRE.",
     )
 
     formula = fields.Char(
         "Fórmula (opcional)",
         help=(
-            "Permitido somente se o método for 'Fórmula'. "
+            "Usado somente se o método for 'Fórmula'. "
             "Exemplo: RECEITA_LIQ = RECEITA_BRUTA - DEVOLUCAO - IMPOSTOS_VENDAS"
         ),
     )

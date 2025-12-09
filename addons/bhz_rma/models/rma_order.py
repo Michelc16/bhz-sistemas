@@ -62,6 +62,7 @@ class BhzRmaOrder(models.Model):
             ("draft", "Rascunho"),
             ("waiting", "Em Espera"),
             ("supplier", "Com Fornecedor"),
+            ("sem_garantia", "Sem Garantia"),
             ("solved", "Solucionado"),
         ],
         string="Status",
@@ -76,14 +77,18 @@ class BhzRmaOrder(models.Model):
         "stock.location",
         string="Local de Origem",
         required=True,
-        default=lambda self: self.env.ref("stock.stock_location_stock", raise_if_not_found=False),
+        default=lambda self: self.env.ref(
+            "stock.stock_location_stock", raise_if_not_found=False
+        ),
     )
 
     rma_location_id = fields.Many2one(
         "stock.location",
         string="Local de RMA",
         required=True,
-        default=lambda self: self.env.ref("bhz_rma.stock_location_rma", raise_if_not_found=False),
+        default=lambda self: self.env.ref(
+            "bhz_rma.stock_location_rma", raise_if_not_found=False
+        ),
     )
 
     unit_cost = fields.Float(
@@ -113,19 +118,37 @@ class BhzRmaOrder(models.Model):
             rec.total_cost = rec.unit_cost * rec.quantity
 
     # =========================================================
-    # MÉTODO CREATE (CORRIGIDO PARA ODOO 18/19)
+    # CREATE (ROBUSTO PARA LIST OU DICT)
     # =========================================================
 
-    @api.model_create_multi
-    def create(self, vals_list):
-        """Corrige erro 'list' object has no attribute get' e gera sequência."""
-        for vals in vals_list:
-            if not vals.get("name") or vals.get("name") == "Novo":
-                vals["name"] = (
+    @api.model
+    def create(self, vals):
+        """
+        Suporta tanto:
+        - create({'campo': 'valor'})
+        - create([{'campo': 'valor'}, {...}])
+        e gera a sequência do RMA.
+        """
+        # Normaliza para lista de dicts
+        if isinstance(vals, list):
+            vals_list = vals
+        else:
+            vals_list = [vals]
+
+        for v in vals_list:
+            if not v.get("name") or v.get("name") in ("Novo", _("Novo")):
+                v["name"] = (
                     self.env["ir.sequence"].next_by_code("bhz.rma.order")
                     or "Novo"
                 )
-        return super().create(vals_list)
+
+        # Chama o super com o tipo certo
+        if len(vals_list) == 1:
+            records = super(BhzRmaOrder, self).create(vals_list[0])
+        else:
+            records = super(BhzRmaOrder, self).create(vals_list)
+
+        return records
 
     # =========================================================
     # AÇÕES DE ESTOQUE
@@ -137,7 +160,7 @@ class BhzRmaOrder(models.Model):
             if rec.quantity <= 0:
                 raise UserError("A quantidade deve ser maior que zero.")
 
-            self.env["stock.move"].create(
+            move = self.env["stock.move"].create(
                 {
                     "name": f"Entrada RMA {rec.name}",
                     "product_id": rec.product_id.id,
@@ -146,14 +169,16 @@ class BhzRmaOrder(models.Model):
                     "location_id": rec.location_id.id,
                     "location_dest_id": rec.rma_location_id.id,
                 }
-            )._action_confirm()._action_done()
+            )
+            move._action_confirm()
+            move._action_done()
 
             rec.state = "waiting"
 
     def action_return_from_rma(self):
         """Quando solucionado, volta o item ao estoque normal."""
         for rec in self:
-            self.env["stock.move"].create(
+            move = self.env["stock.move"].create(
                 {
                     "name": f"Retorno RMA {rec.name}",
                     "product_id": rec.product_id.id,
@@ -162,20 +187,56 @@ class BhzRmaOrder(models.Model):
                     "location_id": rec.rma_location_id.id,
                     "location_dest_id": rec.location_id.id,
                 }
-            )._action_confirm()._action_done()
+            )
+            move._action_confirm()
+            move._action_done()
 
             rec.state = "solved"
 
     # =========================================================
-    # E-MAIL (ENVIO DO RMA)
+    # BOTÕES DE MUDANÇA DE STATUS (USADOS NA VIEW)
+    # =========================================================
+
+    def action_set_waiting(self):
+        """Define o status como 'Em espera'."""
+        for rec in self:
+            rec.state = "waiting"
+
+    def action_set_with_supplier(self):
+        """Define o status como 'Com fornecedor'."""
+        for rec in self:
+            rec.state = "supplier"
+
+    def action_set_no_warranty(self):
+        """Define o status como 'Sem garantia'."""
+        for rec in self:
+            rec.state = "sem_garantia"
+
+    def action_solved(self):
+        """
+        Define o status como 'Solucionado'.
+        Se for garantia com fornecedor, faz o retorno do estoque de RMA
+        para o estoque normal.
+        """
+        for rec in self:
+            if rec.warranty_type == "fornecedor":
+                rec.action_return_from_rma()
+            else:
+                rec.state = "solved"
+
+    # =========================================================
+    # ENVIO DE E-MAIL DO RMA
     # =========================================================
 
     def action_send_rma_email(self):
-        """Abre o popup para enviar o e-mail RMA."""
-        template = self.env.ref("bhz_rma.email_template_bhz_rma_order", raise_if_not_found=False)
+        """Abre o popup para enviar o e-mail de RMA usando o template."""
+        self.ensure_one()
+        template = self.env.ref(
+            "bhz_rma.email_template_bhz_rma_order", raise_if_not_found=False
+        )
 
         if not template:
-            raise UserError("Template de e-mail do RMA não encontrado.")
+            raise UserError("Template de e-mail do RMA não foi encontrado.")
 
         return {
             "name": _("Enviar Pedido de RMA"),
@@ -186,8 +247,8 @@ class BhzRmaOrder(models.Model):
             "context": {
                 "default_model": "bhz.rma.order",
                 "default_res_id": self.id,
-                "default_use_template": True,
-                "default_template_id": template.id,
+                "default_use_template": bool(template),
+                "default_template_id": template.id if template else False,
                 "force_email": True,
             },
         }

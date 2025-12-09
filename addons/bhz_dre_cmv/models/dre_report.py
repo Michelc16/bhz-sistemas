@@ -86,10 +86,8 @@ class BhzDreReport(models.Model):
     def _compute_lines_values(self):
         """Aplica os métodos de cálculo para cada linha (accounts, cmv, fórmula)."""
         for report in self:
-            # index para facilitar fórmulas (code -> line)
-            lines_by_code = {
-                l.code: l for l in report.line_ids if l.code
-            }
+            # índice para facilitar fórmulas (code -> line)
+            lines_by_code = {l.code: l for l in report.line_ids if l.code}
 
             for line in report.line_ids:
                 tmpl = line.template_line_id
@@ -107,8 +105,9 @@ class BhzDreReport(models.Model):
                     # manual = mantém valor (pode ser preenchido depois)
                     amount = line.amount
 
-                # aplica sinal da linha (receita +, despesa/custo -)
-                line.amount = (amount or 0.0) * (tmpl.sign or 1)
+                # CORRIGIDO: converte o sign (string) para int antes de multiplicar
+                sign = int(tmpl.sign or "1")
+                line.amount = (amount or 0.0) * sign
 
     def _compute_amount_from_accounts(self, tmpl_line):
         """Soma o saldo das contas configuradas na linha, no período da DRE."""
@@ -170,8 +169,7 @@ class BhzDreReport(models.Model):
         Exemplo de fórmula:
             RECEITA_BRUTA - DEVOLUCAO - IMPOSTOS_VENDAS
 
-        Atenção: isso não executa Python arbitrário, só substitui códigos por valores
-        e tenta avaliar operações básicas.
+        Isso não executa Python arbitrário, só substitui códigos por valores.
         """
         if not formula:
             return 0.0
@@ -181,7 +179,6 @@ class BhzDreReport(models.Model):
         for code, line in lines_by_code.items():
             local_dict[code] = line.amount or 0.0
 
-        # substitui códigos no texto da fórmula
         expr = formula
         for code in local_dict:
             expr = expr.replace(code, f"local_dict['{code}']")
@@ -189,7 +186,6 @@ class BhzDreReport(models.Model):
         try:
             return eval(expr, {"__builtins__": {}}, {"local_dict": local_dict})
         except Exception:
-            # se der erro na fórmula, não quebra tudo, só retorna 0
             return 0.0
 
 
