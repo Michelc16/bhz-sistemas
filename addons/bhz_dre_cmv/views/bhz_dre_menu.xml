@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <menuitem id="menu_bhz_dre_root"
+              name="BHZ DRE"
+              parent="account.menu_finance_reporting"
+              sequence="50"/>
+
+    <menuitem id="menu_bhz_dre_configuration"
+              name="Configuração"
+              parent="menu_bhz_dre_root"
+              sequence="10"/>
+
+    <menuitem id="menu_bhz_dre_reporting"
+              name="Relatórios"
+              parent="menu_bhz_dre_root"
+              sequence="20"/>
+
+    <!-- Template lines -->
+    <menuitem id="menu_bhz_dre_template_line"
+              name="Template de DRE"
+              parent="menu_bhz_dre_configuration"
+              action="action_bhz_dre_template_line"/>
+
+    <!-- Reports -->
+    <menuitem id="menu_bhz_dre_report"
+              name="Relatórios DRE"
+              parent="menu_bhz_dre_reporting"
+              action="action_bhz_dre_report"/>
+
+</odoo>

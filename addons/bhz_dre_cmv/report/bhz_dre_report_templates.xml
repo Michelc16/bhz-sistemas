@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <report
+        id="action_bhz_dre_print_report"
+        model="bhz.dre.report"
+        string="Imprimir DRE"
+        report_type="qweb-pdf"
+        name="bhz_dre_cmv.report_bhz_dre"
+        file="bhz_dre_cmv.report_bhz_dre"
+        print_report_name="'DRE - %s' % (object.name)"
+    />
+
+    <template id="report_bhz_dre">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div class="page">
+                    <h2>DRE - <t t-esc="o.company_id.name"/></h2>
+                    <p>
+                        Período:
+                        <t t-esc="o.date_from"/> até
+                        <t t-esc="o.date_to"/>
+                    </p>
+
+                    <table class="table table-sm o_main_table">
+                        <thead>
+                            <tr>
+                                <th>Descrição</th>
+                                <th style="text-align:right;">Valor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="o.line_ids" t-as="line">
+                                <tr>
+                                    <td>
+                                        <t t-if="line.level == 'title'">
+                                            <strong><t t-esc="line.name"/></strong>
+                                        </t>
+                                        <t t-if="line.level != 'title'">
+                                            <t t-esc="line.name"/>
+                                        </t>
+                                    </td>
+                                    <td style="text-align:right;">
+                                        <t t-if="line.amount">
+                                            <t t-esc="format_amount(line.amount, o.currency_id)"/>
+                                        </t>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+
+</odoo>

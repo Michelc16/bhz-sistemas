@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="view_bhz_dre_report_tree" model="ir.ui.view">
+        <field name="name">bhz.dre.report.tree</field>
+        <field name="model">bhz.dre.report</field>
+        <field name="arch" type="xml">
+            <tree string="Relatórios DRE">
+                <field name="name"/>
+                <field name="company_id"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_bhz_dre_report_form" model="ir.ui.view">
+        <field name="name">bhz.dre.report.form</field>
+        <field name="model">bhz.dre.report</field>
+        <field name="arch" type="xml">
+            <form string="Relatório de DRE">
+                <header>
+                    <button name="%(action_bhz_dre_print_report)d"
+                            string="Imprimir"
+                            type="action"
+                            class="btn-primary"
+                            states="calculated"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="name" readonly="1"/>
+                        <field name="company_id" readonly="1"/>
+                        <field name="date_from" readonly="1"/>
+                        <field name="date_to" readonly="1"/>
+                        <field name="state" readonly="1"/>
+                    </group>
+                    <field name="line_ids">
+                        <tree editable="bottom">
+                            <field name="sequence" readonly="1"/>
+                            <field name="name" readonly="1"/>
+                            <field name="amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                        </tree>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bhz_dre_report" model="ir.actions.act_window">
+        <field name="name">Relatórios DRE</field>
+        <field name="res_model">bhz.dre.report</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>
