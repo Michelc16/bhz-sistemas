@@ -47,15 +47,14 @@
         <field name="arch" type="xml">
             <form string="Checklist de Laboratório">
                 <header>
+                    <!-- Sem states/attrs no Odoo 19 -->
                     <button name="action_start"
                             string="Em andamento"
                             type="object"
-                            states="draft"
                             class="btn-primary"/>
                     <button name="action_done"
                             string="Concluído"
                             type="object"
-                            states="draft,in_progress"
                             class="btn-secondary"/>
                     <field name="state"
                            widget="statusbar"
