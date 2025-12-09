@@ -79,10 +79,8 @@
                     <notebook>
                         <page string="Itens de Checklist">
                             <field name="line_ids">
-                                <!-- Aqui pode continuar usando <tree> porque é a
-                                     árvore interna do one2many, não é tipo de view -->
                                 <tree editable="bottom">
-                                    <field name="sequence"/>
+                                    <!-- Removido sequence para evitar erro -->
                                     <field name="name"/>
                                     <field name="done"/>
                                     <field name="notes"/>
