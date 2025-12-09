@@ -79,12 +79,13 @@
                     <notebook>
                         <page string="Itens de Checklist">
                             <field name="line_ids">
-                                <tree editable="bottom">
-                                    <!-- Removido sequence para evitar erro -->
+                                <!-- Em Odoo 19, subview do one2many também usa <list> -->
+                                <list editable="bottom">
+                                    <field name="sequence"/>
                                     <field name="name"/>
                                     <field name="done"/>
                                     <field name="notes"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                         <page string="Observações">
