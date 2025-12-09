@@ -53,11 +53,6 @@
             </div>
         </field>
 
-        <!-- ⚠ REMOVIDO O VÍNCULO DIRETO COM O RELATÓRIO
-        <field name="report_template" ref="bhz_rma.action_report_bhz_rma_order"/>
-        -->
-
-        <!-- Nome do arquivo, se anexar depois -->
-        <field name="report_name">RMA_{{ object.name }}</field>
+        <!-- Nenhum report_template / report_name aqui no Odoo 19 -->
     </record>
 </odoo>
