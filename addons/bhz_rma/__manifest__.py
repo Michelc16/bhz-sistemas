@@ -19,8 +19,6 @@
         "views/rma_menus.xml",
         "views/rma_views.xml",
         "views/rma_service_order_views.xml",
-    ],
-    "report": [
         "report/rma_report.xml",
     ],
     "installable": True,

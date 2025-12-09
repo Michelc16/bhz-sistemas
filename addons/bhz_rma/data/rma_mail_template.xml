@@ -1,12 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <record id="email_template_bhz_rma_order" model="mail.template" noupdate="1">
+    <record id="email_template_bhz_rma_order" model="mail.template">
         <field name="name">Pedido de RMA - BHZ</field>
         <field name="model_id" ref="model_bhz_rma_order"/>
         <field name="subject">Pedido de RMA ${object.name}</field>
-        <field name="email_from">${(object.company_id.email or '')|safe}</field>
-        <field name="email_to">${(object.partner_id.email or '')|safe}</field>
+
+        <!-- Remetente = email da empresa -->
+        <field name="email_from">
+            ${(object.company_id.email or '')|safe}
+        </field>
+
+        <!-- Destinatário = email do parceiro -->
+        <field name="email_to">
+            ${(object.partner_id.email or '')|safe}
+        </field>
+
         <field name="auto_delete" eval="True"/>
-        <field name="lang">${object.partner_id.lang or 'pt_BR'}</field>
+        <field name="lang">
+            ${object.partner_id.lang or 'pt_BR'}
+        </field>
+
+        <!-- IMPORTANTE: type="html" para passar na validação -->
         <field name="body_html" type="html">
             <![CDATA[
 <p>Olá ${object.partner_id.name or ''},</p>
@@ -16,8 +30,8 @@
 <p>
     Produto: ${object.product_id.display_name}<br/>
     Quantidade: ${object.quantity}<br/>
-    Tipo de garantia: ${object.warranty_type}<br/>
-    Situação: ${object.state}
+    Tipo de garantia: ${dict(object._fields['warranty_type'].selection).get(object.warranty_type, '')}<br/>
+    Situação: ${dict(object._fields['state'].selection).get(object.state, '')}
 </p>
 
 <p>Em anexo, o PDF do pedido de RMA.</p>
@@ -26,6 +40,8 @@
 ${object.company_id.name or ''}</p>
             ]]>
         </field>
+
+        <!-- Liga o template ao relatório PDF -->
         <field name="report_template" ref="bhz_rma.action_report_bhz_rma_order"/>
         <field name="report_name">RMA_${object.name}</field>
     </record>
