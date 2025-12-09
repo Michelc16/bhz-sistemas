@@ -32,6 +32,14 @@ class BhzRmaOrder(models.Model):
         tracking=True,
     )
 
+    company_id = fields.Many2one(
+        "res.company",
+        string="Empresa",
+        default=lambda self: self.env.company,
+        required=True,
+        readonly=True,
+    )
+
     product_id = fields.Many2one(
         "product.product",
         string="Produto",
