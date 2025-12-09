@@ -4,26 +4,25 @@
     <record id="action_lab_checklist" model="ir.actions.act_window">
         <field name="name">Checklists de Laboratório</field>
         <field name="res_model">lab.checklist</field>
-        <!-- Em Odoo 19 usar list,form -->
         <field name="view_mode">list,form</field>
         <field name="help" type="html">
             <p>Aqui você acompanha os checklists de PCs e notebooks vendidos.</p>
         </field>
     </record>
 
-    <!-- Menu raiz (app própria, sem parent para evitar problemas de XMLID) -->
+    <!-- Menu raiz -->
     <menuitem id="menu_lab_root"
               name="Laboratório"
               sequence="50"/>
 
-    <!-- Submenu de checklists -->
+    <!-- Submenu -->
     <menuitem id="menu_lab_checklist"
               name="Checklists"
               parent="menu_lab_root"
               action="action_lab_checklist"
               sequence="10"/>
 
-    <!-- List view (antigo tree) -->
+    <!-- List view -->
     <record id="view_lab_checklist_list" model="ir.ui.view">
         <field name="name">lab.checklist.list</field>
         <field name="model">lab.checklist</field>
@@ -47,7 +46,6 @@
         <field name="arch" type="xml">
             <form string="Checklist de Laboratório">
                 <header>
-                    <!-- Sem states/attrs no Odoo 19 -->
                     <button name="action_start"
                             string="Em andamento"
                             type="object"
@@ -55,6 +53,11 @@
                     <button name="action_done"
                             string="Concluído"
                             type="object"
+                            class="btn-secondary"/>
+                    <!-- Botão de impressão (chama o report) -->
+                    <button name="bhz_lab_checklist.action_report_lab_checklist"
+                            string="Imprimir"
+                            type="action"
                             class="btn-secondary"/>
                     <field name="state"
                            widget="statusbar"
@@ -78,7 +81,6 @@
                     <notebook>
                         <page string="Itens de Checklist">
                             <field name="line_ids">
-                                <!-- Em Odoo 19, subview do one2many também usa <list> -->
                                 <list editable="bottom">
                                     <field name="sequence"/>
                                     <field name="name"/>

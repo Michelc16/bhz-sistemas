@@ -16,6 +16,7 @@
         "views/lab_checklist_views.xml",
         "views/product_template_views.xml",
         "views/sale_order_views.xml",
+        "report/lab_cjecklist_report.xml",
     ],
     "application": True,
     "installable": True,

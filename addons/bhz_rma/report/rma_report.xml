@@ -1,26 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
+    <!-- Template do PDF -->
     <template id="report_rma_document">
         <t t-call="web.external_layout">
             <t t-set="doc" t-value="doc"/>
             <div class="page">
-                <h2>Pedido de RMA - <span t-esc="doc.name"/></h2>
+                <h2>
+                    Pedido de RMA -
+                    <span t-esc="doc.name"/>
+                </h2>
+
                 <p>
                     <strong>Data:</strong>
                     <span t-esc="doc.date_rma"/>
                 </p>
+
                 <p>
                     <strong>Empresa:</strong>
                     <span t-esc="doc.company_id.name"/>
                 </p>
+
                 <p>
                     <strong>Cliente:</strong>
                     <span t-esc="doc.partner_id.display_name or ''"/>
                 </p>
+
                 <p>
                     <strong>Tipo de garantia:</strong>
                     <span t-esc="doc.warranty_type"/>
                 </p>
+
                 <h3>Produto</h3>
                 <p>
                     <strong>Produto:</strong>
@@ -32,6 +41,7 @@
                     <strong>Custo total (prejuízo potencial):</strong>
                     <span t-esc="doc.total_cost"/>
                 </p>
+
                 <h3>Locais de estoque</h3>
                 <p>
                     <strong>Local de origem:</strong>
@@ -39,12 +49,14 @@
                     <strong>Local de RMA:</strong>
                     <span t-esc="doc.rma_location_id.display_name"/>
                 </p>
+
                 <h3>Observações</h3>
                 <p t-esc="doc.note or ''"/>
             </div>
         </t>
     </template>
 
+    <!-- Ação de relatório -->
     <report
         id="action_report_bhz_rma_order"
         model="bhz.rma.order"
