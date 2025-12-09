@@ -46,7 +46,6 @@ class BhzRmaOrder(models.Model):
         tracking=True,
     )
 
-    # 🔥 CAMPO QUE FALTAVA → ERRO CORRIGIDO
     product_uom_id = fields.Many2one(
         "uom.uom",
         string="Unidade de Medida",
@@ -93,10 +92,10 @@ class BhzRmaOrder(models.Model):
         [
             ("draft", "Rascunho"),
             ("waiting", "Em espera"),
-            ("supplier", "Com fornecedor"),
-            ("sem_garantia", "Sem garantia"),
+            ("with_supplier", "Com fornecedor"),
+            ("no_warranty", "Sem garantia"),
             ("solved", "Solucionado"),
-            ("cancel", "Cancelado"),
+            ("cancelled", "Cancelado"),
         ],
         string="Status",
         default="draft",
@@ -117,6 +116,12 @@ class BhzRmaOrder(models.Model):
 
     note = fields.Text(string="Observações")
 
+    # === 🔥 CAMPO QUE FALTAVA E ESTAVA QUEBRANDO O XML ===
+    service_order_id = fields.Many2one(
+        "bhz.rma.service.order",
+        string="Ordem de Serviço",
+    )
+
     # =========================================================
     # CÁLCULOS AUTOMÁTICOS
     # =========================================================
@@ -125,7 +130,7 @@ class BhzRmaOrder(models.Model):
         for rec in self:
             rec.unit_cost = rec.product_id.standard_price or 0.0
 
-            # Ajusta UoM default baseada no produto
+            # Ajusta UoM baseada no produto
             if rec.product_id:
                 rec.product_uom_id = rec.product_id.uom_id
 
@@ -135,7 +140,7 @@ class BhzRmaOrder(models.Model):
             rec.total_cost = rec.unit_cost * rec.quantity
 
     # =========================================================
-    # CREATE MULTI — Odoo 18/19
+    # CREATE MULTI — compatível com Odoo 18 / 19
     # =========================================================
     @api.model_create_multi
     def create(self, vals_list):
@@ -148,19 +153,19 @@ class BhzRmaOrder(models.Model):
         return super().create(vals_list)
 
     # =========================================================
-    # BOTÕES DE STATUS
+    # BOTÕES DE STATUS (DEVEM CORRESPONDER AO FORM)
     # =========================================================
     def action_set_waiting(self):
         self.write({"state": "waiting"})
 
     def action_set_with_supplier(self):
-        self.write({"state": "supplier"})
+        self.write({"state": "with_supplier"})
 
     def action_set_no_warranty(self):
-        self.write({"state": "sem_garantia"})
+        self.write({"state": "no_warranty"})
 
     def action_cancel(self):
-        self.write({"state": "cancel"})
+        self.write({"state": "cancelled"})
 
     def action_solved(self):
         for rec in self:
@@ -172,7 +177,6 @@ class BhzRmaOrder(models.Model):
     # MOVIMENTAÇÃO DE ESTOQUE
     # =========================================================
     def action_move_to_rma_stock(self):
-        """Move produto para o estoque de RMA."""
         for rec in self:
             if not rec.location_id or not rec.rma_location_id:
                 raise UserError("Defina os locais de origem e RMA.")
@@ -190,7 +194,6 @@ class BhzRmaOrder(models.Model):
             )._action_confirm()._action_done()
 
     def action_return_from_rma(self):
-        """Retorna produto para o estoque normal."""
         for rec in self:
             self.env["stock.move"].create(
                 {
@@ -205,7 +208,7 @@ class BhzRmaOrder(models.Model):
             )._action_confirm()._action_done()
 
     # =========================================================
-    # RELATÓRIO E EMAIL
+    # RELATÓRIO & E-MAIL
     # =========================================================
     def action_print_rma(self):
         return self.env.ref("bhz_rma.action_report_bhz_rma_order").report_action(self)

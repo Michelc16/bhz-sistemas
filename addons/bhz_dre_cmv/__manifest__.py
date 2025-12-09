@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     "name": "BHZ DRE e CMV",
     "summary": "DRE (Demonstração do Resultado) com cálculo de CMV mensal",
@@ -18,13 +17,13 @@ Módulo de DRE e CMV baseado no modelo utilizado pela BHZ / Ventura.
         "account",
         "stock",
     ],
-    "data": [
+    "data": [        
         "security/security.xml",
-        "security/ir.model.access.csv",
-        "views/bhz_dre_menu.xml",
+        "security/ir.model.access.csv",        
         "views/bhz_dre_template_views.xml",
         "views/bhz_dre_report_views.xml",
-        "views/bhz_dre_wizard_views.xml",
+        "views/bhz_dre_wizard_views.xml",        
+        "views/bhz_dre_menu.xml",        
         "report/bhz_dre_report_templates.xml",
     ],
     "application": True,
