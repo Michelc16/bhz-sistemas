@@ -4,7 +4,7 @@ from odoo.exceptions import UserError
 
 class BhzRmaOrder(models.Model):
     _name = "bhz.rma.order"
-    _description = "BHZ RMA - Produtos com Defeito"
+    _description = "BHZ RMA - Controle de Produtos com Defeito"
     _inherit = ["mail.thread", "mail.activity.mixin"]
     _order = "create_date desc"
 
@@ -64,6 +64,7 @@ class BhzRmaOrder(models.Model):
             ("supplier", "Com Fornecedor"),
             ("sem_garantia", "Sem Garantia"),
             ("solved", "Solucionado"),
+            ("cancelled", "Cancelado"),
         ],
         string="Status",
         default="draft",
@@ -98,13 +99,13 @@ class BhzRmaOrder(models.Model):
     )
 
     total_cost = fields.Float(
-        string="Custo Total (Prejuízo)",
+        string="Custo Total",
         compute="_compute_total_cost",
         store=True,
     )
 
     # =========================================================
-    # CÁLCULOS
+    # COMPUTES
     # =========================================================
 
     @api.depends("product_id")
@@ -118,44 +119,34 @@ class BhzRmaOrder(models.Model):
             rec.total_cost = rec.unit_cost * rec.quantity
 
     # =========================================================
-    # CREATE (ROBUSTO PARA LIST OU DICT)
+    # CREATE — SUPORTA LISTA E DICT
     # =========================================================
 
     @api.model
     def create(self, vals):
-        """
-        Suporta tanto:
-        - create({'campo': 'valor'})
-        - create([{'campo': 'valor'}, {...}])
-        e gera a sequência do RMA.
-        """
-        # Normaliza para lista de dicts
+        # Normaliza para lista
         if isinstance(vals, list):
             vals_list = vals
         else:
             vals_list = [vals]
 
+        seq = self.env["ir.sequence"]
+
         for v in vals_list:
             if not v.get("name") or v.get("name") in ("Novo", _("Novo")):
-                v["name"] = (
-                    self.env["ir.sequence"].next_by_code("bhz.rma.order")
-                    or "Novo"
-                )
+                v["name"] = seq.next_by_code("bhz.rma.order") or "Novo"
 
-        # Chama o super com o tipo certo
         if len(vals_list) == 1:
-            records = super(BhzRmaOrder, self).create(vals_list[0])
+            return super().create(vals_list[0])
         else:
-            records = super(BhzRmaOrder, self).create(vals_list)
-
-        return records
+            return super().create(vals_list)
 
     # =========================================================
     # AÇÕES DE ESTOQUE
     # =========================================================
 
     def action_move_to_rma_stock(self):
-        """Baixa do estoque normal e move para local de RMA."""
+        """Move do estoque normal para o estoque RMA."""
         for rec in self:
             if rec.quantity <= 0:
                 raise UserError("A quantidade deve ser maior que zero.")
@@ -176,7 +167,7 @@ class BhzRmaOrder(models.Model):
             rec.state = "waiting"
 
     def action_return_from_rma(self):
-        """Quando solucionado, volta o item ao estoque normal."""
+        """Retorna o produto ao estoque normal."""
         for rec in self:
             move = self.env["stock.move"].create(
                 {
@@ -194,49 +185,52 @@ class BhzRmaOrder(models.Model):
             rec.state = "solved"
 
     # =========================================================
-    # BOTÕES DE MUDANÇA DE STATUS (USADOS NA VIEW)
+    # BOTÕES DA VIEW (OBRIGATÓRIOS)
     # =========================================================
 
     def action_set_waiting(self):
-        """Define o status como 'Em espera'."""
-        for rec in self:
-            rec.state = "waiting"
+        self.write({"state": "waiting"})
 
     def action_set_with_supplier(self):
-        """Define o status como 'Com fornecedor'."""
-        for rec in self:
-            rec.state = "supplier"
+        self.write({"state": "supplier"})
 
     def action_set_no_warranty(self):
-        """Define o status como 'Sem garantia'."""
-        for rec in self:
-            rec.state = "sem_garantia"
+        self.write({"state": "sem_garantia"})
 
     def action_solved(self):
-        """
-        Define o status como 'Solucionado'.
-        Se for garantia com fornecedor, faz o retorno do estoque de RMA
-        para o estoque normal.
-        """
         for rec in self:
             if rec.warranty_type == "fornecedor":
                 rec.action_return_from_rma()
             else:
                 rec.state = "solved"
 
+    def action_cancel(self):
+        """Cancela o RMA."""
+        for rec in self:
+            rec.state = "cancelled"
+
     # =========================================================
-    # ENVIO DE E-MAIL DO RMA
+    # IMPRESSÃO DO RMA
+    # =========================================================
+
+    def action_print_rma(self):
+        """Gera o PDF do RMA."""
+        return self.env.ref("bhz_rma.action_report_bhz_rma_order").report_action(self)
+
+    # =========================================================
+    # ENVIO DE E-MAIL
     # =========================================================
 
     def action_send_rma_email(self):
-        """Abre o popup para enviar o e-mail de RMA usando o template."""
+        """Abre o popup de e-mail usando o template configurado."""
         self.ensure_one()
+
         template = self.env.ref(
             "bhz_rma.email_template_bhz_rma_order", raise_if_not_found=False
         )
 
         if not template:
-            raise UserError("Template de e-mail do RMA não foi encontrado.")
+            raise UserError("O template de e-mail de RMA não foi encontrado.")
 
         return {
             "name": _("Enviar Pedido de RMA"),
@@ -247,8 +241,8 @@ class BhzRmaOrder(models.Model):
             "context": {
                 "default_model": "bhz.rma.order",
                 "default_res_id": self.id,
-                "default_use_template": bool(template),
-                "default_template_id": template.id if template else False,
+                "default_use_template": True,
+                "default_template_id": template.id,
                 "force_email": True,
             },
         }
