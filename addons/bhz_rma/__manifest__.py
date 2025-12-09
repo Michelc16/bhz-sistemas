@@ -9,13 +9,17 @@
     "depends": [
         "stock",
         "product",
+        "mail",
     ],
     "data": [
         "security/ir.model.access.csv",
         "data/rma_sequence.xml",
+        "data/rma_mail_template.xml",
         "data/rma_location.xml",
         "views/rma_menus.xml",
         "views/rma_views.xml",
+        "views/rma_service_order_views.xml",
+        "report/rma_report.xml",
     ],
     "installable": True,
     "application": True,
