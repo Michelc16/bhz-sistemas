@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from odoo import api, fields, models
 
 
@@ -14,7 +15,7 @@ class LabChecklistTemplate(models.Model):
         ],
         string="Tipo de Equipamento",
         default="generic",
-        help="Ajuda a escolher o template automaticamente para PCs/Notebooks."
+        help="Ajuda a escolher o template automaticamente para PCs/Notebooks.",
     )
     active = fields.Boolean("Ativo", default=True)
     line_ids = fields.One2many(
@@ -46,15 +47,28 @@ class LabChecklist(models.Model):
 
     name = fields.Char("Nome", required=True, default=lambda self: "Checklist")
     sale_order_id = fields.Many2one(
-        "sale.order", string="Pedido de Venda", ondelete="cascade"
+        "sale.order",
+        string="Pedido de Venda",
+        ondelete="cascade",
     )
     sale_order_line_id = fields.Many2one(
-        "sale.order.line", string="Linha do Pedido", ondelete="set null"
+        "sale.order.line",
+        string="Linha do Pedido",
+        ondelete="set null",
     )
-    product_id = fields.Many2one("product.product", string="Produto", required=True)
-    template_id = fields.Many2one("lab.checklist.template", string="Template")
+    product_id = fields.Many2one(
+        "product.product",
+        string="Produto",
+        required=True,
+    )
+    template_id = fields.Many2one(
+        "lab.checklist.template",
+        string="Template",
+    )
     technician_id = fields.Many2one(
-        "res.users", string="Técnico Responsável", help="Técnico que fará os testes."
+        "res.users",
+        string="Técnico Responsável",
+        help="Técnico que fará os testes.",
     )
     state = fields.Selection(
         [
@@ -66,9 +80,21 @@ class LabChecklist(models.Model):
         default="draft",
     )
     line_ids = fields.One2many(
-        "lab.checklist.line", "checklist_id", string="Itens de Checklist"
+        "lab.checklist.line",
+        "checklist_id",
+        string="Itens de Checklist",
     )
     notes = fields.Text("Observações Gerais")
+
+    # Botão: colocar em andamento
+    def action_start(self):
+        for rec in self:
+            rec.state = "in_progress"
+
+    # Botão: concluir checklist
+    def action_done(self):
+        for rec in self:
+            rec.state = "done"
 
 
 class LabChecklistLine(models.Model):
@@ -79,7 +105,10 @@ class LabChecklistLine(models.Model):
     name = fields.Char("Item de Verificação", required=True)
     sequence = fields.Integer("Sequência", default=10)
     checklist_id = fields.Many2one(
-        "lab.checklist", string="Checklist", required=True, ondelete="cascade"
+        "lab.checklist",
+        string="Checklist",
+        required=True,
+        ondelete="cascade",
     )
     done = fields.Boolean("Concluído")
     notes = fields.Char("Observações")
@@ -102,9 +131,7 @@ class SaleOrder(models.Model):
 
     def action_view_lab_checklists(self):
         self.ensure_one()
-        action = self.env.ref(
-            "bhz_lab_checklist.action_lab_checklist"
-        ).read()[0]
+        action = self.env.ref("bhz_lab_checklist.action_lab_checklist").read()[0]
         action["domain"] = [("sale_order_id", "=", self.id)]
         action["context"] = {
             "default_sale_order_id": self.id,
@@ -117,7 +144,6 @@ class SaleOrder(models.Model):
         if template:
             return template
 
-        # Se quiser, pode usar categoria ou nome pra diferenciar
         equipment_type = "generic"
         name = (product.name or "").lower()
         if "note" in name or "notebook" in name or "laptop" in name:
@@ -134,14 +160,16 @@ class SaleOrder(models.Model):
         )
         if not template:
             template = self.env["lab.checklist.template"].search(
-                [("equipment_type", "=", "generic"), ("active", "=", True)],
+                [
+                    ("equipment_type", "=", "generic"),
+                    ("active", "=", True),
+                ],
                 limit=1,
             )
         return template
 
     def _create_lab_checklists_from_order(self):
         Checklist = self.env["lab.checklist"]
-        TemplateLine = self.env["lab.checklist.template.line"]
 
         for order in self:
             for line in order.order_line:
@@ -149,9 +177,10 @@ class SaleOrder(models.Model):
                 if not product or not product.product_tmpl_id.is_lab_equipment:
                     continue
 
-                # Evitar duplicar checklist pra mesma linha
+                # Evitar duplicar checklist para a mesma linha
                 existing = Checklist.search(
-                    [("sale_order_line_id", "=", line.id)], limit=1
+                    [("sale_order_line_id", "=", line.id)],
+                    limit=1,
                 )
                 if existing:
                     continue

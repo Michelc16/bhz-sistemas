@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Ação -->
+    <!-- Ação principal -->
     <record id="action_lab_checklist" model="ir.actions.act_window">
         <field name="name">Checklists de Laboratório</field>
         <field name="res_model">lab.checklist</field>
@@ -10,10 +10,10 @@
         </field>
     </record>
 
-    <!-- Menu principal (pode mudar para módulo de Manufatura se preferir) -->
+    <!-- Menu principal (dentro de Vendas) -->
     <menuitem id="menu_lab_root"
               name="Laboratório"
-              parent="sales_team.menu_sales"
+              parent="sale.menu_sale_root"
               sequence="50"/>
 
     <menuitem id="menu_lab_checklist"
@@ -46,19 +46,18 @@
         <field name="arch" type="xml">
             <form string="Checklist de Laboratório">
                 <header>
-                    <button name="write"
+                    <button name="action_start"
                             string="Em andamento"
                             type="object"
                             states="draft"
-                            class="btn-primary"
-                            context="{'state':'in_progress'}"/>
-                    <button name="write"
+                            class="btn-primary"/>
+                    <button name="action_done"
                             string="Concluído"
                             type="object"
                             states="draft,in_progress"
-                            context="{'state':'done'}"/>
-
-                    <field name="state" widget="statusbar"
+                            class="btn-secondary"/>
+                    <field name="state"
+                           widget="statusbar"
                            statusbar_visible="draft,in_progress,done"/>
                 </header>
 
