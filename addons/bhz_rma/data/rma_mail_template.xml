@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <record id="email_template_bhz_rma_order" model="mail.template">
+    <data noupdate="0">
+        <record id="email_template_bhz_rma_order" model="mail.template">
         <field name="name">Pedido de RMA - BHZ</field>
         <field name="model_id" ref="model_bhz_rma_order"/>
         <field name="subject">Pedido de RMA ${object.name}</field>
@@ -41,4 +42,5 @@ ${object.company_id.name or ''}</p>
         <field name="report_template" ref="bhz_rma.action_report_bhz_rma_order"/>
         <field name="report_name">RMA_${object.name}</field>
     </record>
+    </data>
 </odoo>
