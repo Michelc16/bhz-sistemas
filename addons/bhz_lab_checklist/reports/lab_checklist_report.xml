@@ -5,7 +5,6 @@
         <field name="name">Checklist de Laboratório</field>
         <field name="model">lab.checklist</field>
         <field name="report_type">qweb-pdf</field>
-        <!-- nome técnico do template -->
         <field name="report_name">bhz_lab_checklist.report_lab_checklist</field>
         <field name="report_file">bhz_lab_checklist.report_lab_checklist</field>
         <field name="print_report_name">'Checklist - %s' % (object.name)</field>
@@ -83,7 +82,8 @@
                             <br/>
                             <p>
                                 <strong>Data de impressão:</strong>
-                                <span t-esc="format_datetime(datetime.datetime.utcnow(), tz=env.user.tz or 'UTC')"/>
+                                <!-- usa a última atualização do checklist -->
+                                <span t-esc="doc.write_date or doc.create_date"/>
                             </p>
                         </div>
                     </t>

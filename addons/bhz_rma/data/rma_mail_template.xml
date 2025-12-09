@@ -2,6 +2,7 @@
 <odoo>
     <record id="email_template_bhz_rma_order" model="mail.template">
         <field name="name">Pedido de RMA - BHZ</field>
+
         <!-- Modelo do RMA -->
         <field name="model_id" ref="bhz_rma.model_bhz_rma_order"/>
 
@@ -42,7 +43,7 @@
                 </p>
 
                 <p>
-                    O PDF do pedido de RMA segue em anexo.
+                    O PDF do pedido de RMA segue em anexo (quando configurado).
                 </p>
 
                 <p style="margin-top: 16px;">
@@ -52,8 +53,11 @@
             </div>
         </field>
 
-        <!-- Anexo do relatório em PDF -->
+        <!-- ⚠ REMOVIDO O VÍNCULO DIRETO COM O RELATÓRIO
         <field name="report_template" ref="bhz_rma.action_report_bhz_rma_order"/>
+        -->
+
+        <!-- Nome do arquivo, se anexar depois -->
         <field name="report_name">RMA_{{ object.name }}</field>
     </record>
 </odoo>
