@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <record id="view_bhz_rma_service_order_list" model="ir.ui.view">
         <field name="name">bhz.rma.service.order.list</field>

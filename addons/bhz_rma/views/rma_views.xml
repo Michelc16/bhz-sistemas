@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <!-- List view -->
     <record id="view_bhz_rma_order_list" model="ir.ui.view">
@@ -60,8 +61,12 @@
                     </group>
 
                     <group string="Locais de Estoque" colspan="4">
-                        <group><field name="location_id"/></group>
-                        <group><field name="rma_location_id"/></group>
+                        <group>
+                            <field name="location_id"/>
+                        </group>
+                        <group>
+                            <field name="rma_location_id"/>
+                        </group>
                     </group>
 
                     <group string="Vinculações">
@@ -84,7 +89,9 @@
                         </page>
 
                         <page string="Observações">
-                            <group><field name="note"/></group>
+                            <group>
+                                <field name="note"/>
+                            </group>
                         </page>
                     </notebook>
                 </sheet>
@@ -92,7 +99,7 @@
         </field>
     </record>
 
-    <!-- Search view mínima -->
+    <!-- Search view -->
     <record id="view_bhz_rma_order_search" model="ir.ui.view">
         <field name="name">bhz.rma.order.search</field>
         <field name="model">bhz.rma.order</field>
