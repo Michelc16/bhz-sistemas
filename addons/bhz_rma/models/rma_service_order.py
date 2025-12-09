@@ -32,7 +32,6 @@ class BhzRmaServiceOrder(models.Model):
     partner_id = fields.Many2one(
         "res.partner",
         string="Cliente",
-        required=False,
     )
 
     product_id = fields.Many2one(
@@ -98,11 +97,6 @@ class BhzRmaServiceOrder(models.Model):
             order.state = "in_progress"
 
     def action_process_exchange(self):
-        """
-        Troca de peça em garantia do cliente:
-        - tira peça nova do estoque (local de origem do RMA) para o cliente
-        - coloca peça defeituosa no estoque RMA
-        """
         for order in self:
             rma = order.rma_id
             if not rma:
@@ -117,12 +111,11 @@ class BhzRmaServiceOrder(models.Model):
                 )
 
             if order.move_defective_id or order.move_new_id:
-                continue  # já processado
+                continue
 
             if order.quantity <= 0:
                 raise UserError(_("A quantidade deve ser maior que zero."))
 
-            # Locais
             if not rma.location_id or not rma.rma_location_id:
                 raise UserError(
                     _(

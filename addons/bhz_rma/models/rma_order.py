@@ -57,12 +57,6 @@ class BhzRmaOrder(models.Model):
         default="supplier",
         required=True,
         tracking=True,
-        help=(
-            "Garantia do fornecedor: produto sai do estoque e entra no estoque RMA, "
-            "podendo voltar ao estoque normal.\n"
-            "Garantia do cliente: gera uma Ordem de Serviço, permite troca de peça "
-            "para o cliente, colocando peça com defeito no estoque RMA e tirando peça nova do estoque."
-        ),
     )
 
     product_id = fields.Many2one(
@@ -100,7 +94,6 @@ class BhzRmaOrder(models.Model):
         default=lambda self: self.env.ref(
             "stock.stock_location_stock", raise_if_not_found=False
         ),
-        help="Localização de onde o produto será retirado ou usado no processo.",
     )
 
     rma_location_id = fields.Many2one(
@@ -111,7 +104,6 @@ class BhzRmaOrder(models.Model):
         default=lambda self: self.env.ref(
             "bhz_rma.stock_location_rma", raise_if_not_found=False
         ),
-        help="Localização de estoque específica para produtos em RMA.",
     )
 
     state = fields.Selection(
@@ -133,14 +125,12 @@ class BhzRmaOrder(models.Model):
         "stock.move",
         string="Movimento para RMA / peça defeituosa",
         readonly=True,
-        help="Movimentação de estoque para o estoque de RMA (peça defeituosa).",
     )
 
     move_out_id = fields.Many2one(
         "stock.move",
         string="Movimento de retorno / peça nova",
         readonly=True,
-        help="Movimentação de estoque para saída de produto ou peça nova.",
     )
 
     unit_cost = fields.Monetary(
@@ -189,18 +179,10 @@ class BhzRmaOrder(models.Model):
         return super().create(vals)
 
     # -----------------------
-    # AÇÕES DO WORKFLOW
+    # WORKFLOW
     # -----------------------
 
     def action_set_waiting(self):
-        """
-        Coloca o RMA em 'Em espera'.
-
-        - Garantia do fornecedor:
-          move o produto do local de origem para o estoque RMA.
-        - Garantia do cliente:
-          cria uma Ordem de Serviço ligada ao RMA (sem mexer no estoque ainda).
-        """
         for rma in self:
             if rma.state != "draft":
                 raise UserError(
@@ -241,14 +223,6 @@ class BhzRmaOrder(models.Model):
             rma.state = "no_warranty"
 
     def action_solved(self):
-        """
-        Marca o RMA como 'Solucionado'.
-
-        - Garantia do fornecedor:
-          devolve produto do RMA para o estoque normal.
-        - Garantia do cliente:
-          não devolve nada ao estoque; a lógica de troca é feita na Ordem de Serviço.
-        """
         for rma in self:
             if rma.state not in ("waiting", "with_supplier", "no_warranty"):
                 raise UserError(
@@ -273,7 +247,7 @@ class BhzRmaOrder(models.Model):
             rma.state = "cancelled"
 
     # -----------------------
-    # MOVIMENTAÇÕES DE ESTOQUE
+    # ESTOQUE
     # -----------------------
 
     def _check_quantities(self):
@@ -292,7 +266,6 @@ class BhzRmaOrder(models.Model):
                 )
 
     def _create_move_to_rma(self):
-        """Garantia do fornecedor: move produto do local de origem para o estoque RMA."""
         for rma in self:
             rma._check_quantities()
 
@@ -322,7 +295,6 @@ class BhzRmaOrder(models.Model):
             rma.move_in_id = move.id
 
     def _create_move_from_rma(self):
-        """Garantia do fornecedor: move produto do estoque RMA de volta ao estoque normal."""
         for rma in self:
             rma._check_quantities()
 
@@ -352,11 +324,10 @@ class BhzRmaOrder(models.Model):
             rma.move_out_id = move.id
 
     # -----------------------
-    # ORDEM DE SERVIÇO (GARANTIA CLIENTE)
+    # ORDEM DE SERVIÇO
     # -----------------------
 
     def _ensure_service_order(self):
-        """Cria Ordem de Serviço vinculada ao RMA, se ainda não existir."""
         ServiceOrder = self.env["bhz.rma.service.order"]
         for rma in self:
             if rma.service_order_id:
@@ -373,16 +344,14 @@ class BhzRmaOrder(models.Model):
             rma.service_order_id = so.id
 
     # -----------------------
-    # IMPRESSÃO E E-MAIL
+    # IMPRESSÃO / E-MAIL
     # -----------------------
 
     def action_print_rma(self):
-        """Imprime o pedido de RMA (PDF)."""
         self.ensure_one()
         return self.env.ref("bhz_rma.action_report_bhz_rma_order").report_action(self)
 
     def action_send_rma_email(self):
-        """Envia o pedido de RMA por e-mail usando template."""
         self.ensure_one()
         template = self.env.ref(
             "bhz_rma.email_template_bhz_rma_order", raise_if_not_found=False
