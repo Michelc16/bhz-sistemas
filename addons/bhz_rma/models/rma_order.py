@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
@@ -11,24 +12,16 @@ class BhzRmaOrder(models.Model):
     # =========================================================
     # CAMPOS PRINCIPAIS
     # =========================================================
-
     name = fields.Char(
-        string="Número do RMA",
-        default="Novo",
+        string="Número RMA",
         readonly=True,
-        copy=False,
+        default="Novo",
         tracking=True,
     )
 
     date_rma = fields.Date(
         string="Data do RMA",
-        default=fields.Date.context_today,
-        tracking=True,
-    )
-
-    partner_id = fields.Many2one(
-        "res.partner",
-        string="Cliente",
+        default=fields.Date.today,
         tracking=True,
     )
 
@@ -40,6 +33,12 @@ class BhzRmaOrder(models.Model):
         readonly=True,
     )
 
+    partner_id = fields.Many2one(
+        "res.partner",
+        string="Cliente / Fornecedor",
+        tracking=True,
+    )
+
     product_id = fields.Many2one(
         "product.product",
         string="Produto",
@@ -47,57 +46,23 @@ class BhzRmaOrder(models.Model):
         tracking=True,
     )
 
+    # 🔥 CAMPO QUE FALTAVA → ERRO CORRIGIDO
+    product_uom_id = fields.Many2one(
+        "uom.uom",
+        string="Unidade de Medida",
+        required=True,
+        default=lambda self: self.env.ref("uom.product_uom_unit"),
+    )
+
     quantity = fields.Float(
         string="Quantidade",
-        default=1.0,
-        tracking=True,
-    )
-
-    warranty_type = fields.Selection(
-        [
-            ("cliente", "Garantia do Cliente"),
-            ("fornecedor", "Garantia com Fornecedor"),
-            ("sem_garantia", "Sem Garantia"),
-        ],
-        string="Tipo de Garantia",
+        default=1,
         required=True,
-        default="cliente",
-        tracking=True,
     )
 
-    state = fields.Selection(
-        [
-            ("draft", "Rascunho"),
-            ("waiting", "Em Espera"),
-            ("supplier", "Com Fornecedor"),
-            ("sem_garantia", "Sem Garantia"),
-            ("solved", "Solucionado"),
-            ("cancelled", "Cancelado"),
-        ],
-        string="Status",
-        default="draft",
-        tracking=True,
-    )
-
-    note = fields.Text(string="Observações")
-
-    # Estoques
-    location_id = fields.Many2one(
-        "stock.location",
-        string="Local de Origem",
-        required=True,
-        default=lambda self: self.env.ref(
-            "stock.stock_location_stock", raise_if_not_found=False
-        ),
-    )
-
-    rma_location_id = fields.Many2one(
-        "stock.location",
-        string="Local de RMA",
-        required=True,
-        default=lambda self: self.env.ref(
-            "bhz_rma.stock_location_rma", raise_if_not_found=False
-        ),
+    lot_id = fields.Many2one(
+        "stock.lot",
+        string="Número de Série / Lote",
     )
 
     unit_cost = fields.Float(
@@ -112,14 +77,57 @@ class BhzRmaOrder(models.Model):
         store=True,
     )
 
-    # =========================================================
-    # COMPUTES
-    # =========================================================
+    warranty_type = fields.Selection(
+        [
+            ("cliente", "Garantia do Cliente"),
+            ("fornecedor", "Garantia do Fornecedor"),
+            ("sem", "Sem Garantia"),
+        ],
+        string="Tipo de Garantia",
+        default="fornecedor",
+        required=True,
+        tracking=True,
+    )
 
+    state = fields.Selection(
+        [
+            ("draft", "Rascunho"),
+            ("waiting", "Em espera"),
+            ("supplier", "Com fornecedor"),
+            ("sem_garantia", "Sem garantia"),
+            ("solved", "Solucionado"),
+            ("cancel", "Cancelado"),
+        ],
+        string="Status",
+        default="draft",
+        tracking=True,
+    )
+
+    location_id = fields.Many2one(
+        "stock.location",
+        string="Local de Origem",
+        required=True,
+    )
+
+    rma_location_id = fields.Many2one(
+        "stock.location",
+        string="Local de RMA",
+        required=True,
+    )
+
+    note = fields.Text(string="Observações")
+
+    # =========================================================
+    # CÁLCULOS AUTOMÁTICOS
+    # =========================================================
     @api.depends("product_id")
     def _compute_unit_cost(self):
         for rec in self:
             rec.unit_cost = rec.product_id.standard_price or 0.0
+
+            # Ajusta UoM default baseada no produto
+            if rec.product_id:
+                rec.product_uom_id = rec.product_id.uom_id
 
     @api.depends("unit_cost", "quantity")
     def _compute_total_cost(self):
@@ -127,75 +135,21 @@ class BhzRmaOrder(models.Model):
             rec.total_cost = rec.unit_cost * rec.quantity
 
     # =========================================================
-    # CREATE — SUPORTA LISTA E DICT
+    # CREATE MULTI — Odoo 18/19
     # =========================================================
-
-    @api.model
-    def create(self, vals):
-        # Normaliza para lista
-        if isinstance(vals, list):
-            vals_list = vals
-        else:
-            vals_list = [vals]
-
-        seq = self.env["ir.sequence"]
-
-        for v in vals_list:
-            if not v.get("name") or v.get("name") in ("Novo", _("Novo")):
-                v["name"] = seq.next_by_code("bhz.rma.order") or "Novo"
-
-        if len(vals_list) == 1:
-            return super().create(vals_list[0])
-        else:
-            return super().create(vals_list)
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if not vals.get("name") or vals.get("name") in ["Novo", _("Novo")]:
+                vals["name"] = (
+                    self.env["ir.sequence"].next_by_code("bhz.rma.order")
+                    or _("Novo")
+                )
+        return super().create(vals_list)
 
     # =========================================================
-    # AÇÕES DE ESTOQUE
+    # BOTÕES DE STATUS
     # =========================================================
-
-    def action_move_to_rma_stock(self):
-        """Move do estoque normal para o estoque RMA."""
-        for rec in self:
-            if rec.quantity <= 0:
-                raise UserError("A quantidade deve ser maior que zero.")
-
-            move = self.env["stock.move"].create(
-                {
-                    "name": f"Entrada RMA {rec.name}",
-                    "product_id": rec.product_id.id,
-                    "product_uom": rec.product_id.uom_id.id,
-                    "product_uom_qty": rec.quantity,
-                    "location_id": rec.location_id.id,
-                    "location_dest_id": rec.rma_location_id.id,
-                }
-            )
-            move._action_confirm()
-            move._action_done()
-
-            rec.state = "waiting"
-
-    def action_return_from_rma(self):
-        """Retorna o produto ao estoque normal."""
-        for rec in self:
-            move = self.env["stock.move"].create(
-                {
-                    "name": f"Retorno RMA {rec.name}",
-                    "product_id": rec.product_id.id,
-                    "product_uom": rec.product_id.uom_id.id,
-                    "product_uom_qty": rec.quantity,
-                    "location_id": rec.rma_location_id.id,
-                    "location_dest_id": rec.location_id.id,
-                }
-            )
-            move._action_confirm()
-            move._action_done()
-
-            rec.state = "solved"
-
-    # =========================================================
-    # BOTÕES DA VIEW (OBRIGATÓRIOS)
-    # =========================================================
-
     def action_set_waiting(self):
         self.write({"state": "waiting"})
 
@@ -205,52 +159,59 @@ class BhzRmaOrder(models.Model):
     def action_set_no_warranty(self):
         self.write({"state": "sem_garantia"})
 
+    def action_cancel(self):
+        self.write({"state": "cancel"})
+
     def action_solved(self):
         for rec in self:
             if rec.warranty_type == "fornecedor":
                 rec.action_return_from_rma()
-            else:
-                rec.state = "solved"
+        self.write({"state": "solved"})
 
-    def action_cancel(self):
-        """Cancela o RMA."""
+    # =========================================================
+    # MOVIMENTAÇÃO DE ESTOQUE
+    # =========================================================
+    def action_move_to_rma_stock(self):
+        """Move produto para o estoque de RMA."""
         for rec in self:
-            rec.state = "cancelled"
+            if not rec.location_id or not rec.rma_location_id:
+                raise UserError("Defina os locais de origem e RMA.")
+
+            self.env["stock.move"].create(
+                {
+                    "name": f"RMA {rec.name}",
+                    "product_id": rec.product_id.id,
+                    "product_uom": rec.product_uom_id.id,
+                    "product_uom_qty": rec.quantity,
+                    "location_id": rec.location_id.id,
+                    "location_dest_id": rec.rma_location_id.id,
+                    "lot_id": rec.lot_id.id if rec.lot_id else False,
+                }
+            )._action_confirm()._action_done()
+
+    def action_return_from_rma(self):
+        """Retorna produto para o estoque normal."""
+        for rec in self:
+            self.env["stock.move"].create(
+                {
+                    "name": f"Retorno RMA {rec.name}",
+                    "product_id": rec.product_id.id,
+                    "product_uom": rec.product_uom_id.id,
+                    "product_uom_qty": rec.quantity,
+                    "location_id": rec.rma_location_id.id,
+                    "location_dest_id": rec.location_id.id,
+                    "lot_id": rec.lot_id.id if rec.lot_id else False,
+                }
+            )._action_confirm()._action_done()
 
     # =========================================================
-    # IMPRESSÃO DO RMA
+    # RELATÓRIO E EMAIL
     # =========================================================
-
     def action_print_rma(self):
-        """Gera o PDF do RMA."""
         return self.env.ref("bhz_rma.action_report_bhz_rma_order").report_action(self)
 
-    # =========================================================
-    # ENVIO DE E-MAIL
-    # =========================================================
-
     def action_send_rma_email(self):
-        """Abre o popup de e-mail usando o template configurado."""
-        self.ensure_one()
-
-        template = self.env.ref(
-            "bhz_rma.email_template_bhz_rma_order", raise_if_not_found=False
-        )
-
+        template = self.env.ref("bhz_rma.email_template_bhz_rma_order", raise_if_not_found=False)
         if not template:
-            raise UserError("O template de e-mail de RMA não foi encontrado.")
-
-        return {
-            "name": _("Enviar Pedido de RMA"),
-            "type": "ir.actions.act_window",
-            "res_model": "mail.compose.message",
-            "view_mode": "form",
-            "target": "new",
-            "context": {
-                "default_model": "bhz.rma.order",
-                "default_res_id": self.id,
-                "default_use_template": True,
-                "default_template_id": template.id,
-                "force_email": True,
-            },
-        }
+            raise UserError("Template de e-mail não encontrado.")
+        return template.send_mail(self.id, force_send=True)
