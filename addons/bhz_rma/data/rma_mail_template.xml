@@ -1,67 +1,35 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <data>
+    <record id="email_template_bhz_rma_order" model="mail.template" noupdate="1">
+        <field name="name">Pedido de RMA - BHZ</field>
+        <field name="model_id" ref="model_bhz_rma_order"/>
+        <field name="subject">Pedido de RMA ${object.name}</field>
+        <field name="email_from">${(object.company_id.email or '')|safe}</field>
+        <field name="email_to">${(object.partner_id.email or '')|safe}</field>
+        <field name="auto_delete" eval="True"/>
+        <field name="lang">${object.partner_id.lang or 'pt_BR'}</field>
 
-        <record id="email_template_bhz_rma_order" model="mail.template">
-            <field name="name">Pedido de RMA - BHZ</field>
+        <field name="body_html" type="html">
+            <![CDATA[
+<p>Olá ${object.partner_id.name or ''},</p>
 
-            <!-- Model do RMA -->
-            <field name="model_id" ref="bhz_rma.model_bhz_rma_order"/>
+<p>Segue o pedido de RMA número <strong>${object.name}</strong>.</p>
 
-            <!-- Assunto usando QWeb -->
-            <field name="subject">
-                Pedido de RMA <t t-out="object.name or ''"/>
-            </field>
+<p>
+    Produto: ${object.product_id.display_name}<br/>
+    Quantidade: ${object.quantity}<br/>
+    Tipo de garantia: ${object.warranty_type}<br/>
+    Situação: ${object.state}
+</p>
 
-            <!-- Remetente e destinatário usando {{ }} -->
-            <field name="email_from">
-                {{ (object.company_id.email or '') }}
-            </field>
-            <field name="email_to">
-                {{ (object.partner_id.email or '') }}
-            </field>
+<p>Em anexo, o PDF do pedido de RMA.</p>
 
-            <field name="auto_delete" eval="True"/>
-            <field name="lang">
-                {{ object.partner_id.lang or 'pt_BR' }}
-            </field>
+<p>Atenciosamente,<br/>
+${object.company_id.name or ''}</p>
+            ]]>
+        </field>
 
-            <!-- Corpo do email em QWeb -->
-            <field name="body_html" type="html">
-                <div>
-                    <p>Olá <t t-out="object.partner_id.name or ''"/>,</p>
-
-                    <p>
-                        Segue o pedido de RMA número
-                        <strong><t t-out="object.name"/></strong>.
-                    </p>
-
-                    <p>
-                        Produto:
-                        <t t-out="object.product_id.display_name"/><br/>
-                        Quantidade:
-                        <t t-out="object.quantity"/><br/>
-                        Tipo de garantia:
-                        <t t-out="object.warranty_type"/><br/>
-                        Situação:
-                        <t t-out="object.state"/>
-                    </p>
-
-                    <p>Em anexo, o PDF do pedido de RMA.</p>
-
-                    <p>
-                        Atenciosamente,<br/>
-                        <t t-out="object.company_id.name or ''"/>
-                    </p>
-                </div>
-            </field>
-
-            <!-- PDF anexado -->
-            <field name="report_template" ref="bhz_rma.action_report_bhz_rma_order"/>
-            <field name="report_name">
-                RMA_<t t-out="object.name or ''"/>
-            </field>
-        </record>
-
-    </data>
+        <field name="report_template" ref="bhz_rma.action_report_bhz_rma_order"/>
+        <field name="report_name">RMA_${object.name}</field>
+    </record>
 </odoo>
