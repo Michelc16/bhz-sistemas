@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <record id="view_bhz_dre_template_line_tree" model="ir.ui.view">
-        <field name="name">bhz.dre.template.line.tree</field>
+    <!-- LISTA do template -->
+    <record id="view_bhz_dre_template_line_list" model="ir.ui.view">
+        <field name="name">bhz.dre.template.line.list</field>
         <field name="model">bhz.dre.template.line</field>
         <field name="arch" type="xml">
-            <tree string="Template de DRE">
+            <list string="Template de DRE">
                 <field name="sequence"/>
                 <field name="name"/>
                 <field name="code"/>
                 <field name="level"/>
                 <field name="compute_method"/>
                 <field name="sign"/>
-            </tree>
+            </list>
         </field>
     </record>
 
+    <!-- FORM do template -->
     <record id="view_bhz_dre_template_line_form" model="ir.ui.view">
         <field name="name">bhz.dre.template.line.form</field>
         <field name="model">bhz.dre.template.line</field>
@@ -33,37 +35,45 @@
                     <group>
                         <field name="compute_method"/>
                         <field name="sign"/>
-                        <field name="formula" attrs="{'invisible': [('compute_method','!=','formula')]}"/>
+                        <field name="formula"
+                               attrs="{'invisible': [('compute_method','!=','formula')]}"/>
                     </group>
+
                     <notebook>
+                        <!-- Lista de contas -->
                         <page string="Contas contábeis"
                               attrs="{'invisible': [('compute_method','!=','accounts')]}">
                             <field name="account_ids" widget="many2many_tags"/>
                         </page>
-                        <page string="Filhas">
+
+                        <!-- Filhas -->
+                        <page string="Linhas filhas">
                             <field name="child_ids">
-                                <tree editable="bottom">
+                                <list editable="bottom">
                                     <field name="sequence"/>
                                     <field name="name"/>
                                     <field name="code"/>
                                     <field name="level"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
+
+                        <!-- Notas -->
                         <page string="Observações">
                             <field name="note"/>
                         </page>
                     </notebook>
+
                 </sheet>
             </form>
         </field>
     </record>
 
+    <!-- ACTION -->
     <record id="action_bhz_dre_template_line" model="ir.actions.act_window">
         <field name="name">Template de DRE</field>
         <field name="res_model">bhz.dre.template.line</field>
-        <field name="view_mode">tree,form</field>
-        <field name="context">{}</field>
+        <field name="view_mode">list,form</field>
     </record>
 
 </odoo>
