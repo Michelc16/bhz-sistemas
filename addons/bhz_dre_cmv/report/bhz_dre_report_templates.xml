@@ -1,20 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <report
-        id="action_bhz_dre_print_report"
-        model="bhz.dre.report"
-        string="Imprimir DRE"
-        report_type="qweb-pdf"
-        name="bhz_dre_cmv.report_bhz_dre"
-        file="bhz_dre_cmv.report_bhz_dre"
-        print_report_name="'DRE - %s' % (object.name)"
-    />
+    <!-- AÇÃO DO RELATÓRIO (cria o xmlid: bhz_dre_cmv.action_bhz_dre_print_report) -->
+    <record id="action_bhz_dre_print_report" model="ir.actions.report">
+        <field name="name">DRE</field>
+        <field name="model">bhz.dre.report</field>
+        <field name="report_type">qweb-pdf</field>
+        <!-- nome técnico do template abaixo -->
+        <field name="report_name">bhz_dre_cmv.report_bhz_dre</field>
+        <field name="report_file">bhz_dre_cmv.report_bhz_dre</field>
+        <field name="print_report_name">'DRE - %s' % (object.name)</field>
+    </record>
 
+    <!-- TEMPLATE QWEB DO RELATÓRIO -->
     <template id="report_bhz_dre">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
                 <div class="page">
+
                     <h2>DRE - <t t-esc="o.company_id.name"/></h2>
                     <p>
                         Período:
@@ -36,7 +39,12 @@
                                         <t t-if="line.level == 'title'">
                                             <strong><t t-esc="line.name"/></strong>
                                         </t>
-                                        <t t-if="line.level != 'title'">
+                                        <t t-elif="line.level == 'subtotal'">
+                                            <span style="font-weight:600;">
+                                                <t t-esc="line.name"/>
+                                            </span>
+                                        </t>
+                                        <t t-else="">
                                             <t t-esc="line.name"/>
                                         </t>
                                     </td>
@@ -49,6 +57,7 @@
                             </t>
                         </tbody>
                     </table>
+
                 </div>
             </t>
         </t>
