@@ -1,47 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <!--
-        Raiz BHZ DRE dentro do módulo Financeiro.
-        parent="account.menu_finance" faz ele aparecer como uma aba própria
-        no topo do app Financeiro.
-    -->
-    <menuitem id="menu_bhz_dre_root"
-              name="BHZ DRE"
-              parent="account.menu_finance"
-              sequence="40"/>
+    <!-- APP BHZ DRE e CMV (menu de primeiro nível na tela inicial) -->
+    <menuitem
+        id="menu_bhz_dre_app"
+        name="BHZ DRE e CMV"
+        sequence="60"
+    />
+
+    <!-- Raiz interna do módulo (dentro do app BHZ DRE e CMV) -->
+    <menuitem
+        id="menu_bhz_dre_root"
+        name="BHZ DRE"
+        parent="menu_bhz_dre_app"
+        sequence="10"
+    />
 
     <!-- Submenu: Configuração -->
-    <menuitem id="menu_bhz_dre_configuration"
-              name="Configuração"
-              parent="menu_bhz_dre_root"
-              sequence="10"/>
+    <menuitem
+        id="menu_bhz_dre_configuration"
+        name="Configuração"
+        parent="menu_bhz_dre_root"
+        sequence="10"
+    />
 
     <!-- Submenu: Relatórios -->
-    <menuitem id="menu_bhz_dre_reporting"
-              name="Relatórios"
-              parent="menu_bhz_dre_root"
-              sequence="20"/>
+    <menuitem
+        id="menu_bhz_dre_reporting"
+        name="Relatórios"
+        parent="menu_bhz_dre_root"
+        sequence="20"
+    />
 
-    <!-- Template de DRE -->
-    <menuitem id="menu_bhz_dre_template_line"
-              name="Template de DRE"
-              parent="menu_bhz_dre_configuration"
-              action="action_bhz_dre_template_line"
-              sequence="1"/>
+    <!-- Tela: Template de DRE -->
+    <menuitem
+        id="menu_bhz_dre_template_line"
+        name="Template de DRE"
+        parent="menu_bhz_dre_configuration"
+        action="action_bhz_dre_template_line"
+        sequence="1"
+    />
 
-    <!-- Lista de Relatórios DRE -->
-    <menuitem id="menu_bhz_dre_report"
-              name="Relatórios DRE"
-              parent="menu_bhz_dre_reporting"
-              action="action_bhz_dre_report"
-              sequence="1"/>
+    <!-- Tela: Lista de Relatórios DRE -->
+    <menuitem
+        id="menu_bhz_dre_report"
+        name="Relatórios DRE"
+        parent="menu_bhz_dre_reporting"
+        action="action_bhz_dre_report"
+        sequence="1"
+    />
 
     <!-- Wizard: Gerar DRE do mês -->
-    <menuitem id="menu_bhz_dre_generate"
-              name="Gerar DRE do mês"
-              parent="menu_bhz_dre_reporting"
-              action="action_bhz_dre_wizard"
-              sequence="2"/>
+    <menuitem
+        id="menu_bhz_dre_generate"
+        name="Gerar DRE do mês"
+        parent="menu_bhz_dre_reporting"
+        action="action_bhz_dre_wizard"
+        sequence="2"
+    />
 
 </odoo>
