@@ -1,60 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <!-- APP BHZ DRE e CMV (menu de primeiro nível na tela inicial) -->
+    <!-- APP próprio na tela inicial -->
     <menuitem
-        id="menu_bhz_dre_app"
+        id="bhz_dre_menu_app"
         name="BHZ DRE e CMV"
         sequence="60"
     />
 
-    <!-- Raiz interna do módulo (dentro do app BHZ DRE e CMV) -->
+    <!-- Raiz interna do módulo dentro do app -->
     <menuitem
-        id="menu_bhz_dre_root"
+        id="bhz_dre_menu_root"
         name="BHZ DRE"
-        parent="menu_bhz_dre_app"
+        parent="bhz_dre_menu_app"
         sequence="10"
     />
 
     <!-- Submenu: Configuração -->
     <menuitem
-        id="menu_bhz_dre_configuration"
+        id="bhz_dre_menu_configuration"
         name="Configuração"
-        parent="menu_bhz_dre_root"
+        parent="bhz_dre_menu_root"
         sequence="10"
     />
 
     <!-- Submenu: Relatórios -->
     <menuitem
-        id="menu_bhz_dre_reporting"
+        id="bhz_dre_menu_reporting"
         name="Relatórios"
-        parent="menu_bhz_dre_root"
+        parent="bhz_dre_menu_root"
         sequence="20"
     />
 
     <!-- Tela: Template de DRE -->
     <menuitem
-        id="menu_bhz_dre_template_line"
+        id="bhz_dre_menu_template"
         name="Template de DRE"
-        parent="menu_bhz_dre_configuration"
+        parent="bhz_dre_menu_configuration"
         action="action_bhz_dre_template_line"
         sequence="1"
     />
 
     <!-- Tela: Lista de Relatórios DRE -->
     <menuitem
-        id="menu_bhz_dre_report"
+        id="bhz_dre_menu_report_list"
         name="Relatórios DRE"
-        parent="menu_bhz_dre_reporting"
+        parent="bhz_dre_menu_reporting"
         action="action_bhz_dre_report"
         sequence="1"
     />
 
     <!-- Wizard: Gerar DRE do mês -->
     <menuitem
-        id="menu_bhz_dre_generate"
+        id="bhz_dre_menu_generate"
         name="Gerar DRE do mês"
-        parent="menu_bhz_dre_reporting"
+        parent="bhz_dre_menu_reporting"
         action="action_bhz_dre_wizard"
         sequence="2"
     />
