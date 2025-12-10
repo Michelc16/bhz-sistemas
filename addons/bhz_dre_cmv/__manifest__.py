@@ -20,11 +20,11 @@ Módulo de DRE e CMV baseado no modelo utilizado pela BHZ / Ventura.
     "data": [        
         "security/security.xml",
         "security/ir.model.access.csv",        
+        "report/bhz_dre_report_templates.xml",        
         "views/bhz_dre_template_views.xml",
         "views/bhz_dre_report_views.xml",
-        "views/bhz_dre_wizard_views.xml",        
-        "views/bhz_dre_menu.xml",        
-        "report/bhz_dre_report_templates.xml",
+        "views/bhz_dre_wizard_views.xml",
+        "views/bhz_dre_menu.xml",
     ],
     "application": True,
 }
