@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <!-- Menu raiz da DRE -->
+    <!-- Menu raiz da DRE dentro de Financeiro → Relatórios -->
     <menuitem id="menu_bhz_dre_root"
               name="BHZ DRE"
-              parent="account.menu_finance"
+              parent="account.menu_finance_reports"
               sequence="50"/>
 
-    <!-- Configuração -->
+    <!-- Submenu: Configuração -->
     <menuitem id="menu_bhz_dre_configuration"
               name="Configuração"
               parent="menu_bhz_dre_root"
               sequence="10"/>
 
-    <!-- Relatórios -->
+    <!-- Submenu: Relatórios -->
     <menuitem id="menu_bhz_dre_reporting"
               name="Relatórios"
               parent="menu_bhz_dre_root"
@@ -23,12 +23,21 @@
     <menuitem id="menu_bhz_dre_template_line"
               name="Template de DRE"
               parent="menu_bhz_dre_configuration"
-              action="action_bhz_dre_template_line"/>
+              action="action_bhz_dre_template_line"
+              sequence="1"/>
 
-    <!-- Lista de Relatórios -->
+    <!-- Lista de Relatórios DRE -->
     <menuitem id="menu_bhz_dre_report"
               name="Relatórios DRE"
               parent="menu_bhz_dre_reporting"
-              action="action_bhz_dre_report"/>
+              action="action_bhz_dre_report"
+              sequence="2"/>
+
+    <!-- Wizard: Gerar DRE do mês -->
+    <menuitem id="menu_bhz_dre_generate"
+              name="Gerar DRE do mês"
+              parent="menu_bhz_dre_reporting"
+              action="action_bhz_dre_wizard"
+              sequence="3"/>
 
 </odoo>
