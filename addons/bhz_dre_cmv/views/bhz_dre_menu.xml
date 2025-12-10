@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <!-- Menu raiz da DRE dentro de Financeiro → Relatórios -->
+    <!--
+        Raiz BHZ DRE dentro do módulo Financeiro.
+        parent="account.menu_finance" faz ele aparecer como uma aba própria
+        no topo do app Financeiro.
+    -->
     <menuitem id="menu_bhz_dre_root"
               name="BHZ DRE"
-              parent="account.menu_finance_reports"
-              sequence="50"/>
+              parent="account.menu_finance"
+              sequence="40"/>
 
     <!-- Submenu: Configuração -->
     <menuitem id="menu_bhz_dre_configuration"
@@ -31,13 +35,13 @@
               name="Relatórios DRE"
               parent="menu_bhz_dre_reporting"
               action="action_bhz_dre_report"
-              sequence="2"/>
+              sequence="1"/>
 
     <!-- Wizard: Gerar DRE do mês -->
     <menuitem id="menu_bhz_dre_generate"
               name="Gerar DRE do mês"
               parent="menu_bhz_dre_reporting"
               action="action_bhz_dre_wizard"
-              sequence="3"/>
+              sequence="2"/>
 
 </odoo>
