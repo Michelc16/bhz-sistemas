@@ -1,32 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <!-- DRE: lista de relatórios
-         Vai aparecer em: Financeiro -> Relatórios -->
+    <!-- Menu raiz da DRE dentro do Financeiro -->
+    <menuitem
+        id="bhz_dre_menu_root"
+        name="DRE"
+        parent="account.menu_finance"   <!-- esse é o menu "Financeiro" do print -->
+        sequence="60"
+    />
+
+    <!-- Lista de relatórios DRE -->
     <menuitem
         id="bhz_dre_menu_report_list"
-        name="DRE (Relatório)"
-        parent="account.menu_finance_reports"
-        sequence="50"
+        name="Relatórios de DRE"
+        parent="bhz_dre_menu_root"
+        sequence="10"
         action="action_bhz_dre_report"
     />
 
-    <!-- Wizard: Gerar DRE do mês
-         Também em: Financeiro -> Relatórios -->
+    <!-- Wizard para gerar a DRE do mês -->
     <menuitem
         id="bhz_dre_menu_generate"
         name="Gerar DRE do mês"
-        parent="account.menu_finance_reports"
-        sequence="51"
+        parent="bhz_dre_menu_root"
+        sequence="20"
         action="action_bhz_dre_wizard"
     />
 
-    <!-- Configuração do Template da DRE
-         Vai aparecer em: Financeiro -> Configuração -->
+    <!-- Configuração do template da DRE -->
     <menuitem
         id="bhz_dre_menu_template"
         name="Template de DRE"
-        parent="account.menu_finance_configuration"
-        sequence="80"
+        parent="bhz_dre_menu_root"
+        sequence="30"
         action="action_bhz_dre_template_line"
     />
 
