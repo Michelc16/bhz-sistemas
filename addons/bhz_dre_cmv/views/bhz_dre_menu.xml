@@ -1,62 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <!-- APP próprio na tela inicial -->
-    <menuitem
-        id="bhz_dre_menu_app"
-        name="BHZ DRE e CMV"
-        sequence="60"
-    />
-
-    <!-- Raiz interna do módulo dentro do app -->
-    <menuitem
-        id="bhz_dre_menu_root"
-        name="BHZ DRE"
-        parent="bhz_dre_menu_app"
-        sequence="10"
-    />
-
-    <!-- Submenu: Configuração -->
-    <menuitem
-        id="bhz_dre_menu_configuration"
-        name="Configuração"
-        parent="bhz_dre_menu_root"
-        sequence="10"
-    />
-
-    <!-- Submenu: Relatórios -->
-    <menuitem
-        id="bhz_dre_menu_reporting"
-        name="Relatórios"
-        parent="bhz_dre_menu_root"
-        sequence="20"
-    />
-
-    <!-- Tela: Template de DRE -->
-    <menuitem
-        id="bhz_dre_menu_template"
-        name="Template de DRE"
-        parent="bhz_dre_menu_configuration"
-        action="action_bhz_dre_template_line"
-        sequence="1"
-    />
-
-    <!-- Tela: Lista de Relatórios DRE -->
+    <!-- DRE: lista de relatórios
+         Vai aparecer em: Financeiro -> Relatórios -->
     <menuitem
         id="bhz_dre_menu_report_list"
-        name="Relatórios DRE"
-        parent="bhz_dre_menu_reporting"
+        name="DRE (Relatório)"
+        parent="account.menu_finance_reports"
+        sequence="50"
         action="action_bhz_dre_report"
-        sequence="1"
     />
 
-    <!-- Wizard: Gerar DRE do mês -->
+    <!-- Wizard: Gerar DRE do mês
+         Também em: Financeiro -> Relatórios -->
     <menuitem
         id="bhz_dre_menu_generate"
         name="Gerar DRE do mês"
-        parent="bhz_dre_menu_reporting"
+        parent="account.menu_finance_reports"
+        sequence="51"
         action="action_bhz_dre_wizard"
-        sequence="2"
+    />
+
+    <!-- Configuração do Template da DRE
+         Vai aparecer em: Financeiro -> Configuração -->
+    <menuitem
+        id="bhz_dre_menu_template"
+        name="Template de DRE"
+        parent="account.menu_finance_configuration"
+        sequence="80"
+        action="action_bhz_dre_template_line"
     />
 
 </odoo>
