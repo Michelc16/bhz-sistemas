@@ -1,10 +1,6 @@
-# -*- coding: utf-8 -*-
-
 from odoo import api, fields, models, _
 from calendar import monthrange
 from datetime import date
-
-
 class BhzDreWizard(models.TransientModel):
     _name = "bhz.dre.wizard"
     _description = "Assistente para geração de DRE"

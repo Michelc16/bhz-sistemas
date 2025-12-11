@@ -1,9 +1,5 @@
-# -*- coding: utf-8 -*-
-
 from odoo import api, fields, models, _
 from datetime import datetime
-
-
 class BhzDreReport(models.Model):
     _name = "bhz.dre.report"
     _description = "Relatório de DRE"

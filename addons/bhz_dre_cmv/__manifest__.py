@@ -27,4 +27,5 @@ Módulo de DRE e CMV baseado no modelo utilizado pela BHZ / Ventura.
         "views/bhz_dre_menu.xml",
     ],
     "application": True,
+    "installable": True,
 }

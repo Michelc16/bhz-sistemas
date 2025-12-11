@@ -1,8 +1,4 @@
-# -*- coding: utf-8 -*-
-
 from odoo import fields, models
-
-
 class BhzDreTemplateLine(models.Model):
     _name = "bhz.dre.template.line"
     _description = "Template de Linha da DRE"
