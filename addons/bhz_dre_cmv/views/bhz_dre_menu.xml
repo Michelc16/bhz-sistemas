@@ -5,7 +5,7 @@
     <menuitem
         id="bhz_dre_menu_root"
         name="DRE"
-        parent="account.menu_finance"   <!-- esse é o menu "Financeiro" do print -->
+        parent="account.menu_finance"   <-- esse é o menu "Financeiro" do print -->
         sequence="60"
     />
 
