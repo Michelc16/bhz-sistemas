@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <!-- Menu raiz da DRE dentro do Financeiro -->
+    <!-- Menu raiz DRE dentro de Financeiro -->
     <menuitem
         id="bhz_dre_menu_root"
         name="DRE"
-        parent="account.menu_finance"   <-- esse é o menu "Financeiro" do print -->
+        parent="account.menu_finance"
         sequence="60"
     />
 
-    <!-- Lista de relatórios DRE -->
+    <!-- Lista de relatórios de DRE -->
     <menuitem
         id="bhz_dre_menu_report_list"
         name="Relatórios de DRE"
@@ -18,7 +18,7 @@
         action="action_bhz_dre_report"
     />
 
-    <!-- Wizard para gerar a DRE do mês -->
+    <!-- Wizard para gerar DRE do mês -->
     <menuitem
         id="bhz_dre_menu_generate"
         name="Gerar DRE do mês"
@@ -27,7 +27,7 @@
         action="action_bhz_dre_wizard"
     />
 
-    <!-- Configuração do template da DRE -->
+    <!-- Configuração de Template de DRE -->
     <menuitem
         id="bhz_dre_menu_template"
         name="Template de DRE"
