@@ -2,14 +2,13 @@
 <odoo>
   <data>
 
-    <!-- Pasta BHZ dentro de Relatórios -->
+    <!-- Pasta BHZ DRE dentro de Financeiro > Relatórios -->
     <menuitem
       id="menu_bhz_dre_root"
       name="BHZ DRE"
       parent="account.menu_finance_reports"
       sequence="90"/>
 
-    <!-- Gerar DRE -->
     <menuitem
       id="menu_bhz_dre_generate"
       name="Gerar DRE do mês"
@@ -17,7 +16,6 @@
       action="action_bhz_dre_wizard"
       sequence="10"/>
 
-    <!-- Relatórios gerados -->
     <menuitem
       id="menu_bhz_dre_reports"
       name="Relatórios DRE"
@@ -25,7 +23,6 @@
       action="action_bhz_dre_report"
       sequence="20"/>
 
-    <!-- Configuração do template (opcional ficar em Configuração do Financeiro, mas deixei dentro do BHZ DRE) -->
     <menuitem
       id="menu_bhz_dre_templates"
       name="Templates DRE"
