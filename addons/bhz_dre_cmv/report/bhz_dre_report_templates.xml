@@ -1,31 +1,42 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
     <template id="bhz_dre_report_document">
-        <t t-call="web.external_layout">
-            <div class="page">
-                <h2>Demonstração do Resultado do Exercício</h2>
-                <p>
-                    <strong>Empresa:</strong>
-                    <span t-esc="doc.company_id.name"/><br/>
-                    <strong>Período:</strong>
-                    <span t-esc="doc.date_from"/> -
-                    <span t-esc="doc.date_to"/>
-                </p>
-                <table class="table table-sm table-bordered">
-                    <tbody>
-                        <tr t-foreach="doc.line_ids" t-as="line">
-                            <td>
-                                <span t-esc="' ' * max((line.level or 1) - 1, 0) * 4"/>
-                                <span t-esc="line.name"/>
-                            </td>
-                            <td class="text-right">
-                                <span t-esc="line.amount"/>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <h2>Demonstração do Resultado do Exercício</h2>
+                    <p>
+                        <strong>Empresa:</strong>
+                        <span t-esc="doc.company_id.name"/>
+                    </p>
+                    <p>
+                        <strong>Período:</strong>
+                        <span t-esc="doc.date_from"/> - <span t-esc="doc.date_to"/>
+                    </p>
+
+                    <table class="table table-sm o_main_table">
+                        <thead>
+                            <tr>
+                                <th>Descrição</th>
+                                <th class="text-right">Valor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="doc.line_ids" t-as="line">
+                                <tr>
+                                    <td>
+                                        <span t-esc="line.name"/>
+                                    </td>
+                                    <td class="text-right">
+                                        <span t-esc="line.amount"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
         </t>
     </template>
 

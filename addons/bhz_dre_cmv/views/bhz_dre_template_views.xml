@@ -1,47 +1,40 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="view_bhz_dre_template_line_list" model="ir.ui.view">
-        <field name="name">bhz.dre.template.line.list</field>
-        <field name="model">bhz.dre.template.line</field>
+    <record id="view_bhz_dre_template_tree" model="ir.ui.view">
+        <field name="name">bhz.dre.template.tree</field>
+        <field name="model">bhz.dre.template</field>
         <field name="arch" type="xml">
-            <list string="Template de DRE">
-                <field name="sequence"/>
+            <list string="Templates de DRE">
                 <field name="name"/>
-                <field name="code"/>
-                <field name="line_type"/>
-                <field name="sign"/>
-                <field name="level"/>
+                <field name="company_id"/>
             </list>
         </field>
     </record>
 
-    <record id="view_bhz_dre_template_line_form" model="ir.ui.view">
-        <field name="name">bhz.dre.template.line.form</field>
-        <field name="model">bhz.dre.template.line</field>
+    <record id="view_bhz_dre_template_form" model="ir.ui.view">
+        <field name="name">bhz.dre.template.form</field>
+        <field name="model">bhz.dre.template</field>
         <field name="arch" type="xml">
-            <form string="Linha de template DRE">
+            <form string="Template de DRE">
                 <sheet>
                     <group>
                         <field name="name"/>
-                        <field name="sequence"/>
-                        <field name="code"/>
-                        <field name="line_type"/>
-                        <field name="sign"/>
-                        <field name="level"/>
-                        <field name="parent_id"/>
-                        <field name="account_ids" widget="many2many_tags"/>
-                        <field name="show_on_report"/>
+                        <field name="company_id"/>
                     </group>
                     <notebook>
-                        <page string="Sub-linhas">
-                            <field name="child_ids">
+                        <page string="Linhas">
+                            <field name="line_ids">
                                 <list editable="bottom">
                                     <field name="sequence"/>
                                     <field name="name"/>
-                                    <field name="line_type"/>
-                                    <field name="sign"/>
-                                    <field name="level"/>
+                                    <field name="code"/>
+                                    <field name="is_total"/>
+                                    <field name="sign" widget="badge"/>
+                                    <field name="account_ids" widget="many2many_tags"
+                                           modifiers="{'invisible': [['is_total', '=', True]]}"/>
+                                    <field name="total_source_codes"
+                                           modifiers="{'invisible': [['is_total', '=', False]]}"/>
                                 </list>
                             </field>
                         </page>
@@ -51,16 +44,12 @@
         </field>
     </record>
 
-    <record id="action_bhz_dre_template_line" model="ir.actions.act_window">
-        <field name="name">Template de DRE</field>
-        <field name="res_model">bhz.dre.template.line</field>
-        <field name="view_mode">list,form</field>
-        <field name="help" type="html">
-            <p>
-                Configure aqui as linhas da sua DRE (receitas, CMV, despesas, etc.)
-                e vincule as contas contábeis.
-            </p>
-        </field>
+    <record id="action_bhz_dre_template" model="ir.actions.act_window">
+        <field name="name">Templates de DRE</field>
+        <field name="res_model">bhz.dre.template</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'default_company_id': company_id}</field>
+        <field name="domain">[('company_id', '=', company_id)]</field>
     </record>
 
 </odoo>

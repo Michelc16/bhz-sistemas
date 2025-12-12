@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="view_bhz_dre_report_list" model="ir.ui.view">
-        <field name="name">bhz.dre.report.list</field>
+    <record id="view_bhz_dre_report_tree" model="ir.ui.view">
+        <field name="name">bhz.dre.report.tree</field>
         <field name="model">bhz.dre.report</field>
         <field name="arch" type="xml">
             <list string="Relatórios de DRE">
@@ -20,6 +20,13 @@
         <field name="model">bhz.dre.report</field>
         <field name="arch" type="xml">
             <form string="Relatório de DRE">
+                <header>
+                    <button name="action_print_pdf"
+                            string="Imprimir"
+                            type="object"
+                            class="btn-primary"
+                            modifiers="{'invisible': [['state', '!=', 'calculated']]}"/>
+                </header>
                 <sheet>
                     <group>
                         <field name="name" readonly="1"/>
@@ -29,12 +36,10 @@
                         <field name="state" readonly="1"/>
                     </group>
                     <field name="line_ids">
-                        <list>
-                            <field name="sequence"/>
-                            <field name="name"/>
+                        <list string="Linhas da DRE">
+                            <field name="sequence" readonly="1"/>
+                            <field name="name" readonly="1"/>
                             <field name="amount" widget="monetary"/>
-                            <field name="line_type" invisible="1"/>
-                            <field name="level" invisible="1"/>
                         </list>
                     </field>
                 </sheet>
@@ -42,13 +47,10 @@
         </field>
     </record>
 
-    <record id="action_bhz_dre_report" model="ir.actions.act_window">
-        <field name="name">Relatórios de DRE</field>
+    <record id="action_bhz_dre_report_list" model="ir.actions.act_window">
+        <field name="name">Relatórios DRE do mês</field>
         <field name="res_model">bhz.dre.report</field>
-        <field name="view_mode">list,form</field>
-        <field name="help" type="html">
-            <p>Relatórios de DRE gerados a partir do período escolhido.</p>
-        </field>
+        <field name="view_mode">tree,form</field>
     </record>
 
 </odoo>

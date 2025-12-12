@@ -1,39 +1,56 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
-    <!-- Seção DRE dentro de Financeiro → Relatórios -->
+    <!-- Menu raiz BHZ DRE dentro do app Financeiro -->
     <menuitem
-        id="bhz_dre_menu_reporting_root"
-        name="DRE"
-        parent="account.menu_finance_reports"
-        sequence="50"
+        id="menu_bhz_dre_root"
+        name="BHZ DRE"
+        parent="account.menu_finance"
+        groups="bhz_dre_cmv.group_bhz_dre_user"
+        sequence="40"
     />
 
-    <!-- Lista de relatórios gerados -->
+    <!-- Configuração -->
     <menuitem
-        id="bhz_dre_menu_report_list"
-        name="Relatórios de DRE"
-        parent="bhz_dre_menu_reporting_root"
-        action="action_bhz_dre_report"
+        id="menu_bhz_dre_configuration"
+        name="Configuração"
+        parent="menu_bhz_dre_root"
+        groups="bhz_dre_cmv.group_bhz_dre_user"
         sequence="10"
     />
 
-    <!-- Wizard para gerar DRE do mês -->
     <menuitem
-        id="bhz_dre_menu_generate"
-        name="Gerar DRE do mês"
-        parent="bhz_dre_menu_reporting_root"
-        action="action_bhz_dre_wizard"
+        id="menu_bhz_dre_template"
+        name="Template de DRE"
+        parent="menu_bhz_dre_configuration"
+        action="action_bhz_dre_template"
+        groups="bhz_dre_cmv.group_bhz_dre_user"
+        sequence="10"
+    />
+
+    <!-- Relatórios -->
+    <menuitem
+        id="menu_bhz_dre_reporting"
+        name="Relatórios"
+        parent="menu_bhz_dre_root"
+        groups="bhz_dre_cmv.group_bhz_dre_user"
         sequence="20"
     />
 
-    <!-- Configuração de template -->
     <menuitem
-        id="bhz_dre_menu_template"
-        name="Template de DRE"
-        parent="bhz_dre_menu_reporting_root"
-        action="action_bhz_dre_template_line"
-        sequence="30"
+        id="menu_bhz_dre_generate"
+        name="Gerar DRE do mês"
+        parent="menu_bhz_dre_reporting"
+        action="action_bhz_dre_wizard"
+        groups="bhz_dre_cmv.group_bhz_dre_user"
+        sequence="10"
     />
 
+    <menuitem
+        id="menu_bhz_dre_report"
+        name="Relatórios DRE do mês"
+        parent="menu_bhz_dre_reporting"
+        action="action_bhz_dre_report_list"
+        groups="bhz_dre_cmv.group_bhz_dre_user"
+        sequence="20"
+    />
 </odoo>

@@ -1,9 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
-    <!-- Grupo de permissão para a DRE -->
+    <!-- Grupo para acessar DRE -->
     <record id="group_bhz_dre_user" model="res.groups">
         <field name="name">BHZ DRE - Usuário</field>
+        <!-- sem category_id no v17+ -->
     </record>
-
 </odoo>
