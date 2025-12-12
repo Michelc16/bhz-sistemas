@@ -20,4 +20,25 @@
         action="action_bhz_rma_order"
         sequence="10"
     />
+
+    <record id="action_bhz_rma_stock_quant" model="ir.actions.act_window">
+        <field name="name">Estoque RMA</field>
+        <field name="res_model">stock.quant</field>
+        <field name="view_mode">list,pivot,graph</field>
+        <field name="domain">[('location_id', 'child_of', ref('bhz_rma.stock_location_rma'))]</field>
+        <field name="context">
+            {
+                'search_default_location_id': ref('bhz_rma.stock_location_rma'),
+                'default_location_id': ref('bhz_rma.stock_location_rma')
+            }
+        </field>
+    </record>
+
+    <menuitem
+        id="menu_bhz_rma_stock"
+        name="Estoque RMA"
+        parent="menu_bhz_rma_root"
+        action="action_bhz_rma_stock_quant"
+        sequence="20"
+    />
 </odoo>

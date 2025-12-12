@@ -106,12 +106,18 @@ class BhzRmaOrder(models.Model):
         "stock.location",
         string="Local de Origem",
         required=True,
+        default=lambda self: self.env.ref(
+            "stock.stock_location_stock", raise_if_not_found=False
+        ),
     )
 
     rma_location_id = fields.Many2one(
         "stock.location",
         string="Local de RMA",
         required=True,
+        default=lambda self: self.env.ref(
+            "bhz_rma.stock_location_rma", raise_if_not_found=False
+        ),
     )
 
     note = fields.Text(string="Observações")
@@ -120,6 +126,18 @@ class BhzRmaOrder(models.Model):
     service_order_id = fields.Many2one(
         "bhz.rma.service.order",
         string="Ordem de Serviço",
+    )
+
+    move_in_id = fields.Many2one(
+        "stock.move",
+        string="Movimento para RMA",
+        readonly=True,
+    )
+
+    move_out_id = fields.Many2one(
+        "stock.move",
+        string="Movimento de Retorno",
+        readonly=True,
     )
 
     # =========================================================
@@ -150,7 +168,11 @@ class BhzRmaOrder(models.Model):
                     self.env["ir.sequence"].next_by_code("bhz.rma.order")
                     or _("Novo")
                 )
-        return super().create(vals_list)
+        records = super().create(vals_list)
+        for rec in records:
+            rec.action_move_to_rma_stock()
+        records.write({"state": "waiting"})
+        return records
 
     # =========================================================
     # BOTÕES DE STATUS (DEVEM CORRESPONDER AO FORM)
@@ -178,10 +200,12 @@ class BhzRmaOrder(models.Model):
     # =========================================================
     def action_move_to_rma_stock(self):
         for rec in self:
+            if rec.move_in_id:
+                continue
             if not rec.location_id or not rec.rma_location_id:
                 raise UserError("Defina os locais de origem e RMA.")
 
-            self.env["stock.move"].create(
+            move = self.env["stock.move"].create(
                 {
                     "name": f"RMA {rec.name}",
                     "product_id": rec.product_id.id,
@@ -191,11 +215,16 @@ class BhzRmaOrder(models.Model):
                     "location_dest_id": rec.rma_location_id.id,
                     "lot_id": rec.lot_id.id if rec.lot_id else False,
                 }
-            )._action_confirm()._action_done()
+            )
+            move._action_confirm()
+            move._action_done()
+            rec.move_in_id = move.id
 
     def action_return_from_rma(self):
         for rec in self:
-            self.env["stock.move"].create(
+            if rec.move_out_id:
+                continue
+            move = self.env["stock.move"].create(
                 {
                     "name": f"Retorno RMA {rec.name}",
                     "product_id": rec.product_id.id,
@@ -205,7 +234,10 @@ class BhzRmaOrder(models.Model):
                     "location_dest_id": rec.location_id.id,
                     "lot_id": rec.lot_id.id if rec.lot_id else False,
                 }
-            )._action_confirm()._action_done()
+            )
+            move._action_confirm()
+            move._action_done()
+            rec.move_out_id = move.id
 
     # =========================================================
     # RELATÓRIO & E-MAIL
