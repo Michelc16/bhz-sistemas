@@ -1,12 +1,14 @@
+# -*- coding: utf-8 -*-
+
 from datetime import date
 
 from dateutil.relativedelta import relativedelta
-from odoo import api, fields, models
+from odoo import _, api, fields, models
 
 
 class BhzDreWizard(models.TransientModel):
     _name = "bhz.dre.wizard"
-    _description = "Assistente para gerar DRE BHZ"
+    _description = "Assistente para geração da DRE"
 
     company_id = fields.Many2one(
         "res.company",
@@ -16,9 +18,6 @@ class BhzDreWizard(models.TransientModel):
     )
     date_from = fields.Date(string="Data inicial", required=True)
     date_to = fields.Date(string="Data final", required=True)
-    template_id = fields.Many2one(
-        "bhz.dre.template", string="Template de DRE", required=True
-    )
 
     @api.model
     def default_get(self, fields_list):
@@ -26,67 +25,69 @@ class BhzDreWizard(models.TransientModel):
         today = date.today()
         first_day = today.replace(day=1)
         last_day = first_day + relativedelta(months=1, days=-1)
-        if "date_from" in fields_list:
-            res.setdefault("date_from", first_day)
-        if "date_to" in fields_list:
-            res.setdefault("date_to", last_day)
+        res.setdefault("date_from", first_day)
+        res.setdefault("date_to", last_day)
         return res
 
-    def action_generate_dre(self):
-        """Calcula a DRE e abre o relatório transitório."""
+    def _get_move_lines(self):
         self.ensure_one()
-        template = self.template_id
-
-        report_vals = {
-            "company_id": self.company_id.id,
-            "date_from": self.date_from,
-            "date_to": self.date_to,
-            "template_id": template.id,
-            "state": "calculated",
-        }
-        report = self.env["bhz.dre.report"].create(report_vals)
-
-        aml_domain = [
+        domain = [
             ("company_id", "=", self.company_id.id),
             ("date", ">=", self.date_from),
             ("date", "<=", self.date_to),
             ("move_id.state", "=", "posted"),
         ]
-        all_move_lines = self.env["account.move.line"].search(aml_domain)
+        return self.env["account.move.line"].search(domain)
 
-        code_to_amount = {}
+    def _build_line_values(self):
+        move_lines = self._get_move_lines()
+        income_lines = move_lines.filtered(lambda ml: ml.account_id.internal_group == "income")
+        expense_lines = move_lines.filtered(lambda ml: ml.account_id.internal_group == "expense")
 
-        for line in template.line_ids:
-            amount = 0.0
-            if not line.is_total:
-                lines_for_accounts = all_move_lines.filtered(
-                    lambda l: l.account_id in line.account_ids
-                )
-                amount = sum(lines_for_accounts.mapped("balance"))
-                if line.sign == "negative":
-                    amount = -amount
-            else:
-                if line.total_source_codes:
-                    codes = [c.strip() for c in line.total_source_codes.split(",") if c.strip()]
-                    for code in codes:
-                        amount += code_to_amount.get(code, 0.0)
+        income_total = sum(-line.balance for line in income_lines)
+        expense_total = sum(line.balance for line in expense_lines)
+        result = income_total - expense_total
 
-            code_to_amount[line.code or str(line.id)] = amount
+        line_values = [
+            (0, 0, {"sequence": 10, "name": _("Receitas"), "amount": income_total}),
+            (0, 0, {"sequence": 20, "name": _("Despesas"), "amount": expense_total}),
+            (0, 0, {"sequence": 30, "name": _("Resultado do Período"), "amount": result}),
+        ]
+        return line_values
 
-            if abs(amount) < 0.0001:
-                continue
-
-            self.env["bhz.dre.report.line"].create(
+    def action_generate(self):
+        self.ensure_one()
+        report_model = self.env["bhz.dre.report"]
+        report = report_model.search(
+            [
+                ("company_id", "=", self.company_id.id),
+                ("date_from", "=", self.date_from),
+                ("date_to", "=", self.date_to),
+            ],
+            limit=1,
+        )
+        name = _("DRE %(start)s a %(end)s") % {
+            "start": fields.Date.to_string(self.date_from),
+            "end": fields.Date.to_string(self.date_to),
+        }
+        if report:
+            report.write({"name": name, "state": "draft"})
+        else:
+            report = report_model.create(
                 {
-                    "report_id": report.id,
-                    "sequence": line.sequence,
-                    "name": line.name,
-                    "amount": amount,
+                    "name": name,
+                    "company_id": self.company_id.id,
+                    "date_from": self.date_from,
+                    "date_to": self.date_to,
                 }
             )
 
+        line_commands = [(5, 0, 0)] + self._build_line_values()
+        report.write({"line_ids": line_commands, "state": "calculated"})
+
         return {
             "type": "ir.actions.act_window",
+            "name": _("Relatório DRE"),
             "res_model": "bhz.dre.report",
             "view_mode": "form",
             "res_id": report.id,

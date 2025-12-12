@@ -1,34 +1,35 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <data>
-
-    <!-- Pasta BHZ DRE dentro de Financeiro > Relatórios -->
-    <menuitem
-      id="menu_bhz_dre_root"
-      name="BHZ DRE"
-      parent="account.menu_finance_reports"
-      sequence="90"/>
 
     <menuitem
-      id="menu_bhz_dre_generate"
-      name="Gerar DRE do mês"
-      parent="menu_bhz_dre_root"
-      action="action_bhz_dre_wizard"
-      sequence="10"/>
+        id="bhz_dre_menu_root"
+        name="BHZ DRE"
+        parent="account.menu_finance_reports"
+        sequence="40"
+    />
 
     <menuitem
-      id="menu_bhz_dre_reports"
-      name="Relatórios DRE"
-      parent="menu_bhz_dre_root"
-      action="action_bhz_dre_report"
-      sequence="20"/>
+        id="bhz_dre_menu_generate"
+        name="Gerar DRE do mês"
+        parent="bhz_dre_menu_root"
+        sequence="10"
+        action="action_bhz_dre_wizard"
+    />
 
     <menuitem
-      id="menu_bhz_dre_templates"
-      name="Templates DRE"
-      parent="menu_bhz_dre_root"
-      action="action_bhz_dre_template"
-      sequence="30"/>
+        id="bhz_dre_menu_report"
+        name="Relatórios DRE"
+        parent="bhz_dre_menu_root"
+        sequence="20"
+        action="action_bhz_dre_report"
+    />
 
-  </data>
+    <menuitem
+        id="bhz_dre_menu_template"
+        name="Templates DRE"
+        parent="bhz_dre_menu_root"
+        sequence="30"
+        action="action_bhz_dre_template"
+    />
+
 </odoo>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
     <record id="view_bhz_dre_template_tree" model="ir.ui.view">
@@ -8,6 +8,7 @@
             <list string="Templates de DRE">
                 <field name="name"/>
                 <field name="company_id"/>
+                <field name="active"/>
             </list>
         </field>
     </record>
@@ -21,24 +22,40 @@
                     <group>
                         <field name="name"/>
                         <field name="company_id"/>
+                        <field name="active"/>
                     </group>
-                    <notebook>
-                        <page string="Linhas">
-                            <field name="line_ids">
-                                <list editable="bottom">
-                                    <field name="sequence"/>
-                                    <field name="name"/>
-                                    <field name="code"/>
-                                    <field name="is_total"/>
-                                    <field name="sign" widget="badge"/>
-                                    <field name="account_ids" widget="many2many_tags"
-                                           modifiers="{'invisible': [['is_total', '=', True]]}"/>
-                                    <field name="total_source_codes"
-                                           modifiers="{'invisible': [['is_total', '=', False]]}"/>
-                                </list>
-                            </field>
-                        </page>
-                    </notebook>
+                    <field name="line_ids">
+                        <tree editable="bottom">
+                            <field name="sequence"/>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="line_type"/>
+                            <field name="account_ids" widget="many2many_tags"/>
+                        </tree>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Optional standalone form for lines -->
+    <record id="view_bhz_dre_template_line_form" model="ir.ui.view">
+        <field name="name">bhz.dre.template.line.form</field>
+        <field name="model">bhz.dre.template.line</field>
+        <field name="arch" type="xml">
+            <form string="Linha do Template DRE">
+                <sheet>
+                    <group>
+                        <field name="template_id"/>
+                        <field name="sequence"/>
+                        <field name="name"/>
+                        <field name="code"/>
+                        <field name="line_type"/>
+                    </group>
+                    <group>
+                        <field name="account_ids" widget="many2many_tags"/>
+                        <field name="note"/>
+                    </group>
                 </sheet>
             </form>
         </field>
@@ -47,9 +64,7 @@
     <record id="action_bhz_dre_template" model="ir.actions.act_window">
         <field name="name">Templates de DRE</field>
         <field name="res_model">bhz.dre.template</field>
-        <field name="view_mode">tree,form</field>
-        <field name="context">{'default_company_id': company_id}</field>
-        <field name="domain">[('company_id', '=', company_id)]</field>
+        <field name="view_mode">list,form</field>
     </record>
 
 </odoo>

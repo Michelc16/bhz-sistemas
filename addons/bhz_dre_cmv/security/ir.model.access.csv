@@ -1,5 +1,11 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_bhz_dre_template_user,bhz.dre.template user,model_bhz_dre_template,bhz_dre_cmv.group_bhz_dre_user,1,0,0,0
-access_bhz_dre_template_manager,bhz.dre.template manager,model_bhz_dre_template,bhz_dre_cmv.group_bhz_dre_manager,1,1,1,1
-access_bhz_dre_report_user,bhz.dre.report user,model_bhz_dre_report,bhz_dre_cmv.group_bhz_dre_user,1,0,0,0
-access_bhz_dre_report_manager,bhz.dre.report manager,model_bhz_dre_report,bhz_dre_cmv.group_bhz_dre_manager,1,1,1,1
+bhz_dre_template_user,bhz_dre_template_user,model_bhz_dre_template,group_bhz_dre_user,1,0,0,0
+bhz_dre_template_manager,bhz_dre_template_manager,model_bhz_dre_template,group_bhz_dre_manager,1,1,1,1
+bhz_dre_template_line_user,bhz_dre_template_line_user,model_bhz_dre_template_line,group_bhz_dre_user,1,0,0,0
+bhz_dre_template_line_manager,bhz_dre_template_line_manager,model_bhz_dre_template_line,group_bhz_dre_manager,1,1,1,1
+bhz_dre_report_user,bhz_dre_report_user,model_bhz_dre_report,group_bhz_dre_user,1,0,0,0
+bhz_dre_report_manager,bhz_dre_report_manager,model_bhz_dre_report,group_bhz_dre_manager,1,1,1,1
+bhz_dre_report_line_user,bhz_dre_report_line_user,model_bhz_dre_report_line,group_bhz_dre_user,1,0,0,0
+bhz_dre_report_line_manager,bhz_dre_report_line_manager,model_bhz_dre_report_line,group_bhz_dre_manager,1,1,1,1
+bhz_dre_wizard_user,bhz_dre_wizard_user,model_bhz_dre_wizard,group_bhz_dre_user,1,0,1,0
+bhz_dre_wizard_manager,bhz_dre_wizard_manager,model_bhz_dre_wizard,group_bhz_dre_manager,1,0,1,0

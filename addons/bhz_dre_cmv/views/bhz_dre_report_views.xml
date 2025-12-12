@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
     <record id="view_bhz_dre_report_tree" model="ir.ui.view">
         <field name="name">bhz.dre.report.tree</field>
         <field name="model">bhz.dre.report</field>
         <field name="arch" type="xml">
-            <list string="Relatórios de DRE">
+            <list string="Relatórios DRE">
                 <field name="name"/>
                 <field name="company_id"/>
                 <field name="date_from"/>
@@ -19,13 +19,13 @@
         <field name="name">bhz.dre.report.form</field>
         <field name="model">bhz.dre.report</field>
         <field name="arch" type="xml">
-            <form string="Relatório de DRE">
+            <form string="Relatório DRE">
                 <header>
                     <button name="action_print_pdf"
-                            string="Imprimir"
+                            string="Imprimir PDF"
                             type="object"
                             class="btn-primary"
-                            modifiers="{'invisible': [['state', '!=', 'calculated']]}"/>
+                            attrs="{'invisible': [('state', '!=', 'calculated')]}"/>
                 </header>
                 <sheet>
                     <group>
@@ -35,22 +35,22 @@
                         <field name="date_to" readonly="1"/>
                         <field name="state" readonly="1"/>
                     </group>
-                    <field name="line_ids">
-                        <list string="Linhas da DRE">
-                            <field name="sequence" readonly="1"/>
-                            <field name="name" readonly="1"/>
+                    <field name="line_ids" readonly="1">
+                        <tree string="Linhas da DRE">
+                            <field name="sequence"/>
+                            <field name="name"/>
                             <field name="amount" widget="monetary"/>
-                        </list>
+                        </tree>
                     </field>
                 </sheet>
             </form>
         </field>
     </record>
 
-    <record id="action_bhz_dre_report_list" model="ir.actions.act_window">
-        <field name="name">Relatórios DRE do mês</field>
+    <record id="action_bhz_dre_report" model="ir.actions.act_window">
+        <field name="name">Relatórios DRE</field>
         <field name="res_model">bhz.dre.report</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 
 </odoo>
