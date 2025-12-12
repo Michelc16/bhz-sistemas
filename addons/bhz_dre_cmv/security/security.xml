@@ -9,5 +9,15 @@
             <field name="name">BHZ DRE - Gerente</field>
             <field name="implied_ids" eval="[(4, ref('group_bhz_dre_user'))]"/>
         </record>
+
+        <!-- Todos os usuários de Finanças recebem automaticamente o grupo de usuário da DRE -->
+        <record id="account.group_account_user" model="res.groups">
+            <field name="implied_ids" eval="[(4, ref('bhz_dre_cmv.group_bhz_dre_user'))]"/>
+        </record>
+
+        <!-- Contadores/gestores de Finanças recebem o grupo de gerente -->
+        <record id="account.group_account_manager" model="res.groups">
+            <field name="implied_ids" eval="[(4, ref('bhz_dre_cmv.group_bhz_dre_manager'))]"/>
+        </record>
     </data>
 </odoo>
