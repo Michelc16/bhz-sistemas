@@ -37,16 +37,16 @@
     </record>
 
     <record id="view_bhz_dre_template_line_tree" model="ir.ui.view">
-        <field name="name">bhz.dre.template.line.tree</field>
+        <field name="name">bhz.dre.template.line.list</field>
         <field name="model">bhz.dre.template.line</field>
         <field name="arch" type="xml">
-            <tree string="Linhas do Template" editable="bottom">
+            <list string="Linhas do Template" editable="bottom">
                 <field name="sequence"/>
                 <field name="name"/>
                 <field name="code"/>
                 <field name="line_type"/>
                 <field name="account_ids" widget="many2many_tags"/>
-            </tree>
+            </list>
         </field>
     </record>
 
