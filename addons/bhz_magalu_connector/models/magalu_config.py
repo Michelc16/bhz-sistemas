@@ -9,11 +9,11 @@ _logger = logging.getLogger(__name__)
 
 MAGALU_AUTHORIZE_URL = "https://id.magalu.com/login"
 SCOPES = [
-    "open:order-order-seller:read",
-    "open:order-delivery-seller:read",
-    "open:order-invoice-seller:read",
-    "open:portfolio-skus-seller:read",
-    "open:portfolio-stocks-seller:read",
+    "order.order.read",
+    "order.delivery.read",
+    "order.invoice.read",
+    "portfolio.skus.read",
+    "portfolio.stocks.read",
     # "apiin:all",  # habilite somente se o suporte Magalu autorizar formalmente
 ]
 EXTRA_SCOPES_PARAM = "bhz_magalu.extra_scopes"
