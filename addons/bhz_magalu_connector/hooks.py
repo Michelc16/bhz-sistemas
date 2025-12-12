@@ -1,7 +1,7 @@
 from odoo import SUPERUSER_ID, api
 
-CLIENT_ID = "dZCVzEyLat_rtRfHvNAuulhBUZBlz_6Lj_NZghlU7Qw"
-CLIENT_SECRET = "wBI9y2hW604gkBpfxrTWoraU2UtVBC-BHWgVMn-XQE0"
+CLIENT_ID = "djlPMQL1CrD1kv7A4qBvSSaIkHmiZFJ81EVflZpnCdY"
+CLIENT_SECRET = "C4xlUMsKpMINRduPjhMvznuUdi0JWjQHSO0QcdSxGtM"
 
 
 def pre_init_set_magalu_client(env_or_cr):

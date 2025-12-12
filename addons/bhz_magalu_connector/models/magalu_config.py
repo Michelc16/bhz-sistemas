@@ -11,25 +11,9 @@ MAGALU_AUTHORIZE_URL = "https://id.magalu.com/login"
 SCOPES = [
     "open:order-order-seller:read",
     "open:order-delivery-seller:read",
-    "open:order-delivery-seller:write",
-    "open:order-logistics-seller:write",
     "open:order-invoice-seller:read",
-    "open:portfolio-prices-seller:write",
     "open:portfolio-skus-seller:read",
-    "open:portfolio-skus-seller:write",
     "open:portfolio-stocks-seller:read",
-    "open:portfolio-stocks-seller:write",
-    "open:tickets-seller:read",
-    "open:ticket-messages-seller:read",
-    "open:ticket-messages-seller:write",
-    "open:ticket-events-seller:read",
-    "open:ticket-events-seller:write",
-    "open:trace:read",
-    "open:queue-history:read",
-    "services:questions-seller:read",
-    "services:questions-seller:write",
-    "services:conversations-seller:read",
-    "services:conversations-seller:write",
     # "apiin:all",  # habilite somente se o suporte Magalu autorizar formalmente
 ]
 EXTRA_SCOPES_PARAM = "bhz_magalu.extra_scopes"
