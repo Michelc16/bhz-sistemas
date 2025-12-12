@@ -25,7 +25,7 @@
                             string="Imprimir PDF"
                             type="object"
                             class="btn-primary"
-                            attrs="{'invisible': [('state', '!=', 'calculated')]}"/>
+                            invisible="state != 'calculated'"/>
                 </header>
                 <sheet>
                     <group>
