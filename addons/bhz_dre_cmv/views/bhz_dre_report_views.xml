@@ -35,15 +35,24 @@
                         <field name="date_to" readonly="1"/>
                         <field name="state" readonly="1"/>
                     </group>
-                    <field name="line_ids" readonly="1">
-                        <tree string="Linhas da DRE">
-                            <field name="sequence"/>
-                            <field name="name"/>
-                            <field name="amount" widget="monetary"/>
-                        </tree>
-                    </field>
+                    <field name="line_ids"
+                           readonly="1"
+                           mode="tree"
+                           context="{'tree_view_ref': 'bhz_dre_cmv.view_bhz_dre_report_line_tree'}"/>
                 </sheet>
             </form>
+        </field>
+    </record>
+
+    <record id="view_bhz_dre_report_line_tree" model="ir.ui.view">
+        <field name="name">bhz.dre.report.line.list</field>
+        <field name="model">bhz.dre.report.line</field>
+        <field name="arch" type="xml">
+            <list string="Linhas da DRE">
+                <field name="sequence"/>
+                <field name="name"/>
+                <field name="amount" widget="monetary"/>
+            </list>
         </field>
     </record>
 
