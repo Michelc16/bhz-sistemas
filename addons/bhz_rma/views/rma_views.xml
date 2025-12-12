@@ -83,7 +83,6 @@
 
                         <page string="Movimentos de Estoque">
                             <group>
-                                <field name="move_in_id" readonly="1"/>
                                 <field name="move_out_id" readonly="1"/>
                             </group>
                         </page>
