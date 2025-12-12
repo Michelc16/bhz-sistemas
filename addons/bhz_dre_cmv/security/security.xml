@@ -1,14 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-
-    <!-- Grupo de usuário da DRE -->
     <record id="group_bhz_dre_user" model="res.groups">
         <field name="name">BHZ DRE - Usuário</field>
+        <field name="category_id" ref="base.module_category_accounting"/>
     </record>
-
-    <!-- Grupo de gerente da DRE -->
-    <record id="group_bhz_dre_manager" model="res.groups">
-        <field name="name">BHZ DRE - Gerente</field>
-        <field name="implied_ids" eval="[(4, ref('group_bhz_dre_user'))]"/>
-    </record>
-
 </odoo>

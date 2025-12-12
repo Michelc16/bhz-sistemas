@@ -1,6 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <!-- LIST -->
     <record id="view_bhz_dre_template_line_list" model="ir.ui.view">
         <field name="name">bhz.dre.template.line.list</field>
         <field name="model">bhz.dre.template.line</field>
@@ -9,75 +9,58 @@
                 <field name="sequence"/>
                 <field name="name"/>
                 <field name="code"/>
-                <field name="level"/>
-                <field name="compute_method"/>
+                <field name="line_type"/>
                 <field name="sign"/>
+                <field name="level"/>
             </list>
         </field>
     </record>
 
-    <!-- FORM -->
     <record id="view_bhz_dre_template_line_form" model="ir.ui.view">
         <field name="name">bhz.dre.template.line.form</field>
         <field name="model">bhz.dre.template.line</field>
         <field name="arch" type="xml">
-            <form string="Linha de Template DRE">
+            <form string="Linha de template DRE">
                 <sheet>
-
                     <group>
-                        <field name="company_id"/>
-                        <field name="sequence"/>
                         <field name="name"/>
+                        <field name="sequence"/>
                         <field name="code"/>
+                        <field name="line_type"/>
+                        <field name="sign"/>
                         <field name="level"/>
                         <field name="parent_id"/>
+                        <field name="account_ids" widget="many2many_tags"/>
+                        <field name="show_on_report"/>
                     </group>
-
-                    <group>
-                        <field name="compute_method"/>
-                        <field name="sign"/>
-
-                        <!-- NOVO padrão Odoo 19: sem attrs -->
-                        <field name="formula"
-                               invisible="compute_method != 'formula'"/>
-                    </group>
-
                     <notebook>
-
-                        <!-- Contas contábeis -->
-                        <page string="Contas contábeis"
-                              invisible="compute_method != 'accounts'">
-                            <field name="account_ids" widget="many2many_tags"/>
-                        </page>
-
-                        <!-- Filhas -->
-                        <page string="Linhas filhas">
+                        <page string="Sub-linhas">
                             <field name="child_ids">
                                 <list editable="bottom">
                                     <field name="sequence"/>
                                     <field name="name"/>
-                                    <field name="code"/>
+                                    <field name="line_type"/>
+                                    <field name="sign"/>
                                     <field name="level"/>
                                 </list>
                             </field>
                         </page>
-
-                        <page string="Observações">
-                            <field name="note"/>
-                        </page>
-
                     </notebook>
-
                 </sheet>
             </form>
         </field>
     </record>
 
-    <!-- ACTION -->
     <record id="action_bhz_dre_template_line" model="ir.actions.act_window">
         <field name="name">Template de DRE</field>
         <field name="res_model">bhz.dre.template.line</field>
         <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p>
+                Configure aqui as linhas da sua DRE (receitas, CMV, despesas, etc.)
+                e vincule as contas contábeis.
+            </p>
+        </field>
     </record>
 
 </odoo>
