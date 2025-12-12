@@ -26,7 +26,7 @@
                     </group>
                     <field name="line_ids"
                            context="{
-                               'default_template_id': active_id,
+                               'default_template_id': id,
                                'tree_view_ref': 'bhz_dre_cmv.view_bhz_dre_template_line_tree',
                                'form_view_ref': 'bhz_dre_cmv.view_bhz_dre_template_line_form'
                            }"
