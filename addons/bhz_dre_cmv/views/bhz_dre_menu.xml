@@ -6,7 +6,6 @@
         name="BHZ DRE"
         parent="account.menu_finance_reports"
         action="action_bhz_dre_report"
-        groups="bhz_dre_cmv.group_bhz_dre_user"
         sequence="40"
     />
 
@@ -16,7 +15,6 @@
         parent="bhz_dre_menu_root"
         sequence="10"
         action="action_bhz_dre_wizard"
-        groups="bhz_dre_cmv.group_bhz_dre_user"
     />
 
     <menuitem
@@ -25,7 +23,6 @@
         parent="bhz_dre_menu_root"
         sequence="20"
         action="action_bhz_dre_report"
-        groups="bhz_dre_cmv.group_bhz_dre_user"
     />
 
     <menuitem
@@ -34,7 +31,6 @@
         parent="bhz_dre_menu_root"
         sequence="30"
         action="action_bhz_dre_template"
-        groups="bhz_dre_cmv.group_bhz_dre_manager"
     />
 
 </odoo>
