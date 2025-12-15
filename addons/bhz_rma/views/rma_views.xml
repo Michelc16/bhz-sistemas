@@ -29,12 +29,16 @@
                     <button name="action_set_waiting" type="object" string="Em espera" class="btn-primary"/>
                     <button name="action_set_with_supplier" type="object" string="Com fornecedor" class="btn-secondary"/>
                     <button name="action_set_no_warranty" type="object" string="Sem garantia" class="btn-secondary"/>
+                    <button name="action_exchange_with_customer"
+                            type="object"
+                            string="Trocar peça"
+                            class="btn-secondary"
+                            attrs="{'invisible': [('warranty_type', '!=', 'customer')]}"/>
                     <button name="action_solved" type="object" string="Solucionado" class="btn-success"/>
                     <button name="action_cancel" type="object" string="Cancelar" class="btn-secondary"/>
 
                     <button name="action_print_rma" type="object" string="Imprimir RMA" class="btn-secondary"/>
                     <button name="action_send_rma_email" type="object" string="Enviar por e-mail" class="btn-secondary"/>
-
                     <field name="state" widget="statusbar"
                            statusbar_visible="draft,waiting,with_supplier,no_warranty,solved,cancelled"/>
                 </header>
@@ -51,6 +55,7 @@
                             <field name="company_id" readonly="1"/>
                             <field name="partner_id"/>
                             <field name="warranty_type"/>
+                            <field name="resolution_method"/>
                         </group>
                         <group>
                             <field name="product_id"/>
@@ -83,8 +88,10 @@
 
                         <page string="Movimentos de Estoque">
                             <group>
-                                <field name="move_in_id" readonly="1"/>
-                                <field name="move_out_id" readonly="1"/>
+                                <field name="picking_return_id" readonly="1"/>
+                                <field name="scrap_id" readonly="1"/>
+                                <field name="exchange_delivery_move_id" readonly="1"/>
+                                <field name="exchange_return_move_id" readonly="1"/>
                             </group>
                         </page>
 

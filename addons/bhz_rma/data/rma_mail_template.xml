@@ -37,7 +37,9 @@
                     <strong>Quantidade:</strong>
                     <t t-out="object.quantity"/><br/>
                     <strong>Tipo de garantia:</strong>
-                    <t t-out="object.warranty_type"/><br/>
+                    <t t-out="dict(object._fields['warranty_type'].selection).get(object.warranty_type, '')"/><br/>
+                    <strong>Método de resolução:</strong>
+                    <t t-out="dict(object._fields['resolution_method'].selection).get(object.resolution_method, '')"/><br/>
                     <strong>Situação:</strong>
                     <t t-out="object.state"/>
                 </p>
