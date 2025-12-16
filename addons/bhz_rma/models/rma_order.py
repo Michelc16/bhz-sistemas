@@ -282,7 +282,12 @@ class BhzRMAOrder(models.Model):
 
     def action_print_rma(self):
         self.ensure_one()
-        return self.env.ref("bhz_rma.action_report_bhz_rma_order").report_action(self)
+        report_action = self.env.ref("bhz_rma.action_report_bhz_rma_order", raise_if_not_found=False)
+        if not report_action:
+            raise UserError(
+                _("O relatório de RMA não está instalado. Reinstale o módulo bhz_rma ou verifique se o arquivo report/rma_report.xml foi carregado.")
+            )
+        return report_action.report_action(self)
 
     def action_send_rma_email(self):
         self.ensure_one()
@@ -319,13 +324,11 @@ class BhzRMAOrder(models.Model):
         Pega uma localização de sucata válida.
         """
         self.ensure_one()
-        loc = self.env["stock.location"].search(
-            [
-                ("scrap_location", "=", True),
-                ("company_id", "in", [self.company_id.id, False]),
-            ],
-            limit=1,
-        )
+        loc = self.env.ref("stock.stock_location_scrapped", raise_if_not_found=False)
+        if not loc:
+            raise UserError(
+                _("Configure uma localização de sucata (stock.stock_location_scrapped) para usar o fluxo de RMA.")
+            )
         return loc
 
     def _get_customer_location(self):
@@ -365,7 +368,6 @@ class BhzRMAOrder(models.Model):
 
         move = self.env["stock.move"].create(
             {
-                "name": self.product_id.display_name,
                 "product_id": self.product_id.id,
                 "product_uom_qty": self.quantity,
                 "product_uom": self.product_uom_id.id,
@@ -373,6 +375,7 @@ class BhzRMAOrder(models.Model):
                 "location_dest_id": self.location_id.id,
                 "picking_id": picking.id,
                 "company_id": self.company_id.id,
+                "description_picking": self.product_id.display_name,
             }
         )
 
@@ -428,17 +431,16 @@ class BhzRMAOrder(models.Model):
 
     def _create_move(self, source_location, dest_location, description, lot=None):
         self.ensure_one()
-        move = self.env["stock.move"].create(
-            {
-                "name": description,
-                "product_id": self.product_id.id,
-                "product_uom_qty": self.quantity,
-                "product_uom": self.product_uom_id.id,
-                "location_id": source_location.id,
-                "location_dest_id": dest_location.id,
-                "company_id": self.company_id.id,
-            }
-        )
+        move_vals = {
+            "product_id": self.product_id.id,
+            "product_uom_qty": self.quantity,
+            "product_uom": self.product_uom_id.id,
+            "location_id": source_location.id,
+            "location_dest_id": dest_location.id,
+            "company_id": self.company_id.id,
+            "description_picking": description,
+        }
+        move = self.env["stock.move"].create(move_vals)
         move._action_confirm()
         move._action_done()
         if lot:
@@ -475,16 +477,3 @@ class BhzRMAOrder(models.Model):
                 rec.scrap_id = scrap.id
 
             rec.state = "solved"
-    exchange_delivery_move_id = fields.Many2one(
-        "stock.move",
-        string="Entrega nova ao cliente",
-        readonly=True,
-        copy=False,
-    )
-
-    exchange_return_move_id = fields.Many2one(
-        "stock.move",
-        string="Retorno defeituoso do cliente",
-        readonly=True,
-        copy=False,
-    )
