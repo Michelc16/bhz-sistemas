@@ -310,6 +310,8 @@ class BhzRMAOrder(models.Model):
         )
         if not picking_type:
             picking_type = self.env["stock.picking.type"].search([("code", "=", "internal")], limit=1)
+        if not picking_type:
+            picking_type = self.env.ref("stock.picking_type_internal", raise_if_not_found=False)
         return picking_type
 
     def _get_scrap_location(self):

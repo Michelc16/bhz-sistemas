@@ -83,12 +83,17 @@ class BhzRmaServiceOrder(models.Model):
 
     @api.model
     def create(self, vals):
-        if not vals.get("name") or vals.get("name") == _("Novo"):
-            vals["name"] = (
-                self.env["ir.sequence"].next_by_code("bhz.rma.service.order")
-                or _("Novo")
-            )
-        return super().create(vals)
+        if isinstance(vals, list):
+            list_vals = vals
+        else:
+            list_vals = [vals]
+        for v in list_vals:
+            if not v.get("name") or v.get("name") == _("Novo"):
+                v["name"] = (
+                    self.env["ir.sequence"].next_by_code("bhz.rma.service.order")
+                    or _("Novo")
+                )
+        return super().create(list_vals if isinstance(vals, list) else list_vals[0])
 
     def action_start(self):
         for order in self:
