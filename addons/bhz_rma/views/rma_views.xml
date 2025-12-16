@@ -33,7 +33,7 @@
                             type="object"
                             string="Trocar peça"
                             class="btn-secondary"
-                            attrs="{'invisible': [('warranty_type', '!=', 'customer')]}"/>
+                            invisible="warranty_type != 'customer'"/>
                     <button name="action_solved" type="object" string="Solucionado" class="btn-success"/>
                     <button name="action_cancel" type="object" string="Cancelar" class="btn-secondary"/>
 
