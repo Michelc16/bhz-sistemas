@@ -298,8 +298,15 @@ class BhzRMAOrder(models.Model):
         self.ensure_one()
         report_action = self.env.ref("bhz_rma.action_report_bhz_rma_order", raise_if_not_found=False)
         if not report_action:
+            report_action = self.env["ir.actions.report"].search(
+                [("report_name", "=", "bhz_rma.report_rma_document")],
+                limit=1,
+            )
+        if not report_action:
             raise UserError(
-                _("O relatório de RMA não está instalado. Reinstale o módulo bhz_rma ou verifique se o arquivo report/rma_report.xml foi carregado.")
+                _(
+                    "O relatório de RMA não está instalado. Reinstale o módulo bhz_rma ou verifique se o arquivo report/rma_report.xml foi carregado."
+                )
             )
         return report_action.report_action(self)
 
@@ -317,21 +324,43 @@ class BhzRMAOrder(models.Model):
 
     def _get_internal_picking_type(self):
         """
-        Pega um picking type interno da empresa.
+        Recupera o tipo de operação interna (multiempresa).
         """
         self.ensure_one()
-        picking_type = self.env["stock.picking.type"].search(
-            [
-                ("code", "=", "internal"),
-                ("warehouse_id.company_id", "=", self.company_id.id),
-            ],
+        picking_type_env = self.env["stock.picking.type"].with_context(
+            force_company=self.company_id.id,
+            allowed_company_ids=self.company_id.ids,
+        )
+        picking_type = picking_type_env.search(
+            [("code", "=", "internal"), ("company_id", "=", self.company_id.id)],
             limit=1,
         )
         if not picking_type:
-            picking_type = self.env["stock.picking.type"].search([("code", "=", "internal")], limit=1)
+            warehouse = (
+                self.env["stock.warehouse"]
+                .with_context(force_company=self.company_id.id, allowed_company_ids=self.company_id.ids)
+                .search([("company_id", "=", self.company_id.id)], limit=1)
+            )
+            if warehouse and warehouse.int_type_id:
+                picking_type = warehouse.int_type_id
+
+        if not picking_type:
+            picking_type = picking_type_env.search(
+                [("code", "=", "internal"), ("company_id", "in", [False, self.company_id.id])],
+                limit=1,
+            )
+
         if not picking_type:
             picking_type = self.env.ref("stock.picking_type_internal", raise_if_not_found=False)
-        return picking_type
+
+        if not picking_type:
+            raise UserError(
+                _(
+                    "Configure um Tipo de Operação 'Transferência interna' para a empresa %(company)s antes de continuar.",
+                    company=self.company_id.display_name,
+                )
+            )
+        return picking_type.sudo()
 
     def _get_scrap_location(self):
         """

@@ -1,7 +1,6 @@
 import logging
 
 from odoo import http
-from odoo.exceptions import UserError
 from odoo.http import request
 
 _logger = logging.getLogger(__name__)
@@ -16,27 +15,48 @@ class MagaluOAuthController(http.Controller):
         state = kwargs.get("state")
         error = kwargs.get("error")
 
+        cfg_id = None
+        config = None
+        state_data = None
+        try:
+            state_data = self._parse_state(state) if state else None
+            if state_data:
+                cfg_id = int(state_data.get("cfg"))
+        except Exception:
+            _logger.warning("Magalu OAuth: state inválido: %s", state)
+
+        if cfg_id:
+            config = request.env["bhz.magalu.config"].sudo().browse(cfg_id)
+            if not config.exists():
+                config = None
+
         if error:
-            return f"Erro retornado pelo Magalu: {error}"
-        if not code or not state:
+            error_description = kwargs.get("error_description") or ""
+            extra = f" ({error_description})" if error_description else ""
+            if config and error == "invalid_scope":
+                message = _(
+                    "ID Magalu rejeitou os scopes solicitados. Ajuste o parâmetro 'bhz_magalu.oauth_scopes' com scopes permitidos para este client e tente novamente. Erro original: %(err)s%(extra)s",
+                    err=error,
+                    extra=extra,
+                )
+            else:
+                message = f"Erro retornado pelo Magalu: {error}{extra}"
+            _logger.error("Magalu OAuth erro (%s): %s", cfg_id or "sem cfg", message)
+            return message
+
+        if not code or not state_data:
             return "Callback Magalu: faltando 'code' ou 'state'."
 
-        try:
-            cfg_id, state_base = self._parse_state(state)
-        except ValueError:
-            return "Callback Magalu: parâmetro state inválido."
-
-        config = request.env["bhz.magalu.config"].sudo().browse(cfg_id)
-        if not config.exists():
+        if not config:
             return "Callback Magalu: configuração não encontrada."
 
         try:
-            expected_base = config._get_base_url()
+            config._validate_state(state_data)
         except UserError as exc:
-            message = exc.name or (exc.args and exc.args[0]) or "Configuração inválida."
-            return f"Callback Magalu: {message}"
-        if state_base != expected_base:
-            return "Callback Magalu: state não corresponde a esta instância."
+            return f"Callback Magalu: {exc.name or exc.args[0]}"
+        except Exception:
+            _logger.exception("Magalu OAuth: falha ao validar state (cfg %s)", config.id)
+            return "Callback Magalu: falha ao validar o parâmetro state."
 
         try:
             request.env["bhz.magalu.api"].sudo()._exchange_code_for_token(config, code)
@@ -52,9 +72,15 @@ class MagaluOAuthController(http.Controller):
 
     @staticmethod
     def _parse_state(state):
-        parts = dict(item.split(":", 1) for item in state.split("|") if ":" in item)
-        cfg_id = parts.get("cfg")
-        base_url = (parts.get("url") or "").strip()
-        if not cfg_id or not base_url:
+        if not state:
+            raise ValueError("State vazio.")
+        parts = {}
+        for chunk in state.split("|"):
+            if ":" in chunk:
+                key, value = chunk.split(":", 1)
+                parts[key] = value
+        required = {"cfg", "url", "nonce", "sig"}
+        if not required.issubset(parts.keys()):
             raise ValueError("State incompleto.")
-        return int(cfg_id), base_url.rstrip("/")
+        parts["url"] = (parts["url"] or "").rstrip("/")
+        return parts

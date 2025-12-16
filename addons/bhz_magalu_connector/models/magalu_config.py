@@ -1,5 +1,8 @@
 import datetime
+import hmac
 import logging
+import os
+from hashlib import sha256
 from urllib.parse import quote, urlencode
 
 from odoo import _, fields, models
@@ -7,12 +10,14 @@ from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
-MAGALU_AUTHORIZE_URL = "https://id.magalu.com/login"
+MAGALU_AUTHORIZE_URL = "https://id.magalu.com/account/select"
 CLIENT_ID_PARAM = "bhz_magalu.client_id"
 CLIENT_SECRET_PARAM = "bhz_magalu.client_secret"
-REQUESTED_SCOPES_PARAM = "bhz_magalu.requested_scopes"
+REQUESTED_SCOPES_PARAM = "bhz_magalu.oauth_scopes"
 ALLOWED_SCOPES_PARAM = "bhz_magalu.allowed_scopes"
+STATE_SECRET_PARAM = "bhz_magalu.state_secret"
 DEFAULT_SCOPES = [
+    "openid",
     "open:order-order-seller:read",
     "open:order-delivery-seller:read",
     "open:order-invoice-seller:read",
@@ -56,6 +61,8 @@ class BhzMagaluConfig(models.Model):
     access_token = fields.Char("Access Token", readonly=True)
     refresh_token = fields.Char("Refresh Token", readonly=True)
     token_expires_at = fields.Datetime("Token expira em", readonly=True)
+    oauth_state_nonce = fields.Char(string="Nonce OAuth", readonly=True, copy=False)
+    oauth_state_expiration = fields.Datetime(string="Expiração do nonce", readonly=True, copy=False)
 
     # === Helpers ===
     def _get_system_param(self, key):
@@ -90,7 +97,16 @@ class BhzMagaluConfig(models.Model):
     def _build_state_param(self):
         if not self.id:
             raise UserError(_("Salve o registro antes de iniciar a conexão."))
-        return f"cfg:{self.id}|url:{self._get_base_url()}"
+        nonce = os.urandom(8).hex()
+        base = f"cfg:{self.id}|url:{self._get_base_url()}|nonce:{nonce}"
+        signature = self._compute_state_signature(base)
+        self.write(
+            {
+                "oauth_state_nonce": nonce,
+                "oauth_state_expiration": fields.Datetime.now() + datetime.timedelta(minutes=10),
+            }
+        )
+        return f"{base}|sig:{signature}"
 
     def _parse_scopes(self, scope_string):
         return [token.strip() for token in scope_string.split() if token.strip()]
@@ -98,20 +114,35 @@ class BhzMagaluConfig(models.Model):
     def _get_requested_scopes(self):
         requested_raw = self._get_system_param(REQUESTED_SCOPES_PARAM)
         requested = self._parse_scopes(requested_raw) if requested_raw else list(DEFAULT_SCOPES)
+        if not requested:
+            raise UserError(
+                _(
+                    "Nenhum scope configurado. Ajuste o parâmetro %(param)s com os scopes aprovados para o client.",
+                    param=REQUESTED_SCOPES_PARAM,
+                )
+            )
 
         allowed_raw = self._get_system_param(ALLOWED_SCOPES_PARAM)
+        final_scopes = []
         if allowed_raw:
             allowed = set(self._parse_scopes(allowed_raw))
-            final_scopes = [scope for scope in requested if scope in allowed]
+            if not allowed:
+                raise UserError(
+                    _(
+                        "O parâmetro %(param)s está vazio. Preencha com a lista de scopes habilitados pelo client ou remova o parâmetro.",
+                        param=ALLOWED_SCOPES_PARAM,
+                    )
+                )
+            for scope in requested:
+                if scope in allowed:
+                    final_scopes.append(scope)
         else:
-            final_scopes = []
             for scope in requested:
                 if scope == "apiin:all":
                     final_scopes.append(scope)
-                elif scope.startswith("open:") or scope.startswith("services:"):
+                elif scope.startswith("open:") or scope.startswith("services:") or scope == "openid":
                     final_scopes.append(scope)
 
-        # remove duplicados preservando ordem
         dedup_scopes = []
         for scope in final_scopes:
             if scope not in dedup_scopes:
@@ -120,7 +151,7 @@ class BhzMagaluConfig(models.Model):
         if not dedup_scopes:
             raise UserError(
                 _(
-                    "Nenhum scope válido configurado para este client. Ajuste o parâmetro %(param)s ou solicite ao suporte Magalu a liberação dos scopes necessários.",
+                    "Nenhum scope válido configurado para este client. Ajuste %(param)s ou atualize o client no ID Magalu.",
                     param=REQUESTED_SCOPES_PARAM,
                 )
             )
@@ -128,6 +159,17 @@ class BhzMagaluConfig(models.Model):
         scope_string = " ".join(dedup_scopes)
         _logger.info("Magalu OAuth scopes (%s): %s", self.display_name, scope_string)
         return scope_string
+
+    def _get_state_secret(self):
+        secret = self._get_system_param(STATE_SECRET_PARAM)
+        if not secret:
+            secret = os.urandom(32).hex()
+            self.env["ir.config_parameter"].sudo().set_param(STATE_SECRET_PARAM, secret)
+        return secret
+
+    def _compute_state_signature(self, base_string):
+        secret = self._get_state_secret()
+        return hmac.new(secret.encode(), base_string.encode(), sha256).hexdigest()
 
     # === Tokens ===
     def write_tokens(self, token_data):
@@ -156,7 +198,7 @@ class BhzMagaluConfig(models.Model):
             "choose_tenants": "true",
             "state": self._build_state_param(),
         }
-        authorize_url = f"{MAGALU_AUTHORIZE_URL}?{urlencode(params, quote_via=quote, safe=':/')}"
+        authorize_url = f"{MAGALU_AUTHORIZE_URL}?{urlencode(params, quote_via=quote, safe='')}"
         _logger.info("Magalu OAuth authorize URL (%s): %s", self.display_name, authorize_url)
         return {
             "type": "ir.actions.act_url",
@@ -168,3 +210,25 @@ class BhzMagaluConfig(models.Model):
         self.ensure_one()
         self.env["bhz.magalu.api"].refresh_token(self)
         return True
+
+    def _validate_state(self, state_parts):
+        """
+        Valida o state recebido no callback.
+        """
+        expected_url = self._get_base_url()
+        if state_parts.get("url") != expected_url:
+            raise UserError(_("State não corresponde a esta instância."))
+
+        nonce = state_parts.get("nonce")
+        signature = state_parts.get("sig")
+        base = f"cfg:{self.id}|url:{expected_url}|nonce:{nonce}"
+        expected_signature = self._compute_state_signature(base)
+        if signature != expected_signature:
+            raise UserError(_("State inválido (assinatura incorreta)."))
+
+        if not self.oauth_state_nonce or nonce != self.oauth_state_nonce:
+            raise UserError(_("State nonce não corresponde ao último pedido de autorização."))
+        if not self.oauth_state_expiration or fields.Datetime.now() > self.oauth_state_expiration:
+            raise UserError(_("O link de autorização expirou. Tente conectar novamente."))
+
+        self.write({"oauth_state_nonce": False, "oauth_state_expiration": False})
