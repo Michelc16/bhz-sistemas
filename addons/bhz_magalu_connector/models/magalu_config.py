@@ -18,13 +18,10 @@ CLIENT_SECRET_PARAM = "bhz_magalu.client_secret"
 REQUESTED_SCOPES_PARAM = "bhz_magalu.oauth_scopes"
 ALLOWED_SCOPES_PARAM = "bhz_magalu.allowed_scopes"
 STATE_SECRET_PARAM = "bhz_magalu.state_secret"
+SCOPE_MODE_PARAM = "bhz_magalu.scope_mode"
 DEFAULT_SCOPES = [
-    "openid",
-    "open:order-order-seller:read",
-    "open:order-delivery-seller:read",
-    "open:order-invoice-seller:read",
-    "open:portfolio-skus-seller:read",
-    "open:portfolio-stocks-seller:read",
+    "open:portfolio:read",
+    "open:order-order:read",
 ]
 ALLOWED_REDIRECT_URIS = {
     "https://bhzsistemas.com.br/magalu/oauth/callback",
@@ -124,6 +121,15 @@ class BhzMagaluConfig(models.Model):
         return [token.strip() for token in scope_string.split() if token.strip()]
 
     def _get_requested_scopes(self):
+        mode = (self._get_system_param(SCOPE_MODE_PARAM) or "production").lower().strip()
+        if mode == "test":
+            scope_string = "open:portfolio:read"
+            _logger.info(
+                "Magalu OAuth scopes (%s): modo teste ativado, usando escopo %s",
+                self.display_name,
+                scope_string,
+            )
+            return scope_string
         requested_raw = self._get_system_param(REQUESTED_SCOPES_PARAM)
         requested = self._parse_scopes(requested_raw) if requested_raw else list(DEFAULT_SCOPES)
         if not requested:
@@ -214,11 +220,12 @@ class BhzMagaluConfig(models.Model):
         ]
         authorize_url = f"{MAGALU_AUTHORIZE_URL}?{'&'.join(query_parts)}"
         _logger.info(
-            "Magalu OAuth authorize URL (%s): endpoint=%s scopes=%s state=%s",
+            "Magalu OAuth authorize URL (%s): endpoint=%s scopes=%s state=%s mode=%s",
             self.display_name,
             MAGALU_AUTHORIZE_URL,
             scope,
             state[-8:],
+            self._get_system_param(SCOPE_MODE_PARAM) or "production",
         )
         return {
             "type": "ir.actions.act_url",

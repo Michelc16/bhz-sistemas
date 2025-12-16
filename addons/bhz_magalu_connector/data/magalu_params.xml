@@ -2,11 +2,15 @@
     <data noupdate="1">
         <function model="ir.config_parameter" name="set_param">
             <value>bhz_magalu.oauth_scopes</value>
-            <value>openid open:order-order-seller:read open:order-delivery-seller:read open:order-invoice-seller:read open:portfolio-skus-seller:read open:portfolio-stocks-seller:read</value>
+            <value>open:portfolio:read open:order-order:read</value>
         </function>
         <function model="ir.config_parameter" name="set_param">
             <value>bhz_magalu.allowed_scopes</value>
             <value></value>
+        </function>
+        <function model="ir.config_parameter" name="set_param">
+            <value>bhz_magalu.scope_mode</value>
+            <value>production</value>
         </function>
     </data>
 </odoo>

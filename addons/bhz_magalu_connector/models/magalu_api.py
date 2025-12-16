@@ -100,11 +100,11 @@ class BhzMagaluAPI(models.AbstractModel):
 
     def _post_token_payload(self, data, context):
         headers = {
-            "Content-Type": "application/json",
+            "Content-Type": "application/x-www-form-urlencoded",
             "Accept": "application/json",
         }
         try:
-            resp = requests.post(MAGALU_TOKEN_URL, json=data, headers=headers, timeout=REQUEST_TIMEOUT)
+            resp = requests.post(MAGALU_TOKEN_URL, data=data, headers=headers, timeout=REQUEST_TIMEOUT)
         except requests.RequestException as exc:
             _logger.error("Erro HTTP ao solicitar token (%s): %s", context, exc)
             raise UserError(_("Erro ao comunicar com o ID Magalu: %s") % exc)
