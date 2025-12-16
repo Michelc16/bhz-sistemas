@@ -137,6 +137,20 @@ class BhzRMAOrder(models.Model):
         copy=False,
     )
 
+    exchange_delivery_move_id = fields.Many2one(
+        "stock.move",
+        string="Entrega nova ao cliente",
+        readonly=True,
+        copy=False,
+    )
+
+    exchange_return_move_id = fields.Many2one(
+        "stock.move",
+        string="Retorno defeituoso do cliente",
+        readonly=True,
+        copy=False,
+    )
+
     currency_id = fields.Many2one(
         "res.currency",
         string="Moeda",

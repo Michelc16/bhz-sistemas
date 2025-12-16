@@ -2,27 +2,24 @@ from odoo import SUPERUSER_ID, api
 
 CLIENT_ID = "djlPMQL1CrD1kv7A4qBvSSaIkHmiZFJ81EVflZpnCdY"
 CLIENT_SECRET = "C4xlUMsKpMINRduPjhMvznuUdi0JWjQHSO0QcdSxGtM"
+DEFAULT_SCOPE_STRING = "open:order-order-seller:read open:order-delivery-seller:read open:order-invoice-seller:read open:portfolio-skus-seller:read open:portfolio-stocks-seller:read"
 
 
 def pre_init_set_magalu_client(env_or_cr):
-    """Hook executado antes da instalação do módulo.
-
-    Em Odoo 19, o hook está sendo chamado com um Environment.
-    Este código também trata o caso de vir um cursor (cr).
-    """
+    """Hook executado antes da instalação do módulo."""
     if isinstance(env_or_cr, api.Environment):
-        # Caso do Odoo 19: já vem um Environment pronto
         env = env_or_cr
     else:
-        # Caso antigo: vem o cursor cr
         cr = env_or_cr
         env = api.Environment(cr, SUPERUSER_ID, {})
 
     params = env["ir.config_parameter"].sudo()
 
-    # Não usar 'groups' em Odoo 19.0, apenas chave e valor
-    if not params.get_param("bhz_magalu.client_id"):
-        params.set_param("bhz_magalu.client_id", CLIENT_ID)
+    def ensure_param(key, value):
+        if not params.search([("key", "=", key)], limit=1):
+            params.set_param(key, value)
 
-    if not params.get_param("bhz_magalu.client_secret"):
-        params.set_param("bhz_magalu.client_secret", CLIENT_SECRET)
+    ensure_param("bhz_magalu.client_id", CLIENT_ID)
+    ensure_param("bhz_magalu.client_secret", CLIENT_SECRET)
+    ensure_param("bhz_magalu.requested_scopes", DEFAULT_SCOPE_STRING)
+    ensure_param("bhz_magalu.allowed_scopes", "")
