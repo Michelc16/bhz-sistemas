@@ -1,12 +1,12 @@
 <odoo>
     <data noupdate="1">
-        <record id="bhz_magalu_param_oauth_scopes" model="ir.config_parameter">
-            <field name="key">bhz_magalu.oauth_scopes</field>
-            <field name="value">openid open:order-order-seller:read open:order-delivery-seller:read open:order-invoice-seller:read open:portfolio-skus-seller:read open:portfolio-stocks-seller:read</field>
-        </record>
-        <record id="bhz_magalu_param_allowed_scopes" model="ir.config_parameter">
-            <field name="key">bhz_magalu.allowed_scopes</field>
-            <field name="value"></field>
-        </record>
+        <function model="ir.config_parameter" name="set_param">
+            <value>bhz_magalu.oauth_scopes</value>
+            <value>openid open:order-order-seller:read open:order-delivery-seller:read open:order-invoice-seller:read open:portfolio-skus-seller:read open:portfolio-stocks-seller:read</value>
+        </function>
+        <function model="ir.config_parameter" name="set_param">
+            <value>bhz_magalu.allowed_scopes</value>
+            <value></value>
+        </function>
     </data>
 </odoo>
