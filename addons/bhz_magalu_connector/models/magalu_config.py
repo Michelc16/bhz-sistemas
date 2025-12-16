@@ -191,14 +191,15 @@ class BhzMagaluConfig(models.Model):
         redirect_uri = self._get_redirect_uri()
         scope = self._get_requested_scopes()
         state = self._build_state_param()
-        scope_param = scope.replace(" ", "%20")
+        scope_param = quote(scope, safe=":")
+        state_param = quote(state, safe="")
         query_parts = [
             f"client_id={quote(client_id)}",
             f"redirect_uri={redirect_uri}",
             f"scope={scope_param}",
             "response_type=code",
             "choose_tenants=true",
-            f"state={state}",
+            f"state={state_param}",
         ]
         authorize_url = f"{MAGALU_AUTHORIZE_URL}?{'&'.join(query_parts)}"
         _logger.info("Magalu OAuth authorize URL (%s): %s", self.display_name, authorize_url)
