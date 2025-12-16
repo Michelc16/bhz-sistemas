@@ -8,15 +8,7 @@ from odoo.exceptions import UserError
 _logger = logging.getLogger(__name__)
 
 MAGALU_AUTHORIZE_URL = "https://id.magalu.com/login"
-SCOPES = [
-    "order.order.read",
-    "order.delivery.read",
-    "order.invoice.read",
-    "portfolio.skus.read",
-    "portfolio.stocks.read",
-    # "apiin:all",  # habilite somente se o suporte Magalu autorizar formalmente
-]
-EXTRA_SCOPES_PARAM = "bhz_magalu.extra_scopes"
+MAGALU_AUTHORIZE_SCOPE = "openid open:portfolio-stocks-seller:read"
 CLIENT_ID_PARAM = "bhz_magalu.client_id"
 CLIENT_SECRET_PARAM = "bhz_magalu.client_secret"
 ALLOWED_REDIRECT_URIS = {
@@ -85,17 +77,6 @@ class BhzMagaluConfig(models.Model):
             )
         return redirect_uri
 
-    def _get_scope_string(self):
-        scopes = ["openid"] + SCOPES[:]
-        extras = (self._get_system_param(EXTRA_SCOPES_PARAM) or "").split()
-        for scope in extras:
-            scope = scope.strip()
-            if scope:
-                scopes.append(scope)
-        # remove duplicatas preservando a ordem
-        unique_scopes = list(dict.fromkeys(scopes))
-        return " ".join(unique_scopes)
-
     def _build_state_param(self):
         if not self.id:
             raise UserError(_("Salve o registro antes de iniciar a conexão."))
@@ -119,12 +100,11 @@ class BhzMagaluConfig(models.Model):
         self.ensure_one()
         client_id, _ = self._get_client_credentials()
         redirect_uri = self._get_redirect_uri()
-        scope = self._get_scope_string()
         params = {
             "client_id": client_id,
             "response_type": "code",
             "redirect_uri": redirect_uri,
-            "scope": scope,
+            "scope": MAGALU_AUTHORIZE_SCOPE,
             "choose_tenants": "true",
             "state": self._build_state_param(),
         }
