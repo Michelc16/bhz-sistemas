@@ -1,3 +1,5 @@
+import base64
+import json
 import logging
 
 from odoo import http
@@ -17,11 +19,11 @@ class MagaluOAuthController(http.Controller):
 
         cfg_id = None
         config = None
-        state_data = None
+        state_payload = None
         try:
-            state_data = self._parse_state(state) if state else None
-            if state_data:
-                cfg_id = int(state_data.get("cfg"))
+            state_payload = self._parse_state(state) if state else None
+            if state_payload:
+                cfg_id = int(state_payload.get("config_id") or 0)
         except Exception:
             _logger.warning("Magalu OAuth: state inválido: %s", state)
 
@@ -44,14 +46,14 @@ class MagaluOAuthController(http.Controller):
             _logger.error("Magalu OAuth erro (%s): %s", cfg_id or "sem cfg", message)
             return message
 
-        if not code or not state_data:
+        if not code or not state_payload:
             return "Callback Magalu: faltando 'code' ou 'state'."
 
         if not config:
             return "Callback Magalu: configuração não encontrada."
 
         try:
-            config._validate_state(state_data)
+            config._validate_state(state_payload)
         except UserError as exc:
             return f"Callback Magalu: {exc.name or exc.args[0]}"
         except Exception:
@@ -74,13 +76,8 @@ class MagaluOAuthController(http.Controller):
     def _parse_state(state):
         if not state:
             raise ValueError("State vazio.")
-        parts = {}
-        for chunk in state.split("|"):
-            if ":" in chunk:
-                key, value = chunk.split(":", 1)
-                parts[key] = value
-        required = {"cfg", "url", "nonce", "sig"}
-        if not required.issubset(parts.keys()):
-            raise ValueError("State incompleto.")
-        parts["url"] = (parts["url"] or "").rstrip("/")
-        return parts
+        padding = "=" * (-len(state) % 4)
+        raw = base64.urlsafe_b64decode(state + padding)
+        payload = json.loads(raw.decode())
+        payload["return_url"] = (payload.get("return_url") or "").rstrip("/")
+        return payload

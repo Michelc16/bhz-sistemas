@@ -1,16 +1,18 @@
+import base64
 import datetime
 import hmac
+import json
 import logging
 import os
 from hashlib import sha256
-from urllib.parse import quote, urlencode
+from urllib.parse import quote
 
 from odoo import _, fields, models
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
-MAGALU_AUTHORIZE_URL = "https://id.magalu.com/account/select"
+MAGALU_AUTHORIZE_URL = "https://id.magalu.com/login"
 CLIENT_ID_PARAM = "bhz_magalu.client_id"
 CLIENT_SECRET_PARAM = "bhz_magalu.client_secret"
 REQUESTED_SCOPES_PARAM = "bhz_magalu.oauth_scopes"
@@ -97,16 +99,26 @@ class BhzMagaluConfig(models.Model):
     def _build_state_param(self):
         if not self.id:
             raise UserError(_("Salve o registro antes de iniciar a conexão."))
-        nonce = os.urandom(8).hex()
-        base = f"cfg:{self.id}|url:{self._get_base_url()}|nonce:{nonce}"
-        signature = self._compute_state_signature(base)
+        nonce = os.urandom(16).hex()
+        payload = {
+            "db": self.env.cr.dbname,
+            "company_id": self.company_id.id,
+            "config_id": self.id,
+            "return_url": self._get_base_url(),
+            "nonce": nonce,
+            "ts": int(datetime.datetime.utcnow().timestamp()),
+        }
+        payload_json = json.dumps(payload, separators=(",", ":"))
+        payload["sig"] = self._compute_state_signature(payload_json)
+        state_raw = json.dumps(payload, separators=(",", ":")).encode()
+        state = base64.urlsafe_b64encode(state_raw).decode().rstrip("=")
         self.write(
             {
                 "oauth_state_nonce": nonce,
                 "oauth_state_expiration": fields.Datetime.now() + datetime.timedelta(minutes=10),
             }
         )
-        return f"{base}|sig:{signature}"
+        return state
 
     def _parse_scopes(self, scope_string):
         return [token.strip() for token in scope_string.split() if token.strip()]
@@ -192,17 +204,22 @@ class BhzMagaluConfig(models.Model):
         scope = self._get_requested_scopes()
         state = self._build_state_param()
         scope_param = quote(scope, safe=":")
-        state_param = quote(state, safe="")
         query_parts = [
             f"client_id={quote(client_id)}",
-            f"redirect_uri={redirect_uri}",
+            f"redirect_uri={quote(redirect_uri, safe=':/')}",
             f"scope={scope_param}",
             "response_type=code",
             "choose_tenants=true",
-            f"state={state_param}",
+            f"state={state}",
         ]
         authorize_url = f"{MAGALU_AUTHORIZE_URL}?{'&'.join(query_parts)}"
-        _logger.info("Magalu OAuth authorize URL (%s): %s", self.display_name, authorize_url)
+        _logger.info(
+            "Magalu OAuth authorize URL (%s): endpoint=%s scopes=%s state=%s",
+            self.display_name,
+            MAGALU_AUTHORIZE_URL,
+            scope,
+            state[-8:],
+        )
         return {
             "type": "ir.actions.act_url",
             "url": authorize_url,
@@ -214,22 +231,23 @@ class BhzMagaluConfig(models.Model):
         self.env["bhz.magalu.api"].refresh_token(self)
         return True
 
-    def _validate_state(self, state_parts):
-        """
-        Valida o state recebido no callback.
-        """
-        expected_url = self._get_base_url()
-        if state_parts.get("url") != expected_url:
+    def _validate_state(self, state_payload):
+        base_url = self._get_base_url()
+        if int(state_payload.get("config_id") or 0) != self.id:
+            raise UserError(_("State não corresponde a esta configuração."))
+        if state_payload.get("return_url") != base_url:
             raise UserError(_("State não corresponde a esta instância."))
 
-        nonce = state_parts.get("nonce")
-        signature = state_parts.get("sig")
-        base = f"cfg:{self.id}|url:{expected_url}|nonce:{nonce}"
-        expected_signature = self._compute_state_signature(base)
-        if signature != expected_signature:
+        sig = state_payload.get("sig")
+        payload_copy = state_payload.copy()
+        payload_copy.pop("sig", None)
+        payload_json = json.dumps(payload_copy, separators=(",", ":"))
+        expected_sig = self._compute_state_signature(payload_json)
+        if sig != expected_sig:
             raise UserError(_("State inválido (assinatura incorreta)."))
 
-        if not self.oauth_state_nonce or nonce != self.oauth_state_nonce:
+        nonce = state_payload.get("nonce")
+        if not nonce or not self.oauth_state_nonce or nonce != self.oauth_state_nonce:
             raise UserError(_("State nonce não corresponde ao último pedido de autorização."))
         if not self.oauth_state_expiration or fields.Datetime.now() > self.oauth_state_expiration:
             raise UserError(_("O link de autorização expirou. Tente conectar novamente."))
