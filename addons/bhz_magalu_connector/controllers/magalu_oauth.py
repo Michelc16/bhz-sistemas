@@ -43,7 +43,12 @@ class MagaluOAuthController(http.Controller):
                 )
             else:
                 message = f"Erro retornado pelo Magalu: {error}{extra}"
-            _logger.error("Magalu OAuth erro (%s): %s", cfg_id or "sem cfg", message)
+            _logger.error(
+                "Magalu OAuth erro (%s): %s (scope atual: %s)",
+                cfg_id or "sem cfg",
+                message,
+                config._get_requested_scopes() if config else "desconhecido",
+            )
             return message
 
         if not code or not state_payload:

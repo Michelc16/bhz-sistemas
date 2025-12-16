@@ -152,13 +152,11 @@ class BhzMagaluConfig(models.Model):
                     )
                 )
             for scope in requested:
-                if scope in allowed:
+                if scope in allowed and scope.startswith("open:"):
                     final_scopes.append(scope)
         else:
             for scope in requested:
-                if scope == "apiin:all":
-                    final_scopes.append(scope)
-                elif scope.startswith("open:") or scope.startswith("services:") or scope == "openid":
+                if scope.startswith("open:"):
                     final_scopes.append(scope)
 
         dedup_scopes = []
