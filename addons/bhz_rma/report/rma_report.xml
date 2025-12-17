@@ -5,6 +5,7 @@
         <template id="report_rma_document">
             <t t-foreach="docs" t-as="doc">
                 <t t-call="web.external_layout">
+                    <t t-set="doc" t-value="doc"/>
                     <div class="page">
                         <h2>
                             Pedido de RMA -
