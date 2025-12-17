@@ -25,8 +25,8 @@
         <field name="name">Estoque RMA</field>
         <field name="res_model">stock.quant</field>
         <field name="view_mode">list,pivot,graph</field>
-        <field name="domain" eval="[('location_id', 'child_of', ref('bhz_rma.stock_location_rma'))]"/>
-        <field name="context" eval="{'search_default_location_id': ref('bhz_rma.stock_location_rma'), 'default_location_id': ref('bhz_rma.stock_location_rma')}"/>
+        <field name="domain" eval="[('location_id.is_rma_location', '=', True), ('location_id.company_id', 'in', [user.company_id.id, False])]"/>
+        <field name="context" eval="{'default_company_id': user.company_id.id, 'allowed_company_ids': user.company_ids.ids}"/>
     </record>
 
     <menuitem
