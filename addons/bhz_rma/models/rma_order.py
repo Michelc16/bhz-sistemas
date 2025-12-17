@@ -443,7 +443,7 @@ class BhzRMAOrder(models.Model):
             incoming_type = rec._get_picking_type("incoming")
 
             if not rec.exchange_delivery_move_id:
-                _, move_new = rec._create_stock_operation(
+                picking_new, move_new = rec._create_stock_operation(
                     picking_type=outgoing_type,
                     source_location=stock_location,
                     dest_location=customer_location,
@@ -452,7 +452,7 @@ class BhzRMAOrder(models.Model):
                 rec.exchange_delivery_move_id = move_new.id
 
             if not rec.exchange_return_move_id:
-                _, move_defective = rec._create_stock_operation(
+                picking_return, move_defective = rec._create_stock_operation(
                     picking_type=incoming_type,
                     source_location=customer_location,
                     dest_location=rec.rma_location_id,
@@ -617,7 +617,7 @@ class BhzRMAOrder(models.Model):
         if not picking_type:
             raise UserError(_("Não encontrei um Tipo de Operação 'Transferência Interna'."))
 
-        picking, _ = self._create_stock_operation(
+        picking, move_back = self._create_stock_operation(
             picking_type=picking_type,
             source_location=self.rma_location_id,
             dest_location=self.location_id,
