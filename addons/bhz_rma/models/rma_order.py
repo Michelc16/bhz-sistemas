@@ -126,7 +126,7 @@ class BhzRMAOrder(models.Model):
         "stock.location",
         string="Local RMA",
         default=lambda self: self._default_rma_location_id(),
-        domain="[('usage','=','internal'), ('company_id','=',company_id), ('is_rma_location','=',True)]",
+        domain="[('usage','=','internal'), ('company_id','in',[False, company_id]), ('is_rma_location','=',True)]",
         check_company=True,
         help="Local de estoque específico para produtos com defeito / em RMA.",
     )
@@ -222,19 +222,30 @@ class BhzRMAOrder(models.Model):
 
     @api.model
     def _default_location_id(self):
-        company = self.env.company
+        company = self._get_context_company()
         location = self._get_company_stock_location(company)
         return location.id if location else False
 
     @api.model
     def _default_rma_location_id(self):
-        company = self.env.company
+        company = self._get_context_company()
         location = self._ensure_company_rma_location(company)
         return location.id if location else False
 
     @api.model
+    def _get_context_company(self):
+        company_id = (
+            self.env.context.get("default_company_id")
+            or self.env.context.get("force_company")
+            or self.env.company.id
+        )
+        if not company_id:
+            raise UserError(_("Defina a empresa do RMA."))
+        return self.env["res.company"].browse(company_id)
+
+    @api.model
     def _get_company_from_vals(self, vals):
-        company_id = vals.get("company_id") or self.env.company.id
+        company_id = vals.get("company_id") or self.env.context.get("default_company_id") or self.env.company.id
         if not company_id:
             raise UserError(_("Defina a empresa do RMA."))
         return self.env["res.company"].browse(company_id)
@@ -362,6 +373,11 @@ class BhzRMAOrder(models.Model):
                 rec.location_id = rec._get_company_stock_location(company).id
             if not rec.rma_location_id:
                 rec.rma_location_id = rec._ensure_company_rma_location(company).id
+
+    @api.onchange("company_id")
+    def _onchange_company_id(self):
+        for rec in self:
+            rec._ensure_company_locations()
 
     def _apply_defaults_by_warranty_type(self):
         """
