@@ -469,19 +469,7 @@ class BhzRMAOrder(models.Model):
 
     def action_print_rma(self):
         self.ensure_one()
-        report_action = self.env.ref("bhz_rma.action_report_bhz_rma_order", raise_if_not_found=False)
-        if not report_action:
-            _logger.error(
-                "RMA report action is missing for order %s (company %s).",
-                self.id,
-                self.company_id.display_name,
-            )
-            raise UserError(
-                _(
-                    "O relatório de RMA não está instalado. Reinstale o módulo bhz_rma ou verifique se o arquivo report/rma_report.xml foi carregado."
-                )
-            )
-        return report_action.report_action(self)
+        return self.env.ref("bhz_rma.action_report_bhz_rma_order").report_action(self)
 
     def action_send_rma_email(self):
         self.ensure_one()
