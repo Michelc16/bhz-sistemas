@@ -469,7 +469,10 @@ class BhzRMAOrder(models.Model):
 
     def action_print_rma(self):
         self.ensure_one()
-        return self.env.ref("bhz_rma.action_report_bhz_rma_order").report_action(self)
+        report_action = self.env.ref("bhz_rma.action_report_bhz_rma_order", raise_if_not_found=False)
+        if not report_action:
+            report_action = self._ensure_rma_report_action()
+        return report_action.report_action(self)
 
     def action_send_rma_email(self):
         self.ensure_one()
@@ -699,6 +702,51 @@ class BhzRMAOrder(models.Model):
         MoveLine.create(ml_vals)
         picking.with_context(skip_backorder=True).button_validate()
         return picking, move
+
+    def _ensure_rma_report_action(self):
+        template = self.env.ref("bhz_rma.report_rma_document", raise_if_not_found=False)
+        if not template:
+            raise UserError(_("O template de relatório do RMA não está disponível. Reinstale o módulo bhz_rma."))
+        Report = self.env["ir.actions.report"].sudo()
+        report_action = Report.search(
+            [
+                ("report_name", "=", "bhz_rma.report_rma_document"),
+                ("model", "=", "bhz.rma.order"),
+            ],
+            limit=1,
+        )
+        if not report_action:
+            report_action = Report.create(
+                {
+                    "name": _("Pedido de RMA"),
+                    "model": "bhz.rma.order",
+                    "report_type": "qweb-pdf",
+                    "report_name": "bhz_rma.report_rma_document",
+                    "report_file": "bhz_rma.report_rma_document",
+                    "print_report_name": "'Pedido de RMA - %s' % (object.name)",
+                }
+            )
+        imd = self.env["ir.model.data"].sudo()
+        xmlid = imd.search(
+            [
+                ("module", "=", "bhz_rma"),
+                ("name", "=", "action_report_bhz_rma_order"),
+            ],
+            limit=1,
+        )
+        if xmlid:
+            xmlid.write({"model": report_action._name, "res_id": report_action.id, "noupdate": True})
+        else:
+            imd.create(
+                {
+                    "module": "bhz_rma",
+                    "name": "action_report_bhz_rma_order",
+                    "model": report_action._name,
+                    "res_id": report_action.id,
+                    "noupdate": True,
+                }
+            )
+        return report_action
 
     # ---------------------------
     # ✅ BOTÃO SOLUCIONADO (com regra de estoque)
