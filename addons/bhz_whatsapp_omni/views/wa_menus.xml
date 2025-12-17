@@ -30,4 +30,20 @@
         sequence="10"
     />
 
+    <menuitem
+        id="menu_bhz_wa_session"
+        name="Sessões (Starter)"
+        parent="menu_bhz_wa_root"
+        action="action_bhz_wa_session"
+        sequence="20"
+    />
+
+    <menuitem
+        id="menu_bhz_wa_message"
+        name="Caixa de Entrada"
+        parent="menu_bhz_wa_root"
+        action="action_bhz_wa_message"
+        sequence="30"
+    />
+
 </odoo>

@@ -1,8 +1,11 @@
-from odoo import api, fields, models
-from odoo.exceptions import UserError
-from uuid import uuid4
-import requests
+import base64
 import json
+import secrets
+from uuid import uuid4
+
+import requests
+from odoo import _, api, fields, models
+from odoo.exceptions import UserError
 
 
 class BHZWAAccount(models.Model):
@@ -25,15 +28,29 @@ class BHZWAAccount(models.Model):
         string='Sessão Starter',
         copy=False,
         tracking=True,
+        default=lambda self: self._default_starter_session_id(),
         help='Identificador usado pelo starter_service.',
+    )
+    starter_secret = fields.Char(
+        string='Starter Secret',
+        copy=False,
+        readonly=True,
+        default=lambda self: self._generate_starter_secret(),
+        help='Segredo único usado para autenticar chamadas entre Odoo e Starter.',
+    )
+    starter_base_url = fields.Char(
+        string='Starter Base URL',
+        copy=False,
+        tracking=True,
+        default=lambda self: self._default_starter_base_url(),
+        help='URL pública do serviço Starter (Render).',
     )
     starter_status = fields.Selection(
         [
             ('new', 'Nova'),
-            ('loading', 'Carregando'),
             ('waiting_qr', 'Aguardando QR'),
             ('connected', 'Conectada'),
-            ('logged_out', 'Desconectada'),
+            ('disconnected', 'Desconectada'),
             ('error', 'Erro'),
         ],
         default='new',
@@ -44,21 +61,19 @@ class BHZWAAccount(models.Model):
         string='Último pedido de QR',
         copy=False,
     )
+    starter_qr_updated_at = fields.Datetime(
+        string='QR atualizado em',
+        copy=False,
+        readonly=True,
+    )
+    starter_qr_image = fields.Binary(
+        string='QR Code Starter',
+        copy=False,
+        attachment=True,
+    )
     starter_last_number = fields.Char(
         string='Número pareado',
         copy=False,
-    )
-
-    # Starter (configurado globalmente via parâmetros do sistema)
-    starter_base_url = fields.Char(
-        string='Starter Base URL',
-        compute='_compute_starter_settings',
-        readonly=True,
-    )
-    webhook_secret = fields.Char(
-        string='Starter Webhook Secret',
-        compute='_compute_starter_settings',
-        readonly=True,
     )
 
     # Business (Meta Cloud)
@@ -119,19 +134,27 @@ class BHZWAAccount(models.Model):
             return self._business_send_text(to_phone_or_jid, text, partner_id)
 
     def _starter_send_text(self, to, text, partner_id, session_id):
-        base = self._get_starter_base_url()
         session_identifier = session_id or self._get_starter_session_identifier()
         payload = {
             'session': session_identifier,
             'to': to,
             'message': text,
         }
+        ok = False
+        response_payload = {}
+        response = None
         try:
-            r = requests.post(f"{base}/send", json=payload, timeout=20)
-            r.raise_for_status()
-            j = r.json()
-            ok = j.get('status') == 'sent'
-        except Exception:
+            response = self._starter_request(
+                'POST',
+                '/send',
+                session_id=session_identifier,
+                json=payload,
+            )
+            response_payload = response.json()
+            ok = response_payload.get('status') == 'sent'
+        except ValueError:
+            raw_text = response.text if response is not None else ''
+            response_payload = {'raw': raw_text}
             ok = False
 
         state = 'sent' if ok else 'error'
@@ -146,7 +169,10 @@ class BHZWAAccount(models.Model):
             'provider': 'starter',
             'wa_from': self.starter_last_number,
             'wa_to': to,
-            'payload_json': json.dumps(payload),
+            'payload_json': json.dumps({
+                'request': payload,
+                'response': response_payload,
+            }),
         })
         if ok and not self.env.context.get('bypass_limits'):
             self.sent_last_minute += 1
@@ -327,23 +353,35 @@ class BHZWAAccount(models.Model):
 
     # ----------------- Starter helpers -----------------
 
-    def _compute_starter_settings(self):
+    @api.model
+    def _default_starter_base_url(self):
         IrConfig = self.env['ir.config_parameter'].sudo()
         base_url = (IrConfig.get_param('starter_service.base_url') or '').strip()
-        if base_url:
-            base_url = base_url.rstrip('/')
-        secret = IrConfig.get_param('starter_service.secret') or ''
-        for account in self:
-            account.starter_base_url = base_url
-            account.webhook_secret = secret
+        return base_url.rstrip('/') if base_url else ''
+
+    @api.model
+    def _default_starter_session_id(self):
+        return f"acc-{uuid4().hex[:10]}"
+
+    @api.model
+    def _generate_starter_secret(self):
+        return secrets.token_urlsafe(32)
+
+    def _ensure_starter_secret(self):
+        self.ensure_one()
+        if not self.starter_secret:
+            self.starter_secret = self._generate_starter_secret()
+        return self.starter_secret
 
     def _get_starter_base_url(self):
         self.ensure_one()
-        base_url = self.env['ir.config_parameter'].sudo().get_param('starter_service.base_url')
+        base_url = (self.starter_base_url or '').strip()
+        if not base_url:
+            base_url = self._default_starter_base_url()
         if not base_url:
             raise UserError(
                 "URL do serviço Starter não está configurada. "
-                "Peça ao administrador (BHZ) para configurar o parâmetro 'starter_service.base_url'."
+                "Defina em Starter Base URL ou no parâmetro do sistema 'starter_service.base_url'."
             )
         return base_url.rstrip('/')
 
@@ -351,12 +389,52 @@ class BHZWAAccount(models.Model):
         self.ensure_one()
         if self.starter_session_id:
             return self.starter_session_id
-        session_code = f"acc-{self.id}" if self.id else f"tmp-{uuid4().hex[:6]}"
+        session_code = self._default_starter_session_id()
         self.starter_session_id = session_code
         return session_code
 
+    def _get_odoo_public_base_url(self):
+        self.ensure_one()
+        IrConfig = self.env['ir.config_parameter'].sudo()
+        base_url = (IrConfig.get_param('bhz_wa.public_base') or IrConfig.get_param('web.base.url') or '').strip()
+        if not base_url:
+            raise UserError(
+                "Configure a URL pública do Odoo em Configurações > BHZ WhatsApp para habilitar o Starter."
+            )
+        return base_url.rstrip('/')
+
+    def _get_inbound_url(self):
+        base_url = self._get_odoo_public_base_url()
+        return f"{base_url}/bhz_wa/starter/inbound"
+
+    def _starter_request(self, method, path, *, session_id=None, allowed_status=None, **kwargs):
+        self.ensure_one()
+        base_url = self._get_starter_base_url()
+        secret = self._ensure_starter_secret()
+        headers = kwargs.pop('headers', {}) or {}
+        final_headers = {
+            'X-Account-Secret': secret,
+            'X-Odoo-Inbound': self._get_inbound_url(),
+            'X-Odoo-Base': self._get_odoo_public_base_url(),
+        }
+        if session_id:
+            final_headers['X-Session-Id'] = session_id
+        final_headers.update(headers)
+        url = f"{base_url.rstrip('/')}{path}"
+        kwargs.setdefault('timeout', 20)
+        try:
+            response = requests.request(method, url, headers=final_headers, **kwargs)
+        except requests.RequestException as exc:
+            raise UserError(_("Falha ao comunicar com o Starter: %s") % exc)
+        allowed = set(allowed_status or [200])
+        if response.status_code in allowed:
+            return response
+        if response.status_code >= 400:
+            raise UserError(_("Starter retornou %s: %s") % (response.status_code, response.text))
+        raise UserError(_("Resposta inesperada do Starter (%s).") % response.status_code)
+
     def _ensure_session_record(self, session_identifier, base_url):
-        Session = self.env['bhz.wa.session']
+        Session = self.env['bhz.wa.session'].sudo()
         session = Session.search([
             ('account_id', '=', self.id),
             ('session_id', '=', session_identifier),
@@ -373,71 +451,131 @@ class BHZWAAccount(models.Model):
             session = Session.create(vals)
         return session
 
+    def _fetch_starter_qr(self, session_id=None):
+        self.ensure_one()
+        session_identifier = session_id or self._get_starter_session_identifier()
+        response = self._starter_request(
+            'GET',
+            '/qr',
+            session_id=session_identifier,
+            params={'session': session_identifier, 'format': 'img'},
+            allowed_status={200, 202},
+        )
+        if response.status_code == 202:
+            self.write({
+                'starter_status': 'waiting_qr',
+                'starter_last_qr_request': fields.Datetime.now(),
+            })
+            return False
+        content_type = (response.headers.get('Content-Type') or '').lower()
+        if 'image' not in content_type:
+            raise UserError(_("Starter não retornou imagem de QR."))
+        if not response.content:
+            raise UserError(_("Starter retornou imagem vazia para o QR."))
+        encoded = base64.b64encode(response.content).decode()
+        now = fields.Datetime.now()
+        vals = {
+            'starter_qr_image': encoded,
+            'starter_qr_updated_at': now,
+            'starter_last_qr_request': now,
+            'starter_status': 'waiting_qr',
+        }
+        self.write(vals)
+        session = self._ensure_session_record(session_identifier, self._get_starter_base_url())
+        session.write({
+            'qr_image': encoded,
+            'last_qr_at': now,
+            'status': 'qr',
+        })
+        return True
+
     def button_starter_connect(self):
-        """
-        Cria ou reutiliza a sessão Starter e abre o QR em nova janela.
-        """
         self.ensure_one()
         if self.mode != 'starter':
             raise UserError("Essa ação só é válida para contas no modo Starter.")
-        base_url = self._get_starter_base_url()
-        session_identifier = self._get_starter_session_identifier()
-        self._ensure_session_record(session_identifier, base_url)
-        self.starter_last_qr_request = fields.Datetime.now()
-        self.starter_status = 'waiting_qr'
-        url = f"{base_url}/qr?session={session_identifier}&format=img"
-        return {
-            'type': 'ir.actions.act_url',
-            'url': url,
-            'target': 'new',
-        }
+        self._ensure_session_record(self._get_starter_session_identifier(), self._get_starter_base_url())
+        success = self._fetch_starter_qr()
+        if not success:
+            self.message_post(body="Starter ainda gerando o QR. Atualize em alguns segundos.")
+        return True
 
     def button_starter_disconnect(self):
         self.ensure_one()
         if self.mode != 'starter':
             raise UserError("Disponível apenas para contas Starter.")
         session_identifier = self._get_starter_session_identifier()
-        try:
-            base_url = self._get_starter_base_url()
-            requests.post(
-                f"{base_url}/logout",
-                json={'session': session_identifier},
-                timeout=15,
-            )
-        except Exception:
-            pass
+        self._starter_request(
+            'POST',
+            '/logout',
+            session_id=session_identifier,
+            json={'session': session_identifier},
+        )
         self.write({
-            'starter_status': 'logged_out',
+            'starter_status': 'disconnected',
             'starter_last_number': False,
+            'starter_qr_image': False,
         })
+        session = self.env['bhz.wa.session'].sudo().search([
+            ('account_id', '=', self.id),
+            ('session_id', '=', session_identifier),
+        ], limit=1)
+        if session:
+            session.write({
+                'status': 'disconnected',
+                'paired_number': False,
+                'qr_image': False,
+            })
         return True
 
     def button_starter_refresh_status(self):
         for account in self.filtered(lambda a: a.mode == 'starter'):
             session_identifier = account._get_starter_session_identifier()
             try:
-                base_url = account._get_starter_base_url()
-                resp = requests.get(
-                    f"{base_url}/status",
+                resp = account._starter_request(
+                    'GET',
+                    '/status',
+                    session_id=session_identifier,
                     params={'session': session_identifier},
-                    timeout=10,
                 )
                 data = resp.json()
                 account._sync_starter_status(data)
+            except UserError:
+                raise
             except Exception:
-                account.starter_status = 'error'
+                account.write({'starter_status': 'error'})
         return True
 
     def action_connect_starter(self):
         """Compatibilidade com chamadas antigas."""
         return self.button_starter_connect()
 
+    def _normalize_starter_status(self, status):
+        mapping = {
+            'new': 'new',
+            'waiting_qr': 'waiting_qr',
+            'loading': 'waiting_qr',
+            'connected': 'connected',
+            'logged_out': 'disconnected',
+            'disconnected': 'disconnected',
+            'error': 'error',
+        }
+        return mapping.get((status or '').lower(), 'error')
+
     def _sync_starter_status(self, data):
-        status = data.get('status') or 'error'
+        status = self._normalize_starter_status(data.get('status'))
         number = data.get('number')
         vals = {
             'starter_status': status,
         }
         if number:
             vals['starter_last_number'] = number
+        if status != 'waiting_qr':
+            vals['starter_qr_image'] = False
         self.write(vals)
+
+    def _handle_starter_status_webhook(self, payload):
+        status_data = {
+            'status': payload.get('status') or payload.get('event'),
+            'number': payload.get('number'),
+        }
+        self._sync_starter_status(status_data)

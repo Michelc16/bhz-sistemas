@@ -27,26 +27,33 @@
               <field name="name"/>
               <field name="mode"/>
               <field name="quiet_hours" placeholder="22:00-07:59"/>
-              <!-- Campos sempre visíveis; comportamento pode ser controlado na lógica -->
-              <field name="starter_status"/>
-              <field name="starter_session_id" readonly="1"/>
+              <field name="starter_status"
+                     widget="statusbar"
+                     statusbar_visible="new,waiting_qr,connected,disconnected,error"/>
+              <field name="starter_last_number" readonly="1"/>
             </group>
             <group>
               <field name="max_msgs_per_minute"/>
               <field name="max_msgs_per_hour"/>
               <field name="max_msgs_per_contact_per_hour"/>
               <field name="starter_last_qr_request" readonly="1"/>
-              <field name="starter_last_number" readonly="1"/>
+              <field name="starter_qr_updated_at" readonly="1"/>
             </group>
           </group>
           <notebook>
             <page string="Starter (QR)">
               <group>
-                <div class="o_form_label" colspan="2">
-                  Configuração feita pela BHZ Sistemas. Use o botão "Conectar via QR" acima para gerar o código.
+                <div class="o_form_label">
+                  Gere o QR pelo botão acima e escaneie sem sair do formulário.
                 </div>
-                <field name="starter_base_url" readonly="1"/>
-                <field name="webhook_secret" readonly="1"/>
+                <group>
+                  <field name="starter_session_id" readonly="1"/>
+                  <field name="starter_secret" readonly="1"/>
+                  <field name="starter_base_url"/>
+                </group>
+                <group string="QR Code Starter">
+                  <field name="starter_qr_image" widget="image" class="oe_avatar"/>
+                </group>
               </group>
             </page>
 

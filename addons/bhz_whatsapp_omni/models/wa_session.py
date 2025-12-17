@@ -1,6 +1,5 @@
 import logging
 
-import requests
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
@@ -65,48 +64,28 @@ class BHZWASession(models.Model):
         return super().create(vals_list)
 
     # Helpers
-    def _endpoint(self, path):
-        return f"{(self.external_base_url or '').rstrip('/')}{path}"
-
-    # Actions
-
     def action_get_qr(self):
         for rec in self:
-            base = (rec.external_base_url or rec._get_starter_base_url()).rstrip('/')
-            url = f"{base}/api/whatsapp/qr"
-            _logger.info("Solicitando QR do WhatsApp em %s", url)
-            try:
-                resp = requests.get(url, timeout=60)
-            except Exception as exc:
-                raise UserError(_("Falha ao conectar no servidor WhatsApp: %s") % exc)
-
-            if resp.status_code != 200:
-                raise UserError(_("Servidor retornou %s: %s") % (resp.status_code, resp.text))
-            try:
-                data = resp.json()
-            except Exception:
-                raise UserError(_("Resposta não é JSON: %s") % resp.text)
-
-            qrcode = data.get('qr_image')
-            if not qrcode:
-                raise UserError(_("Campo 'qr_image' ausente na resposta."))
-
-            rec.qr_image = qrcode
-            rec.status = 'qr'
-            rec.last_qr_at = fields.Datetime.now()
-            rec._apply_status_payload(data)
+            rec.account_id._fetch_starter_qr(session_id=rec.session_id)
+            rec.write({
+                'qr_image': rec.account_id.starter_qr_image,
+                'last_qr_at': rec.account_id.starter_qr_updated_at,
+                'status': 'qr',
+            })
         return True
 
     def action_refresh_status(self):
         for rec in self:
             try:
-                resp = requests.get(
-                    rec._endpoint("/status"),
+                resp = rec.account_id._starter_request(
+                    'GET',
+                    '/status',
+                    session_id=rec.session_id,
                     params={'session': rec.session_id},
-                    timeout=10,
                 )
                 data = resp.json()
                 rec._apply_status_payload(data)
+                rec.account_id._sync_starter_status(data)
             except Exception:
                 rec.status = 'error'
         return True
@@ -114,10 +93,11 @@ class BHZWASession(models.Model):
     def action_logout(self):
         for rec in self:
             try:
-                requests.post(
-                    rec._endpoint('/logout'),
+                rec.account_id._starter_request(
+                    'POST',
+                    '/logout',
+                    session_id=rec.session_id,
                     json={'session': rec.session_id},
-                    timeout=10,
                 )
                 rec.status = 'disconnected'
                 rec.paired_number = False

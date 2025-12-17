@@ -28,3 +28,13 @@ def post_init_set_starter_defaults(cr, registry):
 
     if secret:
         icp.set_param('starter_service.secret', secret)
+
+    Account = env['bhz.wa.account'].sudo()
+    if base_url:
+        Account.filtered(lambda acc: not acc.starter_base_url).write({
+            'starter_base_url': base_url.rstrip('/'),
+        })
+    for account in Account.filtered(lambda acc: not acc.starter_secret):
+        account._ensure_starter_secret()
+    for account in Account.filtered(lambda acc: not acc.starter_session_id):
+        account._get_starter_session_identifier()

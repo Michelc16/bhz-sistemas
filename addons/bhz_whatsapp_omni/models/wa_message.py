@@ -88,12 +88,12 @@ class BhzWaMessage(models.Model):
         return True
 
     @api.model
-    def create_from_starter_payload(self, payload):
+    def create_from_starter_payload(self, payload, account=None):
         payload = payload or {}
         session_code = payload.get("session") or payload.get("session_id")
         Session = self.env["bhz.wa.session"].sudo()
         session = Session.search([("session_id", "=", session_code)], limit=1) if session_code else Session.browse()
-        account = session.account_id if session else False
+        account = account or (session.account_id if session else False)
 
         remote_jid = (payload.get("remote_jid") or "").strip()
         phone = remote_jid.replace("@s.whatsapp.net", "").replace("@g.us", "").strip()
