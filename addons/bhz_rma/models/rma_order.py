@@ -439,21 +439,24 @@ class BhzRMAOrder(models.Model):
             if not stock_location:
                 raise UserError(_("Configure o Local de origem (estoque)."))
 
-            # Envia produto novo ao cliente
+            outgoing_type = rec._get_picking_type("outgoing")
+            incoming_type = rec._get_picking_type("incoming")
+
             if not rec.exchange_delivery_move_id:
-                move_new = rec._create_move(
-                    stock_location,
-                    customer_location,
-                    _("Troca RMA %s - Envio ao cliente") % rec.name,
+                _, move_new = rec._create_stock_operation(
+                    picking_type=outgoing_type,
+                    source_location=stock_location,
+                    dest_location=customer_location,
+                    description=_("Troca RMA %s - Envio ao cliente") % rec.name,
                 )
                 rec.exchange_delivery_move_id = move_new.id
 
-            # Recebe produto defeituoso de volta
             if not rec.exchange_return_move_id:
-                move_defective = rec._create_move(
-                    customer_location,
-                    rec.rma_location_id,
-                    _("Troca RMA %s - Retorno defeituoso") % rec.name,
+                _, move_defective = rec._create_stock_operation(
+                    picking_type=incoming_type,
+                    source_location=customer_location,
+                    dest_location=rec.rma_location_id,
+                    description=_("Troca RMA %s - Retorno defeituoso") % rec.name,
                     lot=rec.lot_id,
                 )
                 rec.exchange_return_move_id = move_defective.id
@@ -571,6 +574,34 @@ class BhzRMAOrder(models.Model):
             limit=1,
         )
 
+    def _get_picking_type(self, code):
+        self.ensure_one()
+        warehouse = self._get_company_warehouse(self.company_id)
+        field_map = {
+            "incoming": "in_type_id",
+            "outgoing": "out_type_id",
+            "internal": "int_type_id",
+        }
+        picking_type = getattr(warehouse, field_map.get(code, ""), False)
+        if picking_type:
+            return picking_type
+        allowed = self._get_allowed_company_ids(self.company_id)
+        PickingType = (
+            self.env["stock.picking.type"]
+            .with_company(self.company_id)
+            .with_context(allowed_company_ids=allowed)
+        )
+        picking_type = PickingType.search(
+            [("code", "=", code), ("company_id", "=", self.company_id.id)],
+            limit=1,
+        )
+        if not picking_type:
+            raise UserError(
+                _("Configure um tipo de operação '%(code)s' para a empresa %(company)s antes de continuar.")
+                % {"code": code, "company": self.company_id.display_name}
+            )
+        return picking_type
+
     def _create_picking_rma_to_stock(self):
         """
         Cria uma transferência interna (RMA -> Estoque padrão).
@@ -586,49 +617,13 @@ class BhzRMAOrder(models.Model):
         if not picking_type:
             raise UserError(_("Não encontrei um Tipo de Operação 'Transferência Interna'."))
 
-        picking = self.env["stock.picking"].create(
-            {
-                "picking_type_id": picking_type.id,
-                "location_id": self.rma_location_id.id,
-                "location_dest_id": self.location_id.id,
-                "company_id": self.company_id.id,
-                "origin": self.name,
-            }
+        picking, _ = self._create_stock_operation(
+            picking_type=picking_type,
+            source_location=self.rma_location_id,
+            dest_location=self.location_id,
+            description=_("Retorno RMA %s") % self.name,
+            lot=self.lot_id,
         )
-
-        move = self.env["stock.move"].create(
-            {
-                "product_id": self.product_id.id,
-                "product_uom_qty": self.quantity,
-                "product_uom": self.product_uom_id.id,
-                "location_id": self.rma_location_id.id,
-                "location_dest_id": self.location_id.id,
-                "picking_id": picking.id,
-                "company_id": self.company_id.id,
-                "description_picking": self.product_id.display_name,
-            }
-        )
-
-        picking.action_confirm()
-        picking.action_assign()
-
-        # cria move line com qty_done
-        vals_ml = {
-            "picking_id": picking.id,
-            "move_id": move.id,
-            "product_id": self.product_id.id,
-            "product_uom_id": self.product_uom_id.id,
-            "location_id": self.rma_location_id.id,
-            "location_dest_id": self.location_id.id,
-            "qty_done": self.quantity,
-        }
-        if self.lot_id:
-            vals_ml["lot_id"] = self.lot_id.id
-
-        self.env["stock.move.line"].create(vals_ml)
-
-        # valida
-        picking.button_validate()
         return picking
 
     def _scrap_from_rma(self):
@@ -659,23 +654,63 @@ class BhzRMAOrder(models.Model):
         scrap.action_validate()
         return scrap
 
-    def _create_move(self, source_location, dest_location, description, lot=None):
+    def _create_stock_operation(self, picking_type, source_location, dest_location, description, lot=None):
         self.ensure_one()
-        move_vals = {
+        if not picking_type:
+            raise UserError(_("Configure o tipo de operação necessário para o fluxo de RMA."))
+        Picking = (
+            self.env["stock.picking"]
+            .with_company(self.company_id)
+            .with_context(allowed_company_ids=self._get_allowed_company_ids(self.company_id))
+        )
+        Move = (
+            self.env["stock.move"]
+            .with_company(self.company_id)
+            .with_context(allowed_company_ids=self._get_allowed_company_ids(self.company_id))
+        )
+        MoveLine = (
+            self.env["stock.move.line"]
+            .with_company(self.company_id)
+            .with_context(allowed_company_ids=self._get_allowed_company_ids(self.company_id))
+        )
+        picking = Picking.create(
+            {
+                "picking_type_id": picking_type.id,
+                "location_id": source_location.id,
+                "location_dest_id": dest_location.id,
+                "company_id": self.company_id.id,
+                "origin": self.name,
+            }
+        )
+        move = Move.create(
+            {
+                "product_id": self.product_id.id,
+                "product_uom_qty": self.quantity,
+                "product_uom": self.product_uom_id.id,
+                "location_id": source_location.id,
+                "location_dest_id": dest_location.id,
+                "picking_id": picking.id,
+                "company_id": self.company_id.id,
+                "description_picking": description,
+            }
+        )
+        picking.action_confirm()
+        picking.action_assign()
+        ml_vals = {
+            "picking_id": picking.id,
+            "move_id": move.id,
             "product_id": self.product_id.id,
-            "product_uom_qty": self.quantity,
-            "product_uom": self.product_uom_id.id,
+            "product_uom_id": self.product_uom_id.id,
             "location_id": source_location.id,
             "location_dest_id": dest_location.id,
+            "qty_done": self.quantity,
             "company_id": self.company_id.id,
-            "description_picking": description,
         }
-        move = self.env["stock.move"].create(move_vals)
-        move._action_confirm()
-        move._action_done()
         if lot:
-            move.move_line_ids.write({"lot_id": lot.id})
-        return move
+            ml_vals["lot_id"] = lot.id
+        MoveLine.create(ml_vals)
+        picking.with_context(skip_backorder=True).button_validate()
+        return picking, move
 
     # ---------------------------
     # ✅ BOTÃO SOLUCIONADO (com regra de estoque)

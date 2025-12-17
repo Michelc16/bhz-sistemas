@@ -207,9 +207,21 @@ class BhzRmaServiceOrder(models.Model):
         description,
         lot=None,
     ):
-        Picking = self.env["stock.picking"]
-        Move = self.env["stock.move"]
-        MoveLine = self.env["stock.move.line"]
+        Picking = (
+            self.env["stock.picking"]
+            .with_company(order.company_id)
+            .with_context(allowed_company_ids=[order.company_id.id])
+        )
+        Move = (
+            self.env["stock.move"]
+            .with_company(order.company_id)
+            .with_context(allowed_company_ids=[order.company_id.id])
+        )
+        MoveLine = (
+            self.env["stock.move.line"]
+            .with_company(order.company_id)
+            .with_context(allowed_company_ids=[order.company_id.id])
+        )
 
         picking = Picking.create(
             {

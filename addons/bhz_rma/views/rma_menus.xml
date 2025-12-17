@@ -5,12 +5,14 @@
         name="RMA"
         parent="stock.menu_stock_root"
         sequence="50"
+        groups="stock.group_stock_user"
     />
 
     <record id="action_bhz_rma_order" model="ir.actions.act_window">
         <field name="name">Pedidos de RMA</field>
         <field name="res_model">bhz.rma.order</field>
         <field name="view_mode">list,form,graph,pivot</field>
+        <field name="groups_id" eval="[(4, ref('stock.group_stock_user'))]"/>
     </record>
 
     <menuitem
@@ -19,6 +21,7 @@
         parent="menu_bhz_rma_root"
         action="action_bhz_rma_order"
         sequence="10"
+        groups="stock.group_stock_user"
     />
 
     <record id="action_bhz_rma_stock_quant" model="ir.actions.act_window">
@@ -27,6 +30,7 @@
         <field name="view_mode">list,pivot,graph</field>
         <field name="domain" eval="[('location_id.is_rma_location', '=', True), ('location_id.company_id', 'in', [user.company_id.id, False])]"/>
         <field name="context" eval="{'default_company_id': user.company_id.id, 'allowed_company_ids': user.company_ids.ids}"/>
+        <field name="groups_id" eval="[(4, ref('stock.group_stock_user'))]"/>
     </record>
 
     <menuitem
@@ -35,5 +39,6 @@
         parent="menu_bhz_rma_root"
         action="action_bhz_rma_stock_quant"
         sequence="20"
+        groups="stock.group_stock_user"
     />
 </odoo>

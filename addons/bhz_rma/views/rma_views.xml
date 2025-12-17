@@ -6,12 +6,13 @@
             <field name="name">bhz.rma.order.list</field>
             <field name="model">bhz.rma.order</field>
             <field name="arch" type="xml">
-                <list string="Pedidos de RMA">
-                    <field name="name"/>
-                    <field name="date_rma"/>
-                    <field name="partner_id"/>
-                    <field name="product_id"/>
-                    <field name="quantity"/>
+            <list string="Pedidos de RMA">
+                <field name="name"/>
+                <field name="date_rma"/>
+                <field name="company_id"/>
+                <field name="partner_id"/>
+                <field name="product_id"/>
+                <field name="quantity"/>
                     <field name="warranty_type"/>
                     <field name="state"/>
                     <field name="unit_cost"/>
@@ -112,10 +113,11 @@
             <field name="name">bhz.rma.order.search</field>
             <field name="model">bhz.rma.order</field>
             <field name="arch" type="xml">
-                <search>
-                    <field name="name"/>
-                    <field name="partner_id"/>
-                    <field name="product_id"/>
+            <search>
+                <field name="name"/>
+                <field name="company_id"/>
+                <field name="partner_id"/>
+                <field name="product_id"/>
                     <field name="warranty_type"/>
                     <field name="state"/>
                     <field name="date_rma"/>
