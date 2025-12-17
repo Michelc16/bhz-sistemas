@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <!-- Local de estoque para produtos em RMA -->
-    <record id="stock_location_rma" model="stock.location">
-        <field name="name">Estoque RMA</field>
-        <field name="usage">internal</field>
-        <field name="location_id" ref="stock.stock_location_stock"/>
-        <field name="company_id" ref="base.main_company"/>
-        <field name="is_rma_location" eval="True"/>
-        <field name="active" eval="True"/>
-    </record>
+    <data>
+        <!-- Local de estoque para produtos em RMA -->
+        <record id="stock_location_rma" model="stock.location">
+            <field name="name">Estoque RMA</field>
+            <field name="usage">internal</field>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="is_rma_location" eval="True"/>
+            <field name="active" eval="True"/>
+        </record>
+    </data>
 </odoo>

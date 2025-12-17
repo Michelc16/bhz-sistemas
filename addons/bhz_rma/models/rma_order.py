@@ -210,6 +210,8 @@ class BhzRMAOrder(models.Model):
 
     def write(self, vals):
         res = super().write(vals)
+        if "company_id" in vals:
+            self._ensure_company_locations()
         if "warranty_type" in vals and not self.env.context.get("skip_rma_defaults"):
             self._apply_defaults_by_warranty_type()
         return res
@@ -239,21 +241,25 @@ class BhzRMAOrder(models.Model):
 
     @api.model
     def _get_allowed_company_ids(self, company):
-        allowed = list(self.env.context.get("allowed_company_ids") or [])
-        if company.id not in allowed:
-            allowed.append(company.id)
-        return allowed
+        allowed = set(self.env.context.get("allowed_company_ids") or [])
+        if company.id:
+            allowed.add(company.id)
+        return list(allowed)
 
     @api.model
     def _get_company_context(self, company):
         return {
-            "force_company": company.id,
             "allowed_company_ids": self._get_allowed_company_ids(company),
         }
 
     @api.model
     def _get_company_warehouse(self, company):
-        Warehouse = self.env["stock.warehouse"].with_context(**self._get_company_context(company)).sudo()
+        Warehouse = (
+            self.env["stock.warehouse"]
+            .with_company(company)
+            .with_context(**self._get_company_context(company))
+            .sudo()
+        )
         warehouse = Warehouse.search([("company_id", "=", company.id)], limit=1)
         if not warehouse:
             raise UserError(
@@ -274,7 +280,12 @@ class BhzRMAOrder(models.Model):
 
     @api.model
     def _ensure_company_rma_location(self, company):
-        Location = self.env["stock.location"].with_context(**self._get_company_context(company)).sudo()
+        Location = (
+            self.env["stock.location"]
+            .with_company(company)
+            .with_context(**self._get_company_context(company))
+            .sudo()
+        )
         rma_location = Location.search(
             [
                 ("company_id", "=", company.id),
@@ -301,18 +312,30 @@ class BhzRMAOrder(models.Model):
 
     @api.model
     def _ensure_scrap_location(self, company):
-        Location = self.env["stock.location"].with_context(**self._get_company_context(company)).sudo()
-        domain = [("scrap_location", "=", True), ("company_id", "=", company.id)]
-        scrap_location = Location.search(domain, limit=1)
-        if not scrap_location:
-            scrap_location = Location.search([("scrap_location", "=", True), ("company_id", "=", False)], limit=1)
+        scrap_location = self.env.ref("stock.stock_location_scrapped", raise_if_not_found=False)
+        if scrap_location and scrap_location.company_id and scrap_location.company_id != company:
+            scrap_location = False
+        if scrap_location:
+            return scrap_location.with_env(self.env)
+
+        Location = (
+            self.env["stock.location"]
+            .with_company(company)
+            .with_context(**self._get_company_context(company))
+            .sudo()
+        )
+        scrap_location = Location.search(
+            [
+                ("company_id", "=", company.id),
+                ("is_rma_scrap_location", "=", True),
+            ],
+            limit=1,
+        )
         if scrap_location:
             return scrap_location.with_env(self.env)
 
         warehouse = self._get_company_warehouse(company)
-        parent_location = warehouse.view_location_id or self.env.ref(
-            "stock.stock_location_locations_virtual", raise_if_not_found=False
-        )
+        parent_location = warehouse.view_location_id or warehouse.lot_stock_id
         if not parent_location:
             raise UserError(
                 _("Configure uma localização pai para criar a sucata da empresa %(company)s.")
@@ -322,9 +345,9 @@ class BhzRMAOrder(models.Model):
             {
                 "name": _("Sucata - %(company)s") % {"company": company.display_name},
                 "usage": "inventory",
-                "scrap_location": True,
                 "company_id": company.id,
                 "location_id": parent_location.id,
+                "is_rma_scrap_location": True,
                 "active": True,
             }
         )
@@ -343,14 +366,14 @@ class BhzRMAOrder(models.Model):
     def _apply_defaults_by_warranty_type(self):
         """
         Ajusta defaults conforme o tipo de garantia:
-        - Garantia do Cliente: finaliza sem movimentar estoque por padrão.
+        - Garantia do Cliente: baixa o item do RMA (sucata) ao solucionar.
         - Garantia do Fornecedor: volta para o estoque padrão ao finalizar.
         - Sem garantia / Produção: baixa do RMA via sucata.
         """
         self._ensure_company_locations()
         for rec in self:
             if rec.warranty_type == "customer":
-                rec.resolution_method = "none"
+                rec.resolution_method = "scrap_from_rma"
             elif rec.warranty_type in ("no_warranty", "production"):
                 rec.resolution_method = "scrap_from_rma"
             else:
@@ -429,11 +452,6 @@ class BhzRMAOrder(models.Model):
         self.ensure_one()
         report_action = self.env.ref("bhz_rma.action_report_bhz_rma_order", raise_if_not_found=False)
         if not report_action:
-            report_action = self.env["ir.actions.report"].search(
-                [("report_name", "=", "bhz_rma.report_rma_document")],
-                limit=1,
-            )
-        if not report_action:
             _logger.error(
                 "RMA report action is missing for order %s (company %s).",
                 self.id,
@@ -511,19 +529,24 @@ class BhzRMAOrder(models.Model):
             )
         return scrap_location
 
-    def _get_customer_location(self):
+    def _get_customer_location(self, partner=None):
         """
         Localização de cliente usada para trocar produto (quando garantia do cliente).
         """
         self.ensure_one()
-        partner = self.partner_id
+        partner = partner or self.partner_id
         if partner and partner.property_stock_customer:
             partner_location = partner.property_stock_customer
-            if partner_location.company_id and partner_location.company_id != self.company_id:
-                partner_location = False
-            else:
+            if not partner_location.company_id or partner_location.company_id == self.company_id:
                 return partner_location
-        Location = self.env["stock.location"].with_context(**self._get_company_context(self.company_id))
+        fallback = self.env.ref("stock.stock_location_customers", raise_if_not_found=False)
+        if fallback and (not fallback.company_id or fallback.company_id == self.company_id):
+            return fallback
+        Location = (
+            self.env["stock.location"]
+            .with_company(self.company_id)
+            .with_context(**self._get_company_context(self.company_id))
+        )
         return Location.search(
             [
                 ("usage", "=", "customer"),
@@ -658,10 +681,8 @@ class BhzRMAOrder(models.Model):
             # Regras adicionais por tipo de garantia
             if rec.warranty_type == "supplier":
                 resolution = "return_to_stock"
-            elif rec.warranty_type in ("no_warranty", "production"):
+            elif rec.warranty_type in ("customer", "no_warranty", "production"):
                 resolution = "scrap_from_rma"
-            elif rec.warranty_type == "customer" and resolution == "return_to_stock":
-                resolution = "none"
 
             if resolution == "return_to_stock":
                 picking = rec._create_picking_rma_to_stock()
