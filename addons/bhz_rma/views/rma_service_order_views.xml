@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="view_bhz_rma_service_order_list" model="ir.ui.view">
+        <field name="name">bhz.rma.service.order.list</field>
+        <field name="model">bhz.rma.service.order</field>
+        <field name="arch" type="xml">
+            <list string="Ordens de Serviço RMA">
+                <field name="name"/>
+                <field name="company_id"/>
+                <field name="rma_id"/>
+                <field name="partner_id"/>
+                <field name="product_id"/>
+                <field name="quantity"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+        <record id="view_bhz_rma_service_order_form" model="ir.ui.view">
+        <field name="name">bhz.rma.service.order.form</field>
+        <field name="model">bhz.rma.service.order</field>
+        <field name="arch" type="xml">
+            <form string="Ordem de Serviço RMA">
+                <header>
+                    <button name="action_start" type="object" string="Iniciar" class="btn-primary"/>
+                    <button name="action_process_exchange" type="object" string="Processar troca" class="btn-success"/>
+                    <button name="action_cancel" type="object" string="Cancelar" class="btn-secondary"/>
+
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,in_progress,done,cancelled"/>
+                </header>
+
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="company_id" readonly="1"/>
+                            <field name="rma_id"/>
+                            <field name="partner_id"/>
+                        </group>
+                        <group>
+                            <field name="product_id"/>
+                            <field name="product_uom_id"/>
+                            <field name="quantity"/>
+                        </group>
+                    </group>
+
+                    <group string="Movimentações de estoque">
+                        <field name="move_new_id" readonly="1"/>
+                        <field name="move_defective_id" readonly="1"/>
+                    </group>
+
+                    <group string="Observações">
+                        <field name="note"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+        <record id="action_bhz_rma_service_order" model="ir.actions.act_window">
+        <field name="name">Ordens de Serviço RMA</field>
+        <field name="res_model">bhz.rma.service.order</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+        <menuitem
+            id="menu_bhz_rma_service_order"
+            name="Ordens de Serviço RMA"
+            parent="menu_bhz_rma_root"
+            action="action_bhz_rma_service_order"
+            sequence="20"
+            groups="stock.group_stock_user"
+        />
+    </data>
+</odoo>

@@ -34,6 +34,85 @@ class MeliOrder(models.Model):
 
     @api.model
     def cron_fetch_orders(self):
+        """Cron que busca pedidos em todas as contas conectadas."""
+        _logger.info("[ML] Iniciando importação de pedidos")
+        total_imported = 0
+        accounts = self.env["meli.account"].sudo().search([("state", "=", "authorized")])
+        if not accounts:
+            _logger.info("[ML] Nenhuma conta autorizada encontrada para importar pedidos")
+            return
+
+        for account in accounts:
+            account_imported = 0
+            try:
+                account.ensure_valid_token()
+            except Exception as exc:
+                _logger.error("[ML] Conta %s: falha ao validar token (%s)", account.name, exc)
+                continue
+
+            if not account.ml_user_id:
+                _logger.warning("[ML] Conta %s sem ml_user_id. Pulei importação.", account.name)
+                continue
+
+            headers = {"Authorization": f"Bearer {account.access_token}"}
+            limit = 50
+            offset = 0
+            while True:
+                params = {
+                    "seller": account.ml_user_id,
+                    "offset": offset,
+                    "limit": limit,
+                }
+                url = "https://api.mercadolibre.com/orders/search"
+                resp = requests.get(url, headers=headers, params=params, timeout=30)
+                if resp.status_code != 200:
+                    _logger.error(
+                        "[ML] Conta %s: erro HTTP %s ao buscar pedidos: %s",
+                        account.name,
+                        resp.status_code,
+                        resp.text,
+                    )
+                    break
+
+                payload = resp.json()
+                results = payload.get("results") or []
+                if not results:
+                    break
+
+                for ml_order in results:
+                    order_id = str(ml_order.get("id"))
+                    exists = self.search(
+                        [("name", "=", order_id), ("account_id", "=", account.id)], limit=1
+                    )
+                    if exists:
+                        continue
+
+                    buyer = ml_order.get("buyer") or {}
+                    vals = {
+                        "name": order_id,
+                        "account_id": account.id,
+                        "buyer_name": buyer.get("nickname") or buyer.get("first_name") or buyer.get("last_name"),
+                        "buyer_email": buyer.get("email"),
+                        "date_created": ml_order.get("date_created"),
+                        "total_amount": ml_order.get("total_amount") or 0.0,
+                        "status": ml_order.get("status"),
+                        "raw_data": ml_order,
+                    }
+                    rec = self.create(vals)
+                    account_imported += 1
+                    total_imported += 1
+                    try:
+                        self._create_sale_order_from_meli(rec)
+                    except Exception:
+                        _logger.exception("[ML] Falha ao criar pedido de venda no Odoo para %s", order_id)
+
+                if len(results) < limit:
+                    break
+                offset += limit
+
+            _logger.info("[ML] Conta %s: %s pedidos importados", account.name, account_imported)
+
+        _logger.info("[ML] Importação de pedidos finalizada. Total importado: %s", total_imported)
         """Cron que busca os últimos pedidos de todas as contas conectadas."""
         accounts = self.env["meli.account"].search([("state", "=", "authorized")])
         for account in accounts:

@@ -1,0 +1,27 @@
+{
+    "name": "BHZ RMA",
+    "summary": "Controle de RMA e estoque de produtos com defeito",
+    "version": "19.0.1.0.0",
+    "category": "Inventory/Inventory",
+    "author": "BHZ Sistemas Desenvolvimento e Tecnologia LTDA",
+    "website": "https://bhzsistemas.com.br",
+    "license": "LGPL-3",
+    "depends": [
+        "stock",
+        "product",
+        "mail",
+    ],
+    "data": [
+        "security/ir.model.access.csv",
+        "data/rma_sequence.xml",
+        "data/rma_location.xml",
+        "report/rma_report.xml",
+        "data/rma_mail_template.xml",
+        "views/rma_menus.xml",
+        "views/rma_views.xml",
+        "views/rma_service_order_views.xml",
+    ],
+    "installable": True,
+    "application": True,
+    "auto_install": False,
+}

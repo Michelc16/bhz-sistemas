@@ -1,0 +1,20 @@
+{
+    "name": "BHZ DRE e CMV",
+    "version": "19.0.1.0.0",
+    "category": "Accounting/Reporting",
+    "summary": "Gere relatórios simples da Demonstração do Resultado",
+    "depends": ["account"],
+    "data": [
+        "security/security.xml",
+        "security/ir.model.access.csv",
+        "views/bhz_dre_template_views.xml",
+        "views/bhz_dre_report_views.xml",
+        "views/bhz_dre_wizard_views.xml",
+        "report/bhz_dre_report_templates.xml",
+        "report/bhz_dre_report_action.xml",
+        "views/bhz_dre_menu.xml",
+    ],
+    "license": "LGPL-3",
+    "installable": True,
+    "application": True,
+}

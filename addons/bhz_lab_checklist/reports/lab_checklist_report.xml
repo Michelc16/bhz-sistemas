@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Ação do relatório -->
+    <record id="action_report_lab_checklist" model="ir.actions.report">
+        <field name="name">Checklist de Laboratório</field>
+        <field name="model">lab.checklist</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">bhz_lab_checklist.report_lab_checklist</field>
+        <field name="report_file">bhz_lab_checklist.report_lab_checklist</field>
+        <field name="print_report_name">'Checklist - %s' % (object.name)</field>
+    </record>
+
+    <!-- Template QWeb do relatório -->
+    <template id="report_lab_checklist">
+        <t t-name="bhz_lab_checklist.report_lab_checklist">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            <h2>Checklist de Laboratório</h2>
+
+                            <p>
+                                <strong>Nome:</strong>
+                                <span t-esc="doc.name"/>
+                            </p>
+                            <p>
+                                <strong>Pedido de Venda:</strong>
+                                <span t-esc="doc.sale_order_id.name or '-'"/>
+                            </p>
+                            <p>
+                                <strong>Linha do Pedido:</strong>
+                                <span t-esc="doc.sale_order_line_id.display_name or '-'"/>
+                            </p>
+                            <p>
+                                <strong>Produto:</strong>
+                                <span t-esc="doc.product_id.display_name or '-'"/>
+                            </p>
+                            <p>
+                                <strong>Template:</strong>
+                                <span t-esc="doc.template_id.name or '-'"/>
+                            </p>
+                            <p>
+                                <strong>Técnico Responsável:</strong>
+                                <span t-esc="doc.technician_id.name or '-'"/>
+                            </p>
+                            <p>
+                                <strong>Status:</strong>
+                                <span t-esc="dict(doc.fields_get(['state'])['state']['selection'])[doc.state]"/>
+                            </p>
+
+                            <h3>Itens de Checklist</h3>
+                            <table class="table table-sm o_main_table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 10%;">Seq.</th>
+                                        <th style="width: 50%;">Item de Verificação</th>
+                                        <th style="width: 10%;">Concluído</th>
+                                        <th style="width: 30%;">Observações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="doc.line_ids" t-as="line">
+                                        <td>
+                                            <span t-esc="line.sequence"/>
+                                        </td>
+                                        <td>
+                                            <span t-esc="line.name"/>
+                                        </td>
+                                        <td>
+                                            <span t-esc="'Sim' if line.done else 'Não'"/>
+                                        </td>
+                                        <td>
+                                            <span t-esc="line.notes or ''"/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <h3>Observações Gerais</h3>
+                            <p t-esc="doc.notes or ''"/>
+
+                            <br/>
+                            <p>
+                                <strong>Data de impressão:</strong>
+                                <!-- usa a última atualização do checklist -->
+                                <span t-esc="doc.write_date or doc.create_date"/>
+                            </p>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

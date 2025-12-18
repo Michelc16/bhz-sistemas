@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- Template do PDF -->
+        <template id="report_rma_document">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <t t-set="report_type" t-value="'pdf'"/>
+                    <main class="oe_structure">
+                        <div class="page">
+                            <h2>
+                                Pedido de RMA -
+                                <span t-esc="doc.name"/>
+                            </h2>
+
+                            <p>
+                                <strong>Data:</strong>
+                                <span t-esc="doc.date_rma"/>
+                            </p>
+
+                            <p>
+                                <strong>Empresa:</strong>
+                                <span t-esc="doc.company_id.name"/>
+                            </p>
+
+                            <p>
+                                <strong>Cliente:</strong>
+                                <span t-esc="doc.partner_id.display_name or ''"/>
+                            </p>
+
+                            <p>
+                                <strong>Tipo de garantia:</strong>
+                                <span t-esc="doc.warranty_type"/>
+                            </p>
+
+                            <h3>Produto</h3>
+                            <p>
+                                <strong>Produto:</strong>
+                                <span t-esc="doc.product_id.display_name"/><br/>
+                                <strong>Quantidade:</strong>
+                                <span t-esc="doc.quantity"/><br/>
+                                <strong>Custo unitário:</strong>
+                                <span t-esc="doc.unit_cost"/><br/>
+                                <strong>Custo total (prejuízo potencial):</strong>
+                                <span t-esc="doc.total_cost"/>
+                            </p>
+
+                            <h3>Locais de estoque</h3>
+                            <p>
+                                <strong>Local de origem:</strong>
+                                <span t-esc="doc.location_id.display_name"/><br/>
+                                <strong>Local de RMA:</strong>
+                                <span t-esc="doc.rma_location_id.display_name"/>
+                            </p>
+
+                            <h3>Observações</h3>
+                            <p t-esc="doc.note or ''"/>
+                        </div>
+                    </main>
+                </t>
+            </t>
+        </template>
+
+        <!-- Ação de relatório -->
+        <report
+            id="action_report_bhz_rma_order"
+            model="bhz.rma.order"
+            string="Pedido de RMA"
+            report_type="qweb-pdf"
+            name="bhz_rma.report_rma_document"
+            file="bhz_rma.report_rma_document"
+            print_report_name="'Pedido de RMA - %s' % (object.name)"
+        />
+    </data>
+</odoo>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="email_template_bhz_rma_order" model="mail.template">
+        <field name="name">Pedido de RMA - BHZ</field>
+
+        <!-- Modelo do RMA -->
+        <field name="model_id" ref="bhz_rma.model_bhz_rma_order"/>
+
+        <!-- Assunto e endereços usando Jinja2 -->
+        <field name="subject">Pedido de RMA {{ object.name }}</field>
+        <field name="email_from">{{ object.company_id.email or '' }}</field>
+        <field name="email_to">{{ object.partner_id.email or '' }}</field>
+
+        <!-- Outras configurações -->
+        <field name="auto_delete">True</field>
+        <field name="lang">{{ object.partner_id.lang or 'pt_BR' }}</field>
+
+        <!-- Corpo do e-mail em QWeb / HTML -->
+        <field name="body_html" type="html">
+            <div style="font-family: Arial, sans-serif; font-size: 14px; color: #333;">
+                <p>
+                    Olá
+                    <t t-if="object.partner_id">
+                        <strong><t t-out="object.partner_id.name"/></strong>
+                    </t>
+                    ,
+                </p>
+
+                <p>
+                    Segue o pedido de RMA número
+                    <strong><t t-out="object.name"/></strong>.
+                </p>
+
+                <p>
+                    <strong>Produto:</strong>
+                    <t t-out="object.product_id.display_name"/><br/>
+                    <strong>Quantidade:</strong>
+                    <t t-out="object.quantity"/><br/>
+                    <strong>Tipo de garantia:</strong>
+                    <t t-out="dict(object._fields['warranty_type'].selection).get(object.warranty_type, '')"/><br/>
+                    <strong>Método de resolução:</strong>
+                    <t t-out="dict(object._fields['resolution_method'].selection).get(object.resolution_method, '')"/><br/>
+                    <strong>Situação:</strong>
+                    <t t-out="object.state"/>
+                </p>
+
+                <p>
+                    O PDF do pedido de RMA segue em anexo (quando configurado).
+                </p>
+
+                <p style="margin-top: 16px;">
+                    Atenciosamente,<br/>
+                    <t t-out="object.company_id.name or ''"/>
+                </p>
+            </div>
+        </field>
+
+        <!-- Nenhum report_template / report_name aqui no Odoo 19 -->
+    </record>
+</odoo>

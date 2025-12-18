@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Ação principal -->
+    <record id="action_lab_checklist" model="ir.actions.act_window">
+        <field name="name">Checklists de Laboratório</field>
+        <field name="res_model">lab.checklist</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p>Aqui você acompanha os checklists de PCs e notebooks vendidos.</p>
+        </field>
+    </record>
+
+    <!-- Menu raiz -->
+    <menuitem id="menu_lab_root"
+              name="Laboratório"
+              sequence="50"/>
+
+    <!-- Submenu -->
+    <menuitem id="menu_lab_checklist"
+              name="Checklists"
+              parent="menu_lab_root"
+              action="action_lab_checklist"
+              sequence="10"/>
+
+    <!-- List view -->
+    <record id="view_lab_checklist_list" model="ir.ui.view">
+        <field name="name">lab.checklist.list</field>
+        <field name="model">lab.checklist</field>
+        <field name="arch" type="xml">
+            <list string="Checklists de Laboratório">
+                <field name="name"/>
+                <field name="sale_order_id"/>
+                <field name="sale_order_line_id"/>
+                <field name="product_id"/>
+                <field name="technician_id"/>
+                <field name="state"/>
+                <field name="create_date"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_lab_checklist_form" model="ir.ui.view">
+        <field name="name">lab.checklist.form</field>
+        <field name="model">lab.checklist</field>
+        <field name="arch" type="xml">
+            <form string="Checklist de Laboratório">
+                <header>
+                    <button name="action_start"
+                            string="Em andamento"
+                            type="object"
+                            class="btn-primary"/>
+                    <button name="action_done"
+                            string="Concluído"
+                            type="object"
+                            class="btn-secondary"/>
+                    <!-- Botão de impressão (chama o report em PDF) -->
+                    <button name="%(bhz_lab_checklist.action_report_lab_checklist)d"
+                            string="Imprimir"
+                            type="action"
+                            class="btn-secondary"/>
+                    <field name="state"
+                           widget="statusbar"
+                           statusbar_visible="draft,in_progress,done"/>
+                </header>
+
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="sale_order_id"/>
+                            <field name="sale_order_line_id"/>
+                            <field name="product_id"/>
+                        </group>
+                        <group>
+                            <field name="template_id" readonly="1"/>
+                            <field name="technician_id"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Itens de Checklist">
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="sequence"/>
+                                    <field name="name"/>
+                                    <field name="done"/>
+                                    <field name="notes"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Observações">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Ação principal da lista de Contas WhatsApp -->
+    <record id="action_bhz_wa_account" model="ir.actions.act_window">
+        <field name="name">Contas WhatsApp</field>
+        <field name="res_model">bhz.wa.account</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crie uma conta WhatsApp para conectar seu número ao BHZ WhatsApp.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu raiz do módulo BHZ WhatsApp -->
+    <menuitem
+        id="menu_bhz_wa_root"
+        name="BHZ WhatsApp"
+        parent="base.menu_custom"
+        sequence="10"
+    />
+
+    <!-- Menu de Contas WhatsApp, usando a action definida acima -->
+    <menuitem
+        id="menu_bhz_wa_account"
+        name="Contas WhatsApp"
+        parent="menu_bhz_wa_root"
+        action="action_bhz_wa_account"
+        sequence="10"
+    />
+
+    <menuitem
+        id="menu_bhz_wa_session"
+        name="Sessões (Starter)"
+        parent="menu_bhz_wa_root"
+        action="action_bhz_wa_session"
+        sequence="20"
+    />
+
+    <menuitem
+        id="menu_bhz_wa_message"
+        name="Caixa de Entrada"
+        parent="menu_bhz_wa_root"
+        action="action_bhz_wa_message"
+        sequence="30"
+    />
+
+</odoo>

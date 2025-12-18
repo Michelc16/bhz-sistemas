@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Template genérico -->
+    <record id="lab_checklist_template_generic" model="lab.checklist.template">
+        <field name="name">Checklist Genérico de Equipamento</field>
+        <field name="equipment_type">generic</field>
+    </record>
+
+    <record id="lab_checklist_template_generic_item_1" model="lab.checklist.template.line">
+        <field name="template_id" ref="lab_checklist_template_generic"/>
+        <field name="sequence">10</field>
+        <field name="name">Conferir número de série e etiqueta interna</field>
+    </record>
+
+    <record id="lab_checklist_template_generic_item_2" model="lab.checklist.template.line">
+        <field name="template_id" ref="lab_checklist_template_generic"/>
+        <field name="sequence">20</field>
+        <field name="name">Testar liga/desliga (power) e estabilidade inicial</field>
+    </record>
+
+    <!-- Template para Computador (Desktop) -->
+    <record id="lab_checklist_template_desktop" model="lab.checklist.template">
+        <field name="name">Checklist Computador Desktop</field>
+        <field name="equipment_type">desktop</field>
+    </record>
+
+    <record id="lab_checklist_template_desktop_item_1" model="lab.checklist.template.line">
+        <field name="template_id" ref="lab_checklist_template_desktop"/>
+        <field name="sequence">10</field>
+        <field name="name">Conferir processador, memória e armazenamento conforme pedido</field>
+    </record>
+
+    <record id="lab_checklist_template_desktop_item_2" model="lab.checklist.template.line">
+        <field name="template_id" ref="lab_checklist_template_desktop"/>
+        <field name="sequence">20</field>
+        <field name="name">Testar todas as portas USB, HDMI/Display e rede</field>
+    </record>
+
+    <record id="lab_checklist_template_desktop_item_3" model="lab.checklist.template.line">
+        <field name="template_id" ref="lab_checklist_template_desktop"/>
+        <field name="sequence">30</field>
+        <field name="name">Rodar teste de estresse rápido (CPU/RAM) e verificar temperatura</field>
+    </record>
+
+    <!-- Template para Notebook -->
+    <record id="lab_checklist_template_notebook" model="lab.checklist.template">
+        <field name="name">Checklist Notebook</field>
+        <field name="equipment_type">notebook</field>
+    </record>
+
+    <record id="lab_checklist_template_notebook_item_1" model="lab.checklist.template.line">
+        <field name="template_id" ref="lab_checklist_template_notebook"/>
+        <field name="sequence">10</field>
+        <field name="name">Conferir tela (pixels, brilho, manchas) e dobradiças</field>
+    </record>
+
+    <record id="lab_checklist_template_notebook_item_2" model="lab.checklist.template.line">
+        <field name="template_id" ref="lab_checklist_template_notebook"/>
+        <field name="sequence">20</field>
+        <field name="name">Testar teclado, touchpad e portas USB/HDMI</field>
+    </record>
+
+    <record id="lab_checklist_template_notebook_item_3" model="lab.checklist.template.line">
+        <field name="template_id" ref="lab_checklist_template_notebook"/>
+        <field name="sequence">30</field>
+        <field name="name">Testar bateria (carregamento e descarga rápida)</field>
+    </record>
+</odoo>

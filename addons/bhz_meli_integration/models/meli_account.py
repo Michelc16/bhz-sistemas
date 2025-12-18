@@ -1,3 +1,4 @@
+import datetime
 import logging
 import requests
 from odoo import api, fields, models, _
@@ -68,6 +69,27 @@ class MeliAccount(models.Model):
             "url": url,
         }
 
+    def _store_token_payload(self, payload, code=None):
+        expires_in = int(payload.get("expires_in") or 0)
+        expire_dt = fields.Datetime.now() + datetime.timedelta(seconds=max(expires_in - 60, 0))
+        vals = {
+            "access_token": payload.get("access_token"),
+            "refresh_token": payload.get("refresh_token") or self.refresh_token,
+            "token_expires_in": expire_dt,
+        }
+        if code:
+            vals["authorization_code"] = code
+        self.write(vals)
+
+    def ensure_valid_token(self):
+        """Garante que o token esteja válido antes de chamar a API."""
+        self.ensure_one()
+        if not self.access_token:
+            raise UserError(_("Conta Mercado Livre sem access token. Conecte novamente."))
+        if not self.token_expires_in or fields.Datetime.now() >= self.token_expires_in:
+            _logger.info("Token ML expirado para a conta %s. Renovando...", self.name)
+            self.refresh_access_token()
+
     def exchange_code_for_token(self, code):
         """Troca o code que o ML devolve por access_token e salva na conta."""
         self.ensure_one()
@@ -84,6 +106,8 @@ class MeliAccount(models.Model):
             raise UserError(_("Erro ao autenticar no Mercado Livre: %s") % resp.text)
 
         payload = resp.json()
+        self._store_token_payload(payload, code=code)
+        self.state = "authorized"
         self.write({
             "access_token": payload.get("access_token"),
             "refresh_token": payload.get("refresh_token"),
@@ -116,6 +140,7 @@ class MeliAccount(models.Model):
             raise UserError(_("Erro ao renovar token do Mercado Livre: %s") % resp.text)
 
         payload = resp.json()
+        self._store_token_payload(payload)
         self.write({
             "access_token": payload.get("access_token"),
             "refresh_token": payload.get("refresh_token") or self.refresh_token,

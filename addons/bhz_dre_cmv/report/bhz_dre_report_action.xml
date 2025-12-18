@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <report
+        id="action_bhz_dre_print_report"
+        model="bhz.dre.report"
+        string="DRE BHZ"
+        report_type="qweb-pdf"
+        name="bhz_dre_cmv.bhz_dre_report_document"
+        file="bhz_dre_cmv.bhz_dre_report_document"
+    />
+
+</odoo>
