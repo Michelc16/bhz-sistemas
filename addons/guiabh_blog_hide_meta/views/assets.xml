@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="guiabh_blog_hide_meta_assets" inherit_id="web.assets_frontend" name="GUIA BH Blog Hide Meta Assets">
+        <xpath expr="." position="inside">
+            <link rel="stylesheet/scss" href="/guiabh_blog_hide_meta/static/src/scss/blog_hide_meta.scss"/>
+        </xpath>
+    </template>
+</odoo>
