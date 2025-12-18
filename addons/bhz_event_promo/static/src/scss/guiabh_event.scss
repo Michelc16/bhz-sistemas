@@ -1,0 +1,16 @@
+.guiabh-agenda {
+  .guiabh-event-card {
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .guiabh-cover {
+    height: 190px;
+    object-fit: cover;
+  }
+
+  .guiabh-cover.placeholder {
+    height: 190px;
+    background: rgba(255,255,255,.06);
+  }
+}

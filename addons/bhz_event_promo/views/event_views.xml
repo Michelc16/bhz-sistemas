@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_event_form_inherit_guiabh_promo" model="ir.ui.view">
+        <field name="name">event.event.form.guiabh.promo</field>
+        <field name="model">event.event</field>
+        <field name="inherit_id" ref="event.view_event_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Aba extra para o seu “modo Guia BH” -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Divulgação (Guia BH)">
+                    <group>
+                        <group>
+                            <field name="show_on_public_agenda"/>
+                            <field name="promo_category_id"/>
+                            <field name="promo_short_description"/>
+                        </group>
+                        <group>
+                            <field name="promo_cover_image" widget="image" class="oe_avatar"/>
+                        </group>
+                    </group>
+
+                    <separator string="Evento de terceiros"/>
+                    <group>
+                        <field name="is_third_party"/>
+                        <field name="third_party_name" attrs="{'invisible':[('is_third_party','=',False)]}"/>
+                        <field name="third_party_partner_id" attrs="{'invisible':[('is_third_party','=',False)]}"/>
+                    </group>
+
+                    <separator string="Botão de inscrição"/>
+                    <group>
+                        <field name="registration_mode"/>
+                        <field name="registration_button_label"/>
+                        <field name="registration_external_url"
+                               attrs="{'required':[('registration_mode','=','external')],
+                                       'invisible':[('registration_mode','!=','external')]}"/>
+                    </group>
+                </page>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>

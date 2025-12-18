@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Página Agenda -->
+    <template id="guiabh_agenda_page" name="GuiaBH Agenda">
+        <t t-call="website.layout">
+            <div class="container mt-4 mb-5 guiabh-agenda">
+                <div class="row mb-3 align-items-center">
+                    <div class="col-12 col-lg-7">
+                        <h1 class="mb-1">Agenda de Eventos</h1>
+                        <p class="text-muted mb-0">Encontre shows, festivais, teatro, congressos e muito mais.</p>
+                    </div>
+
+                    <div class="col-12 col-lg-5 mt-3 mt-lg-0">
+                        <form method="get" action="/agenda" class="d-flex gap-2">
+                            <select name="category" class="form-select">
+                                <option value="">Todas as categorias</option>
+                                <t t-foreach="categories" t-as="cat">
+                                    <option t-att-value="cat.id" t-att-selected="active_category == cat.id">
+                                        <t t-esc="cat.name"/>
+                                    </option>
+                                </t>
+                            </select>
+                            <input type="text" name="search" class="form-control" placeholder="Buscar evento..." t-att-value="search"/>
+                            <button class="btn btn-primary" type="submit">Filtrar</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <t t-if="not events">
+                        <div class="col-12">
+                            <div class="alert alert-info mb-0">Nenhum evento encontrado para esse filtro.</div>
+                        </div>
+                    </t>
+
+                    <t t-foreach="events" t-as="ev">
+                        <div class="col-12 col-md-6 col-lg-4">
+                            <div class="card h-100 guiabh-event-card">
+
+                                <!-- Capa -->
+                                <t t-if="ev.promo_cover_image">
+                                    <img class="card-img-top guiabh-cover"
+                                         t-att-src="'/web/image/event.event/%s/promo_cover_image' % ev.id"
+                                         t-att-alt="ev.name"/>
+                                </t>
+                                <t t-else="">
+                                    <div class="guiabh-cover placeholder"></div>
+                                </t>
+
+                                <div class="card-body d-flex flex-column">
+                                    <div class="d-flex justify-content-between align-items-start gap-2">
+                                        <h5 class="card-title mb-1">
+                                            <a t-att-href="ev.website_url" class="text-decoration-none">
+                                                <t t-esc="ev.name"/>
+                                            </a>
+                                        </h5>
+                                    </div>
+
+                                    <p class="text-muted mb-2">
+                                        <t t-esc="ev.date_begin.strftime('%d/%m/%Y %H:%M') if ev.date_begin else ''"/>
+                                        <t t-if="ev.address_id and ev.address_id.city"> • <t t-esc="ev.address_id.city"/></t>
+                                    </p>
+
+                                    <t t-if="ev.promo_short_description">
+                                        <p class="mb-2"><t t-esc="ev.promo_short_description"/></p>
+                                    </t>
+
+                                    <t t-if="ev.is_third_party">
+                                        <p class="small text-muted mb-3">
+                                            Evento de terceiros
+                                            <t t-if="ev.third_party_name"> • <t t-esc="ev.third_party_name"/></t>
+                                        </p>
+                                    </t>
+
+                                    <div class="mt-auto d-flex gap-2">
+                                        <!-- Botão principal custom -->
+                                        <t t-if="ev.registration_mode == 'external' and ev.registration_external_url">
+                                            <a class="btn btn-primary w-100"
+                                               t-att-href="ev.registration_external_url"
+                                               target="_blank" rel="noopener">
+                                                <t t-esc="ev.registration_button_label or 'Inscrever-se'"/>
+                                            </a>
+                                        </t>
+                                        <t t-else="">
+                                            <!-- Interno: leva para a página do evento (lá você pode usar o fluxo padrão de inscrição/venda) -->
+                                            <a class="btn btn-primary w-100" t-att-href="ev.website_url">
+                                                <t t-esc="ev.registration_button_label or 'Inscrever-se'"/>
+                                            </a>
+                                        </t>
+
+                                        <a class="btn btn-outline-secondary" t-att-href="ev.website_url">Detalhes</a>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Override leve: botão de inscrição NA PÁGINA DO EVENTO também respeitar o modo externo -->
+    <template id="website_event_event_register_inherit_guiabh"
+              inherit_id="website_event.event_description_full">
+        <!-- A ideia aqui é substituir o botão padrão (quando existir) por um que respeita seu modo -->
+        <xpath expr="//a[contains(@class,'btn') and (contains(@href,'/event/') or contains(@href,'/event/register'))][1]"
+               position="replace">
+            <t t-if="event.registration_mode == 'external' and event.registration_external_url">
+                <a class="btn btn-primary"
+                   t-att-href="event.registration_external_url"
+                   target="_blank" rel="noopener">
+                    <t t-esc="event.registration_button_label or 'Inscrever-se'"/>
+                </a>
+            </t>
+            <t t-else="">
+                <a class="btn btn-primary" t-att-href="event.website_url">
+                    <t t-esc="event.registration_button_label or 'Inscrever-se'"/>
+                </a>
+            </t>
+        </xpath>
+    </template>
+
+</odoo>
