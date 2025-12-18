@@ -113,6 +113,42 @@ class MeliOrder(models.Model):
             _logger.info("[ML] Conta %s: %s pedidos importados", account.name, account_imported)
 
         _logger.info("[ML] Importação de pedidos finalizada. Total importado: %s", total_imported)
+        """Cron que busca os últimos pedidos de todas as contas conectadas."""
+        accounts = self.env["meli.account"].search([("state", "=", "authorized")])
+        for account in accounts:
+            try:
+                account.refresh_access_token()
+            except Exception:
+                _logger.exception("Não foi possível renovar token da conta %s", account.name)
+                continue
+
+            url = f"https://api.mercadolibre.com/orders/search?seller={account.ml_user_id}&order.status=paid"
+            headers = {"Authorization": f"Bearer {account.access_token}"}
+            resp = requests.get(url, headers=headers, timeout=30)
+            if resp.status_code != 200:
+                _logger.error("Erro ao buscar pedidos ML conta %s: %s", account.name, resp.text)
+                continue
+
+            payload = resp.json()
+            for ml_order in payload.get("results", []):
+                order_id = str(ml_order.get("id"))
+                exists = self.search([("name", "=", order_id), ("account_id", "=", account.id)], limit=1)
+                if exists:
+                    continue
+
+                buyer = ml_order.get("buyer", {})
+                vals = {
+                    "name": order_id,
+                    "account_id": account.id,
+                    "buyer_name": buyer.get("nickname") or buyer.get("first_name"),
+                    "buyer_email": buyer.get("email"),
+                    "date_created": ml_order.get("date_created"),
+                    "total_amount": ml_order.get("total_amount"),
+                    "status": ml_order.get("status"),
+                    "raw_data": ml_order,
+                }
+                rec = self.create(vals)
+                self._create_sale_order_from_meli(rec)
 
     def _create_sale_order_from_meli(self, meli_order):
         """Cria um sale.order simples a partir do pedido ML."""

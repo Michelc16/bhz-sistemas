@@ -108,6 +108,12 @@ class MeliAccount(models.Model):
         payload = resp.json()
         self._store_token_payload(payload, code=code)
         self.state = "authorized"
+        self.write({
+            "access_token": payload.get("access_token"),
+            "refresh_token": payload.get("refresh_token"),
+            "authorization_code": code,
+            "state": "authorized",
+        })
 
         # pega dados do usuário do ML
         headers = {"Authorization": f"Bearer {self.access_token}"}
@@ -135,4 +141,8 @@ class MeliAccount(models.Model):
 
         payload = resp.json()
         self._store_token_payload(payload)
+        self.write({
+            "access_token": payload.get("access_token"),
+            "refresh_token": payload.get("refresh_token") or self.refresh_token,
+        })
         return True
