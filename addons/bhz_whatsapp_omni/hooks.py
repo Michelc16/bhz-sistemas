@@ -1,14 +1,24 @@
 import os
 
+from odoo import SUPERUSER_ID
+from odoo.api import Environment
 
-def post_init_set_starter_defaults(cr, registry):
+
+def _ensure_env(env_or_cr):
+    """Compat layer allowing env or (cr, registry) signature."""
+    if isinstance(env_or_cr, Environment):
+        if env_or_cr.uid != SUPERUSER_ID:
+            return env_or_cr(env_or_cr.cr, SUPERUSER_ID, env_or_cr.context)
+        return env_or_cr
+    return Environment(env_or_cr, SUPERUSER_ID, {})
+
+
+def post_init_set_starter_defaults(env_or_cr, registry=None):
     """
     Configura automaticamente os parâmetros do serviço Starter
     durante a instalação ou upgrade do módulo.
     """
-    from odoo.api import Environment
-
-    env = Environment(cr, 1, {})
+    env = _ensure_env(env_or_cr)
     icp = env['ir.config_parameter'].sudo()
 
     # Lê variáveis de ambiente enviadas pelo Render
