@@ -6,8 +6,8 @@
     <!-- View pai correta no Odoo 19 -->
     <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
     <field name="arch" type="xml">
-      <!-- Insere após o último bloco padrão -->
-      <xpath expr="//div[contains(@class,'app_settings_block')][last()]" position="after">
+      <!-- Insere bloco customizado diretamente no sheet para evitar xpath frágil -->
+      <xpath expr="//sheet" position="inside">
         <div class="app_settings_block" string="BHZ WhatsApp" data-string="BHZ WhatsApp">
           <h2>BHZ WhatsApp</h2>
           <div class="row mt16 o_settings_container">
