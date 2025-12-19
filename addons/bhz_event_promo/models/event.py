@@ -42,6 +42,36 @@ class EventEvent(models.Model):
         string="Chamada curta (lista/agenda)",
         help="Linha curta para a lista (ex.: 'Return to South America 2026')",
     )
+    age_rating = fields.Selection(
+        [
+            ("l", "Livre"),
+            ("10", "10 anos"),
+            ("12", "12 anos"),
+            ("14", "14 anos"),
+            ("16", "16 anos"),
+            ("18", "18 anos"),
+        ],
+        string="Classificação indicativa",
+        default="l",
+    )
+    is_accessible_pcd = fields.Boolean(string="Acessível para PCD", default=False)
+    producer_name = fields.Char(string="Produtor / Realização")
+    is_featured = fields.Boolean(string="Destaque na agenda", default=False)
+    is_sponsored = fields.Boolean(string="Patrocinado", default=False)
+    ticket_kind = fields.Selection(
+        [
+            ("unknown", "Não informado"),
+            ("free", "Gratuito"),
+            ("paid", "Pago"),
+        ],
+        string="Tipo de ingresso",
+        default="unknown",
+    )
+    venue_partner_id = fields.Many2one(
+        "res.partner",
+        string="Local / Casa do evento",
+    )
+    neighborhood = fields.Char(string="Bairro")
 
     promo_category_id = fields.Many2one(
         "event.type",

@@ -13,4 +13,50 @@
     height: 190px;
     background: rgba(255,255,255,.06);
   }
+
+  .guiabh-view-tabs .nav-link {
+    border-radius: 999px;
+    color: var(--bs-body-color);
+    &.active {
+      background-color: var(--bs-primary);
+      color: #fff;
+    }
+  }
+
+  .guiabh-badges .badge {
+    font-size: 0.75rem;
+    letter-spacing: 0.02em;
+  }
+
+  .guiabh-filters select[multiple] {
+    min-height: 110px;
+  }
+
+  .guiabh-calendar {
+    .table {
+      background: rgba(0, 0, 0, 0.02);
+    }
+    td {
+      height: 120px;
+      vertical-align: top;
+      padding: 0.5rem;
+    }
+    .guiabh-calendar-events {
+      margin: 0;
+      padding-left: 0;
+      li {
+        text-align: left;
+        font-size: 0.85rem;
+        line-height: 1.2;
+        margin-bottom: 0.25rem;
+      }
+    }
+  }
+
+  .guiabh-week-card {
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    padding: 1rem;
+    background-color: rgba(255, 255, 255, 0.7);
+  }
 }

@@ -13,10 +13,11 @@
         "views/event_views.xml",
         "views/website_menu.xml",
         "views/templates.xml",
+        "views/bhz_event_import_views.xml",
     ],
     "assets": {
         "web.assets_frontend": [
-            "guiabh_event_promo/static/src/scss/guiabh_event.scss",
+            "bhz_event_promo/static/src/scss/guiabh_event.scss",
         ],
     },
     "installable": True,

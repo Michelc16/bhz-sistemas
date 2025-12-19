@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_bhz_event_import_wizard" model="ir.ui.view">
+        <field name="name">bhz.event.import.wizard.form</field>
+        <field name="model">bhz.event.import.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Importar eventos (Guia BH)">
+                <sheet>
+                    <div class="alert alert-info">
+                        Os arquivos CSV devem conter as colunas:
+                        <code>name,date_begin,date_end,external_url,button_label,category,neighborhood,venue,ticket_kind,age_rating,producer_name,is_accessible_pcd</code>.
+                        O ICS deve seguir o padrão iCal com SUMMARY/DTSTART/DTEND/LOCATION.
+                    </div>
+                    <group>
+                        <group string="Importar via arquivo">
+                            <field name="csv_file" filename="csv_filename"/>
+                            <field name="ics_file" filename="ics_filename"/>
+                        </group>
+                        <group string="Importar via link">
+                            <field name="link_url"/>
+                            <field name="link_format"/>
+                            <field name="default_button_label"/>
+                        </group>
+                    </group>
+                </sheet>
+                <footer>
+                    <button string="Importar" type="object" name="action_import" class="btn btn-primary"/>
+                    <button string="Cancelar" special="cancel" class="btn btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bhz_event_import_wizard" model="ir.actions.act_window">
+        <field name="name">Importar eventos (Guia BH)</field>
+        <field name="res_model">bhz.event.import.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_bhz_event_import_wizard"/>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem
+        id="menu_bhz_event_import_wizard"
+        name="Importar (Guia BH)"
+        parent="event.menu_event_config"
+        action="action_bhz_event_import_wizard"
+        sequence="45"
+        groups="event.group_event_manager"/>
+
+</odoo>

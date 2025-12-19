@@ -34,6 +34,26 @@
                         <field name="registration_external_url"
                                modifiers="{'required': [('registration_mode', '=', 'external')], 'invisible': [('registration_mode', '!=', 'external')]}"/>
                     </group>
+
+                    <separator string="Tags e Destaques"/>
+                    <group>
+                        <group>
+                            <field name="is_featured"/>
+                            <field name="is_sponsored"/>
+                            <field name="ticket_kind"/>
+                        </group>
+                        <group>
+                            <field name="age_rating"/>
+                            <field name="is_accessible_pcd"/>
+                            <field name="producer_name"/>
+                        </group>
+                    </group>
+
+                    <separator string="Local / Bairro"/>
+                    <group>
+                        <field name="venue_partner_id"/>
+                        <field name="neighborhood"/>
+                    </group>
                 </page>
             </xpath>
 
