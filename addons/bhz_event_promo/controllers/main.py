@@ -7,6 +7,7 @@ from babel.dates import format_date
 from werkzeug.urls import url_encode
 
 from odoo import fields, http
+from odoo.addons.http_routing.models.ir_http import slug
 from odoo.http import request
 
 
@@ -67,6 +68,7 @@ class GuiaBHAgendaController(http.Controller):
             "view_urls": view_urls,
             "base_query": base_params,
             "multi_query": multi_params,
+            "slug": slug,
         }
 
         if filters["view"] == self.MONTH_VIEW:
@@ -77,6 +79,22 @@ class GuiaBHAgendaController(http.Controller):
             context.update({"week_info": week_info})
 
         return request.render("guiabh_event_promo.guiabh_agenda_page", context)
+
+    @http.route(
+        ["/agenda/event/<model('event.event'):event>"],
+        type="http",
+        auth="public",
+        website=True,
+    )
+    def guiabh_event_detail(self, event, **kwargs):
+        event = event.sudo()
+        return request.render(
+            "guiabh_event_promo.bhz_event_detail",
+            {
+                "event": event,
+                "slug": slug,
+            },
+        )
 
     def _extract_filters(self, category_record=None):
         args = request.httprequest.args

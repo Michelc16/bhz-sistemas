@@ -64,3 +64,17 @@
 .bhz-ext-register {
   max-width: 760px;
 }
+
+.bhz-event-detail {
+  .bhz-event-detail-cover {
+    max-height: 420px;
+    object-fit: cover;
+    width: 100%;
+  }
+  .bhz-badges .badge {
+    font-size: 0.85rem;
+  }
+  .bhz-event-description p {
+    line-height: 1.6;
+  }
+}

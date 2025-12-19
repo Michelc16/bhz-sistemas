@@ -116,7 +116,7 @@
                                     <div class="card-body d-flex flex-column">
                                         <div class="d-flex justify-content-between align-items-start gap-2">
                                             <h5 class="card-title mb-1">
-                                                <a t-att-href="ev.website_url" class="text-decoration-none">
+                                                <a t-att-href="'/agenda/event/%s' % slug(ev)" class="text-decoration-none">
                                                     <t t-esc="ev.name"/>
                                                 </a>
                                             </h5>
@@ -159,13 +159,14 @@
                                                 </a>
                                             </t>
                                             <t t-else="">
-                                                <!-- Interno: leva para a página do evento (lá você pode usar o fluxo padrão de inscrição/venda) -->
-                                                <a class="btn btn-primary w-100" t-att-href="ev.website_url">
+                                                <a class="btn btn-primary w-100"
+                                                   t-att-href="'/agenda/event/%s' % slug(ev)">
                                                     <t t-esc="ev.registration_button_label or 'Inscrever-se'"/>
                                                 </a>
                                             </t>
 
-                                            <a class="btn btn-outline-secondary" t-att-href="ev.website_url">Detalhes</a>
+                                            <a class="btn btn-outline-secondary"
+                                               t-att-href="'/agenda/event/%s' % slug(ev)">Detalhes</a>
                                         </div>
 
                                     </div>
@@ -184,21 +185,6 @@
                 </t>
             </div>
         </t>
-    </template>
-
-    <template id="bhz_event_external_register_button_safe"
-              inherit_id="website_event.event_description_full">
-        <xpath expr="//main" position="inside">
-            <t t-if="event and event.registration_mode == 'external' and event.registration_external_url">
-                <div class="container my-3 bhz-ext-register">
-                    <a class="btn btn-primary btn-lg w-100"
-                       t-att-href="event.registration_external_url"
-                       target="_blank" rel="noopener">
-                        <t t-esc="event.registration_button_label or 'Inscrever-se'"/>
-                    </a>
-                </div>
-            </t>
-        </xpath>
     </template>
 
     <template id="bhz_agenda_month">
@@ -231,7 +217,7 @@
                                             <ul class="list-unstyled guiabh-calendar-events">
                                                 <t t-foreach="day.get('events')" t-as="ev">
                                                     <li>
-                                                        <a t-att-href="ev.website_url">
+                                                        <a t-att-href="'/agenda/event/%s' % slug(ev)">
                                                             <t t-esc="ev.name"/>
                                                         </a>
                                                     </li>
@@ -268,7 +254,7 @@
                                 <ul class="list-unstyled mb-0">
                                     <t t-foreach="day.get('events')" t-as="ev">
                                         <li class="mb-2">
-                                            <a t-att-href="ev.website_url" class="fw-semibold d-block">
+                                            <a t-att-href="'/agenda/event/%s' % slug(ev)" class="fw-semibold d-block">
                                                 <t t-esc="ev.name"/>
                                             </a>
                                             <small class="text-muted">
@@ -303,6 +289,66 @@
                 <t t-esc="dict([('l','Livre'),('10','10+'),('12','12+'),('14','14+'),('16','16+'),('18','18+')]).get(event.age_rating, 'Livre')"/>
             </span>
         </div>
+    </template>
+
+    <template id="bhz_event_detail" name="GuiaBH Event Detail">
+        <t t-call="website.layout">
+            <div class="container py-5 bhz-event-detail">
+                <a href="/agenda" class="btn btn-link mb-3">&larr; Voltar para Agenda</a>
+                <div class="bg-white shadow-sm rounded-4 p-4">
+                    <t t-if="event.promo_cover_image">
+                        <img class="img-fluid rounded-4 mb-4 bhz-event-detail-cover"
+                             t-att-src="'/web/image/event.event/%s/promo_cover_image' % event.id"
+                             t-att-alt="event.name"/>
+                    </t>
+                    <h1 class="mb-3"><t t-esc="event.name"/></h1>
+                    <t t-call="guiabh_event_promo.bhz_event_badges"/>
+                    <p class="text-muted">
+                        <t t-if="event.date_begin">
+                            <t t-esc="event.date_begin.strftime('%d/%m/%Y %H:%M')"/>
+                            <t t-if="event.date_end"> - <t t-esc="event.date_end.strftime('%d/%m/%Y %H:%M')"/></t>
+                        </t>
+                        <br/>
+                        <t t-if="event.venue_partner_id">
+                            <strong><t t-esc="event.venue_partner_id.name"/></strong>
+                        </t>
+                        <t t-if="event.address_id and event.address_id.city">
+                            • <t t-esc="event.address_id.city"/>
+                        </t>
+                        <t t-if="event.neighborhood">
+                            • <t t-esc="event.neighborhood"/>
+                        </t>
+                    </p>
+                    <div class="my-4">
+                        <t t-if="event.registration_mode == 'external' and event.registration_external_url">
+                            <a class="btn btn-primary btn-lg bhz-ext-register w-100"
+                               t-att-href="event.registration_external_url"
+                               rel="noopener"
+                               target="_blank">
+                                <t t-esc="event.registration_button_label or 'Inscrever-se'"/>
+                            </a>
+                        </t>
+                        <t t-else="">
+                            <a class="btn btn-primary btn-lg bhz-ext-register w-100"
+                               t-att-href="event.website_url">
+                                <t t-esc="event.registration_button_label or 'Inscrever-se'"/>
+                            </a>
+                        </t>
+                    </div>
+                    <div class="bhz-event-description">
+                        <t t-if="event.description">
+                            <t t-raw="event.description"/>
+                        </t>
+                        <t t-elif="event.subtitle">
+                            <p><t t-esc="event.subtitle"/></p>
+                        </t>
+                        <t t-elif="event.promo_short_description">
+                            <p><t t-esc="event.promo_short_description"/></p>
+                        </t>
+                    </div>
+                </div>
+            </div>
+        </t>
     </template>
 
 </odoo>
