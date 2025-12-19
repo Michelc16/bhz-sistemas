@@ -295,7 +295,7 @@
     <template id="bhz_event_detail" name="GuiaBH Event Detail">
         <t t-call="website.layout">
             <div class="container py-5 bhz-event-detail">
-                <a href="/agenda" class="btn btn-link mb-3">&larr; Voltar para Agenda</a>
+                <a href="/agenda" class="btn btn-link mb-3">&#8592; Voltar para Agenda</a>
                 <div class="bg-white shadow-sm rounded-4 p-4">
                     <t t-if="event.promo_cover_image">
                         <img class="img-fluid rounded-4 mb-4 bhz-event-detail-cover"
