@@ -105,8 +105,7 @@
     <template id="website_event_event_register_inherit_guiabh"
               inherit_id="website_event.event_description_full">
         <!-- A ideia aqui é substituir o botão padrão (quando existir) por um que respeita seu modo -->
-        <xpath expr="//a[contains(@class,'btn') and (contains(@href,'/event/') or contains(@href,'/event/register'))][1]"
-               position="replace">
+        <xpath expr="//a[contains(@class,'btn') and contains(@href, '/event/')][1]" position="replace">
             <t t-if="event.registration_mode == 'external' and event.registration_external_url">
                 <a class="btn btn-primary"
                    t-att-href="event.registration_external_url"
