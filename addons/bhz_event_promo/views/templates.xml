@@ -100,6 +100,7 @@
                         </t>
 
                         <t t-foreach="events" t-as="ev">
+                            <t t-set="detail_url" t-value="'/agenda/event/%s' % ev.id"/>
                             <div class="col-12 col-md-6 col-lg-4">
                                 <div class="card h-100 guiabh-event-card">
 
@@ -116,7 +117,7 @@
                                     <div class="card-body d-flex flex-column">
                                         <div class="d-flex justify-content-between align-items-start gap-2">
                                             <h5 class="card-title mb-1">
-                                                <a t-att-href="'/agenda/event/%s' % slug(ev)" class="text-decoration-none">
+                                                <a t-att-href="detail_url" class="text-decoration-none">
                                                     <t t-esc="ev.name"/>
                                                 </a>
                                             </h5>
@@ -160,13 +161,13 @@
                                             </t>
                                             <t t-else="">
                                                 <a class="btn btn-primary w-100"
-                                                   t-att-href="'/agenda/event/%s' % slug(ev)">
+                                                   t-att-href="detail_url">
                                                     <t t-esc="ev.registration_button_label or 'Inscrever-se'"/>
                                                 </a>
                                             </t>
 
                                             <a class="btn btn-outline-secondary"
-                                               t-att-href="'/agenda/event/%s' % slug(ev)">Detalhes</a>
+                                               t-att-href="detail_url">Detalhes</a>
                                         </div>
 
                                     </div>
@@ -217,7 +218,7 @@
                                             <ul class="list-unstyled guiabh-calendar-events">
                                                 <t t-foreach="day.get('events')" t-as="ev">
                                                     <li>
-                                                        <a t-att-href="'/agenda/event/%s' % slug(ev)">
+                                                        <a t-att-href="'/agenda/event/%s' % ev.id">
                                                             <t t-esc="ev.name"/>
                                                         </a>
                                                     </li>
@@ -254,7 +255,7 @@
                                 <ul class="list-unstyled mb-0">
                                     <t t-foreach="day.get('events')" t-as="ev">
                                         <li class="mb-2">
-                                            <a t-att-href="'/agenda/event/%s' % slug(ev)" class="fw-semibold d-block">
+                                            <a t-att-href="'/agenda/event/%s' % ev.id" class="fw-semibold d-block">
                                                 <t t-esc="ev.name"/>
                                             </a>
                                             <small class="text-muted">
