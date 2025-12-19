@@ -107,17 +107,16 @@
         <!-- A ideia aqui é substituir o botão padrão (quando existir) por um que respeita seu modo -->
         <xpath expr="//div[contains(@id, 'wrap')]//a[contains(@class,'btn')][1]" position="replace">
             <t t-if="event.registration_mode == 'external' and event.registration_external_url">
-                    <a class="btn btn-primary"
-                       t-att-href="event.registration_external_url"
-                       target="_blank" rel="noopener">
-                        <t t-esc="event.registration_button_label or 'Inscrever-se'"/>
-                    </a>
-                </t>
-                <t t-else="">
-                    <a class="btn btn-primary" t-att-href="event.website_url">
-                        <t t-esc="event.registration_button_label or 'Inscrever-se'"/>
-                    </a>
-                </t>
+                <a class="btn btn-primary"
+                   t-att-href="event.registration_external_url"
+                   target="_blank" rel="noopener">
+                    <t t-esc="event.registration_button_label or 'Inscrever-se'"/>
+                </a>
+            </t>
+            <t t-else="">
+                <a class="btn btn-primary" t-att-href="event.website_url">
+                    <t t-esc="event.registration_button_label or 'Inscrever-se'"/>
+                </a>
             </t>
         </xpath>
     </template>
