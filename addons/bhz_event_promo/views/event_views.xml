@@ -23,8 +23,8 @@
                     <separator string="Evento de terceiros"/>
                     <group>
                         <field name="is_third_party"/>
-                        <field name="third_party_name" attrs="{'invisible':[('is_third_party','=',False)]}"/>
-                        <field name="third_party_partner_id" attrs="{'invisible':[('is_third_party','=',False)]}"/>
+                        <field name="third_party_name" modifiers="{'invisible': [('is_third_party', '=', False)]}"/>
+                        <field name="third_party_partner_id" modifiers="{'invisible': [('is_third_party', '=', False)]}"/>
                     </group>
 
                     <separator string="Botão de inscrição"/>
@@ -32,8 +32,7 @@
                         <field name="registration_mode"/>
                         <field name="registration_button_label"/>
                         <field name="registration_external_url"
-                               attrs="{'required':[('registration_mode','=','external')],
-                                       'invisible':[('registration_mode','!=','external')]}"/>
+                               modifiers="{'required': [('registration_mode', '=', 'external')], 'invisible': [('registration_mode', '!=', 'external')]}"/>
                     </group>
                 </page>
             </xpath>
