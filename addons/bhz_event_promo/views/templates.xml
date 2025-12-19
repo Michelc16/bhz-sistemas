@@ -188,7 +188,7 @@
 
     <template id="bhz_event_external_register_button_safe"
               inherit_id="website_event.event_description_full">
-        <xpath expr="//div[@id='wrap']" position="inside">
+        <xpath expr="//div[@id='wrapwrap']" position="inside">
             <t t-if="event and event.registration_mode == 'external' and event.registration_external_url">
                 <div class="container my-3 bhz-ext-register">
                     <a class="btn btn-primary btn-lg w-100"
