@@ -43,7 +43,7 @@
     <menuitem
         id="menu_bhz_event_import_wizard"
         name="Importar (Guia BH)"
-        parent="event.menu_event_root"
+        parent="base.menu_custom"
         action="action_bhz_event_import_wizard"
         sequence="45"
         groups="event.group_event_manager"/>
