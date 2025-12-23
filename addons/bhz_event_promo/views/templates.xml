@@ -288,7 +288,6 @@
                 <span class="badge text-bg-success" t-if="event_record.ticket_kind == 'free'">Gratuito</span>
                 <span class="badge text-bg-primary" t-if="event_record.ticket_kind == 'paid'">Pago</span>
                 <span class="badge text-bg-secondary" t-if="event_record.is_accessible_pcd">Acessível PCD</span>
-                <span class="badge text-bg-light text-uppercase" t-if="event_record.is_third_party">Evento de terceiros</span>
                 <span class="badge text-bg-dark" t-if="event_record.age_rating">
                     <t t-esc="dict([('l','Livre'),('10','10+'),('12','12+'),('14','14+'),('16','16+'),('18','18+')]).get(event_record.age_rating, 'Livre')"/>
                 </span>
@@ -376,7 +375,8 @@
                         </t>
                     </div>
                     <div class="bhz-event-description">
-                        <t t-if="event.description">
+                        <t t-set="default_snippet" t-value="'Join us for this 24 hours Event'"/>
+                        <t t-if="event.description and default_snippet not in (event.description or '')">
                             <t t-raw="event.description"/>
                         </t>
                         <t t-elif="event.subtitle">
