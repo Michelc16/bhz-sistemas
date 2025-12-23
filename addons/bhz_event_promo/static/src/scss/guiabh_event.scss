@@ -71,6 +71,16 @@
     object-fit: cover;
     width: 100%;
   }
+  .bhz-event-detail-cover.placeholder {
+    height: 320px;
+    background: repeating-linear-gradient(
+      45deg,
+      rgba(0, 0, 0, 0.04),
+      rgba(0, 0, 0, 0.04) 10px,
+      rgba(0, 0, 0, 0.08) 10px,
+      rgba(0, 0, 0, 0.08) 20px
+    );
+  }
   .bhz-badges .badge {
     font-size: 0.85rem;
   }

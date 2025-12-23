@@ -5,6 +5,7 @@
     <template id="bhz_agenda_page" name="GuiaBH Agenda">
         <t t-call="website.layout">
             <div class="container mt-4 mb-5 guiabh-agenda">
+                <!-- BHZ_EVENT_PROMO_ACTIVE -->
                 <div class="row mb-3 align-items-center">
                     <div class="col-12 col-lg-7">
                         <h1 class="mb-1">Agenda de Eventos</h1>
@@ -286,25 +287,37 @@
             <span class="badge text-bg-success" t-if="event.ticket_kind == 'free'">Gratuito</span>
             <span class="badge text-bg-primary" t-if="event.ticket_kind == 'paid'">Pago</span>
             <span class="badge text-bg-secondary" t-if="event.is_accessible_pcd">Acessível PCD</span>
+            <span class="badge text-bg-light text-uppercase" t-if="event.is_third_party">Evento de terceiros</span>
             <span class="badge text-bg-dark" t-if="event.age_rating">
                 <t t-esc="dict([('l','Livre'),('10','10+'),('12','12+'),('14','14+'),('16','16+'),('18','18+')]).get(event.age_rating, 'Livre')"/>
             </span>
         </div>
     </template>
 
-    <template id="bhz_event_detail" name="GuiaBH Event Detail">
-        <t t-call="website.layout">
-            <div class="container py-5 bhz-event-detail">
+    <template id="bhz_event_detail_content" name="GuiaBH Event Detail Content">
+        <section class="bhz-event-detail py-5 py-lg-5">
+            <!-- BHZ_EVENT_PROMO_ACTIVE -->
+            <div class="container">
                 <a href="/agenda" class="btn btn-link mb-3">&#8592; Voltar para Agenda</a>
-                <div class="bg-white shadow-sm rounded-4 p-4">
-                    <t t-if="event.promo_cover_image">
-                        <img class="img-fluid rounded-4 mb-4 bhz-event-detail-cover"
-                             t-att-src="'/web/image/event.event/%s/promo_cover_image' % event.id"
-                             t-att-alt="event.name"/>
-                    </t>
+                <div class="bg-white shadow-sm rounded-4 p-4 p-lg-5">
+                    <div class="bhz-event-hero mb-4">
+                        <t t-if="event.promo_cover_image">
+                            <img class="img-fluid rounded-4 bhz-event-detail-cover"
+                                 t-att-src="'/web/image/event.event/%s/promo_cover_image' % event.id"
+                                 t-att-alt="event.name"/>
+                        </t>
+                        <t t-elif="event.image_1920">
+                            <img class="img-fluid rounded-4 bhz-event-detail-cover"
+                                 t-att-src="'/web/image/event.event/%s/image_1920' % event.id"
+                                 t-att-alt="event.name"/>
+                        </t>
+                        <t t-else="">
+                            <div class="bhz-event-detail-cover placeholder rounded-4"></div>
+                        </t>
+                    </div>
                     <h1 class="mb-3"><t t-esc="event.name"/></h1>
                     <t t-call="bhz_event_promo.bhz_event_badges"/>
-                    <p class="text-muted">
+                    <p class="text-muted mb-4">
                         <t t-if="event.date_begin">
                             <t t-esc="event.date_begin.strftime('%d/%m/%Y %H:%M')"/>
                             <t t-if="event.date_end"> - <t t-esc="event.date_end.strftime('%d/%m/%Y %H:%M')"/></t>
@@ -320,6 +333,26 @@
                             • <t t-esc="event.neighborhood"/>
                         </t>
                     </p>
+                    <div class="row g-3 mb-4">
+                        <div class="col-12 col-md-6">
+                            <strong>Categoria:</strong>
+                            <span>
+                                <t t-esc="event.promo_category_id.name or event.event_type_id.name or 'Outros'"/>
+                            </span>
+                        </div>
+                        <div class="col-12 col-md-6" t-if="event.producer_name">
+                            <strong>Produtor:</strong>
+                            <span><t t-esc="event.producer_name"/></span>
+                        </div>
+                        <div class="col-12 col-md-6" t-if="event.is_third_party and event.third_party_name">
+                            <strong>Origem:</strong>
+                            <span><t t-esc="event.third_party_name"/></span>
+                        </div>
+                        <div class="col-12 col-md-6" t-if="event.venue_partner_id">
+                            <strong>Local:</strong>
+                            <span><t t-esc="event.venue_partner_id.display_name"/></span>
+                        </div>
+                    </div>
                     <div class="my-4">
                         <t t-if="event.registration_mode == 'external' and event.registration_external_url">
                             <a class="btn btn-primary btn-lg bhz-ext-register w-100"
@@ -330,10 +363,9 @@
                             </a>
                         </t>
                         <t t-else="">
-                            <a class="btn btn-primary btn-lg bhz-ext-register w-100"
-                               t-att-href="event.website_url">
-                                <t t-esc="event.registration_button_label or 'Inscrever-se'"/>
-                            </a>
+                            <div id="o_wevent_register_button" class="bhz-ext-register w-100">
+                                <t t-call="website_event.event_register_button"/>
+                            </div>
                         </t>
                     </div>
                     <div class="bhz-event-description">
@@ -346,10 +378,30 @@
                         <t t-elif="event.promo_short_description">
                             <p><t t-esc="event.promo_short_description"/></p>
                         </t>
+                        <t t-else="">
+                            <p class="text-muted">Mais detalhes em breve.</p>
+                        </t>
                     </div>
                 </div>
             </div>
+        </section>
+    </template>
+
+    <template id="bhz_event_detail" name="GuiaBH Event Detail">
+        <t t-call="website.layout">
+            <t t-set="main_object" t-value="event"/>
+            <div id="wrap" class="oe_structure">
+                <t t-call="bhz_event_promo.bhz_event_detail_content"/>
+            </div>
         </t>
+    </template>
+
+    <template id="bhz_event_main_override" inherit_id="website_event.event_main">
+        <xpath expr="//div[@id='wrap']" position="replace">
+            <div id="wrap" class="oe_structure">
+                <t t-call="bhz_event_promo.bhz_event_detail_content"/>
+            </div>
+        </xpath>
     </template>
 
 </odoo>
