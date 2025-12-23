@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import calendar
+import logging
 from collections import defaultdict
 from datetime import date, datetime, time, timedelta
 
@@ -8,6 +9,8 @@ from urllib.parse import urlencode as py_urlencode
 
 from odoo import fields, http
 from odoo.http import request
+
+_logger = logging.getLogger(__name__)
 
 
 class GuiaBHAgendaController(http.Controller):
@@ -39,14 +42,12 @@ class GuiaBHAgendaController(http.Controller):
     # Helpers -----------------------------------------------------------------
     def _render_agenda_page(self, category_record=None, **kw):
         filters = self._extract_filters(category_record=category_record)
-        domain = self._build_domain(filters)
+        base_domain = self._base_agenda_domain()
+        domain = self._build_domain(filters, base_domain=base_domain)
         events_model = request.env["event.event"].sudo()
         events = events_model.search(domain, order="date_begin asc")
+        _logger.debug("Agenda domain %s -> %s events", domain, len(events))
 
-        base_domain = [
-            ("website_published", "=", True),
-            ("show_on_public_agenda", "=", True),
-        ]
         venues = self._get_available_venues(base_domain)
         categories = request.env["event.type"].sudo().search([], order="name asc")
         tags = request.env["event.tag"].sudo().search([], order="name asc")
@@ -139,11 +140,19 @@ class GuiaBHAgendaController(http.Controller):
 
         return filters
 
-    def _build_domain(self, filters):
-        domain = [
-            ("website_published", "=", True),
-            ("show_on_public_agenda", "=", True),
-        ]
+    def _base_agenda_domain(self):
+        Event = request.env["event.event"]
+        domain = [("show_on_public_agenda", "=", True)]
+        if "website_published" in Event._fields:
+            domain.append(("website_published", "=", True))
+        if "website_id" in Event._fields:
+            current_website = request.website
+            if current_website:
+                domain += ["|", ("website_id", "=", False), ("website_id", "=", current_website.id)]
+        return domain
+
+    def _build_domain(self, filters, base_domain=None):
+        domain = list(base_domain or self._base_agenda_domain())
         if filters["category_id"]:
             domain.append(("promo_category_id", "=", filters["category_id"]))
         if filters["search"]:
