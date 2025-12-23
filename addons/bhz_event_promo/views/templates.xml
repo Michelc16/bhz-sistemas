@@ -124,8 +124,8 @@
                                             </h5>
                                         </div>
 
-                                        <t t-with="event=ev">
-                                            <t t-call="bhz_event_promo.bhz_event_badges"/>
+                                        <t t-call="bhz_event_promo.bhz_event_badges">
+                                            <t t-set="event_record" t-value="ev"/>
                                         </t>
 
                                         <p class="text-muted mb-2">
@@ -263,8 +263,8 @@
                                                 <t t-esc="ev.date_begin.strftime('%H:%M') if ev.date_begin else ''"/>
                                                 <t t-if="ev.venue_partner_id"> • <t t-esc="ev.venue_partner_id.name"/></t>
                                             </small>
-                                            <t t-with="event=ev">
-                                            <t t-call="bhz_event_promo.bhz_event_badges"/>
+                                            <t t-call="bhz_event_promo.bhz_event_badges">
+                                                <t t-set="event_record" t-value="ev"/>
                                             </t>
                                         </li>
                                     </t>
@@ -281,17 +281,19 @@
     </template>
 
     <template id="bhz_event_badges">
-        <div class="guiabh-badges mb-2 d-flex flex-wrap gap-2">
-            <span class="badge text-bg-warning text-uppercase" t-if="event.is_featured">Destaque</span>
-            <span class="badge text-bg-info text-uppercase" t-if="event.is_sponsored">Patrocinado</span>
-            <span class="badge text-bg-success" t-if="event.ticket_kind == 'free'">Gratuito</span>
-            <span class="badge text-bg-primary" t-if="event.ticket_kind == 'paid'">Pago</span>
-            <span class="badge text-bg-secondary" t-if="event.is_accessible_pcd">Acessível PCD</span>
-            <span class="badge text-bg-light text-uppercase" t-if="event.is_third_party">Evento de terceiros</span>
-            <span class="badge text-bg-dark" t-if="event.age_rating">
-                <t t-esc="dict([('l','Livre'),('10','10+'),('12','12+'),('14','14+'),('16','16+'),('18','18+')]).get(event.age_rating, 'Livre')"/>
-            </span>
-        </div>
+        <t t-if="event_record">
+            <div class="guiabh-badges mb-2 d-flex flex-wrap gap-2">
+                <span class="badge text-bg-warning text-uppercase" t-if="event_record.is_featured">Destaque</span>
+                <span class="badge text-bg-info text-uppercase" t-if="event_record.is_sponsored">Patrocinado</span>
+                <span class="badge text-bg-success" t-if="event_record.ticket_kind == 'free'">Gratuito</span>
+                <span class="badge text-bg-primary" t-if="event_record.ticket_kind == 'paid'">Pago</span>
+                <span class="badge text-bg-secondary" t-if="event_record.is_accessible_pcd">Acessível PCD</span>
+                <span class="badge text-bg-light text-uppercase" t-if="event_record.is_third_party">Evento de terceiros</span>
+                <span class="badge text-bg-dark" t-if="event_record.age_rating">
+                    <t t-esc="dict([('l','Livre'),('10','10+'),('12','12+'),('14','14+'),('16','16+'),('18','18+')]).get(event_record.age_rating, 'Livre')"/>
+                </span>
+            </div>
+        </t>
     </template>
 
     <template id="bhz_event_detail_content" name="GuiaBH Event Detail Content">
@@ -316,7 +318,9 @@
                         </t>
                     </div>
                     <h1 class="mb-3"><t t-esc="event.name"/></h1>
-                    <t t-call="bhz_event_promo.bhz_event_badges"/>
+                    <t t-call="bhz_event_promo.bhz_event_badges">
+                        <t t-set="event_record" t-value="event"/>
+                    </t>
                     <p class="text-muted mb-4">
                         <t t-if="event.date_begin">
                             <t t-esc="event.date_begin.strftime('%d/%m/%Y %H:%M')"/>
@@ -393,7 +397,10 @@
     <template id="bhz_event_detail" name="GuiaBH Event Detail">
         <t t-call="website.layout">
             <t t-set="main_object" t-value="event"/>
-            <div id="wrap" class="oe_structure">
+            <div id="wrap"
+                 class="oe_structure"
+                 data-oe-model="event.event"
+                 t-att-data-oe-id="event.id">
                 <t t-call="bhz_event_promo.bhz_event_detail_content"/>
             </div>
         </t>
