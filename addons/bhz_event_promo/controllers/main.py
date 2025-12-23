@@ -4,7 +4,7 @@ from collections import defaultdict
 from datetime import date, datetime, time, timedelta
 
 from babel.dates import format_date
-from werkzeug.urls import url_encode
+from urllib.parse import urlencode as py_urlencode
 
 from odoo import fields, http
 from odoo.http import request
@@ -327,7 +327,7 @@ class GuiaBHAgendaController(http.Controller):
         for key, values in multi_params.items():
             for value in values:
                 query_pairs.append((key, value))
-        query = url_encode(query_pairs, doseq=True)
+        query = py_urlencode(query_pairs, doseq=True)
         return "{}?{}".format(base_path, query) if query else base_path
 
     def _shift_month(self, year, month, delta):
