@@ -6,7 +6,7 @@
     "summary": "Agenda de eventos com suporte a eventos de terceiros, link externo e botão personalizável.",
     "author": "BHZ Sistemas",
     "license": "LGPL-3",
-    "depends": ["website_event", "event_sale"],  # event_sale opcional, mas útil
+    "depends": ["website", "event", "website_event", "event_sale"],
     "data": [
         "security/security.xml",
         "security/ir.model.access.csv",

@@ -143,6 +143,8 @@ class GuiaBHAgendaController(http.Controller):
     def _base_agenda_domain(self):
         Event = request.env["event.event"]
         domain = [("show_on_public_agenda", "=", True)]
+        if "state" in Event._fields:
+            domain.append(("state", "in", ("confirm", "done")))
         if "website_published" in Event._fields:
             domain.append(("website_published", "=", True))
         if "website_id" in Event._fields:
