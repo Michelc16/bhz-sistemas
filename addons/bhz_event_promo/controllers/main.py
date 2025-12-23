@@ -92,13 +92,21 @@ class GuiaBHAgendaController(http.Controller):
         sitemap=True,
     )
     def guiabh_event_detail(self, event, **kwargs):
-        event = event.sudo()
-        return request.render(
-            "bhz_event_promo.bhz_event_detail",
-            {
-                "event": event,
-            },
-        )
+        return self._render_event_detail(event)
+
+    @http.route(
+        [
+            "/event/<model('event.event'):event>",
+            "/event/<model('event.event'):event>/register",
+        ],
+        type="http",
+        auth="public",
+        website=True,
+        sitemap=True,
+    )
+    def odoo_event_detail_override(self, event, **kwargs):
+        """Override standard website_event page to use Guia BH layout."""
+        return self._render_event_detail(event)
 
     def _extract_filters(self, category_record=None):
         args = request.httprequest.args
@@ -150,6 +158,15 @@ class GuiaBHAgendaController(http.Controller):
             if current_website:
                 domain += ["|", ("website_id", "=", False), ("website_id", "=", current_website.id)]
         return domain
+
+    def _render_event_detail(self, event):
+        event = event.sudo()
+        return request.render(
+            "bhz_event_promo.bhz_event_detail",
+            {
+                "event": event,
+            },
+        )
 
     def _build_domain(self, filters, base_domain=None):
         domain = list(base_domain or self._base_agenda_domain())

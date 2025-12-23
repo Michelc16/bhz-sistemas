@@ -396,12 +396,4 @@
         </t>
     </template>
 
-    <template id="bhz_event_main_override" inherit_id="website_event.event_main">
-        <xpath expr="//div[@id='wrap']" position="replace">
-            <div id="wrap" class="oe_structure">
-                <t t-call="bhz_event_promo.bhz_event_detail_content"/>
-            </div>
-        </xpath>
-    </template>
-
 </odoo>
