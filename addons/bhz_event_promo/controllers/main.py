@@ -46,7 +46,7 @@ class GuiaBHAgendaController(http.Controller):
         domain = self._build_domain(filters, base_domain=base_domain)
         events_model = request.env["event.event"].sudo()
         events = events_model.search(domain, order="date_begin asc")
-        _logger.debug("Agenda domain %s -> %s events", domain, len(events))
+        _logger.info("Agenda domain %s -> %s events", domain, len(events))
 
         venues = self._get_available_venues(base_domain)
         categories = request.env["event.type"].sudo().search([], order="name asc")
@@ -155,8 +155,19 @@ class GuiaBHAgendaController(http.Controller):
             domain.append(("is_published", "=", True))
         elif "website_published" in Event._fields:
             domain.append(("website_published", "=", True))
+
         if "state" in Event._fields:
-            domain.append(("state", "!=", "cancel"))
+            state_field = Event._fields["state"]
+            selection_values = {value for value, _label in (state_field.selection or [])}
+            if "confirm" in selection_values or "done" in selection_values:
+                allowed_states = [state for state in ("confirm", "done") if state in selection_values]
+                if allowed_states:
+                    domain.append(("state", "in", allowed_states))
+                if "cancel" in selection_values:
+                    domain.append(("state", "!=", "cancel"))
+            elif "cancel" in selection_values:
+                domain.append(("state", "!=", "cancel"))
+
         if "website_id" in Event._fields:
             current_website = request.website
             if current_website:
