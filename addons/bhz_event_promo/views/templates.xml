@@ -363,9 +363,12 @@
                             </a>
                         </t>
                         <t t-else="">
-                            <div id="o_wevent_register_button" class="bhz-ext-register w-100">
-                                <t t-call="website_event.event_register_button"/>
-                            </div>
+                            <t t-set="register_url"
+                               t-value="(event.website_url and '%s/register' % event.website_url.rstrip('/')) or ('/event/%s/register' % event.id)"/>
+                            <a class="btn btn-primary btn-lg bhz-ext-register w-100"
+                               t-att-href="register_url">
+                                <t t-esc="event.registration_button_label or 'Inscrever-se'"/>
+                            </a>
                         </t>
                     </div>
                     <div class="bhz-event-description">
