@@ -46,7 +46,16 @@ class GuiaBHAgendaController(http.Controller):
         domain = self._build_domain(filters, base_domain=base_domain)
         events_model = request.env["event.event"].sudo()
         events = events_model.search(domain, order="date_begin asc")
-        _logger.info("Agenda domain %s -> %s events", domain, len(events))
+        sample = self._serialize_for_log(events[:5])
+        if events:
+            _logger.info("Agenda domain %s -> %s events | sample=%s", domain, len(events), sample)
+        else:
+            fallback = events_model.search([], order="write_date desc, id desc", limit=5)
+            _logger.info(
+                "Agenda domain %s returned 0 events. Recent records snapshot=%s",
+                domain,
+                self._serialize_for_log(fallback),
+            )
 
         venues = self._get_available_venues(base_domain)
         categories = request.env["event.type"].sudo().search([], order="name asc")
@@ -151,9 +160,19 @@ class GuiaBHAgendaController(http.Controller):
     def _base_agenda_domain(self):
         Event = request.env["event.event"]
         domain = [("show_on_public_agenda", "=", True)]
-        if "is_published" in Event._fields:
+        has_is_published = "is_published" in Event._fields
+        has_website_published = "website_published" in Event._fields
+        if has_is_published and has_website_published:
+            domain.extend(
+                [
+                    "|",
+                    ("is_published", "=", True),
+                    ("website_published", "=", True),
+                ]
+            )
+        elif has_is_published:
             domain.append(("is_published", "=", True))
-        elif "website_published" in Event._fields:
+        elif has_website_published:
             domain.append(("website_published", "=", True))
 
         if "state" in Event._fields:
@@ -340,6 +359,21 @@ class GuiaBHAgendaController(http.Controller):
         if filters["tag_ids"]:
             multi["tag"] = [str(tag_id) for tag_id in filters["tag_ids"]]
         return params, multi
+
+    def _serialize_for_log(self, events):
+        return [
+            {
+                "id": ev.id,
+                "name": ev.name,
+                "show_on_public_agenda": ev.show_on_public_agenda,
+                "is_published": getattr(ev, "is_published", None),
+                "website_published": getattr(ev, "website_published", None),
+                "website_id": ev.website_id.id if ev.website_id else False,
+                "state": getattr(ev, "state", None),
+                "date_begin": ev.date_begin,
+            }
+            for ev in events
+        ]
 
     def _build_view_urls(self, base_path, base_params, multi_params, filters):
         urls = {}

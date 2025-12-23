@@ -340,10 +340,6 @@
                             <strong>Produtor:</strong>
                             <span><t t-esc="event.producer_name"/></span>
                         </div>
-                        <div class="col-12 col-md-6" t-if="event.is_third_party and event.third_party_name">
-                            <strong>Origem:</strong>
-                            <span><t t-esc="event.third_party_name"/></span>
-                        </div>
                         <div class="col-12 col-md-6" t-if="event.venue_partner_id">
                             <strong>Local:</strong>
                             <span><t t-esc="event.venue_partner_id.display_name"/></span>
