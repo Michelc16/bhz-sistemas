@@ -144,13 +144,6 @@
                                             <p class="mb-2"><t t-esc="ev.promo_short_description"/></p>
                                         </t>
 
-                                        <t t-if="ev.is_third_party">
-                                            <p class="small text-muted mb-3">
-                                                Evento de terceiros
-                                                <t t-if="ev.third_party_name"> • <t t-esc="ev.third_party_name"/></t>
-                                            </p>
-                                        </t>
-
                                         <div class="mt-auto d-flex gap-2">
                                             <!-- Botão principal custom -->
                                             <t t-if="ev.registration_mode == 'external' and ev.registration_external_url">
@@ -374,16 +367,17 @@
                             </a>
                         </t>
                     </div>
+                    <t t-set="default_snippet" t-value="'Join us for this 24 hours Event'"/>
+                    <t t-set="desc_html"
+                       t-value="event.description if (event.description and default_snippet not in (event.description or '')) else False"/>
+                    <t t-set="desc_text"
+                       t-value="False if desc_html else (event.subtitle or event.promo_short_description)"/>
                     <div class="bhz-event-description">
-                        <t t-set="default_snippet" t-value="'Join us for this 24 hours Event'"/>
-                        <t t-if="event.description and default_snippet not in (event.description or '')">
-                            <t t-raw="event.description"/>
+                        <t t-if="desc_html">
+                            <t t-raw="desc_html"/>
                         </t>
-                        <t t-elif="event.subtitle">
-                            <p><t t-esc="event.subtitle"/></p>
-                        </t>
-                        <t t-elif="event.promo_short_description">
-                            <p><t t-esc="event.promo_short_description"/></p>
+                        <t t-elif="desc_text">
+                            <p><t t-esc="desc_text"/></p>
                         </t>
                         <t t-else="">
                             <p class="text-muted">Mais detalhes em breve.</p>
