@@ -363,9 +363,10 @@
                             </a>
                         </t>
                     </div>
+                    <t t-set="free_html" t-value="event.third_party_name"/>
                     <t t-set="default_snippet" t-value="'Join us for this 24 hours Event'"/>
                     <t t-set="desc_html"
-                       t-value="event.description if (event.description and default_snippet not in (event.description or '')) else False"/>
+                       t-value="free_html or (event.description if (event.description and default_snippet not in (event.description or '')) else False)"/>
                     <t t-set="desc_text"
                        t-value="False if desc_html else (event.subtitle or event.promo_short_description)"/>
                     <div class="bhz-event-description">
