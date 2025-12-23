@@ -21,6 +21,11 @@ class GuiaBHAgendaController(http.Controller):
     def guiabh_agenda(self, **kw):
         return self._render_agenda_page(category_record=None, **kw)
 
+    @http.route("/event", type="http", auth="public", website=True, sitemap=False)
+    def redirect_event_root(self, **kwargs):
+        """Keep legacy /event URL working by redirecting to the new agenda."""
+        return request.redirect("/agenda", code=301)
+
     @http.route(
         ["/agenda/c/<model('event.type'):category_record>"],
         type="http",
@@ -76,7 +81,7 @@ class GuiaBHAgendaController(http.Controller):
             week_info = self._build_week_info(events, filters, base_path, base_params, multi_params)
             context.update({"week_info": week_info})
 
-        return request.render("guiabh_event_promo.guiabh_agenda_page", context)
+        return request.render("bhz_event_promo.bhz_agenda_page", context)
 
     @http.route(
         ["/agenda/event/<model('event.event'):event>"],
@@ -88,7 +93,7 @@ class GuiaBHAgendaController(http.Controller):
     def guiabh_event_detail(self, event, **kwargs):
         event = event.sudo()
         return request.render(
-            "guiabh_event_promo.bhz_event_detail",
+            "bhz_event_promo.bhz_event_detail",
             {
                 "event": event,
             },

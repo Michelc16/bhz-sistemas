@@ -2,7 +2,7 @@
 <odoo>
 
     <!-- Página Agenda -->
-    <template id="guiabh_agenda_page" name="GuiaBH Agenda">
+    <template id="bhz_agenda_page" name="GuiaBH Agenda">
         <t t-call="website.layout">
             <div class="container mt-4 mb-5 guiabh-agenda">
                 <div class="row mb-3 align-items-center">
@@ -124,7 +124,7 @@
                                         </div>
 
                                         <t t-with="event=ev">
-                                            <t t-call="guiabh_event_promo.bhz_event_badges"/>
+                                            <t t-call="bhz_event_promo.bhz_event_badges"/>
                                         </t>
 
                                         <p class="text-muted mb-2">
@@ -178,11 +178,11 @@
                 </t>
 
                 <t t-if="view_mode == 'month' and month_info">
-                    <t t-call="guiabh_event_promo.bhz_agenda_month"/>
+                    <t t-call="bhz_event_promo.bhz_agenda_month"/>
                 </t>
 
                 <t t-if="view_mode == 'week' and week_info">
-                    <t t-call="guiabh_event_promo.bhz_agenda_week"/>
+                    <t t-call="bhz_event_promo.bhz_agenda_week"/>
                 </t>
             </div>
         </t>
@@ -263,7 +263,7 @@
                                                 <t t-if="ev.venue_partner_id"> • <t t-esc="ev.venue_partner_id.name"/></t>
                                             </small>
                                             <t t-with="event=ev">
-                                                <t t-call="guiabh_event_promo.bhz_event_badges"/>
+                                            <t t-call="bhz_event_promo.bhz_event_badges"/>
                                             </t>
                                         </li>
                                     </t>
@@ -303,7 +303,7 @@
                              t-att-alt="event.name"/>
                     </t>
                     <h1 class="mb-3"><t t-esc="event.name"/></h1>
-                    <t t-call="guiabh_event_promo.bhz_event_badges"/>
+                    <t t-call="bhz_event_promo.bhz_event_badges"/>
                     <p class="text-muted">
                         <t t-if="event.date_begin">
                             <t t-esc="event.date_begin.strftime('%d/%m/%Y %H:%M')"/>
