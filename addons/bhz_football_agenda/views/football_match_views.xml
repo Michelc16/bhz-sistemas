@@ -3,7 +3,7 @@
         <field name="name">bhz.football.match.tree</field>
         <field name="model">bhz.football.match</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="match_datetime"/>
                 <field name="competition"/>
                 <field name="home_team_id"/>
@@ -11,7 +11,7 @@
                 <field name="stadium"/>
                 <field name="website_published"/>
                 <field name="active"/>
-            </tree>
+            </list>
         </field>
     </record>
 

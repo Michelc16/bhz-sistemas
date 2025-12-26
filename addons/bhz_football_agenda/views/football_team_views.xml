@@ -3,12 +3,12 @@
         <field name="name">bhz.football.team.tree</field>
         <field name="model">bhz.football.team</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name"/>
                 <field name="slug"/>
                 <field name="website_published"/>
                 <field name="active"/>
-            </tree>
+            </list>
         </field>
     </record>
 
