@@ -1,9 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
-<odoo>
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
     <template id="guiabh_cineart_page" name="GuiaBH - Cineart" page="True">
         <t t-call="website.layout">
             <div class="container py-4">
-
                 <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
                     <div>
                         <h1 class="mb-1">Cineart</h1>
@@ -13,7 +12,6 @@
                         Ver no site do Cineart
                     </a>
                 </div>
-
                 <ul class="nav nav-tabs" id="cineartTabs" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="tab-now" data-bs-toggle="tab" data-bs-target="#pane-now" type="button" role="tab">
@@ -31,7 +29,6 @@
                         </button>
                     </li>
                 </ul>
-
                 <div class="tab-content pt-3">
                     <div class="tab-pane fade show active" id="pane-now" role="tabpanel">
                         <t t-call="guiabh_cineart._cineart_grid">
@@ -49,7 +46,6 @@
                         </t>
                     </div>
                 </div>
-
             </div>
         </t>
     </template>
@@ -59,14 +55,14 @@
                 Ainda não temos itens aqui. (O sincronizador pode estar rodando — tente atualizar mais tarde.)
             </div>
         </t>
-
         <div class="row g-3" t-if="movies">
             <t t-foreach="movies" t-as="m">
                 <div class="col-6 col-md-4 col-lg-3">
                     <a t-att-href="m.cineart_url or '#'" t-att-target="'_blank' if m.cineart_url else None" class="text-decoration-none">
                         <div class="card h-100 shadow-sm">
                             <t t-if="m.poster_image">
-                                <img class="card-img-top" t-att-src="'data:image/png;base64,%s' % (m.poster_image.decode() if hasattr(m.poster_image,'decode') else m.poster_image)"
+                                <img class="card-img-top"
+                                     t-att-src="'data:image/png;base64,%s' % (m.poster_image.decode() if hasattr(m.poster_image,'decode') else m.poster_image)"
                                      style="aspect-ratio: 2/3; object-fit: cover;" alt="Poster"/>
                             </t>
                             <t t-elif="m.poster_url">
@@ -77,7 +73,6 @@
                                     <span class="text-muted">Sem imagem</span>
                                 </div>
                             </t>
-
                             <div class="card-body">
                                 <h6 class="card-title mb-2" t-esc="m.name"/>
                                 <div class="d-flex flex-wrap gap-2">
@@ -85,10 +80,14 @@
                                         <span class="badge text-bg-secondary" t-esc="m.genre"/>
                                     </t>
                                     <t t-if="m.age_rating">
-                                        <span class="badge text-bg-danger"> <t t-esc="m.age_rating"/> </span>
+                                        <span class="badge text-bg-danger">
+                                            <t t-esc="m.age_rating"/>
+                                        </span>
                                     </t>
                                     <t t-if="m.release_date">
-                                        <span class="badge text-bg-warning"><t t-esc="m.release_date"/></span>
+                                        <span class="badge text-bg-warning">
+                                            <t t-esc="m.release_date"/>
+                                        </span>
                                     </t>
                                 </div>
                             </div>
@@ -98,5 +97,4 @@
             </t>
         </div>
     </template>
-
-</odoo>
+</templates>
