@@ -31,12 +31,12 @@
                     </div>
                     <div class="card shadow-sm">
                         <div class="card-body">
-                            <t t-if="not matches">
+                            <t t-if="not matches_data">
                                 <div class="alert alert-info mb-0">
                                     Nenhum jogo encontrado para os próximos dias (ou ainda não cadastrado).
                                 </div>
                             </t>
-                            <t t-if="matches">
+                            <t t-if="matches_data">
                                 <div class="table-responsive">
                                     <table class="table align-middle mb-0">
                                         <thead>
@@ -50,38 +50,38 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <t t-foreach="matches" t-as="m">
+                                            <t t-foreach="matches_data" t-as="m">
                                                 <tr>
                                                     <td style="white-space:nowrap;">
-                                                        <t t-esc="formatLang(m.match_datetime, date=True, time=True)"/>
+                                                        <t t-esc="m.get('match_datetime_str')"/>
                                                     </td>
                                                     <td>
-                                                        <strong><t t-esc="m.home_team_id.name"/></strong>
+                                                        <strong><t t-esc="m.get('home_team_name')"/></strong>
                                                         <span class="mx-1">x</span>
-                                                        <strong><t t-esc="m.away_team_id.name"/></strong>
-                                                        <t t-if="m.round_name">
-                                                            <div class="text-muted small"><t t-esc="m.round_name"/></div>
+                                                        <strong><t t-esc="m.get('away_team_name')"/></strong>
+                                                        <t t-if="m.get('round_name')">
+                                                            <div class="text-muted small"><t t-esc="m.get('round_name')"/></div>
                                                         </t>
                                                     </td>
                                                     <td>
-                                                        <t t-esc="m.competition or '-'"/>
+                                                        <t t-esc="m.get('competition') or '-'"/>
                                                     </td>
                                                     <td>
-                                                        <t t-esc="m.stadium or '-'"/>
-                                                        <t t-if="m.city">
-                                                            <div class="text-muted small"><t t-esc="m.city"/></div>
+                                                        <t t-esc="m.get('stadium') or '-'"/>
+                                                        <t t-if="m.get('city')">
+                                                            <div class="text-muted small"><t t-esc="m.get('city')"/></div>
                                                         </t>
                                                     </td>
                                                     <td>
-                                                        <t t-esc="m.broadcast or '-'"/>
+                                                        <t t-esc="m.get('broadcast') or '-'"/>
                                                     </td>
                                                     <td>
-                                                        <t t-if="m.ticket_url">
-                                                            <a class="btn btn-sm btn-primary" t-att-href="m.ticket_url" target="_blank" rel="noopener">
+                                                        <t t-if="m.get('ticket_url')">
+                                                            <a class="btn btn-sm btn-primary" t-att-href="m.get('ticket_url')" target="_blank" rel="noopener">
                                                                 Comprar
                                                             </a>
                                                         </t>
-                                                        <t t-if="not m.ticket_url">-</t>
+                                                        <t t-if="not m.get('ticket_url')">-</t>
                                                     </td>
                                                 </tr>
                                             </t>

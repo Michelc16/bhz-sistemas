@@ -1,5 +1,6 @@
-from odoo import http
+from odoo import fields, http
 from odoo.http import request
+from odoo.tools.misc import format_datetime as misc_format_datetime
 
 class BhzFootballAgendaController(http.Controller):
 
@@ -26,9 +27,33 @@ class BhzFootballAgendaController(http.Controller):
                 domain.append(("team_ids", "in", selected_team.id))
 
         matches = Match.search(domain, order="match_datetime asc", limit=50)
+        matches_data = []
+        user_tz = request.env.user.tz or request.website and request.website.user_id.tz
+        for match in matches:
+            if misc_format_datetime:
+                match_datetime_str = misc_format_datetime(request.env, match.match_datetime, tz=user_tz, dtf="short")
+            else:
+                match_datetime_str = fields.Datetime.to_string(match.match_datetime)
+            matches_data.append(
+                {
+                    "id": match.id,
+                    "home_team_name": match.home_team_id.name,
+                    "away_team_name": match.away_team_id.name,
+                    "competition": match.competition,
+                    "stadium": match.stadium,
+                    "city": match.city,
+                    "round_name": match.round_name,
+                    "broadcast": match.broadcast,
+                    "ticket_url": match.ticket_url,
+                    "match_datetime_str": match_datetime_str,
+                }
+            )
 
-        return request.render("bhz_football_agenda.page_football_agenda", {
-            "teams": teams,
-            "selected_team": selected_team,
-            "matches": matches,
-        })
+        return request.render(
+            "bhz_football_agenda.page_football_agenda",
+            {
+                "teams": teams,
+                "selected_team": selected_team,
+                "matches_data": matches_data,
+            },
+        )
