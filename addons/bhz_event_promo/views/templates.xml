@@ -145,25 +145,17 @@
                                         </t>
 
                                         <div class="mt-auto d-flex gap-2">
-                                            <!-- Botão principal custom -->
-                                            <t t-if="ev.registration_mode == 'external' and ev.registration_external_url">
-                                                <a class="btn btn-primary w-100"
-                                                   t-att-href="ev.registration_external_url"
-                                                   target="_blank" rel="noopener">
-                                                    <t t-esc="ev.registration_button_label or 'Inscrever-se'"/>
-                                                </a>
-                                            </t>
-                                            <t t-elif="ev.registration_mode == 'promo'">
-                                                <t t-if="ev.promo_show_button and ev.registration_button_label">
-                                                    <span class="btn btn-outline-primary w-100 disabled"
-                                                          role="button" aria-disabled="true">
-                                                        <t t-esc="ev.registration_button_label"/>
-                                                    </span>
+                                            <t t-if="ev.registration_mode != 'none'">
+                                                <t t-set="primary_href" t-value="detail_url"/>
+                                                <t t-set="primary_target" t-value="False"/>
+                                                <t t-if="ev.registration_mode == 'external' and ev.registration_external_url">
+                                                    <t t-set="primary_href" t-value="ev.registration_external_url"/>
+                                                    <t t-set="primary_target" t-value="'_blank'"/>
                                                 </t>
-                                            </t>
-                                            <t t-else="">
                                                 <a class="btn btn-primary w-100"
-                                                   t-att-href="detail_url">
+                                                   t-att-href="primary_href"
+                                                   t-att-target="primary_target"
+                                                   t-att-rel="primary_target and 'noopener' or False">
                                                     <t t-esc="ev.registration_button_label or 'Inscrever-se'"/>
                                                 </a>
                                             </t>
@@ -353,28 +345,20 @@
                             <span><t t-esc="event.venue_partner_id.display_name"/></span>
                         </div>
                     </div>
+                    <t t-set="register_url"
+                       t-value="(event.website_url and '%s/register' % event.website_url.rstrip('/')) or ('/event/%s/register' % event.id)"/>
                     <div class="my-4">
-                        <t t-if="event.registration_mode == 'external' and event.registration_external_url">
-                            <a class="btn btn-primary btn-lg bhz-ext-register w-100"
-                               t-att-href="event.registration_external_url"
-                               rel="noopener"
-                               target="_blank">
-                                <t t-esc="event.registration_button_label or 'Inscrever-se'"/>
-                            </a>
-                        </t>
-                        <t t-elif="event.registration_mode == 'promo'">
-                            <t t-if="event.promo_show_button and event.registration_button_label">
-                                <span class="btn btn-outline-primary btn-lg w-100 disabled"
-                                      role="button" aria-disabled="true">
-                                    <t t-esc="event.registration_button_label"/>
-                                </span>
+                        <t t-if="event.registration_mode != 'none'">
+                            <t t-set="button_href" t-value="register_url"/>
+                            <t t-set="button_target" t-value="False"/>
+                            <t t-if="event.registration_mode == 'external' and event.registration_external_url">
+                                <t t-set="button_href" t-value="event.registration_external_url"/>
+                                <t t-set="button_target" t-value="'_blank'"/>
                             </t>
-                        </t>
-                        <t t-else="">
-                            <t t-set="register_url"
-                               t-value="(event.website_url and '%s/register' % event.website_url.rstrip('/')) or ('/event/%s/register' % event.id)"/>
                             <a class="btn btn-primary btn-lg bhz-ext-register w-100"
-                               t-att-href="register_url">
+                               t-att-href="button_href"
+                               t-att-target="button_target"
+                               t-att-rel="button_target and 'noopener' or False">
                                 <t t-esc="event.registration_button_label or 'Inscrever-se'"/>
                             </a>
                         </t>
@@ -383,10 +367,13 @@
                         <div class="oe_structure oe_empty"
                              id="bhz_event_editor_content"
                              data-oe-model="event.event"
-                             data-oe-field="promo_html_description"
+                             data-oe-field="public_description_html"
                              t-att-data-oe-id="event.id">
-                            <t t-if="event.promo_html_description">
-                                <t t-raw="event.promo_html_description"/>
+                            <t t-if="event.public_description_html">
+                                <t t-raw="event.public_description_html"/>
+                            </t>
+                            <t t-else="">
+                                <p class="text-muted">Mais detalhes em breve.</p>
                             </t>
                         </div>
                     </div>
