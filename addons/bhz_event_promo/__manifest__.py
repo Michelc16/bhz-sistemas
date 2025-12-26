@@ -13,6 +13,7 @@
         "views/event_views.xml",
         "views/website_menu.xml",
         "views/templates.xml",
+        "views/featured_carousel_snippet.xml",
         "views/bhz_event_import_views.xml",
     ],
     "assets": {
