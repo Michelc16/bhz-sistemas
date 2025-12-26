@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     "name": "GuiaBH - Eventos (Agenda + Terceiros + Botão custom)",
     "version": "19.0.1.0.0",
