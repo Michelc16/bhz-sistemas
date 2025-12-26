@@ -45,15 +45,42 @@ class GuiaBHAgendaController(http.Controller):
         base_domain = self._base_agenda_domain()
         domain = self._build_domain(filters, base_domain=base_domain)
         events_model = request.env["event.event"].sudo()
+        field_names = [
+            "state",
+            "stage_id",
+            "kanban_state",
+            "is_published",
+            "website_published",
+            "date_begin",
+            "date_end",
+            "website_id",
+            "show_on_public_agenda",
+        ]
+        field_presence = {name: name in events_model._fields for name in field_names}
+        _logger.info("Agenda field availability: %s", field_presence)
+        _logger.info("Agenda domain (pre-search): %s", domain)
         events = events_model.search(domain, order="date_begin asc")
-        sample = self._serialize_for_log(events[:5])
-        if events:
-            _logger.info("Agenda domain %s -> %s events | sample=%s", domain, len(events), sample)
-        else:
+        preview = []
+        for ev in events[:5]:
+            preview.append(
+                {
+                    "id": ev.id,
+                    "state": getattr(ev, "state", False),
+                    "stage_id": getattr(ev, "stage_id", False) and ev.stage_id.id,
+                    "kanban_state": getattr(ev, "kanban_state", False),
+                    "date_begin": ev.date_begin,
+                    "date_end": ev.date_end,
+                    "is_published": getattr(ev, "is_published", False),
+                    "website_published": getattr(ev, "website_published", False),
+                    "show_on_public_agenda": getattr(ev, "show_on_public_agenda", False),
+                    "website_id": getattr(ev, "website_id", False) and ev.website_id.id,
+                }
+            )
+        _logger.info("Agenda search returned %s events | preview=%s", len(events), preview)
+        if not events:
             fallback = events_model.search([], order="write_date desc, id desc", limit=5)
             _logger.info(
-                "Agenda domain %s returned 0 events. Recent records snapshot=%s",
-                domain,
+                "Agenda fallback snapshot=%s",
                 self._serialize_for_log(fallback),
             )
 
@@ -178,6 +205,16 @@ class GuiaBHAgendaController(http.Controller):
             selection_values = {value for value, _label in (state_field.selection or [])}
             if "cancel" in selection_values:
                 domain.append(("state", "!=", "cancel"))
+
+        if "date_end" in Event._fields:
+            now = fields.Datetime.now()
+            domain += [
+                "|",
+                ("date_end", "=", False),
+                ("date_end", ">=", now),
+            ]
+        elif "date_begin" in Event._fields:
+            domain.append(("date_begin", ">=", fields.Datetime.now()))
 
         if "website_id" in Event._fields:
             current_website = request.website
