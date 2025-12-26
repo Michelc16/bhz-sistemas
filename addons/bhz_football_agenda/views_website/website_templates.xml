@@ -52,7 +52,7 @@
                                         <t t-foreach="matches" t-as="m">
                                             <tr>
                                                 <td style="white-space:nowrap;">
-                                                    <t t-esc="format_datetime(request.env, m.match_datetime)"/>
+                                                    <t t-esc="formatLang(m.match_datetime, date=True, time=True)"/>
                                                 </td>
                                                 <td>
                                                     <strong><t t-esc="m.home_team_id.name"/></strong>
