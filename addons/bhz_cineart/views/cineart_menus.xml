@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_guiabh_root" name="GuiaBH" sequence="10"/>
+
+    <menuitem id="menu_guiabh_cineart_root" name="Cineart" parent="menu_guiabh_root" sequence="20"/>
+    <menuitem id="menu_guiabh_cineart_movies" name="Filmes (Sync)" parent="menu_guiabh_cineart_root"
+              action="action_guiabh_cineart_movie" sequence="10"/>
+</odoo>

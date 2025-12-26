@@ -1,0 +1,255 @@
+# -*- coding: utf-8 -*-
+import logging
+from urllib.parse import urljoin
+
+import requests
+from lxml import html
+
+from odoo import api, fields, models, _
+from odoo.exceptions import UserError
+
+_logger = logging.getLogger(__name__)
+
+
+class CineartMovie(models.Model):
+    _name = "guiabh.cineart.movie"
+    _description = "Cineart - Filmes"
+    _order = "category, name"
+
+    name = fields.Char(required=True, index=True)
+    category = fields.Selection(
+        [
+            ("now", "Em cartaz"),
+            ("soon", "Em breve"),
+            ("premiere", "Estreias da semana"),
+        ],
+        required=True,
+        index=True,
+        default="now",
+    )
+
+    genre = fields.Char()
+    age_rating = fields.Char()
+    release_date = fields.Char(help="Data exibida no site (quando houver).")
+    cineart_url = fields.Char()
+    poster_url = fields.Char()
+    active = fields.Boolean(default=True)
+
+    # Opcional: baixar e armazenar a imagem no Odoo
+    poster_image = fields.Image(max_width=1024, max_height=1024)
+
+    last_sync = fields.Datetime(readonly=True)
+
+    def action_open_cineart(self):
+        self.ensure_one()
+        if not self.cineart_url:
+            raise UserError(_("Este filme não possui URL do Cineart."))
+        return {
+            "type": "ir.actions.act_url",
+            "url": self.cineart_url,
+            "target": "new",
+        }
+
+    # =========================
+    # SINCRONIZAÇÃO
+    # =========================
+
+    @api.model
+    def cron_sync_all(self):
+        """Cron: sincroniza as 3 categorias."""
+        self.sync_category("now")
+        self.sync_category("soon")
+        self.sync_category("premiere")
+
+    @api.model
+    def sync_category(self, category):
+        base = "https://cineart.com.br/"
+        routes = {
+            "now": "https://cineart.com.br/",
+            "soon": "https://cineart.com.br/em-breve",
+            "premiere": "https://cineart.com.br/estreias",
+        }
+        if category not in routes:
+            raise UserError(_("Categoria inválida: %s") % category)
+
+        url = routes[category]
+        _logger.info("Cineart sync: category=%s url=%s", category, url)
+
+        headers = {
+            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome Safari"
+        }
+        r = requests.get(url, timeout=30, headers=headers)
+        r.raise_for_status()
+
+        doc = html.fromstring(r.content)
+
+        items = self._parse_movies(doc, base_url=base)
+
+        # Marca como inativos os antigos dessa categoria que não vieram na lista
+        existing = self.search([("category", "=", category)])
+        seen_keys = set()
+
+        for it in items:
+            key = (it.get("name") or "").strip().lower()
+            if not key:
+                continue
+            seen_keys.add(key)
+
+            vals = {
+                "name": it.get("name"),
+                "category": category,
+                "genre": it.get("genre"),
+                "age_rating": it.get("age_rating"),
+                "release_date": it.get("release_date"),
+                "cineart_url": it.get("cineart_url"),
+                "poster_url": it.get("poster_url"),
+                "active": True,
+                "last_sync": fields.Datetime.now(),
+            }
+
+            rec = self.search([("category", "=", category), ("name", "ilike", it.get("name"))], limit=1)
+            if rec:
+                rec.write(vals)
+                self._try_fetch_image(rec)
+            else:
+                rec = self.create(vals)
+                self._try_fetch_image(rec)
+
+        for rec in existing:
+            k = (rec.name or "").strip().lower()
+            if k and k not in seen_keys:
+                rec.active = False
+
+        _logger.info("Cineart sync DONE: category=%s items=%s", category, len(items))
+        return True
+
+    # -------- PARSER --------
+    @api.model
+    def _parse_movies(self, doc, base_url):
+        """
+        Parser robusto por heurística:
+        - tenta achar cards clicáveis com imagem + título
+        Ajuste aqui se o Cineart alterar a marcação.
+        """
+        results = []
+
+        # Heurística 1: links que envolvem poster
+        # (muitos sites usam <a ...><img ...> + titulo por perto)
+        cards = doc.xpath("//a[.//img]")
+
+        def clean(t):
+            return " ".join((t or "").split()).strip()
+
+        for a in cards:
+            img = a.xpath(".//img[1]")
+            if not img:
+                continue
+
+            poster_url = img[0].get("src") or img[0].get("data-src") or ""
+            poster_url = poster_url.strip()
+
+            # ignora ícones/brand
+            if "logo" in poster_url.lower():
+                continue
+
+            href = a.get("href") or ""
+            href = href.strip()
+            cineart_url = urljoin(base_url, href) if href else ""
+
+            # título: tenta aria-label, title, ou algum texto abaixo do card
+            title = clean(a.get("title") or a.get("aria-label") or "")
+            if not title:
+                # tenta pegar texto do card
+                title = clean(" ".join(a.xpath(".//text()")))
+                # evita textos gigantes
+                if len(title) > 80:
+                    title = title[:80].strip()
+
+            # filtro: precisa ter cara de filme
+            if not title or len(title) < 2:
+                continue
+
+            # tenta achar metadados próximos (gênero/classificação/data)
+            container = a.getparent()
+            text_near = ""
+            if container is not None:
+                text_near = clean(" ".join(container.xpath(".//text()")))
+
+            # heurísticas de extração simples
+            age = ""
+            if "16" in text_near:
+                age = "16"
+            elif "14" in text_near:
+                age = "14"
+            elif "12" in text_near:
+                age = "12"
+            elif "10" in text_near:
+                age = "10"
+            elif "18" in text_near:
+                age = "18"
+            elif "L" in text_near:
+                # pode ser "L"
+                age = "L"
+
+            # data (muitas vezes vem como 01/01/2026)
+            release = ""
+            for token in text_near.split():
+                if "/" in token and len(token) >= 8:
+                    # bem simples, evita pegar lixo
+                    if token.count("/") == 2:
+                        release = token.strip()
+                        break
+
+            # gênero: tenta achar palavras típicas (isso é só “nice to have”)
+            genre = ""
+            for g in ["Ação", "Animação", "Infantil", "Terror", "Suspense", "Drama", "Comédia", "Aventura", "Romance"]:
+                if g.lower() in text_near.lower():
+                    genre = g
+                    break
+
+            # valida: garante que não é link do menu / redes sociais
+            if any(x in cineart_url.lower() for x in ["instagram", "facebook", "twitter", "whatsapp"]):
+                continue
+            if "cineart.com.br" not in cineart_url.lower() and cineart_url:
+                # pode ser relativo; urljoin resolve. Se ficou fora do domínio, ignora.
+                continue
+
+            results.append(
+                {
+                    "name": title,
+                    "genre": genre,
+                    "age_rating": age,
+                    "release_date": release,
+                    "cineart_url": cineart_url,
+                    "poster_url": urljoin(base_url, poster_url) if poster_url else "",
+                }
+            )
+
+        # remove duplicados por (nome + poster)
+        dedup = []
+        seen = set()
+        for r in results:
+            k = ((r.get("name") or "").lower(), (r.get("poster_url") or "").lower())
+            if k in seen:
+                continue
+            seen.add(k)
+            dedup.append(r)
+
+        return dedup
+
+    # -------- BAIXAR IMAGEM (opcional) --------
+    def _try_fetch_image(self, rec):
+        if not rec.poster_url:
+            return
+        try:
+            r = requests.get(rec.poster_url, timeout=30)
+            r.raise_for_status()
+            rec.poster_image = r.content
+        except Exception as e:
+            _logger.warning("Falha ao baixar poster %s: %s", rec.poster_url, e)
+
+    # botão manual no backend
+    @api.model
+    def action_sync_now(self):
+        self.cron_sync_all()
+        return True

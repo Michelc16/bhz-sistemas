@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_guiabh_cineart_movie_tree" model="ir.ui.view">
+        <field name="name">guiabh.cineart.movie.tree</field>
+        <field name="model">guiabh.cineart.movie</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="category"/>
+                <field name="genre"/>
+                <field name="age_rating"/>
+                <field name="release_date"/>
+                <field name="active"/>
+                <field name="last_sync"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_guiabh_cineart_movie_form" model="ir.ui.view">
+        <field name="name">guiabh.cineart.movie.form</field>
+        <field name="model">guiabh.cineart.movie</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_open_cineart" type="object" string="Abrir no Cineart" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="category"/>
+                        <field name="genre"/>
+                        <field name="age_rating"/>
+                        <field name="release_date"/>
+                        <field name="cineart_url"/>
+                        <field name="poster_url"/>
+                        <field name="active"/>
+                        <field name="last_sync" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="poster_image" widget="image" class="oe_avatar"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_guiabh_cineart_movie" model="ir.actions.act_window">
+        <field name="name">Cineart - Filmes</field>
+        <field name="res_model">guiabh.cineart.movie</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{}</field>
+    </record>
+
+    <!-- Server Action para botão manual -->
+    <record id="server_action_guiabh_cineart_sync" model="ir.actions.server">
+        <field name="name">Cineart - Sincronizar agora</field>
+        <field name="model_id" ref="model_guiabh_cineart_movie"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_sync_all()</field>
+    </record>
+</odoo>
