@@ -347,7 +347,7 @@
                     </div>
                     <t t-set="register_url"
                        t-value="(event.website_url and '%s/register' % event.website_url.rstrip('/')) or ('/event/%s/register' % event.id)"/>
-                    <div class="my-4">
+                    <div class="my-4 bhz-event-cta-box">
                         <t t-if="event.registration_mode != 'disclosure_only'">
                             <t t-set="button_href" t-value="register_url"/>
                             <t t-set="button_target" t-value="False"/>
@@ -355,7 +355,7 @@
                                 <t t-set="button_href" t-value="event.registration_external_url"/>
                                 <t t-set="button_target" t-value="'_blank'"/>
                             </t>
-                            <a class="btn btn-primary btn-lg bhz-ext-register w-100"
+                            <a class="btn btn-primary btn-lg bhz-ext-register bhz-event-cta"
                                t-att-href="button_href"
                                t-att-target="button_target"
                                t-att-rel="button_target and 'noopener' or False">

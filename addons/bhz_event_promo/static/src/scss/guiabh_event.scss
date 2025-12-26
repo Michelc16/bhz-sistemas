@@ -87,4 +87,15 @@
   .bhz-event-description p {
     line-height: 1.6;
   }
+  .bhz-event-cta-box {
+    text-align: center;
+  }
+  .bhz-event-cta {
+    display: inline-flex;
+    width: auto;
+    min-width: unset;
+    justify-content: center;
+    padding-left: 1.75rem;
+    padding-right: 1.75rem;
+  }
 }
