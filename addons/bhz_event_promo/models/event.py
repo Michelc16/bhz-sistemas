@@ -206,3 +206,62 @@ class EventEvent(models.Model):
             event.write(vals)
             processed += 1
         _logger.info("BHZ Event Promo cleanup executed: %s candidates, %s updated", len(events), processed)
+
+    # ------------------------------------------------------------------ Publish
+    def _prepare_announced_publication_vals(self):
+        vals = {"show_on_public_agenda": True}
+        if "website_published" in self._fields:
+            vals["website_published"] = True
+        if "is_published" in self._fields:
+            vals["is_published"] = True
+        return vals
+
+    def _is_announced_stage(self, stage):
+        if not stage:
+            return False
+        stage_names = stage.mapped("name")
+        for name in stage_names:
+            if not name:
+                continue
+            lowered = name.lower()
+            if "announced" in lowered or "anunciado" in lowered:
+                return True
+        return False
+
+    def _publish_announced_events(self, events):
+        if not events:
+            return
+        vals = self._prepare_announced_publication_vals()
+        events.with_context(skip_announced_publish=True).write(vals)
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        stage_model = self.env["event.stage"]
+        for vals in vals_list:
+            stage_id = vals.get("stage_id")
+            if stage_id:
+                stage = stage_model.browse(stage_id)
+                if self._is_announced_stage(stage):
+                    vals.update(self._prepare_announced_publication_vals())
+        records = super().create(vals_list)
+        announced_records = records.filtered(lambda ev: self._is_announced_stage(ev.stage_id))
+        non_compliant = announced_records.filtered(
+            lambda ev: not ev.show_on_public_agenda
+            or ("website_published" in ev._fields and not getattr(ev, "website_published"))
+            or ("is_published" in ev._fields and not getattr(ev, "is_published"))
+        )
+        if non_compliant:
+            self._publish_announced_events(non_compliant)
+        return records
+
+    def write(self, vals):
+        if self.env.context.get("skip_announced_publish"):
+            return super().write(vals)
+
+        vals_to_write = dict(vals)
+        if "stage_id" in vals_to_write and vals_to_write.get("stage_id"):
+            stage = self.env["event.stage"].browse(vals_to_write["stage_id"])
+            if self._is_announced_stage(stage):
+                vals_to_write.update(self._prepare_announced_publication_vals())
+        result = super().write(vals_to_write)
+        return result
