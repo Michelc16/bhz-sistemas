@@ -7,6 +7,12 @@ class EventEvent(models.Model):
 
     is_third_party = fields.Boolean(string="Evento de terceiro", default=False)
     third_party_name = fields.Char(string="Organizador / Fonte (texto livre)")
+    third_party_description_html = fields.Html(
+        string="Descrição para o site",
+        sanitize=False,
+        translate=True,
+        help="Conteúdo rico exibido na página pública do evento.",
+    )
     third_party_partner_id = fields.Many2one("res.partner", string="Organizador (contato)")
 
     # Modo do botão: interno (Odoo) ou externo (link)

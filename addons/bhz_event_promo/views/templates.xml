@@ -363,22 +363,19 @@
                             </a>
                         </t>
                     </div>
-                    <t t-set="free_html" t-value="event.third_party_name"/>
-                    <t t-set="default_snippet" t-value="'Join us for this 24 hours Event'"/>
-                    <t t-set="desc_html"
-                       t-value="free_html or (event.description if (event.description and default_snippet not in (event.description or '')) else False)"/>
-                    <t t-set="desc_text"
-                       t-value="False if desc_html else (event.subtitle or event.promo_short_description)"/>
                     <div class="bhz-event-description">
-                        <t t-if="desc_html">
-                            <t t-raw="desc_html"/>
-                        </t>
-                        <t t-elif="desc_text">
-                            <p><t t-esc="desc_text"/></p>
-                        </t>
-                        <t t-else="">
-                            <p class="text-muted">Mais detalhes em breve.</p>
-                        </t>
+                        <div class="oe_structure"
+                             id="bhz_event_editor_content"
+                             data-oe-model="event.event"
+                             data-oe-field="third_party_description_html"
+                             t-att-data-oe-id="event.id">
+                            <t t-if="event.third_party_description_html">
+                                <t t-raw="event.third_party_description_html"/>
+                            </t>
+                            <t t-else="">
+                                <div class="text-muted">Use o editor para adicionar o conteúdo do evento.</div>
+                            </t>
+                        </div>
                     </div>
                 </div>
             </div>
