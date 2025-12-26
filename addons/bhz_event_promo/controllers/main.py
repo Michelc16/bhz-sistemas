@@ -189,16 +189,15 @@ class GuiaBHAgendaController(http.Controller):
         domain = [("show_on_public_agenda", "=", True)]
         has_is_published = "is_published" in Event._fields
         has_website_published = "website_published" in Event._fields
-        if has_is_published and has_website_published:
-            domain += [
-                "|",
-                ("is_published", "=", True),
-                ("website_published", "=", True),
-            ]
-        elif has_is_published:
-            domain.append(("is_published", "=", True))
-        elif has_website_published:
-            domain.append(("website_published", "=", True))
+        publication_filters = []
+        if has_is_published:
+            publication_filters.append(("is_published", "=", True))
+        if has_website_published:
+            publication_filters.append(("website_published", "=", True))
+        if len(publication_filters) == 2:
+            domain += ["|"] + publication_filters
+        elif publication_filters:
+            domain.append(publication_filters[0])
 
         if "state" in Event._fields:
             state_field = Event._fields["state"]
