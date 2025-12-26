@@ -9,8 +9,8 @@
     "data": [
         "security/ir.model.access.csv",
         "data/ir_cron.xml",
-        "views/cineart_menus.xml",
         "views/cineart_movie_views.xml",
+        "views/cineart_menus.xml",
         "views_website/cineart_templates.xml",
     ],
     "installable": True,
