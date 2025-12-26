@@ -160,33 +160,15 @@ class GuiaBHAgendaController(http.Controller):
     def _base_agenda_domain(self):
         Event = request.env["event.event"]
         domain = [("show_on_public_agenda", "=", True)]
-        now = fields.Datetime.now()
-        domain.append(("date_end", ">=", now))
-        has_is_published = "is_published" in Event._fields
-        has_website_published = "website_published" in Event._fields
-        if has_is_published and has_website_published:
-            domain.extend(
-                [
-                    "|",
-                    ("is_published", "=", True),
-                    ("website_published", "=", True),
-                ]
-            )
-        elif has_is_published:
+        if "is_published" in Event._fields:
             domain.append(("is_published", "=", True))
-        elif has_website_published:
+        elif "website_published" in Event._fields:
             domain.append(("website_published", "=", True))
 
         if "state" in Event._fields:
             state_field = Event._fields["state"]
             selection_values = {value for value, _label in (state_field.selection or [])}
-            if "confirm" in selection_values or "done" in selection_values:
-                allowed_states = [state for state in ("confirm", "done") if state in selection_values]
-                if allowed_states:
-                    domain.append(("state", "in", allowed_states))
-                if "cancel" in selection_values:
-                    domain.append(("state", "!=", "cancel"))
-            elif "cancel" in selection_values:
+            if "cancel" in selection_values:
                 domain.append(("state", "!=", "cancel"))
 
         if "website_id" in Event._fields:

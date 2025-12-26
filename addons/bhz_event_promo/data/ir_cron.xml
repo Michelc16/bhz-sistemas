@@ -6,7 +6,7 @@
         <field name="state">code</field>
         <field name="code">model.sudo().cron_auto_cleanup_events()</field>
         <field name="interval_number">1</field>
-        <field name="interval_type">day</field>
+        <field name="interval_type">days</field>
         <field name="active">True</field>
     </record>
 </odoo>

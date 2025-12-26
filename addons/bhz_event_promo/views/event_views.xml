@@ -14,7 +14,7 @@
                             <field name="show_on_public_agenda"/>
                             <field name="promo_category_id"/>
                             <field name="promo_short_description"/>
-                            <field name="public_description_html" widget="html" options="{'sanitize': True}"/>
+                            <field name="promo_description_html" widget="html" options="{'sanitize': True}"/>
                         </group>
                         <group>
                             <field name="promo_cover_image" widget="image" class="oe_avatar"/>

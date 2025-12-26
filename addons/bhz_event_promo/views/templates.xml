@@ -145,7 +145,7 @@
                                         </t>
 
                                         <div class="mt-auto d-flex gap-2">
-                                            <t t-if="ev.registration_mode != 'none'">
+                                            <t t-if="ev.registration_mode != 'disclosure_only'">
                                                 <t t-set="primary_href" t-value="detail_url"/>
                                                 <t t-set="primary_target" t-value="False"/>
                                                 <t t-if="ev.registration_mode == 'external' and ev.registration_external_url">
@@ -348,7 +348,7 @@
                     <t t-set="register_url"
                        t-value="(event.website_url and '%s/register' % event.website_url.rstrip('/')) or ('/event/%s/register' % event.id)"/>
                     <div class="my-4">
-                        <t t-if="event.registration_mode != 'none'">
+                        <t t-if="event.registration_mode != 'disclosure_only'">
                             <t t-set="button_href" t-value="register_url"/>
                             <t t-set="button_target" t-value="False"/>
                             <t t-if="event.registration_mode == 'external' and event.registration_external_url">
@@ -367,10 +367,14 @@
                         <div class="oe_structure oe_empty"
                              id="bhz_event_editor_content"
                              data-oe-model="event.event"
-                             data-oe-field="public_description_html"
+                             data-oe-field="promo_description_html"
                              t-att-data-oe-id="event.id">
-                            <t t-if="event.public_description_html">
-                                <t t-raw="event.public_description_html"/>
+                            <t t-set="fallback_text" t-value="event.subtitle or event.promo_short_description"/>
+                            <t t-if="event.promo_description_html">
+                                <t t-raw="event.promo_description_html"/>
+                            </t>
+                            <t t-elif="fallback_text">
+                                <p><t t-esc="fallback_text"/></p>
                             </t>
                             <t t-else="">
                                 <p class="text-muted">Mais detalhes em breve.</p>

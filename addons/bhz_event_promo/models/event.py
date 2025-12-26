@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
+import logging
+
 from odoo import api, fields, models
+
+_logger = logging.getLogger(__name__)
 
 
 class EventEvent(models.Model):
@@ -8,10 +12,10 @@ class EventEvent(models.Model):
     is_third_party = fields.Boolean(string="Evento de terceiro", default=False)
     third_party_name = fields.Char(string="Organizador / Fonte (texto livre)")
     third_party_partner_id = fields.Many2one("res.partner", string="Organizador (contato)")
-    public_description_html = fields.Html(
-        string="Descrição pública (site)",
+    promo_description_html = fields.Html(
+        string="Descrição (Guia BH)",
         sanitize=True,
-        translate=True,
+        translate=False,
         help="Descrição rica exibida na página pública do evento.",
     )
 
@@ -20,7 +24,7 @@ class EventEvent(models.Model):
         [
             ("internal", "Inscrição/Venda pelo meu site (Odoo)"),
             ("external", "Redirecionar para link externo"),
-            ("none", "Somente divulgação (sem botão)"),
+            ("disclosure_only", "Somente divulgação (sem link / sem ingressos)"),
         ],
         string="Modo do botão de inscrição",
         default="internal",
@@ -113,7 +117,7 @@ class EventEvent(models.Model):
 
     def init(self):
         super().init()
-        self._migrate_public_description_html()
+        self._migrate_promo_description_html()
         self._migrate_registration_mode_values()
 
     def _existing_columns(self):
@@ -127,13 +131,14 @@ class EventEvent(models.Model):
         )
         return {row[0] for row in self.env.cr.fetchall()}
 
-    def _migrate_public_description_html(self):
+    def _migrate_promo_description_html(self):
         columns = self._existing_columns()
-        target_col = "public_description_html"
+        target_col = "promo_description_html"
         if target_col not in columns:
             return
 
         for source in (
+            "public_description_html",
             "promo_html_description",
             "third_party_description_html",
             "third_party_description",
@@ -158,27 +163,46 @@ class EventEvent(models.Model):
         self.env.cr.execute(
             """
             UPDATE event_event
-               SET registration_mode = 'none'
-             WHERE registration_mode = 'promo'
+               SET registration_mode = 'disclosure_only'
+             WHERE registration_mode IN ('promo', 'none')
             """
         )
 
     @api.model
     def cron_auto_cleanup_events(self):
-        now = fields.Datetime.now()
+        now_utc = fields.Datetime.now()
         domain = [
+            "|",
+            "&",
             ("date_end", "!=", False),
-            ("date_end", "<", now),
+            ("date_end", "<", now_utc),
+            "&",
+            ("date_end", "=", False),
+            ("date_begin", "<", now_utc),
         ]
         events = self.search(domain)
+        processed = 0
+        tz_name = self.env.user.tz or "UTC"
+        tz_env = self.with_context(tz=tz_name)
+        now_local = fields.Datetime.context_timestamp(tz_env, now_utc)
         for event in events.sudo():
+            deadline = event.date_end or event.date_begin
+            if not deadline:
+                continue
+            deadline_local = fields.Datetime.context_timestamp(tz_env, deadline)
+            if deadline_local and now_local and deadline_local > now_local:
+                continue
             vals = {}
             if event.show_on_public_agenda:
                 vals["show_on_public_agenda"] = False
             if "is_published" in event._fields and event.is_published:
                 vals["is_published"] = False
-            if "website_published" in event._fields and event.website_published:
+            elif "website_published" in event._fields and event.website_published:
                 vals["website_published"] = False
+            if "active" in event._fields and event.active:
+                vals["active"] = False
             if not vals:
                 continue
             event.write(vals)
+            processed += 1
+        _logger.info("BHZ Event Promo cleanup executed: %s candidates, %s updated", len(events), processed)
