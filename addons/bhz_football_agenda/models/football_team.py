@@ -13,10 +13,6 @@ class FootballTeam(models.Model):
     logo = fields.Binary(string="Logo")
     website_published = fields.Boolean(default=True, string="Publicado no site")
 
-    _sql_constraints = [
-        ("slug_unique", "unique(slug)", "O slug do time deve ser único."),
-    ]
-
     @api.constrains("slug")
     def _check_slug(self):
         for rec in self:
