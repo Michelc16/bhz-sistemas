@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_bhz_football_team_manager,bhz.football.team manager,model_bhz_football_team,bhz_football_agenda.group_bhz_football_manager,1,1,1,1
+access_bhz_football_match_manager,bhz.football.match manager,model_bhz_football_match,bhz_football_agenda.group_bhz_football_manager,1,1,1,1

@@ -1,0 +1,102 @@
+<odoo>
+    <template id="page_football_agenda" name="Agenda de Jogos (BHZ Futebol)">
+        <t t-call="website.layout">
+            <t t-set="pageName" t-value="'Agenda de Jogos'"/>
+
+            <div class="container py-5">
+                <div class="row align-items-center mb-4">
+                    <div class="col-12 col-lg-8">
+                        <h1 class="mb-2">Agenda de Jogos</h1>
+                        <p class="text-muted mb-0">
+                            Cruzeiro, Atlético-MG e América-MG — próximos jogos e informações.
+                        </p>
+                    </div>
+                    <div class="col-12 col-lg-4 mt-3 mt-lg-0">
+                        <div class="d-flex gap-2 justify-content-lg-end flex-wrap">
+                            <a class="btn btn-outline-primary"
+                               t-attf-href="/futebol/agenda"
+                               t-att-class="'btn btn-outline-primary ' + ('' if selected_team else 'active')">
+                                Todos
+                            </a>
+                            <t t-foreach="teams" t-as="tteam">
+                                <a class="btn btn-outline-primary"
+                                   t-attf-href="/futebol/agenda/{{ tteam.slug }}"
+                                   t-att-class="'btn btn-outline-primary ' + ('active' if (selected_team and selected_team.id == tteam.id) else '')">
+                                    <t t-esc="tteam.name"/>
+                                </a>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <t t-if="not matches">
+                            <div class="alert alert-info mb-0">
+                                Nenhum jogo encontrado para os próximos dias (ou ainda não cadastrado).
+                            </div>
+                        </t>
+
+                        <t t-if="matches">
+                            <div class="table-responsive">
+                                <table class="table align-middle mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Data/Hora</th>
+                                            <th>Jogo</th>
+                                            <th>Competição</th>
+                                            <th>Local</th>
+                                            <th>Transmissão</th>
+                                            <th>Ingressos</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="matches" t-as="m">
+                                            <tr>
+                                                <td style="white-space:nowrap;">
+                                                    <t t-esc="format_datetime(request.env, m.match_datetime)"/>
+                                                </td>
+                                                <td>
+                                                    <strong><t t-esc="m.home_team_id.name"/></strong>
+                                                    <span class="mx-1">x</span>
+                                                    <strong><t t-esc="m.away_team_id.name"/></strong>
+                                                    <t t-if="m.round_name">
+                                                        <div class="text-muted small"><t t-esc="m.round_name"/></div>
+                                                    </t>
+                                                </td>
+                                                <td>
+                                                    <t t-esc="m.competition or '-'"/>
+                                                </td>
+                                                <td>
+                                                    <t t-esc="m.stadium or '-'"/>
+                                                    <t t-if="m.city">
+                                                        <div class="text-muted small"><t t-esc="m.city"/></div>
+                                                    </t>
+                                                </td>
+                                                <td>
+                                                    <t t-esc="m.broadcast or '-'"/>
+                                                </td>
+                                                <td>
+                                                    <t t-if="m.ticket_url">
+                                                        <a class="btn btn-sm btn-primary" t-att-href="m.ticket_url" target="_blank" rel="noopener">
+                                                            Comprar
+                                                        </a>
+                                                    </t>
+                                                    <t t-if="not m.ticket_url">-</t>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+
+                <div class="mt-4 text-muted small">
+                    Dica: você pode cadastrar/atualizar os jogos no menu <strong>BHZ Futebol → Jogos</strong>.
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

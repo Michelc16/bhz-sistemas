@@ -1,0 +1,9 @@
+<odoo>
+    <!-- Menu no site (Website > Menus) -->
+    <record id="website_menu_futebol_agenda" model="website.menu">
+        <field name="name">Agenda de Jogos</field>
+        <field name="url">/futebol/agenda</field>
+        <field name="sequence" eval="60"/>
+        <field name="parent_id" ref="website.main_menu"/>
+    </record>
+</odoo>

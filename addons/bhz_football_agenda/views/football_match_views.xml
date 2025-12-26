@@ -1,0 +1,66 @@
+<odoo>
+    <record id="view_bhz_football_match_tree" model="ir.ui.view">
+        <field name="name">bhz.football.match.tree</field>
+        <field name="model">bhz.football.match</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="match_datetime"/>
+                <field name="competition"/>
+                <field name="home_team_id"/>
+                <field name="away_team_id"/>
+                <field name="stadium"/>
+                <field name="website_published"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_bhz_football_match_form" model="ir.ui.view">
+        <field name="name">bhz.football.match.form</field>
+        <field name="model">bhz.football.match</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="match_datetime"/>
+                        <field name="competition"/>
+                        <field name="round_name"/>
+                    </group>
+
+                    <group>
+                        <field name="home_team_id"/>
+                        <field name="away_team_id"/>
+                    </group>
+
+                    <group>
+                        <field name="stadium"/>
+                        <field name="city"/>
+                    </group>
+
+                    <group>
+                        <field name="broadcast"/>
+                        <field name="ticket_url"/>
+                    </group>
+
+                    <group>
+                        <field name="website_published"/>
+                        <field name="active"/>
+                    </group>
+
+                    <notebook>
+                        <page string="Observações">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bhz_football_match" model="ir.actions.act_window">
+        <field name="name">Jogos</field>
+        <field name="res_model">bhz.football.match</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{}</field>
+    </record>
+</odoo>

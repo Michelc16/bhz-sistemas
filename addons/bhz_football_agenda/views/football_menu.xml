@@ -1,0 +1,9 @@
+<odoo>
+    <menuitem id="bhz_football_root" name="BHZ Futebol" sequence="10"/>
+
+    <menuitem id="bhz_football_menu_matches" name="Jogos"
+              parent="bhz_football_root" action="action_bhz_football_match" sequence="10"/>
+
+    <menuitem id="bhz_football_menu_teams" name="Times"
+              parent="bhz_football_root" action="action_bhz_football_team" sequence="20"/>
+</odoo>

@@ -1,0 +1,19 @@
+<odoo>
+    <record id="team_cruzeiro" model="bhz.football.team">
+        <field name="name">Cruzeiro</field>
+        <field name="slug">cruzeiro</field>
+        <field name="website_published">True</field>
+    </record>
+
+    <record id="team_atletico_mg" model="bhz.football.team">
+        <field name="name">Atlético-MG</field>
+        <field name="slug">atletico-mg</field>
+        <field name="website_published">True</field>
+    </record>
+
+    <record id="team_america_mg" model="bhz.football.team">
+        <field name="name">América-MG</field>
+        <field name="slug">america-mg</field>
+        <field name="website_published">True</field>
+    </record>
+</odoo>
