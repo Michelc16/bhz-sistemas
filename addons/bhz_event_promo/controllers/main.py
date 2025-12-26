@@ -45,38 +45,10 @@ class GuiaBHAgendaController(http.Controller):
         base_domain = self._base_agenda_domain()
         domain = self._build_domain(filters, base_domain=base_domain)
         events_model = request.env["event.event"].sudo()
-        field_names = [
-            "state",
-            "stage_id",
-            "kanban_state",
-            "is_published",
-            "website_published",
-            "date_begin",
-            "date_end",
-            "website_id",
-            "show_on_public_agenda",
-        ]
-        field_presence = {name: name in events_model._fields for name in field_names}
-        _logger.info("Agenda field availability: %s", field_presence)
         _logger.info("Agenda domain (pre-search): %s", domain)
         events = events_model.search(domain, order="date_begin asc")
-        preview = []
-        for ev in events[:5]:
-            preview.append(
-                {
-                    "id": ev.id,
-                    "state": getattr(ev, "state", False),
-                    "stage_id": getattr(ev, "stage_id", False) and ev.stage_id.id,
-                    "kanban_state": getattr(ev, "kanban_state", False),
-                    "date_begin": ev.date_begin,
-                    "date_end": ev.date_end,
-                    "is_published": getattr(ev, "is_published", False),
-                    "website_published": getattr(ev, "website_published", False),
-                    "show_on_public_agenda": getattr(ev, "show_on_public_agenda", False),
-                    "website_id": getattr(ev, "website_id", False) and ev.website_id.id,
-                }
-            )
-        _logger.info("Agenda search returned %s events | preview=%s", len(events), preview)
+        snapshot = [(ev.id, ev.name) for ev in events[:10]]
+        _logger.info("Agenda domain result: %s events | sample=%s", len(events), snapshot)
         if not events:
             fallback = events_model.search([], order="write_date desc, id desc", limit=5)
             _logger.info(
@@ -189,15 +161,16 @@ class GuiaBHAgendaController(http.Controller):
         domain = [("show_on_public_agenda", "=", True)]
         has_is_published = "is_published" in Event._fields
         has_website_published = "website_published" in Event._fields
-        publication_filters = []
-        if has_is_published:
-            publication_filters.append(("is_published", "=", True))
-        if has_website_published:
-            publication_filters.append(("website_published", "=", True))
-        if len(publication_filters) == 2:
-            domain += ["|"] + publication_filters
-        elif publication_filters:
-            domain.append(publication_filters[0])
+        if has_is_published and has_website_published:
+            domain += [
+                "|",
+                ("is_published", "=", True),
+                ("website_published", "=", True),
+            ]
+        elif has_is_published:
+            domain.append(("is_published", "=", True))
+        elif has_website_published:
+            domain.append(("website_published", "=", True))
 
         if "state" in Event._fields:
             state_field = Event._fields["state"]
