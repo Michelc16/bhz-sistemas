@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
     <template id="guiabh_cineart_page" name="GuiaBH - Cineart" page="True">
         <t t-call="website.layout">
             <div class="container py-4">
@@ -54,8 +53,6 @@
             </div>
         </t>
     </template>
-
-    <!-- Grid reutilizável -->
     <template id="_cineart_grid">
         <t t-if="not movies">
             <div class="alert alert-info">
