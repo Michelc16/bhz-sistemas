@@ -16,7 +16,7 @@
         "views/football_team_views.xml",
         "views/football_match_views.xml",
         "views/football_menu.xml",
-        "views/website_templates.xml",
+        "views_website/website_templates.xml",
     ],
     "application": True,
     "installable": True,
