@@ -35,6 +35,6 @@
     <record id="action_bhz_football_team" model="ir.actions.act_window">
         <field name="name">Times</field>
         <field name="res_model">bhz.football.team</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 </odoo>

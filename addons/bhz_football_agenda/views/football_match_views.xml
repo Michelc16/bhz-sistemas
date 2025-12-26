@@ -60,7 +60,7 @@
     <record id="action_bhz_football_match" model="ir.actions.act_window">
         <field name="name">Jogos</field>
         <field name="res_model">bhz.football.match</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="context">{}</field>
     </record>
 </odoo>
