@@ -14,6 +14,7 @@
                             <field name="show_on_public_agenda"/>
                             <field name="promo_category_id"/>
                             <field name="promo_short_description"/>
+                            <field name="promo_html_description" widget="html" options="{'sanitize': True}"/>
                         </group>
                         <group>
                             <field name="promo_cover_image" widget="image" class="oe_avatar"/>
@@ -33,6 +34,8 @@
                         <field name="registration_button_label"/>
                         <field name="registration_external_url"
                                modifiers="{'required': [('registration_mode', '=', 'external')], 'invisible': [('registration_mode', '!=', 'external')]}"/>
+                        <field name="promo_show_button"
+                               modifiers="{'invisible': [('registration_mode', '!=', 'promo')]}"/>
                     </group>
 
                     <separator string="Tags e Destaques"/>
@@ -53,6 +56,7 @@
                     <group>
                         <field name="venue_partner_id"/>
                         <field name="neighborhood"/>
+                        <field name="auto_remove_after_event"/>
                     </group>
                 </page>
             </xpath>

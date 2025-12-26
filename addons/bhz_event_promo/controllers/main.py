@@ -160,6 +160,8 @@ class GuiaBHAgendaController(http.Controller):
     def _base_agenda_domain(self):
         Event = request.env["event.event"]
         domain = [("show_on_public_agenda", "=", True)]
+        now = fields.Datetime.now()
+        domain.append(("date_end", ">=", now))
         has_is_published = "is_published" in Event._fields
         has_website_published = "website_published" in Event._fields
         if has_is_published and has_website_published:

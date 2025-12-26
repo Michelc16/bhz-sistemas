@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ir_cron_bhz_event_cleanup" model="ir.cron">
+        <field name="name">BHZ Event Promo - Cleanup</field>
+        <field name="model_id" ref="event.model_event_event"/>
+        <field name="state">code</field>
+        <field name="code">model.sudo().cron_auto_cleanup_events()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">day</field>
+        <field name="numbercall">-1</field>
+        <field name="active">True</field>
+    </record>
+</odoo>

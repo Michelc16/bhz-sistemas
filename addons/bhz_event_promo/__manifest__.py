@@ -10,6 +10,7 @@
     "data": [
         "security/security.xml",
         "security/ir.model.access.csv",
+        "data/ir_cron.xml",
         "views/event_views.xml",
         "views/website_menu.xml",
         "views/templates.xml",
