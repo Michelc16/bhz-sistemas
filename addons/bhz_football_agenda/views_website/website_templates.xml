@@ -1,9 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
-<odoo>
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
     <template id="page_football_agenda" name="Agenda de Jogos (BHZ Futebol)">
         <t t-call="website.layout">
             <t t-set="pageName" t-value="'Agenda de Jogos'"/>
-
             <div class="container py-5">
                 <div class="row align-items-center mb-4">
                     <div class="col-12 col-lg-8">
@@ -29,7 +28,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="card shadow-sm">
                     <div class="card-body">
                         <t t-if="not matches">
@@ -37,7 +35,6 @@
                                 Nenhum jogo encontrado para os próximos dias (ou ainda não cadastrado).
                             </div>
                         </t>
-
                         <t t-if="matches">
                             <div class="table-responsive">
                                 <table class="table align-middle mb-0">
@@ -93,11 +90,10 @@
                         </t>
                     </div>
                 </div>
-
                 <div class="mt-4 text-muted small">
                     Dica: você pode cadastrar/atualizar os jogos no menu <strong>BHZ Futebol → Jogos</strong>.
                 </div>
             </div>
         </t>
     </template>
-</odoo>
+</templates>

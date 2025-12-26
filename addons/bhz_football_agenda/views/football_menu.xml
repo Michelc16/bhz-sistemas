@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <menuitem id="bhz_football_root" name="BHZ Futebol" sequence="10"/>
 
