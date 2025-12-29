@@ -16,6 +16,13 @@ class CineartMovie(models.Model):
     _description = "Cineart - Filmes"
     _order = "category, name"
 
+    CINEART_ROUTES = {
+        "now": "https://www.cineart.com.br/em-cartaz",
+        "soon": "https://www.cineart.com.br/em-breve",
+        "premiere": "https://www.cineart.com.br/estreias",
+    }
+    MIN_VALID_ITEMS = 5
+
     name = fields.Char(string="Título", required=True, index=True)
     category = fields.Selection(
         [
@@ -41,6 +48,10 @@ class CineartMovie(models.Model):
 
     last_sync = fields.Datetime(string="Última sincronização", readonly=True)
 
+    _sql_constraints = [
+        ("cineart_url_unique", "unique(cineart_url)", "Já existe um filme com este link do Cineart.")
+    ]
+
     def action_open_cineart(self):
         self.ensure_one()
         if not self.cineart_url:
@@ -53,14 +64,20 @@ class CineartMovie(models.Model):
 
     def action_sync_now(self):
         message_lines = []
-        categories = [("now", _("Em cartaz")), ("soon", _("Em breve")), ("premiere", _("Estreias da semana"))]
+        Movie = self.sudo()
+        categories = [
+            ("now", _("Em cartaz")),
+            ("soon", _("Em breve")),
+            ("premiere", _("Estreias da semana")),
+        ]
         for code, label in categories:
+            route = Movie.CINEART_ROUTES.get(code)
             try:
-                result = self.sudo().sync_category(code)
-            except UserError as err:
+                result = Movie._sync_category(route, code, raise_on_error=True)
+            except UserError:
                 raise
             except Exception as err:
-                _logger.exception("Erro ao sincronizar categoria %s", code)
+                _logger.exception("Erro inesperado ao sincronizar categoria %s via botão", code)
                 raise UserError(_("Falha ao sincronizar %(cat)s: %(msg)s") % {"cat": label, "msg": err})
 
             if not result or not result.get("valid"):
@@ -86,83 +103,93 @@ class CineartMovie(models.Model):
     @api.model
     def cron_sync_all(self):
         """Cron: sincroniza as 3 categorias."""
-        for code in ("now", "soon", "premiere"):
+        for code, url in self.CINEART_ROUTES.items():
             try:
-                self.sync_category(code)
+                self._sync_category(url, code)
             except Exception:
                 _logger.exception("Erro ao sincronizar categoria %s via cron", code)
 
     @api.model
     def sync_category(self, category):
-        base = "https://cineart.com.br/"
-        routes = {
-            "now": "https://cineart.com.br/",
-            "soon": "https://cineart.com.br/em-breve",
-            "premiere": "https://cineart.com.br/estreias",
-        }
-        if category not in routes:
-            raise UserError(_("Categoria inválida: %s") % category)
+        """Compatibilidade antiga."""
+        route = self.CINEART_ROUTES.get(category)
+        return self._sync_category(route, category, raise_on_error=True)
 
-        url = routes[category]
+    @api.model
+    def _sync_category(self, url, category, raise_on_error=False):
+        if not url:
+            msg = _("Categoria inválida: %s") % (category,)
+            _logger.error("Cineart sync aborted: %s", msg)
+            if raise_on_error:
+                raise UserError(msg)
+            return {"valid": False, "count": 0}
+
         _logger.info("Cineart sync: category=%s url=%s", category, url)
-
         headers = {
-            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome Safari"
+            "User-Agent": (
+                "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+                "(KHTML, like Gecko) Chrome Safari"
+            )
         }
         try:
-            r = requests.get(url, timeout=30, headers=headers)
-            r.raise_for_status()
+            response = requests.get(url, timeout=30, headers=headers)
+            response.raise_for_status()
         except Exception as err:
-            _logger.error("Cineart sync error (%s): %s", category, err)
+            _logger.exception("Cineart sync HTTP error (%s): %s", category, err)
+            if raise_on_error:
+                raise UserError(_("Falha ao acessar %(url)s: %(msg)s") % {"url": url, "msg": err})
             return {"valid": False, "count": 0}
 
         try:
-            doc = html.fromstring(r.content)
-            items = self._parse_movies(doc, base_url=base)
+            doc = html.fromstring(response.content)
+            items = self._parse_movies(doc, base_url="https://www.cineart.com.br/")
         except Exception as err:
-            _logger.error("Cineart parse error (%s): %s", category, err)
+            _logger.exception("Cineart parse error (%s): %s", category, err)
+            if raise_on_error:
+                raise UserError(_("Falha ao interpretar os dados de %(cat)s: %(msg)s") % {"cat": category, "msg": err})
             return {"valid": False, "count": 0}
 
-        MIN_VALID_ITEMS = 5
-        if not items or len(items) < MIN_VALID_ITEMS:
-            _logger.warning("Cineart sync aborted (%s): encontrou %s itens (< %s)", category, len(items), MIN_VALID_ITEMS)
-            return {"valid": False, "count": len(items)}
+        if not items or len(items) < self.MIN_VALID_ITEMS:
+            _logger.warning(
+                "Cineart sync aborted (%s): encontrou %s itens (< %s)",
+                category,
+                len(items) if items else 0,
+                self.MIN_VALID_ITEMS,
+            )
+            return {"valid": False, "count": len(items) if items else 0}
 
-        # Marca como inativos os antigos dessa categoria que não vieram na lista
         existing = self.search([("category", "=", category)])
-        existing_by_key = {self._build_sync_key(rec.name, rec.cineart_url): rec for rec in existing}
+        existing_by_key = {self._build_sync_key(rec.name, rec.cineart_url, rec.category): rec for rec in existing}
         seen_keys = set()
+        now = fields.Datetime.now()
 
-        for it in items:
-            key = self._build_sync_key(it.get("name"), it.get("cineart_url"))
+        for item in items:
+            key = self._build_sync_key(item.get("name"), item.get("cineart_url"), category)
             if not key:
                 continue
             seen_keys.add(key)
-
             vals = {
-                "name": it.get("name"),
+                "name": item.get("name"),
                 "category": category,
-                "genre": it.get("genre"),
-                "age_rating": it.get("age_rating"),
-                "release_date": it.get("release_date"),
-                "cineart_url": it.get("cineart_url"),
-                "poster_url": it.get("poster_url"),
+                "genre": item.get("genre"),
+                "age_rating": item.get("age_rating"),
+                "release_date": item.get("release_date"),
+                "cineart_url": item.get("cineart_url"),
+                "poster_url": item.get("poster_url"),
                 "active": True,
-                "last_sync": fields.Datetime.now(),
+                "last_sync": now,
             }
-
             rec = existing_by_key.get(key)
             if rec:
                 rec.write(vals)
-                self._try_fetch_image(rec)
             else:
                 rec = self.create(vals)
-                self._try_fetch_image(rec)
                 existing_by_key[key] = rec
+            self._try_fetch_image(rec)
 
         for rec in existing:
-            k = self._build_sync_key(rec.name, rec.cineart_url)
-            if k and k not in seen_keys:
+            rec_key = self._build_sync_key(rec.name, rec.cineart_url, rec.category)
+            if rec_key and rec_key not in seen_keys:
                 rec.active = False
 
         _logger.info("Cineart sync DONE: category=%s items=%s", category, len(items))
@@ -283,12 +310,14 @@ class CineartMovie(models.Model):
         return dedup
 
     # -------- BAIXAR IMAGEM (opcional) --------
-    def _build_sync_key(self, name, url):
+    def _build_sync_key(self, name, url, category):
         url = (url or "").strip().lower()
         if url:
             return url
         name = (name or "").strip().lower()
-        return name or False
+        if not name:
+            return False
+        return "%s|%s" % ((category or "").strip().lower(), name)
 
     def _try_fetch_image(self, rec):
         if not rec.poster_url:

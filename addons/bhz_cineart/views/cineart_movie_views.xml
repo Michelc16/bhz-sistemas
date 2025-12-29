@@ -23,7 +23,7 @@
             <form string="Filme Cineart">
                 <header>
                     <button name="action_open_cineart" type="object" string="Abrir no Cineart" class="btn-primary"/>
-                    <button name="action_sync_now" type="object" string="Sincronizar agora" class="btn-secondary" context="{'from_button': True}"/>
+                    <button name="action_sync_now" type="object" string="Sincronizar agora" class="btn-secondary oe_highlight" context="{'from_button': True}"/>
                 </header>
                 <sheet>
                     <group>
