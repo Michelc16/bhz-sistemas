@@ -98,7 +98,7 @@
         </section>
     </template>
     <template id="guiabh_featured_carousel_snippet_menu" inherit_id="website.snippets" name="Inserir GuiaBH - Carrossel de Destaques">
-        <xpath expr="//we-snippets" position="inside">
+        <xpath expr="(//div[contains(@class,'o_panel_snippet')])[last()]" position="after">
             <div class="o_panel_snippet o_panel_snippet_dynamic" data-name="GuiaBH">
                 <h3 class="o_panel_title">GuiaBH</h3>
                 <div class="o_panel_body">
