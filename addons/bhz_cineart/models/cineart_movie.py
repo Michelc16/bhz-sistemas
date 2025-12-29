@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 import logging
 import re
 from urllib.parse import urljoin
@@ -128,7 +129,10 @@ class CineartMovie(models.Model):
 
         _logger.info("Cineart sync: category=%s url=%s", category, url)
         headers = {
-            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome Safari"
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome Safari",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+            "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.8",
+            "Referer": url,
         }
         try:
             response = requests.get(url, timeout=30, headers=headers)
@@ -170,7 +174,9 @@ class CineartMovie(models.Model):
         created = updated = 0
 
         for item in items:
-            cineart_url = self._normalize_cineart_url(item.get("cineart_url"))
+            cineart_url = self._normalize_cineart_url(item.get("cineart_url")) or self._build_fallback_url(
+                category, item.get("name")
+            )
             if not cineart_url:
                 continue
             key = cineart_url.lower()
@@ -253,6 +259,15 @@ class CineartMovie(models.Model):
     # -------- PARSER --------
     @api.model
     def _parse_movies(self, doc, base_url):
+        movies = self._parse_movies_from_dom(doc, base_url)
+        if len(movies) >= self.MIN_VALID_ITEMS:
+            return movies
+        json_movies = self._parse_movies_from_json(doc, base_url)
+        if json_movies:
+            return json_movies
+        return movies
+
+    def _parse_movies_from_dom(self, doc, base_url):
         results = []
         seen_urls = set()
         images = doc.xpath("//img")
@@ -267,15 +282,66 @@ class CineartMovie(models.Model):
 
             container = self._get_card_container(img)
             movie = self._extract_movie_data(container, img, base_url)
-            if not movie or not movie.get("cineart_url"):
+            if not movie:
                 continue
-            key = movie["cineart_url"].lower()
-            if key in seen_urls:
+            key = (movie.get("cineart_url") or movie.get("name", "")).lower()
+            if key and key in seen_urls:
                 continue
             seen_urls.add(key)
             results.append(movie)
 
         return results
+
+    def _parse_movies_from_json(self, doc, base_url):
+        scripts = doc.xpath("//script[contains(@type,'json')]/text()") + doc.xpath("//script[@id='__NEXT_DATA__']/text()")
+        movies = []
+        seen = set()
+        for script_text in scripts:
+            try:
+                data = json.loads(script_text)
+            except Exception:  # pylint: disable=broad-except
+                continue
+            extracted = self._extract_from_json_blob(data, base_url)
+            for movie in extracted:
+                key = (movie.get("cineart_url") or movie.get("name", "")).lower()
+                if key and key in seen:
+                    continue
+                seen.add(key)
+                movies.append(movie)
+        return movies
+
+    def _extract_from_json_blob(self, data, base_url):
+        results = []
+        if isinstance(data, dict):
+            if data.get("@type") in {"Movie", "VideoObject"}:
+                movie = {
+                    "name": data.get("name"),
+                    "genre": ", ".join(data.get("genre")) if isinstance(data.get("genre"), list) else data.get("genre"),
+                    "age_rating": data.get("contentRating"),
+                    "release_date": data.get("datePublished") or data.get("dateCreated"),
+                    "cineart_url": self._normalize_cineart_url(data.get("url")),
+                    "poster_url": self._safe_url(data.get("image"), base_url),
+                }
+                if movie["name"]:
+                    results.append(movie)
+            for value in data.values():
+                results.extend(self._extract_from_json_blob(value, base_url))
+        elif isinstance(data, list):
+            for item in data:
+                results.extend(self._extract_from_json_blob(item, base_url))
+        return results
+
+    def _safe_url(self, value, base_url):
+        if not value:
+            return False
+        if isinstance(value, dict):
+            value = value.get("url")
+        if isinstance(value, list):
+            value = value[0]
+        value = (value or "").strip()
+        if not value:
+            return False
+        return urljoin(base_url, value)
 
     def _get_card_container(self, node):
         for ancestor in node.iterancestors():
@@ -379,3 +445,15 @@ class CineartMovie(models.Model):
         if "cineart.com.br" not in url:
             return False
         return url
+
+    def _build_fallback_url(self, category, name):
+        name = (name or "").strip()
+        if not name:
+            return False
+        slug = self._slugify(name)
+        return f"https://www.cineart.com.br/fallback/{category or 'movie'}/{slug}"
+
+    def _slugify(self, value):
+        slug = re.sub(r"[^a-z0-9]+", "-", (value or "").lower())
+        slug = slug.strip("-")
+        return slug or "filme"
