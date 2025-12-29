@@ -31,34 +31,36 @@
                         <div class="carousel-controls d-none d-md-flex gap-2">
                             <button class="btn btn-outline-secondary btn-sm"
                                     t-att-data-bs-target="'#%s' % carousel_id"
-                                    data-bs-slide="prev">
-                                ‹
-                            </button>
+                                    data-bs-slide="prev">‹</button>
                             <button class="btn btn-outline-secondary btn-sm"
                                     t-att-data-bs-target="'#%s' % carousel_id"
-                                    data-bs-slide="next">
-                                ›
-                            </button>
+                                    data-bs-slide="next">›</button>
                         </div>
                     </div>
 
                     <div class="carousel slide" data-bs-ride="carousel" t-att-id="carousel_id">
+
+                        <!-- INDICATORS (sem loop/t-foreach-index) -->
                         <div class="carousel-indicators">
-                            <t t-foreach="featured_events" t-as="event">
+                            <t t-foreach="enumerate(featured_events)" t-as="it">
+                                <t t-set="idx" t-value="it[0]"/>
                                 <button type="button"
                                         t-att-data-bs-target="'#%s' % carousel_id"
-                                        t-att-data-bs-slide-to="loop.index0"
-                                        t-att-class="'active' if loop.first else ''"
-                                        t-att-aria-current="'true' if loop.first else 'false'"
-                                        t-att-aria-label="'Slide %s' % loop.index"/>
+                                        t-att-data-bs-slide-to="idx"
+                                        t-att-class="'active' if idx == 0 else ''"
+                                        t-att-aria-current="'true' if idx == 0 else 'false'"
+                                        t-att-aria-label="'Slide %s' % (idx + 1)"/>
                             </t>
                         </div>
 
+                        <!-- SLIDES (sem loop/t-foreach-index) -->
                         <div class="carousel-inner">
-                            <t t-foreach="featured_events" t-as="event">
-                                <div class="carousel-item" t-att-class="'active' if loop.first else ''">
-                                    <t t-set="detail_url" t-value="'/agenda/event/%s' % event.id"/>
+                            <t t-foreach="enumerate(featured_events)" t-as="it">
+                                <t t-set="idx" t-value="it[0]"/>
+                                <t t-set="event" t-value="it[1]"/>
 
+                                <div class="carousel-item" t-att-class="'active' if idx == 0 else ''">
+                                    <t t-set="detail_url" t-value="'/agenda/event/%s' % event.id"/>
                                     <a class="carousel-card d-block text-decoration-none" t-att-href="detail_url">
                                         <t t-if="event.promo_cover_image">
                                             <img class="w-100 rounded-4"
@@ -75,9 +77,7 @@
                                             <p class="small text-uppercase text-muted mb-1">
                                                 <t t-esc="event.date_begin.strftime('%d/%m/%Y %H:%M') if event.date_begin else ''"/>
                                             </p>
-                                            <h3 class="h5 mb-2">
-                                                <t t-esc="event.name"/>
-                                            </h3>
+                                            <h3 class="h5 mb-2"><t t-esc="event.name"/></h3>
                                             <p class="mb-0 text-decoration-underline">Ver detalhes</p>
                                         </div>
                                     </a>
@@ -85,23 +85,19 @@
                             </t>
                         </div>
 
-                        <button class="carousel-control-prev d-md-none"
-                                type="button"
-                                t-att-data-bs-target="'#%s' % carousel_id"
-                                data-bs-slide="prev">
+                        <button class="carousel-control-prev d-md-none" type="button"
+                                t-att-data-bs-target="'#%s' % carousel_id" data-bs-slide="prev">
                             <span class="carousel-control-prev-icon" aria-hidden="true"/>
                             <span class="visually-hidden">Anterior</span>
                         </button>
-
-                        <button class="carousel-control-next d-md-none"
-                                type="button"
-                                t-att-data-bs-target="'#%s' % carousel_id"
-                                data-bs-slide="next">
+                        <button class="carousel-control-next d-md-none" type="button"
+                                t-att-data-bs-target="'#%s' % carousel_id" data-bs-slide="next">
                             <span class="carousel-control-next-icon" aria-hidden="true"/>
                             <span class="visually-hidden">Próximo</span>
                         </button>
                     </div>
                 </t>
+
                 <t t-else="">
                     <div class="alert alert-secondary mb-0 text-center">
                         Nenhum evento em destaque no momento.
