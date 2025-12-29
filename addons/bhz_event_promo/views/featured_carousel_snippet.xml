@@ -97,6 +97,11 @@
                 </t>
             </div>
         </section>
-</template>
+    </template>
+
+    <!-- Alias para manter compatibilidade com o antigo XMLID -->
+    <template id="guiabh_featured_carousel_snippet" name="GuiaBH - Carrossel de Destaques (Legacy)">
+        <t t-call="bhz_event_promo.s_guiabh_featured_carousel"/>
+    </template>
 
 </odoo>

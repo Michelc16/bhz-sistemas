@@ -12,6 +12,7 @@ _LOGGER = logging.getLogger(__name__)
 SNIPPET_ID = "s_guiabh_featured_carousel"
 SNIPPET_DISPLAY_NAME = "GuiaBH - Carrossel de Destaques"
 SNIPPET_THUMBNAIL = "/bhz_event_promo/static/description/featured_carousel.png"
+SNIPPET_CATEGORIES = "events,GuiaBH"
 
 
 def _load_arch(view):
@@ -19,46 +20,44 @@ def _load_arch(view):
     return etree.fromstring(view.arch_db.encode("utf-8"), parser=parser)
 
 
-def _preview_exists(root):
-    return bool(root.xpath(f"//*[@data-snippet-id='{SNIPPET_ID}']"))
+def _snippet_exists(root):
+    return bool(root.xpath(f".//we-snippet[@data-snippet='{SNIPPET_ID}']"))
 
 
-def _build_preview():
-    markup = f"""
-    <div class="o_snippet_preview_wrap position-relative"
-         data-snippet-id="{SNIPPET_ID}"
-         data-name="{SNIPPET_DISPLAY_NAME}"
-         tabindex="0"
-         role="button"
-         aria-label="Eventos">
-        <div class="o_snippet_preview o_snippet_preview_carousel">
-            <img class="o_snippet_thumbnail"
-                 src="{SNIPPET_THUMBNAIL}"
-                 alt="{SNIPPET_DISPLAY_NAME}"/>
-        </div>
-    </div>
-    """
-    return etree.fromstring(markup)
+def _build_we_snippet():
+    return etree.Element(
+        "we-snippet",
+        {
+            "data-name": SNIPPET_DISPLAY_NAME,
+            "data-snippet": SNIPPET_ID,
+            "data-thumbnail": SNIPPET_THUMBNAIL,
+            "data-categories": SNIPPET_CATEGORIES,
+        },
+    )
 
 
 def _find_anchor(root):
-    anchor = root.xpath("//div[@data-snippet-id='s_events_picture']")
-    if anchor:
-        return anchor[0]
-    return None
+    snippets = root.xpath(".//we-snippet")
+    if not snippets:
+        return None
+    for node in snippets:
+        categories = (node.get("data-categories") or "").lower()
+        snippet_name = node.get("data-snippet") or ""
+        if "event" in categories or snippet_name.startswith("s_events"):
+            return node
+    return snippets[-1]
 
 
-def _insert_preview(root):
-    if _preview_exists(root):
+def _insert_snippet(root):
+    if _snippet_exists(root):
         return False
 
     anchor = _find_anchor(root)
-    preview = _build_preview()
+    new_snippet = _build_we_snippet()
     if anchor is not None and anchor.getparent() is not None:
-        anchor.addnext(preview)
+        anchor.addnext(new_snippet)
     else:
-        # fallback: append at the end of the root
-        root.append(preview)
+        root.append(new_snippet)
     return True
 
 
@@ -75,7 +74,7 @@ def post_init_hook(cr, registry):
         _LOGGER.exception("Unable to parse website.snippets when registering GuiaBH snippet")
         return
 
-    if not _insert_preview(root):
+    if not _insert_snippet(root):
         _LOGGER.info("GuiaBH snippet already registered in website.snippets")
         return
 
