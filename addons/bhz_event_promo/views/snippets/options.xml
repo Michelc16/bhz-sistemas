@@ -10,10 +10,24 @@
 
         <xpath expr="//snippets[@id='snippet_structure']/*[1]" position="before">
             <t t-snippet="bhz_event_promo.s_guiabh_featured_carousel"
+               data-snippet="bhz_event_promo.s_guiabh_featured_carousel"
                string="GuiaBH - Carrossel de Destaques"
                group="guiabh">
                 <keywords>guiabh carrossel destaque destaques evento eventos</keywords>
             </t>
+        </xpath>
+    </template>
+    <template id="bhz_event_promo_snippet_options" inherit_id="website.snippet_options" name="GuiaBH - Carousel Options">
+        <xpath expr="//we-snippet[@data-snippet='bhz_event_promo.s_guiabh_featured_carousel']" position="inside">
+            <we-select string="Auto-play" data-attribute-name="data-bs-ride" data-attribute-target=".s_guiabh_featured_carousel .carousel">
+                <we-option string="Ativo" data-attribute-value="carousel"/>
+                <we-option string="Desativado" data-attribute-value="false"/>
+            </we-select>
+            <we-select string="Intervalo" data-attribute-name="data-bs-interval" data-attribute-target=".s_guiabh_featured_carousel .carousel">
+                <we-option string="3 segundos" data-attribute-value="3000"/>
+                <we-option string="5 segundos" data-attribute-value="5000" selected="selected"/>
+                <we-option string="8 segundos" data-attribute-value="8000"/>
+            </we-select>
         </xpath>
     </template>
 </odoo>

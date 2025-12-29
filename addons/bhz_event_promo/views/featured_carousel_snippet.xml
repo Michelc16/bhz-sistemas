@@ -31,7 +31,13 @@
                         </div>
                     </div>
 
-                    <div class="carousel slide" data-bs-ride="carousel" t-att-id="carousel_id">
+                    <div class="carousel slide"
+                         data-bs-ride="carousel"
+                         data-bs-interval="5000"
+                         data-bs-pause="false"
+                         data-bs-touch="true"
+                         data-bs-wrap="true"
+                         t-att-id="carousel_id">
 
                         <div class="carousel-indicators" t-if="len(items) &gt; 1">
                             <t t-foreach="items" t-as="it">

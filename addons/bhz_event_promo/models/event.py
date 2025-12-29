@@ -196,7 +196,9 @@ class EventEvent(models.Model):
         if "state" in self._fields:
             state_field = self._fields["state"]
             selection_values = {value for value, _label in (state_field.selection or [])}
-            if "cancel" in selection_values:
+            if "published" in selection_values:
+                domain.append(("state", "=", "published"))
+            elif "cancel" in selection_values:
                 domain.append(("state", "!=", "cancel"))
 
         now = fields.Datetime.now()
