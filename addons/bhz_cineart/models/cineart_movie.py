@@ -2,7 +2,7 @@
 import json
 import logging
 import re
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse, urlunparse
 
 import requests
 from lxml import html
@@ -18,11 +18,11 @@ class CineartMovie(models.Model):
     _description = "Cineart - Filmes"
     _order = "category, name"
 
-    BASE_URL = "https://www.cineart.com.br/"
+    BASE_URL = "https://cineart.com.br/"
     CINEART_ROUTES = {
-        "now": "https://www.cineart.com.br/em-cartaz",
-        "premiere": "https://www.cineart.com.br/estreias",
-        "soon": "https://www.cineart.com.br/em-breve",
+        "now": "https://cineart.com.br/em-cartaz",
+        "premiere": "https://cineart.com.br/estreias",
+        "soon": "https://cineart.com.br/em-breve",
     }
     MIN_VALID_ITEMS = 5
 
@@ -38,14 +38,12 @@ class CineartMovie(models.Model):
         index=True,
         default="now",
     )
-
     genre = fields.Char(string="Gênero")
     age_rating = fields.Char(string="Classificação indicativa")
     release_date = fields.Char(string="Data de estreia", help="Data exibida no site (quando houver).")
     cineart_url = fields.Char(string="Link no site Cineart")
     poster_url = fields.Char(string="URL externa do cartaz")
     active = fields.Boolean(string="Ativo", default=True)
-
     poster_image = fields.Image(string="Cartaz (imagem)", max_width=1024, max_height=1024)
     last_sync = fields.Datetime(string="Última sincronização", readonly=True)
 
@@ -72,23 +70,23 @@ class CineartMovie(models.Model):
         return self._build_sync_notification(results, _("Sincronização concluída"))
 
     def _build_sync_notification(self, results, title):
-        message_lines = []
+        lines = []
         for entry in results:
             if entry.get("valid"):
-                message_lines.append(
+                lines.append(
                     _("%(cat)s: %(count)s itens (%(created)s novos, %(updated)s atualizados, %(inactive)s inativados)")
                     % entry
                 )
             else:
-                message_lines.append(_("%(cat)s: sem mudanças (falha ou poucos itens)") % entry)
-        if not message_lines:
-            message_lines.append(_("Sincronização executada."))
+                lines.append(_("%(cat)s: sem mudanças (falha ou poucos itens)") % entry)
+        if not lines:
+            lines.append(_("Sincronização executada."))
         return {
             "type": "ir.actions.client",
             "tag": "display_notification",
             "params": {
                 "title": title,
-                "message": "\n".join(message_lines),
+                "message": "\n".join(lines),
                 "type": "success",
                 "sticky": False,
             },
@@ -127,20 +125,27 @@ class CineartMovie(models.Model):
                 raise UserError(msg)
             return {"valid": False, "count": 0, "created": 0, "updated": 0, "inactivated": 0}
 
-        _logger.info("Cineart sync: category=%s url=%s", category, url)
+        response = None
+        last_error = None
         headers = {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome Safari",
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
             "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.8",
             "Referer": url,
         }
-        try:
-            response = requests.get(url, timeout=30, headers=headers)
-            response.raise_for_status()
-        except Exception as err:  # pylint: disable=broad-except
-            _logger.exception("Cineart sync HTTP error (%s): %s", category, err)
+        for candidate in self._iter_fallback_urls(url):
+            try:
+                response = requests.get(candidate, timeout=(10, 30), headers=headers, allow_redirects=True)
+                response.raise_for_status()
+                _logger.info("Cineart sync request OK: %s", candidate)
+                break
+            except Exception as err:  # pylint: disable=broad-except
+                last_error = err
+                _logger.warning("Cineart sync HTTP error (%s) em %s: %s", category, candidate, err)
+        if not response:
+            _logger.exception("Cineart sync HTTP error (%s): %s", category, last_error)
             if raise_on_error:
-                raise UserError(_("Falha ao acessar %(url)s: %(msg)s") % {"url": url, "msg": err})
+                raise UserError(_("Falha ao acessar %(url)s: %(msg)s") % {"url": url, "msg": last_error})
             return {"valid": False, "count": 0, "created": 0, "updated": 0, "inactivated": 0}
 
         try:
@@ -256,14 +261,15 @@ class CineartMovie(models.Model):
             )
         return results
 
-    # -------- PARSER --------
     @api.model
     def _parse_movies(self, doc, base_url):
         movies = self._parse_movies_from_dom(doc, base_url)
+        _logger.info("Cineart parser DOM aceitou %s itens", len(movies))
         if len(movies) >= self.MIN_VALID_ITEMS:
             return movies
         json_movies = self._parse_movies_from_json(doc, base_url)
         if json_movies:
+            _logger.info("Cineart parser JSON aceitou %s itens", len(json_movies))
             return json_movies
         return movies
 
@@ -290,6 +296,7 @@ class CineartMovie(models.Model):
             seen_urls.add(key)
             results.append(movie)
 
+        _logger.info("Cineart parser DOM examinou %s imagens e encontrou %s candidatos", len(images), len(results))
         return results
 
     def _parse_movies_from_json(self, doc, base_url):
@@ -392,8 +399,6 @@ class CineartMovie(models.Model):
         if anchor:
             href = anchor[0].get("href") or ""
         cineart_url = self._normalize_cineart_url(urljoin(base_url, href))
-        if not cineart_url:
-            return None
 
         return {
             "name": title,
@@ -420,7 +425,6 @@ class CineartMovie(models.Model):
     def _clean_text(self, value):
         return " ".join((value or "").split()).strip()
 
-    # -------- BAIXAR IMAGEM (opcional) --------
     def _try_fetch_image(self, rec):
         if not rec.poster_url:
             return
@@ -431,7 +435,6 @@ class CineartMovie(models.Model):
         except Exception as err:  # pylint: disable=broad-except
             _logger.warning("Falha ao baixar poster %s: %s", rec.poster_url, err)
 
-    # -------- Helpers --------
     def _normalize_cineart_url(self, url):
         url = (url or "").strip()
         if not url:
@@ -441,19 +444,37 @@ class CineartMovie(models.Model):
         if not url.startswith("http"):
             url = urljoin(self.BASE_URL, url.lstrip("/"))
         url = url.replace("http://", "https://", 1)
-        url = url.replace("https://cineart.com.br", "https://www.cineart.com.br", 1)
-        if "cineart.com.br" not in url:
+        parsed = urlparse(url)
+        host = parsed.netloc.replace("www.", "")
+        netloc = host or parsed.netloc
+        canonical = urlunparse((parsed.scheme or "https", netloc, parsed.path or "", "", parsed.query or "", ""))
+        if "cineart.com.br" not in canonical:
             return False
-        return url
+        return canonical
 
     def _build_fallback_url(self, category, name):
         name = (name or "").strip()
         if not name:
             return False
         slug = self._slugify(name)
-        return f"https://www.cineart.com.br/fallback/{category or 'movie'}/{slug}"
+        return f"https://cineart.com.br/{category or 'filme'}/{slug}"
 
     def _slugify(self, value):
-        slug = re.sub(r"[^a-z0-9]+", "-", (value or "").lower())
-        slug = slug.strip("-")
+        slug = re.sub(r"[^a-z0-9]+", "-", (value or "").lower()).strip("-")
         return slug or "filme"
+
+    def _iter_fallback_urls(self, url):
+        url = (url or "").strip()
+        if not url:
+            return
+        if not url.startswith("http"):
+            url = "https://" + url.lstrip("/")
+        parsed = urlparse(url)
+        host = parsed.netloc.replace("www.", "")
+        candidates = [host, f"www.{host}"] if host else [parsed.netloc]
+        seen = set()
+        for candidate in candidates:
+            if not candidate or candidate in seen:
+                continue
+            seen.add(candidate)
+            yield urlunparse((parsed.scheme or "https", candidate, parsed.path or "", "", parsed.query or "", parsed.fragment or ""))
