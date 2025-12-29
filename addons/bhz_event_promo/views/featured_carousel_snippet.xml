@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="guiabh_featured_carousel_snippet" name="GuiaBH - Carrossel de Destaques" t-name="bhz_event_promo.s_guiabh_featured_carousel">
+    <template id="guiabh_featured_carousel_snippet" name="GuiaBH - Carrossel de Destaques" t-name="s_guiabh_featured_carousel">
         <section class="s_guiabh_featured_carousel py-5"
-                 data-snippet="bhz_event_promo.s_guiabh_featured_carousel"
+                 data-snippet="s_guiabh_featured_carousel"
                  data-name="GuiaBH - Carrossel de Destaques"
                  data-categories="dynamic,GuiaBH">
             <div class="container">
@@ -103,7 +103,7 @@
                 <h3 class="o_panel_title">GuiaBH</h3>
                 <div class="o_panel_body">
                     <we-snippet data-name="GuiaBH - Carrossel de Destaques"
-                                data-snippet="bhz_event_promo.s_guiabh_featured_carousel"
+                                data-snippet="s_guiabh_featured_carousel"
                                 data-thumbnail="/web/image/website.s_cover_image/thumbnail"
                                 data-categories="dynamic,events,GuiaBH"/>
                 </div>

@@ -263,6 +263,20 @@ class EventEvent(models.Model):
             return
         vals = self._prepare_announced_publication_vals()
         events.with_context(skip_announced_publish=True).write(vals)
+        self._log_announced_publication(events, source="recovery")
+
+    def _log_announced_publication(self, events, stage=None, source="auto_publish"):
+        if not events:
+            return
+        if stage is None:
+            stage = events.mapped("stage_id")
+        stage_names = ", ".join(filter(None, stage.mapped("name"))) if stage else ""
+        _logger.info(
+            "BHZ Event Promo auto-publish via %s (stages=%s, event_ids=%s)",
+            source,
+            stage_names or "?",
+            events.ids,
+        )
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -275,6 +289,8 @@ class EventEvent(models.Model):
                     vals.update(self._prepare_announced_publication_vals())
         records = super().create(vals_list)
         announced_records = records.filtered(lambda ev: self._is_announced_stage(ev.stage_id))
+        if announced_records:
+            self._log_announced_publication(announced_records, source="create")
         non_compliant = announced_records.filtered(
             lambda ev: not ev.show_on_public_agenda
             or ("website_published" in ev._fields and not getattr(ev, "website_published"))
@@ -289,9 +305,13 @@ class EventEvent(models.Model):
             return super().write(vals)
 
         vals_to_write = dict(vals)
+        publish_stage = False
         if "stage_id" in vals_to_write and vals_to_write.get("stage_id"):
             stage = self.env["event.stage"].browse(vals_to_write["stage_id"])
             if self._is_announced_stage(stage):
                 vals_to_write.update(self._prepare_announced_publication_vals())
+                publish_stage = stage
         result = super().write(vals_to_write)
+        if publish_stage:
+            self._log_announced_publication(self, stage=publish_stage, source="write")
         return result
