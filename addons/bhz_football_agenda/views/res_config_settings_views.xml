@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_bhz_football_config_settings" model="ir.ui.view">
+        <field name="name">bhz.football.config.settings</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.view_res_config_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@id='settings']" position="inside">
+                <div class="app_settings_block" data-string="BHZ Futebol" string="BHZ Futebol">
+                    <h2>BHZ Futebol</h2>
+                    <div class="row mt16 o_settings_container">
+                        <div class="col-12 col-lg-6">
+                            <div class="o_setting_box">
+                                <label for="bhz_football_agenda_api_token"/>
+                                <div class="o_setting_right_pane">
+                                    <field name="bhz_football_agenda_api_token" password="True"/>
+                                    <div class="text-muted">
+                                        Token usado para autenticar a API POST /bhz/football/api/matches.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_bhz_football_config_settings" model="ir.actions.act_window">
+        <field name="name">Configurações BHZ Futebol</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'module': 'bhz_football_agenda'}</field>
+    </record>
+
+    <menuitem id="bhz_football_menu_settings"
+              name="Configurações"
+              parent="bhz_football_root"
+              action="action_bhz_football_config_settings"
+              sequence="30"/>
+</odoo>

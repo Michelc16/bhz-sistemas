@@ -262,7 +262,7 @@ class EventEvent(models.Model):
         if not events:
             return
         vals = self._prepare_announced_publication_vals()
-        events.with_context(skip_announced_publish=True).write(vals)
+        events.with_context(_bhz_skip_announced_auto_publish=True).write(vals)
         self._log_announced_publication(events, source="recovery")
 
     def _log_announced_publication(self, events, stage=None, source="auto_publish"):
@@ -301,7 +301,7 @@ class EventEvent(models.Model):
         return records
 
     def write(self, vals):
-        if self.env.context.get("skip_announced_publish"):
+        if self.env.context.get("_bhz_skip_announced_auto_publish"):
             return super().write(vals)
 
         vals_to_write = dict(vals)

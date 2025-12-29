@@ -5,6 +5,12 @@
         <field name="model">guiabh.cineart.movie</field>
         <field name="arch" type="xml">
             <list string="Filmes sincronizados">
+                <header>
+                    <button type="action"
+                            name="%(action_guiabh_cineart_sync_manual)d"
+                            string="Sincronizar filmes"
+                            class="oe_highlight"/>
+                </header>
                 <field name="name"/>
                 <field name="category"/>
                 <field name="genre"/>

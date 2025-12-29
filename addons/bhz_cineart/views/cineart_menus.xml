@@ -11,8 +11,33 @@
         <field name="model_id" ref="model_guiabh_cineart_movie"/>
         <field name="binding_model_id" ref="model_guiabh_cineart_movie"/>
         <field name="binding_type">action</field>
+        <field name="binding_view_types">list,form</field>
         <field name="state">code</field>
-        <field name="code">action = env['guiabh.cineart.movie'].action_sync_all()</field>
+        <field name="code"><![CDATA[
+results = env['guiabh.cineart.movie'].cron_sync_all()
+messages = []
+for entry in results:
+    if entry.get('valid'):
+        messages.append("%s: %s itens (%s novos, %s atualizados, %s inativos)" % (
+            entry.get('cat'),
+            entry.get('count'),
+            entry.get('created'),
+            entry.get('updated'),
+            entry.get('inactive'),
+        ))
+    else:
+        messages.append("%s: sem mudanças (falha ou poucos itens)" % entry.get('cat'))
+action = {
+    "type": "ir.actions.client",
+    "tag": "display_notification",
+    "params": {
+        "title": "Sincronização executada",
+        "message": "\n".join(messages) if messages else "Sincronização executada. Verifique Cineart > Filmes.",
+        "type": "success",
+        "sticky": False,
+    },
+}
+        ]]></field>
     </record>
 
     <menuitem id="menu_guiabh_cineart_sync"

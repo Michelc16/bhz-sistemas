@@ -16,10 +16,11 @@ class CineartMovie(models.Model):
     _description = "Cineart - Filmes"
     _order = "category, name"
 
+    BASE_URL = "https://cineart.com.br/"
     CINEART_ROUTES = {
-        "now": "https://www.cineart.com.br/em-cartaz",
-        "premiere": "https://www.cineart.com.br/estreias",
-        "soon": "https://www.cineart.com.br/em-breve",
+        "now": "https://cineart.com.br/em-cartaz",
+        "premiere": "https://cineart.com.br/estreias",
+        "soon": "https://cineart.com.br/em-breve",
     }
     MIN_VALID_ITEMS = 5
 
@@ -109,6 +110,7 @@ class CineartMovie(models.Model):
                 )
             else:
                 _logger.warning("Cineart cron sync falhou/parcial para %(cat)s (itens=%(count)s)", entry)
+        return results
 
     @api.model
     def sync_category(self, category):
@@ -144,7 +146,7 @@ class CineartMovie(models.Model):
 
         try:
             doc = html.fromstring(response.content)
-            items = self._parse_movies(doc, base_url="https://www.cineart.com.br/")
+            items = self._parse_movies(doc, base_url=self.BASE_URL)
         except Exception as err:
             _logger.exception("Cineart parse error (%s): %s", category, err)
             if raise_on_error:
@@ -161,13 +163,20 @@ class CineartMovie(models.Model):
             return {"valid": False, "count": len(items) if items else 0, "created": 0, "updated": 0, "inactivated": 0}
 
         existing = self.search([("category", "=", category)])
-        existing_by_url = {rec.cineart_url.lower(): rec for rec in existing if rec.cineart_url}
+        existing_by_url = {}
+        for rec in existing:
+            norm_url = self._normalize_cineart_url(rec.cineart_url)
+            if norm_url and rec.cineart_url != norm_url:
+                rec.with_context(active_test=False).write({"cineart_url": norm_url})
+            if norm_url:
+                existing_by_url[norm_url.lower()] = rec
         seen = set()
         now = fields.Datetime.now()
         created = updated = 0
 
         for item in items:
             cineart_url = (item.get("cineart_url") or "").strip()
+            cineart_url = self._normalize_cineart_url(cineart_url)
             if not cineart_url:
                 continue
             key = cineart_url.lower()
@@ -195,7 +204,8 @@ class CineartMovie(models.Model):
 
         inactivated = 0
         for rec in existing:
-            if rec.cineart_url and rec.cineart_url.lower() not in seen:
+            norm_url = self._normalize_cineart_url(rec.cineart_url)
+            if norm_url and norm_url.lower() not in seen:
                 rec.active = False
                 inactivated += 1
 
@@ -370,3 +380,20 @@ class CineartMovie(models.Model):
             rec.poster_image = r.content
         except Exception as e:
             _logger.warning("Falha ao baixar poster %s: %s", rec.poster_url, e)
+
+    # -------- Helpers --------
+    def _normalize_cineart_url(self, url):
+        url = (url or "").strip()
+        if not url:
+            return False
+        url = url.replace("http://", "https://")
+        if url.startswith("//"):
+            url = "https:" + url
+        if url.startswith("https://www."):
+            url = "https://" + url[12:]
+        if url.startswith("http://www."):
+            url = "http://" + url[11:]
+            url = url.replace("http://", "https://", 1)
+        if url.startswith("www."):
+            url = "https://" + url[4:]
+        return url
