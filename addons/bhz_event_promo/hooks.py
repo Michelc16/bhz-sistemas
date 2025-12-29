@@ -1,97 +1,83 @@
-"""Module hooks."""
+"""Post-init hooks to register website snippets safely."""
+
+import logging
 
 from lxml import etree
 
 from odoo import SUPERUSER_ID, api
 
-import logging
-
 
 _LOGGER = logging.getLogger(__name__)
 
-SNIPPET_QWEB_ID = "s_guiabh_featured_carousel"
+SNIPPET_ID = "s_guiabh_featured_carousel"
 SNIPPET_DISPLAY_NAME = "GuiaBH - Carrossel de Destaques"
 SNIPPET_THUMBNAIL = "/bhz_event_promo/static/description/featured_carousel.png"
-SNIPPET_CATEGORY_LABEL = "GuiaBH"
 
 
-def _find_container(root):
-    """Return a node that can host snippet categories/items."""
-
-    expressions = [
-        ".//we-snippets",
-        ".//*[contains(@class, 'o_we_snippet_categories')]",
-        ".//*[contains(@class, 'o_panel_body')]",
-    ]
-    for expr in expressions:
-        try:
-            nodes = root.xpath(expr)
-        except Exception:  # pragma: no cover - defensive
-            nodes = []
-        if nodes:
-            return nodes[0]
-    return root
+def _load_arch(view):
+    parser = etree.XMLParser(remove_blank_text=False)
+    return etree.fromstring(view.arch_db.encode("utf-8"), parser=parser)
 
 
-def _ensure_category(container):
-    """Return or create a category block for GuiaBH snippets."""
-
-    for candidate in container.xpath(".//*[@data-name='%s']" % SNIPPET_CATEGORY_LABEL):
-        if candidate.getparent() is not None:
-            return candidate
-
-    panel = etree.Element("div", {
-        "class": "o_we_snippet_category",
-        "data-name": SNIPPET_CATEGORY_LABEL,
-        "data-icon": "fa fa-star",
-    })
-    header = etree.SubElement(panel, "div", {"class": "o_we_snippet_category_header"})
-    etree.SubElement(header, "h3").text = SNIPPET_CATEGORY_LABEL
-    etree.SubElement(panel, "div", {"class": "o_we_snippet_category_items"})
-    container.append(panel)
-    return panel
+def _preview_exists(root):
+    return bool(root.xpath(f"//*[@data-snippet-id='{SNIPPET_ID}']"))
 
 
-def _snippet_exists(root):
-    xpath_expr = "//*[@data-snippet='%s']" % SNIPPET_QWEB_ID
-    return bool(root.xpath(xpath_expr))
+def _build_preview():
+    markup = f"""
+    <div class="o_snippet_preview_wrap position-relative"
+         data-snippet-id="{SNIPPET_ID}"
+         data-name="{SNIPPET_DISPLAY_NAME}"
+         tabindex="0"
+         role="button"
+         aria-label="Eventos">
+        <div class="o_snippet_preview o_snippet_preview_carousel">
+            <img class="o_snippet_thumbnail"
+                 src="{SNIPPET_THUMBNAIL}"
+                 alt="{SNIPPET_DISPLAY_NAME}"/>
+        </div>
+    </div>
+    """
+    return etree.fromstring(markup)
+
+
+def _find_anchor(root):
+    anchor = root.xpath("//div[@data-snippet-id='s_events_picture']")
+    if anchor:
+        return anchor[0]
+    return None
+
+
+def _insert_preview(root):
+    if _preview_exists(root):
+        return False
+
+    anchor = _find_anchor(root)
+    preview = _build_preview()
+    if anchor is not None and anchor.getparent() is not None:
+        anchor.addnext(preview)
+    else:
+        # fallback: append at the end of the root
+        root.append(preview)
+    return True
 
 
 def post_init_hook(cr, registry):
     env = api.Environment(cr, SUPERUSER_ID, {})
     view = env.ref("website.snippets", raise_if_not_found=False)
     if not view:
-        _LOGGER.warning("website.snippets not found; skipping GuiaBH snippet registration")
+        _LOGGER.warning("website.snippets view not found; skipping GuiaBH snippet registration")
         return
 
     try:
-        parser = etree.XMLParser(remove_blank_text=False)
-        root = etree.fromstring(view.arch_db.encode("utf-8"), parser=parser)
-    except Exception:  # pragma: no cover - defensive
-        _LOGGER.exception("Could not parse website.snippets arch for GuiaBH snippet")
+        root = _load_arch(view)
+    except Exception:
+        _LOGGER.exception("Unable to parse website.snippets when registering GuiaBH snippet")
         return
 
-    if _snippet_exists(root):
+    if not _insert_preview(root):
         _LOGGER.info("GuiaBH snippet already registered in website.snippets")
         return
 
-    container = _find_container(root)
-    category = _ensure_category(container)
-    items_node = category.xpath(".//*[contains(@class,'o_we_snippet_category_items')]")
-    if items_node:
-        items = items_node[0]
-    else:
-        items = etree.SubElement(category, "div", {"class": "o_we_snippet_category_items"})
-
-    snippet_node = etree.Element(
-        "we-snippet",
-        {
-            "data-name": SNIPPET_DISPLAY_NAME,
-            "data-snippet": SNIPPET_QWEB_ID,
-            "data-thumbnail": SNIPPET_THUMBNAIL,
-            "data-categories": "GuiaBH,Events,Dynamic",
-        },
-    )
-    items.append(snippet_node)
     view.write({"arch_db": etree.tostring(root, encoding="unicode")})
-    _LOGGER.info("GuiaBH featured carousel snippet registered in website.snippets")
+    _LOGGER.info("GuiaBH snippet successfully registered in website.snippets")
