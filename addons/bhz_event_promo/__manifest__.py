@@ -16,6 +16,7 @@
         "views/featured_carousel_snippet.xml",
         "views/bhz_event_import_views.xml",
     ],
+    "post_init_hook": "post_init_hook",
     "assets": {
         "web.assets_frontend": [
             "bhz_event_promo/static/src/scss/guiabh_event.scss",
