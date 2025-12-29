@@ -1,6 +1,10 @@
 from odoo import fields, http
 from odoo.http import request
-from odoo.tools.misc import format_datetime as misc_format_datetime
+
+try:
+    from odoo.tools.misc import format_datetime as misc_format_datetime
+except Exception:
+    misc_format_datetime = None
 
 class BhzFootballAgendaController(http.Controller):
 
@@ -28,12 +32,20 @@ class BhzFootballAgendaController(http.Controller):
 
         matches = Match.search(domain, order="match_datetime asc", limit=50)
         matches_data = []
-        user_tz = request.env.user.tz or request.website and request.website.user_id.tz
-        for match in matches:
+
+        def _fmt(dt):
+            if not dt:
+                return ""
             if misc_format_datetime:
-                match_datetime_str = misc_format_datetime(request.env, match.match_datetime, tz=user_tz, dtf="short")
-            else:
-                match_datetime_str = fields.Datetime.to_string(match.match_datetime)
+                try:
+                    return misc_format_datetime(request.env, dt)
+                except TypeError:
+                    pass
+                except Exception:
+                    pass
+            return fields.Datetime.to_string(dt)
+
+        for match in matches:
             matches_data.append(
                 {
                     "id": match.id,
@@ -45,7 +57,7 @@ class BhzFootballAgendaController(http.Controller):
                     "round_name": match.round_name,
                     "broadcast": match.broadcast,
                     "ticket_url": match.ticket_url,
-                    "match_datetime_str": match_datetime_str,
+                    "match_datetime_str": _fmt(match.match_datetime),
                 }
             )
 

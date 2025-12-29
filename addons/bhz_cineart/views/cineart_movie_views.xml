@@ -4,7 +4,7 @@
         <field name="name">guiabh.cineart.movie.tree</field>
         <field name="model">guiabh.cineart.movie</field>
         <field name="arch" type="xml">
-            <list>
+            <list string="Filmes sincronizados">
                 <field name="name"/>
                 <field name="category"/>
                 <field name="genre"/>
@@ -20,9 +20,10 @@
         <field name="name">guiabh.cineart.movie.form</field>
         <field name="model">guiabh.cineart.movie</field>
         <field name="arch" type="xml">
-            <form>
+            <form string="Filme Cineart">
                 <header>
                     <button name="action_open_cineart" type="object" string="Abrir no Cineart" class="btn-primary"/>
+                    <button name="action_sync_now" type="object" string="Sincronizar agora" class="btn-secondary"/>
                 </header>
                 <sheet>
                     <group>

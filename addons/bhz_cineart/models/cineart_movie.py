@@ -16,29 +16,30 @@ class CineartMovie(models.Model):
     _description = "Cineart - Filmes"
     _order = "category, name"
 
-    name = fields.Char(required=True, index=True)
+    name = fields.Char(string="Título", required=True, index=True)
     category = fields.Selection(
         [
             ("now", "Em cartaz"),
             ("soon", "Em breve"),
             ("premiere", "Estreias da semana"),
         ],
+        string="Categoria",
         required=True,
         index=True,
         default="now",
     )
 
-    genre = fields.Char()
-    age_rating = fields.Char()
-    release_date = fields.Char(help="Data exibida no site (quando houver).")
-    cineart_url = fields.Char()
-    poster_url = fields.Char()
-    active = fields.Boolean(default=True)
+    genre = fields.Char(string="Gênero")
+    age_rating = fields.Char(string="Classificação indicativa")
+    release_date = fields.Char(string="Data de estreia", help="Data exibida no site (quando houver).")
+    cineart_url = fields.Char(string="Link no site Cineart")
+    poster_url = fields.Char(string="URL externa do cartaz")
+    active = fields.Boolean(string="Ativo", default=True)
 
     # Opcional: baixar e armazenar a imagem no Odoo
-    poster_image = fields.Image(max_width=1024, max_height=1024)
+    poster_image = fields.Image(string="Cartaz (imagem)", max_width=1024, max_height=1024)
 
-    last_sync = fields.Datetime(readonly=True)
+    last_sync = fields.Datetime(string="Última sincronização", readonly=True)
 
     def action_open_cineart(self):
         self.ensure_one()
@@ -48,6 +49,19 @@ class CineartMovie(models.Model):
             "type": "ir.actions.act_url",
             "url": self.cineart_url,
             "target": "new",
+        }
+
+    def action_sync_now(self):
+        self.env["guiabh.cineart.movie"].sudo().cron_sync_all()
+        return {
+            "type": "ir.actions.client",
+            "tag": "display_notification",
+            "params": {
+                "title": _("Sincronização concluída"),
+                "message": _("Os filmes foram atualizados com sucesso."),
+                "type": "success",
+                "sticky": False,
+            },
         }
 
     # =========================
@@ -247,9 +261,3 @@ class CineartMovie(models.Model):
             rec.poster_image = r.content
         except Exception as e:
             _logger.warning("Falha ao baixar poster %s: %s", rec.poster_url, e)
-
-    # botão manual no backend
-    @api.model
-    def action_sync_now(self):
-        self.cron_sync_all()
-        return True

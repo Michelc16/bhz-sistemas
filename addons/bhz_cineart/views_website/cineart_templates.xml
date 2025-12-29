@@ -32,17 +32,17 @@
                     </ul>
                     <div class="tab-content pt-3">
                         <div class="tab-pane fade show active" id="pane-now" role="tabpanel">
-                            <t t-call="bhz_cineart.guiabh_cineart_grid">
+                            <t t-call="bhz_cineart._cineart_grid">
                                 <t t-set="movies" t-value="now_movies"/>
                             </t>
                         </div>
                         <div class="tab-pane fade" id="pane-soon" role="tabpanel">
-                            <t t-call="bhz_cineart.guiabh_cineart_grid">
+                            <t t-call="bhz_cineart._cineart_grid">
                                 <t t-set="movies" t-value="soon_movies"/>
                             </t>
                         </div>
                         <div class="tab-pane fade" id="pane-premiere" role="tabpanel">
-                            <t t-call="bhz_cineart.guiabh_cineart_grid">
+                            <t t-call="bhz_cineart._cineart_grid">
                                 <t t-set="movies" t-value="premiere_movies"/>
                             </t>
                         </div>
@@ -50,7 +50,7 @@
                 </div>
             </t>
         </template>
-        <template id="guiabh_cineart_grid">
+        <template id="_cineart_grid">
             <t t-if="not movies">
                 <div class="alert alert-info">
                     Ainda não temos itens aqui. (O sincronizador pode estar rodando — tente atualizar mais tarde.)
@@ -61,14 +61,14 @@
                     <div class="col-6 col-md-4 col-lg-3">
                         <a t-att-href="m.cineart_url or '#'" t-att-target="'_blank' if m.cineart_url else None" class="text-decoration-none">
                             <div class="card h-100 shadow-sm">
-                                <t t-if="m.poster_image">
-                                    <img class="card-img-top"
-                                         t-att-src="'data:image/png;base64,%s' % (m.poster_image.decode() if hasattr(m.poster_image,'decode') else m.poster_image)"
-                                         style="aspect-ratio: 2/3; object-fit: cover;" alt="Poster"/>
-                                </t>
-                                <t t-elif="m.poster_url">
-                                    <img class="card-img-top" t-att-src="m.poster_url" style="aspect-ratio: 2/3; object-fit: cover;" alt="Poster"/>
-                                </t>
+                            <t t-if="m.poster_image">
+                                <img class="card-img-top"
+                                     t-att-src="'/web/image/guiabh.cineart.movie/%s/poster_image' % m.id"
+                                     style="aspect-ratio: 2/3; object-fit: cover;" alt="Cartaz"/>
+                            </t>
+                            <t t-elif="m.poster_url">
+                                <img class="card-img-top" t-att-src="m.poster_url" style="aspect-ratio: 2/3; object-fit: cover;" alt="Cartaz"/>
+                            </t>
                                 <t t-else="">
                                     <div class="bg-light d-flex align-items-center justify-content-center" style="aspect-ratio: 2/3;">
                                         <span class="text-muted">Sem imagem</span>

@@ -12,6 +12,7 @@
         "views/cineart_movie_views.xml",
         "views/cineart_menus.xml",
         "views_website/cineart_templates.xml",
+        "views_website/cineart_website_menu.xml",
     ],
     "installable": True,
     "application": False,
