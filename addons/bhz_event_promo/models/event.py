@@ -216,6 +216,27 @@ class EventEvent(models.Model):
             vals["is_published"] = True
         return vals
 
+    def _get_announced_stage_sequence(self):
+        cache_key = "_bhz_announced_stage_sequence"
+        cached = getattr(self.env, cache_key, None)
+        if cached is not None:
+            return cached
+        sequence = False
+        Stage = self.env["event.stage"].sudo()
+        stage_ref = Stage.search(
+            [
+                "|",
+                ("name", "ilike", "announced"),
+                ("name", "ilike", "anunciado"),
+            ],
+            limit=1,
+            order="sequence asc, id asc",
+        )
+        if stage_ref:
+            sequence = stage_ref.sequence
+        setattr(self.env, cache_key, sequence)
+        return sequence
+
     def _is_announced_stage(self, stage):
         if not stage:
             return False
@@ -225,6 +246,15 @@ class EventEvent(models.Model):
                 continue
             lowered = name.lower()
             if "announced" in lowered or "anunciado" in lowered:
+                return True
+        threshold = self._get_announced_stage_sequence()
+        if threshold is False:
+            return False
+        for stage_item in stage:
+            sequence = stage_item.sequence
+            if sequence is None:
+                continue
+            if sequence >= threshold:
                 return True
         return False
 
