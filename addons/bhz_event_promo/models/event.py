@@ -2,6 +2,7 @@
 import logging
 
 from odoo import api, fields, models
+from odoo.http import request
 
 _logger = logging.getLogger(__name__)
 
@@ -166,6 +167,28 @@ class EventEvent(models.Model):
                SET registration_mode = 'disclosure_only'
              WHERE registration_mode IN ('promo', 'none')
             """
+        )
+
+    @api.model
+    def guiabh_get_featured_events(self, limit=12):
+        """Return events flagged as featured for website snippets."""
+        domain = []
+        website = getattr(request, "website", False)
+        if website:
+            domain += list(website.website_domain())
+        domain += [
+            ("show_on_public_agenda", "=", True),
+            ("is_featured", "=", True),
+        ]
+        if "website_published" in self._fields and "is_published" in self._fields:
+            domain += ["|", ("website_published", "=", True), ("is_published", "=", True)]
+        elif "website_published" in self._fields:
+            domain += [("website_published", "=", True)]
+        elif "is_published" in self._fields:
+            domain += [("is_published", "=", True)]
+        return (
+            self.sudo()
+            .search(domain, limit=limit, order="date_begin asc, id desc")
         )
 
     @api.model

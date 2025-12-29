@@ -8,19 +8,13 @@
                  data-name="GuiaBH - Carrossel de Destaques"
                  data-categories="Events">
             <div class="container">
-                <t t-set="Event" t-value="request.env['event.event'].sudo()"/>
-                <t t-set="domain" t-value="[('show_on_public_agenda','=', True), ('is_featured','=', True)]"/>
+                <t t-set="featured_events" t-value="request.env['event.event'].guiabh_get_featured_events(12)"/>
 
-                <t t-if="'active' in Event._fields">
-                    <t t-set="domain" t-value="domain + [('active','=', True)]"/>
-                </t>
-
-                <t t-set="featured_events" t-value="Event.search(domain, limit=8, order='date_begin asc')"/>
-
-                <!-- filtro de publicado (quando existir) -->
-                <t t-if="'is_published' in Event._fields or 'website_published' in Event._fields">
-                    <t t-set="featured_events"
-                       t-value="featured_events.filtered(lambda e: (('is_published' in e._fields and e.is_published) or ('website_published' in e._fields and e.website_published)))"/>
+                <t t-if="request.debug">
+                    <p class="small text-muted mb-2">
+                        Eventos destaque carregados:
+                        <t t-esc="len(featured_events)"/>
+                    </p>
                 </t>
 
                 <t t-if="featured_events">
