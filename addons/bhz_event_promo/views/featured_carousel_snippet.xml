@@ -97,6 +97,26 @@
                 </t>
             </div>
         </section>
+</template>
+
+    <!-- Registro do snippet no Website Builder -->
+    <template id="guiabh_featured_carousel_snippet_menu"
+              inherit_id="website.snippets"
+              name="Inserir GuiaBH - Carrossel de Destaques">
+        <xpath expr="//div[@data-snippet-id='s_events_picture']" position="after">
+            <div class="o_snippet_preview_wrap position-relative"
+                 data-snippet-id="s_guiabh_featured_carousel"
+                 data-name="GuiaBH - Carrossel de Destaques"
+                 tabindex="0"
+                 role="button"
+                 aria-label="Eventos">
+                <div class="o_snippet_preview o_snippet_preview_carousel">
+                    <img class="o_snippet_thumbnail"
+                         src="/bhz_event_promo/static/description/featured_carousel.png"
+                         alt="GuiaBH - Carrossel de Destaques"/>
+                </div>
+            </div>
+        </xpath>
     </template>
 
 </odoo>
