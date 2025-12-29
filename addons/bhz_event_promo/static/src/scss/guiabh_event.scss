@@ -101,6 +101,14 @@
     line-height: 1;
     padding: 0;
   }
+  .carousel-item {
+    min-height: 420px;
+  }
+  .guiabh-slide-bg {
+    width: 100%;
+    min-height: 420px;
+    object-fit: cover;
+  }
 }
 
 .bhz-ext-register {
