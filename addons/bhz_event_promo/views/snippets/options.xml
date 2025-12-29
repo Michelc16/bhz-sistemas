@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="bhz_event_promo_snippets" inherit_id="website.snippets" name="GuiaBH - Snippets">
+        <xpath expr="//snippets[@id='snippet_groups']/*[1]" position="before">
+            <t snippet-group="guiabh"
+               t-snippet="website.s_snippet_group"
+               string="GuiaBH"
+               t-thumbnail="/bhz_event_promo/static/description/featured_carousel.png"/>
+        </xpath>
+
+        <xpath expr="//snippets[@id='snippet_structure']/*[1]" position="before">
+            <t t-snippet="bhz_event_promo.s_guiabh_featured_carousel"
+               string="GuiaBH - Carrossel de Destaques"
+               group="guiabh">
+                <keywords>guiabh carrossel destaque destaques evento eventos</keywords>
+            </t>
+        </xpath>
+    </template>
+</odoo>

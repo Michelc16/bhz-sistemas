@@ -5,7 +5,7 @@
     "summary": "Agenda de eventos com suporte a eventos de terceiros, link externo e botão personalizável.",
     "author": "BHZ Sistemas",
     "license": "LGPL-3",
-    "depends": ["website", "event", "website_event", "event_sale"],
+    "depends": ["base", "website", "event", "website_event", "event_sale"],
     "data": [
         "security/security.xml",
         "security/ir.model.access.csv",
@@ -13,10 +13,10 @@
         "views/event_views.xml",
         "views/website_menu.xml",
         "views/templates.xml",
+        "views/snippets/options.xml",
         "views/featured_carousel_snippet.xml",
         "views/bhz_event_import_views.xml",
     ],
-    "post_init_hook": "post_init_hook",
     "assets": {
         "web.assets_frontend": [
             "bhz_event_promo/static/src/scss/guiabh_event.scss",
