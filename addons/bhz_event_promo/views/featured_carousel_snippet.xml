@@ -4,7 +4,7 @@
         <section class="s_guiabh_featured_carousel py-5"
                  data-snippet="bhz_event_promo.s_guiabh_featured_carousel"
                  data-name="GuiaBH - Carrossel de Destaques"
-                 data-categories="events,GuiaBH">
+                 data-categories="dynamic,GuiaBH">
             <div class="container">
                 <t t-set="Event" t-value="request.env['event.event'].sudo()"/>
                 <t t-set="domain" t-value="[('show_on_public_agenda','=', True), ('is_featured','=', True)]"/>
@@ -98,11 +98,8 @@
         </section>
     </template>
     <template id="guiabh_featured_carousel_snippet_menu" inherit_id="website.snippets" name="Inserir GuiaBH - Carrossel de Destaques">
-        <xpath expr="//div[@id='snippet_events']" position="inside">
-            <we-snippet data-name="GuiaBH - Carrossel de Destaques"
-                        data-snippet="bhz_event_promo.s_guiabh_featured_carousel"
-                        data-thumbnail="/web/image/website.s_cover_image/thumbnail"
-                        data-categories="events,GuiaBH"/>
+        <xpath expr="//div[@id='snippet_dynamic']" position="inside">
+            <t t-snippet="bhz_event_promo.s_guiabh_featured_carousel" string="GuiaBH - Carrossel de Destaques"/>
         </xpath>
     </template>
 </odoo>

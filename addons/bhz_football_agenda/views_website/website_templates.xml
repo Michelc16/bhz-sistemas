@@ -29,11 +29,48 @@
                             </div>
                         </div>
                     </div>
+                    <form class="card shadow-sm mb-4" method="get" action="/futebol/agenda">
+                        <div class="card-body row g-3">
+                            <div class="col-12 col-md-4">
+                                <label class="form-label">Data inicial</label>
+                                <input type="date" class="form-control" name="date_from" t-att-value="filters.get('date_from')"/>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label class="form-label">Data final</label>
+                                <input type="date" class="form-control" name="date_to" t-att-value="filters.get('date_to')"/>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label class="form-label">Time</label>
+                                <select class="form-select" name="team_id">
+                                    <option value="">Todos os times</option>
+                                    <t t-foreach="teams" t-as="team">
+                                        <option t-att-value="team.id" t-att-selected="str(team.id) == (filters.get('team_id') or '') and 'selected' or False">
+                                            <t t-esc="team.name"/>
+                                        </option>
+                                    </t>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">Competição</label>
+                                <select class="form-select" name="competition">
+                                    <option value="">Todas</option>
+                                    <t t-foreach="competitions" t-as="competition">
+                                        <option t-att-value="competition" t-att-selected="competition == filters.get('competition') and 'selected' or False">
+                                            <t t-esc="competition"/>
+                                        </option>
+                                    </t>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-6 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+                            </div>
+                        </div>
+                    </form>
                     <div class="card shadow-sm">
                         <div class="card-body">
                             <t t-if="not matches_data">
                                 <div class="alert alert-info mb-0">
-                                    Nenhum jogo encontrado para os próximos dias (ou ainda não cadastrado).
+                                    Nenhum jogo encontrado para os filtros selecionados.
                                 </div>
                             </t>
                             <t t-if="matches_data">

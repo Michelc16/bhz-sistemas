@@ -101,10 +101,11 @@ class CineartMovie(models.Model):
 
         # Marca como inativos os antigos dessa categoria que não vieram na lista
         existing = self.search([("category", "=", category)])
+        existing_by_key = {self._build_sync_key(rec.name, rec.cineart_url): rec for rec in existing}
         seen_keys = set()
 
         for it in items:
-            key = (it.get("name") or "").strip().lower()
+            key = self._build_sync_key(it.get("name"), it.get("cineart_url"))
             if not key:
                 continue
             seen_keys.add(key)
@@ -121,16 +122,17 @@ class CineartMovie(models.Model):
                 "last_sync": fields.Datetime.now(),
             }
 
-            rec = self.search([("category", "=", category), ("name", "ilike", it.get("name"))], limit=1)
+            rec = existing_by_key.get(key)
             if rec:
                 rec.write(vals)
                 self._try_fetch_image(rec)
             else:
                 rec = self.create(vals)
                 self._try_fetch_image(rec)
+                existing_by_key[key] = rec
 
         for rec in existing:
-            k = (rec.name or "").strip().lower()
+            k = self._build_sync_key(rec.name, rec.cineart_url)
             if k and k not in seen_keys:
                 rec.active = False
 
@@ -252,6 +254,13 @@ class CineartMovie(models.Model):
         return dedup
 
     # -------- BAIXAR IMAGEM (opcional) --------
+    def _build_sync_key(self, name, url):
+        url = (url or "").strip().lower()
+        if url:
+            return url
+        name = (name or "").strip().lower()
+        return name or False
+
     def _try_fetch_image(self, rec):
         if not rec.poster_url:
             return

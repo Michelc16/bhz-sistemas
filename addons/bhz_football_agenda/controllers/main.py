@@ -1,3 +1,5 @@
+from datetime import datetime, time
+
 from odoo import fields, http
 from odoo.http import request
 
@@ -22,13 +24,50 @@ class BhzFootballAgendaController(http.Controller):
         domain = [
             ("website_published", "=", True),
             ("active", "=", True),
-            ("match_datetime", ">=", request.env.cr.now()),
+            ("match_datetime", ">=", fields.Datetime.now()),
         ]
 
         if team_slug:
             selected_team = Team.search([("slug", "=", team_slug), ("website_published", "=", True), ("active", "=", True)], limit=1)
             if selected_team:
                 domain.append(("team_ids", "in", selected_team.id))
+
+        filters = {
+            "date_from": request.params.get("date_from") or "",
+            "date_to": request.params.get("date_to") or "",
+            "team_id": request.params.get("team_id") or "",
+            "competition": request.params.get("competition") or "",
+        }
+
+        def _parse_date(value, end=False):
+            if not value:
+                return False
+            try:
+                parsed = fields.Date.from_string(value)
+                if not parsed:
+                    return False
+                if end:
+                    return datetime.combine(parsed, time.max)
+                return datetime.combine(parsed, time.min)
+            except Exception:
+                return False
+
+        date_from_dt = _parse_date(filters["date_from"])
+        date_to_dt = _parse_date(filters["date_to"], end=True)
+        if date_from_dt:
+            domain.append(("match_datetime", ">=", fields.Datetime.to_string(date_from_dt)))
+        if date_to_dt:
+            domain.append(("match_datetime", "<=", fields.Datetime.to_string(date_to_dt)))
+
+        if filters["team_id"]:
+            try:
+                team_id_int = int(filters["team_id"])
+                domain.append(("team_ids", "in", team_id_int))
+            except ValueError:
+                filters["team_id"] = ""
+
+        if filters["competition"]:
+            domain.append(("competition", "=", filters["competition"]))
 
         matches = Match.search(domain, order="match_datetime asc", limit=50)
         matches_data = []
@@ -61,11 +100,20 @@ class BhzFootballAgendaController(http.Controller):
                 }
             )
 
+        base_comp_domain = [
+            ("website_published", "=", True),
+            ("active", "=", True),
+        ]
+        competition_groups = Match.read_group(base_comp_domain, ["competition"], ["competition"])
+        competitions = sorted(filter(None, (grp["competition"] for grp in competition_groups)))
+
         return request.render(
             "bhz_football_agenda.page_football_agenda",
             {
                 "teams": teams,
                 "selected_team": selected_team,
                 "matches_data": matches_data,
+                "competitions": competitions,
+                "filters": filters,
             },
         )
