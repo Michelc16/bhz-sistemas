@@ -10,7 +10,7 @@ class FootballTeam(models.Model):
     slug = fields.Char(required=True, index=True)
     active = fields.Boolean(default=True)
 
-    logo = fields.Binary(string="Logo")
+    logo = fields.Image(string="Logo", max_width=512, max_height=512)
     website_published = fields.Boolean(default=True, string="Publicado no site")
 
     @api.constrains("slug")

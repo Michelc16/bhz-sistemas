@@ -52,13 +52,28 @@ class CineartMovie(models.Model):
         }
 
     def action_sync_now(self):
-        self.env["guiabh.cineart.movie"].sudo().cron_sync_all()
+        message_lines = []
+        categories = [("now", _("Em cartaz")), ("soon", _("Em breve")), ("premiere", _("Estreias da semana"))]
+        for code, label in categories:
+            try:
+                result = self.sudo().sync_category(code)
+            except UserError as err:
+                raise
+            except Exception as err:
+                _logger.exception("Erro ao sincronizar categoria %s", code)
+                raise UserError(_("Falha ao sincronizar %(cat)s: %(msg)s") % {"cat": label, "msg": err})
+
+            if not result or not result.get("valid"):
+                message_lines.append(_("%s: sem mudanças (falha ou nada novo)") % label)
+            else:
+                message_lines.append(_("%(cat)s: %(count)s itens") % {"cat": label, "count": result.get("count", 0)})
+
         return {
             "type": "ir.actions.client",
             "tag": "display_notification",
             "params": {
                 "title": _("Sincronização concluída"),
-                "message": _("Os filmes foram atualizados com sucesso."),
+                "message": "\n".join(message_lines) if message_lines else _("Sincronização executada."),
                 "type": "success",
                 "sticky": False,
             },
@@ -71,9 +86,11 @@ class CineartMovie(models.Model):
     @api.model
     def cron_sync_all(self):
         """Cron: sincroniza as 3 categorias."""
-        self.sync_category("now")
-        self.sync_category("soon")
-        self.sync_category("premiere")
+        for code in ("now", "soon", "premiere"):
+            try:
+                self.sync_category(code)
+            except Exception:
+                _logger.exception("Erro ao sincronizar categoria %s via cron", code)
 
     @api.model
     def sync_category(self, category):
@@ -92,12 +109,24 @@ class CineartMovie(models.Model):
         headers = {
             "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome Safari"
         }
-        r = requests.get(url, timeout=30, headers=headers)
-        r.raise_for_status()
+        try:
+            r = requests.get(url, timeout=30, headers=headers)
+            r.raise_for_status()
+        except Exception as err:
+            _logger.error("Cineart sync error (%s): %s", category, err)
+            return {"valid": False, "count": 0}
 
-        doc = html.fromstring(r.content)
+        try:
+            doc = html.fromstring(r.content)
+            items = self._parse_movies(doc, base_url=base)
+        except Exception as err:
+            _logger.error("Cineart parse error (%s): %s", category, err)
+            return {"valid": False, "count": 0}
 
-        items = self._parse_movies(doc, base_url=base)
+        MIN_VALID_ITEMS = 5
+        if not items or len(items) < MIN_VALID_ITEMS:
+            _logger.warning("Cineart sync aborted (%s): encontrou %s itens (< %s)", category, len(items), MIN_VALID_ITEMS)
+            return {"valid": False, "count": len(items)}
 
         # Marca como inativos os antigos dessa categoria que não vieram na lista
         existing = self.search([("category", "=", category)])
@@ -137,7 +166,7 @@ class CineartMovie(models.Model):
                 rec.active = False
 
         _logger.info("Cineart sync DONE: category=%s items=%s", category, len(items))
-        return True
+        return {"valid": True, "count": len(items)}
 
     # -------- PARSER --------
     @api.model

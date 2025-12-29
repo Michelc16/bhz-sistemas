@@ -68,63 +68,80 @@
                     </form>
                     <div class="card shadow-sm">
                         <div class="card-body">
-                            <t t-if="not matches_data">
+                            <t t-if="not groups">
                                 <div class="alert alert-info mb-0">
                                     Nenhum jogo encontrado para os filtros selecionados.
                                 </div>
                             </t>
-                            <t t-if="matches_data">
-                                <div class="table-responsive">
-                                    <table class="table align-middle mb-0">
-                                        <thead>
-                                            <tr>
-                                                <th>Data/Hora</th>
-                                                <th>Jogo</th>
-                                                <th>Competição</th>
-                                                <th>Local</th>
-                                                <th>Transmissão</th>
-                                                <th>Ingressos</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <t t-foreach="matches_data" t-as="m">
-                                                <tr>
-                                                    <td style="white-space:nowrap;">
-                                                        <t t-esc="m.get('match_datetime_str')"/>
-                                                    </td>
-                                                    <td>
-                                                        <strong><t t-esc="m.get('home_team_name')"/></strong>
-                                                        <span class="mx-1">x</span>
-                                                        <strong><t t-esc="m.get('away_team_name')"/></strong>
-                                                        <t t-if="m.get('round_name')">
-                                                            <div class="text-muted small"><t t-esc="m.get('round_name')"/></div>
-                                                        </t>
-                                                    </td>
-                                                    <td>
-                                                        <t t-esc="m.get('competition') or '-'"/>
-                                                    </td>
-                                                    <td>
-                                                        <t t-esc="m.get('stadium') or '-'"/>
-                                                        <t t-if="m.get('city')">
-                                                            <div class="text-muted small"><t t-esc="m.get('city')"/></div>
-                                                        </t>
-                                                    </td>
-                                                    <td>
-                                                        <t t-esc="m.get('broadcast') or '-'"/>
-                                                    </td>
-                                                    <td>
-                                                        <t t-if="m.get('ticket_url')">
-                                                            <a class="btn btn-sm btn-primary" t-att-href="m.get('ticket_url')" target="_blank" rel="noopener">
-                                                                Comprar
-                                                            </a>
-                                                        </t>
-                                                        <t t-if="not m.get('ticket_url')">-</t>
-                                                    </td>
-                                                </tr>
-                                            </t>
-                                        </tbody>
-                                    </table>
-                                </div>
+                            <t t-if="groups">
+                                <t t-foreach="groups" t-as="group">
+                                    <div class="mb-4">
+                                        <h3 class="h5 mb-3" t-esc="group.get('label')"/>
+                                        <div class="table-responsive">
+                                            <table class="table align-middle mb-0">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Data/Hora</th>
+                                                        <th>Jogo</th>
+                                                        <th>Competição</th>
+                                                        <th>Local</th>
+                                                        <th>Transmissão</th>
+                                                        <th>Ingressos</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <t t-foreach="group.get('items')" t-as="m">
+                                                        <tr>
+                                                            <td style="white-space:nowrap;">
+                                                                <t t-esc="m.get('match_datetime_str')"/>
+                                                            </td>
+                                                            <td>
+                                                                <div class="d-flex align-items-center gap-2 flex-wrap">
+                                                                    <div class="d-flex align-items-center gap-2">
+                                                                        <t t-if="m.get('home_team_logo')">
+                                                                            <img t-att-src="m.get('home_team_logo')" alt="" class="rounded" style="width:36px; height:36px; object-fit:contain;"/>
+                                                                        </t>
+                                                                        <strong><t t-esc="m.get('home_team_name')"/></strong>
+                                                                    </div>
+                                                                    <span class="mx-1">x</span>
+                                                                    <div class="d-flex align-items-center gap-2">
+                                                                        <t t-if="m.get('away_team_logo')">
+                                                                            <img t-att-src="m.get('away_team_logo')" alt="" class="rounded" style="width:36px; height:36px; object-fit:contain;"/>
+                                                                        </t>
+                                                                        <strong><t t-esc="m.get('away_team_name')"/></strong>
+                                                                    </div>
+                                                                </div>
+                                                                <t t-if="m.get('round_name')">
+                                                                    <div class="text-muted small"><t t-esc="m.get('round_name')"/></div>
+                                                                </t>
+                                                            </td>
+                                                            <td>
+                                                                <t t-esc="m.get('competition') or '-'"/>
+                                                            </td>
+                                                            <td>
+                                                                <t t-esc="m.get('stadium') or '-'"/>
+                                                                <t t-if="m.get('city')">
+                                                                    <div class="text-muted small"><t t-esc="m.get('city')"/></div>
+                                                                </t>
+                                                            </td>
+                                                            <td>
+                                                                <t t-esc="m.get('broadcast') or '-'"/>
+                                                            </td>
+                                                            <td>
+                                                                <t t-if="m.get('ticket_url')">
+                                                                    <a class="btn btn-sm btn-primary" t-att-href="m.get('ticket_url')" target="_blank" rel="noopener">
+                                                                        Comprar
+                                                                    </a>
+                                                                </t>
+                                                                <t t-if="not m.get('ticket_url')">-</t>
+                                                            </td>
+                                                        </tr>
+                                                    </t>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </t>
                             </t>
                         </div>
                     </div>

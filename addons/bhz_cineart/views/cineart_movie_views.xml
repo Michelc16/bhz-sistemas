@@ -23,7 +23,7 @@
             <form string="Filme Cineart">
                 <header>
                     <button name="action_open_cineart" type="object" string="Abrir no Cineart" class="btn-primary"/>
-                    <button name="action_sync_now" type="object" string="Sincronizar agora" class="btn-secondary"/>
+                    <button name="action_sync_now" type="object" string="Sincronizar agora" class="btn-secondary" context="{'from_button': True}"/>
                 </header>
                 <sheet>
                     <group>
@@ -52,11 +52,4 @@
         <field name="context">{}</field>
     </record>
 
-    <!-- Server Action para botão manual -->
-    <record id="server_action_guiabh_cineart_sync" model="ir.actions.server">
-        <field name="name">Cineart - Sincronizar agora</field>
-        <field name="model_id" ref="model_guiabh_cineart_movie"/>
-        <field name="state">code</field>
-        <field name="code">model.cron_sync_all()</field>
-    </record>
 </odoo>

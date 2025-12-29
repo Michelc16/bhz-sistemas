@@ -5,6 +5,7 @@
         <field name="model">bhz.football.team</field>
         <field name="arch" type="xml">
             <list>
+                <field name="logo" widget="image" options="{'preview_image': 'logo'}" class="o_avatar"/>
                 <field name="name"/>
                 <field name="slug"/>
                 <field name="website_published"/>
@@ -20,13 +21,15 @@
             <form>
                 <sheet>
                     <group>
-                        <field name="name"/>
-                        <field name="slug"/>
-                        <field name="website_published"/>
-                        <field name="active"/>
-                    </group>
-                    <group>
-                        <field name="logo" widget="image" class="oe_avatar"/>
+                        <group>
+                            <field name="name"/>
+                            <field name="slug"/>
+                            <field name="website_published"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="logo" widget="image" class="oe_avatar"/>
+                        </group>
                     </group>
                 </sheet>
             </form>

@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from datetime import datetime, time
 
 from odoo import fields, http
@@ -24,7 +25,6 @@ class BhzFootballAgendaController(http.Controller):
         domain = [
             ("website_published", "=", True),
             ("active", "=", True),
-            ("match_datetime", ">=", fields.Datetime.now()),
         ]
 
         if team_slug:
@@ -69,8 +69,19 @@ class BhzFootballAgendaController(http.Controller):
         if filters["competition"]:
             domain.append(("competition", "=", filters["competition"]))
 
-        matches = Match.search(domain, order="match_datetime asc", limit=50)
-        matches_data = []
+        has_filters = any(
+            [
+                date_from_dt,
+                date_to_dt,
+                filters["team_id"],
+                filters["competition"],
+                bool(team_slug),
+            ]
+        )
+        if not has_filters:
+            domain.append(("match_datetime", ">=", fields.Datetime.to_string(fields.Datetime.now())))
+
+        matches = Match.search(domain, order="match_datetime asc", limit=100)
 
         def _fmt(dt):
             if not dt:
@@ -84,12 +95,43 @@ class BhzFootballAgendaController(http.Controller):
                     pass
             return fields.Datetime.to_string(dt)
 
+        def _logo_url(team):
+            if not team or not team.id or not team.logo:
+                return False
+            return "/web/image/%s/%s/logo" % (team._name, team.id)
+
+        month_names = [
+            "Janeiro",
+            "Fevereiro",
+            "Março",
+            "Abril",
+            "Maio",
+            "Junho",
+            "Julho",
+            "Agosto",
+            "Setembro",
+            "Outubro",
+            "Novembro",
+            "Dezembro",
+        ]
+
+        groups_map = OrderedDict()
         for match in matches:
-            matches_data.append(
+            match_dt = match.match_datetime
+            if match_dt:
+                key = match_dt.strftime("%Y-%m")
+                label = "{month} {year}".format(month=month_names[match_dt.month - 1], year=match_dt.year)
+            else:
+                key = "sem-data"
+                label = "Sem data"
+            groups_map.setdefault(key, {"label": label, "items": []})
+            groups_map[key]["items"].append(
                 {
                     "id": match.id,
                     "home_team_name": match.home_team_id.name,
+                    "home_team_logo": _logo_url(match.home_team_id),
                     "away_team_name": match.away_team_id.name,
+                    "away_team_logo": _logo_url(match.away_team_id),
                     "competition": match.competition,
                     "stadium": match.stadium,
                     "city": match.city,
@@ -99,6 +141,8 @@ class BhzFootballAgendaController(http.Controller):
                     "match_datetime_str": _fmt(match.match_datetime),
                 }
             )
+
+        groups = list(groups_map.values())
 
         base_comp_domain = [
             ("website_published", "=", True),
@@ -112,7 +156,7 @@ class BhzFootballAgendaController(http.Controller):
             {
                 "teams": teams,
                 "selected_team": selected_team,
-                "matches_data": matches_data,
+                "groups": groups,
                 "competitions": competitions,
                 "filters": filters,
             },

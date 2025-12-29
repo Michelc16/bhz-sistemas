@@ -45,10 +45,9 @@ class GuiaBHAgendaController(http.Controller):
         base_domain = self._base_agenda_domain()
         domain = self._build_domain(filters, base_domain=base_domain)
         events_model = request.env["event.event"].sudo()
-        _logger.info("Agenda domain (pre-search): %s", domain)
         events = events_model.search(domain, order="date_begin asc")
-        snapshot = [(ev.id, ev.name) for ev in events[:10]]
-        _logger.info("Agenda domain result: %s events | sample=%s", len(events), snapshot)
+        snapshot = [(ev.id, ev.name) for ev in events[:5]]
+        _logger.info("Agenda domain used: %s -> %s eventos | sample=%s", domain, len(events), snapshot)
         if not events:
             fallback = events_model.search([], order="write_date desc, id desc", limit=5)
             _logger.info(
@@ -159,18 +158,21 @@ class GuiaBHAgendaController(http.Controller):
     def _base_agenda_domain(self):
         Event = request.env["event.event"]
         domain = [("show_on_public_agenda", "=", True)]
-        has_is_published = "is_published" in Event._fields
-        has_website_published = "website_published" in Event._fields
-        if has_is_published and has_website_published:
-            domain += [
-                "|",
-                ("is_published", "=", True),
-                ("website_published", "=", True),
-            ]
-        elif has_is_published:
-            domain.append(("is_published", "=", True))
-        elif has_website_published:
-            domain.append(("website_published", "=", True))
+
+        Stage = request.env["event.stage"].sudo() if "stage_id" in Event._fields else False
+        stage_domain = False
+        if Stage:
+            announced_stage = Stage.search(
+                [("name", "in", ["Anunciado", "Announced"])],
+                order="sequence asc",
+                limit=1,
+            )
+            if announced_stage and announced_stage.sequence:
+                stage_domain = ("stage_id.sequence", ">=", announced_stage.sequence)
+            elif announced_stage:
+                stage_domain = ("stage_id", "in", announced_stage.ids)
+        if stage_domain:
+            domain.append(stage_domain)
 
         if "state" in Event._fields:
             state_field = Event._fields["state"]
