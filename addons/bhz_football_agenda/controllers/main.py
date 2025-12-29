@@ -1,5 +1,6 @@
 from collections import OrderedDict
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
+from urllib.parse import urlencode
 
 from odoo import fields, http
 from odoo.http import request
@@ -95,6 +96,58 @@ class BhzFootballAgendaController(http.Controller):
                     pass
             return fields.Datetime.to_string(dt)
 
+        tz_name = request.context.get("tz") or request.env.user.tz or "UTC"
+
+        def _to_local(dt):
+            if not dt:
+                return None
+            user = request.env.user
+            return fields.Datetime.context_timestamp(user.with_context(tz=tz_name), dt)
+
+        today_local = fields.Date.context_today(request.env.user.with_context(tz=tz_name))
+        tomorrow_local = today_local + timedelta(days=1)
+
+        def _badge_label(local_dt):
+            if not local_dt:
+                return ""
+            local_date = local_dt.date()
+            if local_date == today_local:
+                return "Hoje"
+            if local_date == tomorrow_local:
+                return "Amanhã"
+            return ""
+
+        def _gcal_url(match):
+            start_dt = fields.Datetime.from_string(match.match_datetime) if match.match_datetime else None
+            if not start_dt:
+                return False
+            end_dt = start_dt + timedelta(hours=2)
+            start_str = start_dt.strftime("%Y%m%dT%H%M%SZ")
+            end_str = end_dt.strftime("%Y%m%dT%H%M%SZ")
+            title = f"{match.home_team_id.name} x {match.away_team_id.name}"
+            if match.competition:
+                title += f" - {match.competition}"
+            location_parts = [part for part in [match.stadium, match.city] if part]
+            location = " - ".join(location_parts)
+            details_parts = []
+            if match.stadium or match.city:
+                details_parts.append(location or "")
+            if match.broadcast:
+                details_parts.append(f"Transmissão: {match.broadcast}")
+            if match.ticket_url:
+                details_parts.append(f"Ingressos: {match.ticket_url}")
+            if match.round_name:
+                details_parts.append(f"Rodada: {match.round_name}")
+            details = "\n".join(filter(None, details_parts))
+            params = {
+                "action": "TEMPLATE",
+                "text": title,
+                "dates": f"{start_str}/{end_str}",
+                "details": details,
+                "location": location,
+            }
+            return "https://calendar.google.com/calendar/render?%s" % urlencode(params)
+
         def _logo_url(team):
             if not team or not team.id or not team.logo:
                 return False
@@ -125,6 +178,8 @@ class BhzFootballAgendaController(http.Controller):
                 key = "sem-data"
                 label = "Sem data"
             groups_map.setdefault(key, {"label": label, "items": []})
+            local_dt = _to_local(match_dt)
+            badge = _badge_label(local_dt)
             groups_map[key]["items"].append(
                 {
                     "id": match.id,
@@ -139,6 +194,8 @@ class BhzFootballAgendaController(http.Controller):
                     "broadcast": match.broadcast,
                     "ticket_url": match.ticket_url,
                     "match_datetime_str": _fmt(match.match_datetime),
+                    "badge_label": badge,
+                    "gcal_url": _gcal_url(match),
                 }
             )
 

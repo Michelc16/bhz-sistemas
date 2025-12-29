@@ -98,16 +98,11 @@
         </section>
     </template>
     <template id="guiabh_featured_carousel_snippet_menu" inherit_id="website.snippets" name="Inserir GuiaBH - Carrossel de Destaques">
-        <xpath expr="(//div[contains(@class,'o_panel_snippet')])[last()]" position="after">
-            <div class="o_panel_snippet o_panel_snippet_dynamic" data-name="GuiaBH">
-                <h3 class="o_panel_title">GuiaBH</h3>
-                <div class="o_panel_body">
-                    <we-snippet data-name="GuiaBH - Carrossel de Destaques"
-                                data-snippet="s_guiabh_featured_carousel"
-                                data-thumbnail="/web/image/website.s_cover_image/thumbnail"
-                                data-categories="dynamic,events,GuiaBH"/>
-                </div>
-            </div>
+        <xpath expr="." position="inside">
+            <we-snippet data-name="GuiaBH - Carrossel de Destaques"
+                        data-snippet="bhz_event_promo.s_guiabh_featured_carousel"
+                        data-thumbnail="/bhz_event_promo/static/description/featured_carousel.png"
+                        data-categories="dynamic,events,GuiaBH"/>
         </xpath>
     </template>
 </odoo>

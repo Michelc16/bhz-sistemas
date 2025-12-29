@@ -87,13 +87,22 @@
                                                         <th>Local</th>
                                                         <th>Transmissão</th>
                                                         <th>Ingressos</th>
+                                                        <th>Calendário</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     <t t-foreach="group.get('items')" t-as="m">
                                                         <tr>
                                                             <td style="white-space:nowrap;">
-                                                                <t t-esc="m.get('match_datetime_str')"/>
+                                                                <div class="d-flex align-items-center gap-2 flex-wrap">
+                                                                    <span><t t-esc="m.get('match_datetime_str')"/></span>
+                                                                    <t t-if="m.get('badge_label') == 'Hoje'">
+                                                                        <span class="badge bg-success text-white">Hoje</span>
+                                                                    </t>
+                                                                    <t t-if="m.get('badge_label') == 'Amanhã'">
+                                                                        <span class="badge bg-primary text-white">Amanhã</span>
+                                                                    </t>
+                                                                </div>
                                                             </td>
                                                             <td>
                                                                 <div class="d-flex align-items-center gap-2 flex-wrap">
@@ -134,6 +143,16 @@
                                                                     </a>
                                                                 </t>
                                                                 <t t-if="not m.get('ticket_url')">-</t>
+                                                            </td>
+                                                            <td>
+                                                                <t t-if="m.get('gcal_url')">
+                                                                    <a class="btn btn-sm btn-outline-secondary"
+                                                                       t-att-href="m.get('gcal_url')"
+                                                                       target="_blank" rel="noopener">
+                                                                        Adicionar ao Google Calendar
+                                                                    </a>
+                                                                </t>
+                                                                <t t-if="not m.get('gcal_url')">-</t>
                                                             </td>
                                                         </tr>
                                                     </t>
