@@ -6,9 +6,9 @@
         <field name="arch" type="xml">
             <list string="Filmes sincronizados">
                 <header>
-                    <button type="action"
-                            name="%(action_guiabh_cineart_sync_manual)d"
-                            string="Sincronizar filmes"
+                    <button type="object"
+                            name="action_sync_all_now"
+                            string="Sincronizar filmes (agora)"
                             class="oe_highlight"/>
                 </header>
                 <field name="name"/>

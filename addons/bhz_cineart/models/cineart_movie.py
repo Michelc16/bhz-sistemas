@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
+import re
 from urllib.parse import urljoin
 
 import requests
@@ -16,11 +17,11 @@ class CineartMovie(models.Model):
     _description = "Cineart - Filmes"
     _order = "category, name"
 
-    BASE_URL = "https://cineart.com.br/"
+    BASE_URL = "https://www.cineart.com.br/"
     CINEART_ROUTES = {
-        "now": "https://cineart.com.br/em-cartaz",
-        "premiere": "https://cineart.com.br/estreias",
-        "soon": "https://cineart.com.br/em-breve",
+        "now": "https://www.cineart.com.br/em-cartaz",
+        "premiere": "https://www.cineart.com.br/estreias",
+        "soon": "https://www.cineart.com.br/em-breve",
     }
     MIN_VALID_ITEMS = 5
 
@@ -44,13 +45,11 @@ class CineartMovie(models.Model):
     poster_url = fields.Char(string="URL externa do cartaz")
     active = fields.Boolean(string="Ativo", default=True)
 
-    # Opcional: baixar e armazenar a imagem no Odoo
     poster_image = fields.Image(string="Cartaz (imagem)", max_width=1024, max_height=1024)
-
     last_sync = fields.Datetime(string="Última sincronização", readonly=True)
 
     _sql_constraints = [
-        ("cineart_url_unique", "unique(cineart_url)", "Já existe um filme com este link do Cineart.")
+        ("cineart_url_unique", "unique(cineart_url)", "Já existe um filme com este link do Cineart."),
     ]
 
     def action_open_cineart(self):
@@ -64,31 +63,31 @@ class CineartMovie(models.Model):
         }
 
     def action_sync_now(self):
-        self.ensure_one()
-        return self.env["guiabh.cineart.movie"].action_sync_all()
+        return self.env["guiabh.cineart.movie"].action_sync_all_now()
 
     @api.model
-    def action_sync_all(self):
-        Movie = self.sudo()
-        results = Movie._run_sync(raise_on_error=True)
+    def action_sync_all_now(self):
+        results = self.sudo()._run_sync(raise_on_error=True)
+        return self._build_sync_notification(results, _("Sincronização concluída"))
+
+    def _build_sync_notification(self, results, title):
         message_lines = []
         for entry in results:
-            if entry["valid"]:
+            if entry.get("valid"):
                 message_lines.append(
-                    _(
-                        "%(cat)s: %(count)s itens (%(created)s novos, %(updated)s atualizados, %(inactive)s inativados)"
-                    )
+                    _("%(cat)s: %(count)s itens (%(created)s novos, %(updated)s atualizados, %(inactive)s inativados)")
                     % entry
                 )
             else:
                 message_lines.append(_("%(cat)s: sem mudanças (falha ou poucos itens)") % entry)
-
+        if not message_lines:
+            message_lines.append(_("Sincronização executada."))
         return {
             "type": "ir.actions.client",
             "tag": "display_notification",
             "params": {
-                "title": _("Sincronização concluída"),
-                "message": "\n".join(message_lines) if message_lines else _("Sincronização executada."),
+                "title": title,
+                "message": "\n".join(message_lines),
                 "type": "success",
                 "sticky": False,
             },
@@ -100,7 +99,6 @@ class CineartMovie(models.Model):
 
     @api.model
     def cron_sync_all(self):
-        """Cron: sincroniza as 3 categorias."""
         results = self.sudo()._run_sync(raise_on_error=False)
         for entry in results:
             if entry["valid"]:
@@ -130,15 +128,12 @@ class CineartMovie(models.Model):
 
         _logger.info("Cineart sync: category=%s url=%s", category, url)
         headers = {
-            "User-Agent": (
-                "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
-                "(KHTML, like Gecko) Chrome Safari"
-            )
+            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome Safari"
         }
         try:
             response = requests.get(url, timeout=30, headers=headers)
             response.raise_for_status()
-        except Exception as err:
+        except Exception as err:  # pylint: disable=broad-except
             _logger.exception("Cineart sync HTTP error (%s): %s", category, err)
             if raise_on_error:
                 raise UserError(_("Falha ao acessar %(url)s: %(msg)s") % {"url": url, "msg": err})
@@ -147,7 +142,7 @@ class CineartMovie(models.Model):
         try:
             doc = html.fromstring(response.content)
             items = self._parse_movies(doc, base_url=self.BASE_URL)
-        except Exception as err:
+        except Exception as err:  # pylint: disable=broad-except
             _logger.exception("Cineart parse error (%s): %s", category, err)
             if raise_on_error:
                 raise UserError(_("Falha ao interpretar os dados de %(cat)s: %(msg)s") % {"cat": category, "msg": err})
@@ -175,8 +170,7 @@ class CineartMovie(models.Model):
         created = updated = 0
 
         for item in items:
-            cineart_url = (item.get("cineart_url") or "").strip()
-            cineart_url = self._normalize_cineart_url(cineart_url)
+            cineart_url = self._normalize_cineart_url(item.get("cineart_url"))
             if not cineart_url:
                 continue
             key = cineart_url.lower()
@@ -238,7 +232,7 @@ class CineartMovie(models.Model):
                 data = self._sync_category(url, code, raise_on_error=raise_on_error) or {}
             except UserError:
                 raise
-            except Exception as err:
+            except Exception as err:  # pylint: disable=broad-except
                 _logger.exception("Erro inesperado ao sincronizar categoria %s", code)
                 if raise_on_error:
                     raise UserError(_("Falha inesperada ao sincronizar %(cat)s: %(msg)s") % {"cat": label, "msg": err})
@@ -259,141 +253,129 @@ class CineartMovie(models.Model):
     # -------- PARSER --------
     @api.model
     def _parse_movies(self, doc, base_url):
-        """
-        Parser robusto por heurística:
-        - tenta achar cards clicáveis com imagem + título
-        Ajuste aqui se o Cineart alterar a marcação.
-        """
         results = []
+        seen_urls = set()
+        images = doc.xpath("//img")
 
-        # Heurística 1: links que envolvem poster
-        # (muitos sites usam <a ...><img ...> + titulo por perto)
-        cards = doc.xpath("//a[.//img]")
-
-        def clean(t):
-            return " ".join((t or "").split()).strip()
-
-        for a in cards:
-            img = a.xpath(".//img[1]")
-            if not img:
+        for img in images:
+            poster_raw = img.get("src") or img.get("data-src") or ""
+            if not poster_raw:
+                continue
+            poster_low = poster_raw.lower()
+            if any(token in poster_low for token in ("logo", "icon", "sprite", "placeholder")):
                 continue
 
-            poster_url = img[0].get("src") or img[0].get("data-src") or ""
-            poster_url = poster_url.strip()
-
-            # ignora ícones/brand
-            if "logo" in poster_url.lower():
+            container = self._get_card_container(img)
+            movie = self._extract_movie_data(container, img, base_url)
+            if not movie or not movie.get("cineart_url"):
                 continue
-
-            href = a.get("href") or ""
-            href = href.strip()
-            cineart_url = urljoin(base_url, href) if href else ""
-
-            # título: tenta aria-label, title, ou algum texto abaixo do card
-            title = clean(a.get("title") or a.get("aria-label") or "")
-            if not title:
-                # tenta pegar texto do card
-                title = clean(" ".join(a.xpath(".//text()")))
-                # evita textos gigantes
-                if len(title) > 80:
-                    title = title[:80].strip()
-
-            # filtro: precisa ter cara de filme
-            if not title or len(title) < 2:
+            key = movie["cineart_url"].lower()
+            if key in seen_urls:
                 continue
+            seen_urls.add(key)
+            results.append(movie)
 
-            # tenta achar metadados próximos (gênero/classificação/data)
-            container = a.getparent()
-            text_near = ""
-            if container is not None:
-                text_near = clean(" ".join(container.xpath(".//text()")))
+        return results
 
-            # heurísticas de extração simples
-            age = ""
-            if "16" in text_near:
-                age = "16"
-            elif "14" in text_near:
-                age = "14"
-            elif "12" in text_near:
-                age = "12"
-            elif "10" in text_near:
-                age = "10"
-            elif "18" in text_near:
-                age = "18"
-            elif "L" in text_near:
-                # pode ser "L"
-                age = "L"
+    def _get_card_container(self, node):
+        for ancestor in node.iterancestors():
+            if ancestor.tag in ("article", "div", "li", "section"):
+                classes = (ancestor.get("class") or "").lower()
+                if any(keyword in classes for keyword in ("filme", "movie", "card", "item", "catalogo", "poster")):
+                    return ancestor
+        parent = node.getparent()
+        return parent if parent is not None else node
 
-            # data (muitas vezes vem como 01/01/2026)
-            release = ""
-            for token in text_near.split():
-                if "/" in token and len(token) >= 8:
-                    # bem simples, evita pegar lixo
-                    if token.count("/") == 2:
-                        release = token.strip()
-                        break
+    def _extract_movie_data(self, container, img, base_url):
+        if container is None:
+            return None
+        poster_url = img.get("src") or img.get("data-src") or ""
+        poster_url = poster_url.strip()
+        poster_url = urljoin(base_url, poster_url) if poster_url else False
 
-            # gênero: tenta achar palavras típicas (isso é só “nice to have”)
-            genre = ""
-            for g in ["Ação", "Animação", "Infantil", "Terror", "Suspense", "Drama", "Comédia", "Aventura", "Romance"]:
-                if g.lower() in text_near.lower():
-                    genre = g
-                    break
+        texts = [self._clean_text(text) for text in container.xpath(".//text()")]
+        texts = [text for text in texts if text]
+        text_block = " ".join(texts)
+        text_block_lower = text_block.lower()
+        text_block_upper = text_block.upper()
 
-            # valida: garante que não é link do menu / redes sociais
-            if any(x in cineart_url.lower() for x in ["instagram", "facebook", "twitter", "whatsapp"]):
-                continue
-            if "cineart.com.br" not in cineart_url.lower() and cineart_url:
-                # pode ser relativo; urljoin resolve. Se ficou fora do domínio, ignora.
-                continue
+        title = self._extract_title(container, texts)
+        if not title:
+            return None
 
-            results.append(
-                {
-                    "name": title,
-                    "genre": genre,
-                    "age_rating": age,
-                    "release_date": release,
-                    "cineart_url": cineart_url,
-                    "poster_url": urljoin(base_url, poster_url) if poster_url else "",
-                }
-            )
+        genre = ""
+        for option in ["Ação", "Animação", "Infantil", "Terror", "Suspense", "Drama", "Comédia", "Aventura", "Romance"]:
+            if option.lower() in text_block_lower:
+                genre = option
+                break
 
-        # remove duplicados por (nome + poster)
-        dedup = []
-        seen = set()
-        for r in results:
-            k = ((r.get("name") or "").lower(), (r.get("poster_url") or "").lower())
-            if k in seen:
-                continue
-            seen.add(k)
-            dedup.append(r)
+        age_rating = ""
+        match = re.search(r"\b(10|12|14|16|18)\b", text_block)
+        if match:
+            age_rating = match.group(1)
+        elif re.search(r"\bL\b", text_block_upper):
+            age_rating = "L"
 
-        return dedup
+        release_date = ""
+        release_match = re.search(r"\b(\d{1,2}/\d{1,2}/\d{2,4})\b", text_block)
+        if release_match:
+            release_date = release_match.group(1)
+
+        href = ""
+        anchor = container.xpath(".//a[@href][1]")
+        if anchor:
+            href = anchor[0].get("href") or ""
+        cineart_url = self._normalize_cineart_url(urljoin(base_url, href))
+        if not cineart_url:
+            return None
+
+        return {
+            "name": title,
+            "genre": genre,
+            "age_rating": age_rating,
+            "release_date": release_date,
+            "cineart_url": cineart_url,
+            "poster_url": poster_url,
+        }
+
+    def _extract_title(self, container, texts):
+        title_nodes = container.xpath(
+            ".//h1|.//h2|.//h3|.//h4|.//h5|.//h6|.//*[contains(@class,'title')]|.//*[contains(@class,'titulo')]"
+        )
+        for node in title_nodes:
+            value = self._clean_text(" ".join(node.xpath(".//text()")))
+            if len(value) > 2:
+                return value
+        for text in texts:
+            if len(text) > 2:
+                return text
+        return ""
+
+    def _clean_text(self, value):
+        return " ".join((value or "").split()).strip()
 
     # -------- BAIXAR IMAGEM (opcional) --------
     def _try_fetch_image(self, rec):
         if not rec.poster_url:
             return
         try:
-            r = requests.get(rec.poster_url, timeout=30)
-            r.raise_for_status()
-            rec.poster_image = r.content
-        except Exception as e:
-            _logger.warning("Falha ao baixar poster %s: %s", rec.poster_url, e)
+            response = requests.get(rec.poster_url, timeout=30)
+            response.raise_for_status()
+            rec.poster_image = response.content
+        except Exception as err:  # pylint: disable=broad-except
+            _logger.warning("Falha ao baixar poster %s: %s", rec.poster_url, err)
 
     # -------- Helpers --------
     def _normalize_cineart_url(self, url):
         url = (url or "").strip()
         if not url:
             return False
-        url = url.replace("http://", "https://")
         if url.startswith("//"):
             url = "https:" + url
-        if url.startswith("https://www."):
-            url = "https://" + url[12:]
-        if url.startswith("http://www."):
-            url = "http://" + url[11:]
-            url = url.replace("http://", "https://", 1)
-        if url.startswith("www."):
-            url = "https://" + url[4:]
+        if not url.startswith("http"):
+            url = urljoin(self.BASE_URL, url.lstrip("/"))
+        url = url.replace("http://", "https://", 1)
+        url = url.replace("https://cineart.com.br", "https://www.cineart.com.br", 1)
+        if "cineart.com.br" not in url:
+            return False
         return url
