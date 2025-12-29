@@ -1,113 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="guiabh_featured_carousel_snippet" name="GuiaBH - Carrossel de Destaques" t-name="s_guiabh_featured_carousel">
-        <section class="s_guiabh_featured_carousel py-5"
-                 data-snippet="s_guiabh_featured_carousel"
-                 data-name="GuiaBH - Carrossel de Destaques"
-                 data-categories="dynamic,GuiaBH">
+
+    <!-- SNIPPET VISUAL -->
+    <template id="s_guiabh_featured_carousel" name="GuiaBH - Carrossel de Destaques">
+        <section class="s_guiabh_featured_carousel py-5">
             <div class="container">
                 <t t-set="Event" t-value="request.env['event.event'].sudo()"/>
-                <t t-set="domain" t-value="[('show_on_public_agenda','=', True), ('is_featured','=', True)]"/>
-                <t t-if="'active' in Event._fields">
-                    <t t-set="domain" t-value="domain + [('active','=', True)]"/>
-                </t>
-                <t t-set="featured_events" t-value="Event.search(domain, limit=8, order='date_begin asc')"/>
-                <t t-if="'is_published' in Event._fields or 'website_published' in Event._fields">
-                    <t t-set="featured_events"
-                       t-value="featured_events.filtered(lambda e: (('is_published' in e._fields and e.is_published) or ('website_published' in e._fields and e.website_published)))"/>
-                </t>
+                <t t-set="events"
+                   t-value="Event.search([
+                        ('show_on_public_agenda','=',True),
+                        ('is_featured','=',True),
+                        ('website_published','=',True)
+                   ], limit=8, order='date_begin asc')"/>
 
-                <t t-if="featured_events">
-                    <t t-set="carousel_id" t-value="'guiabh_featured_carousel_%s' % (request.env.uid or 0)"/>
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h2 class="h4 mb-0">Eventos em destaque</h2>
-                        <div class="carousel-controls d-none d-md-flex gap-2">
-                            <button class="btn btn-outline-secondary btn-sm"
-                                    t-att-data-bs-target="'#%s' % carousel_id"
-                                    data-bs-slide="prev">
-                                ‹
-                            </button>
-                            <button class="btn btn-outline-secondary btn-sm"
-                                    t-att-data-bs-target="'#%s' % carousel_id"
-                                    data-bs-slide="next">
-                                ›
-                            </button>
-                        </div>
-                    </div>
-                    <div class="carousel slide" data-bs-ride="carousel" t-att-id="carousel_id">
-                        <div class="carousel-indicators">
-                            <t t-foreach="featured_events" t-as="event" t-foreach-index="idx">
-                                <button type="button"
-                                        t-att-data-bs-target="'#%s' % carousel_id"
-                                        t-att-data-bs-slide-to="idx"
-                                        t-att-class="'active' if idx == 0 else ''"
-                                        t-att-aria-current="'true' if idx == 0 else 'false'"
-                                        t-att-aria-label="'Slide %s' % (idx + 1)"/>
-                            </t>
-                        </div>
+                <t t-if="events">
+                    <div id="guiabhFeaturedCarousel" class="carousel slide" data-bs-ride="carousel">
                         <div class="carousel-inner">
-                            <t t-foreach="featured_events" t-as="event" t-foreach-index="idx">
-                                <div class="carousel-item" t-att-class="'active' if idx == 0 else ''">
-                                    <t t-set="detail_url" t-value="'/agenda/event/%s' % event.id"/>
-                                    <a class="carousel-card d-block text-decoration-none" t-att-href="detail_url">
-                                        <t t-if="event.promo_cover_image">
-                                            <img class="w-100 rounded-4"
-                                                 t-att-src="'/web/image/event.event/%s/promo_cover_image' % event.id"
-                                                 t-att-alt="event.name"/>
-                                        </t>
-                                        <t t-else="">
-                                            <div class="guiabh-carousel-placeholder rounded-4 d-flex align-items-center justify-content-center">
-                                                <span class="text-muted">Sem imagem disponível</span>
-                                            </div>
-                                        </t>
-                                        <div class="carousel-caption text-start">
-                                            <p class="small text-uppercase text-muted mb-1">
-                                                <t t-esc="event.date_begin.strftime('%d/%m/%Y %H:%M') if event.date_begin else ''"/>
-                                            </p>
-                                            <h3 class="h5 mb-2">
-                                                <t t-esc="event.name"/>
-                                            </h3>
-                                            <p class="mb-0 text-decoration-underline">Ver detalhes</p>
-                                        </div>
+                            <t t-foreach="events" t-as="event" t-foreach-index="i">
+                                <div class="carousel-item" t-att-class="'active' if i == 0 else ''">
+                                    <a t-att-href="'/agenda/event/%s' % event.id">
+                                        <img class="d-block w-100 rounded-4"
+                                             t-att-src="'/web/image/event.event/%s/promo_cover_image' % event.id"
+                                             t-att-alt="event.name or ''"/>
                                     </a>
                                 </div>
                             </t>
                         </div>
-                        <button class="carousel-control-prev d-md-none"
-                                type="button"
-                                t-att-data-bs-target="'#%s' % carousel_id"
-                                data-bs-slide="prev">
-                            <span class="carousel-control-prev-icon" aria-hidden="true"/>
+
+                        <button class="carousel-control-prev" type="button"
+                                data-bs-target="#guiabhFeaturedCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon"/>
                             <span class="visually-hidden">Anterior</span>
                         </button>
-                        <button class="carousel-control-next d-md-none"
-                                type="button"
-                                t-att-data-bs-target="'#%s' % carousel_id"
-                                data-bs-slide="next">
-                            <span class="carousel-control-next-icon" aria-hidden="true"/>
+                        <button class="carousel-control-next" type="button"
+                                data-bs-target="#guiabhFeaturedCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon"/>
                             <span class="visually-hidden">Próximo</span>
                         </button>
                     </div>
                 </t>
+
                 <t t-else="">
-                    <div class="alert alert-secondary mb-0 text-center">
+                    <div class="alert alert-secondary text-center">
                         Nenhum evento em destaque no momento.
                     </div>
                 </t>
             </div>
         </section>
     </template>
-    <template id="guiabh_featured_carousel_snippet_menu" inherit_id="website.snippets" name="Inserir GuiaBH - Carrossel de Destaques">
+
+    <!-- REGISTRO NO BUILDER -->
+    <template id="guiabh_featured_carousel_snippet_menu"
+              inherit_id="website.snippets"
+              name="GuiaBH - Carrossel de Destaques (Menu)">
         <xpath expr="." position="inside">
-            <div class="o_panel_snippet o_panel_snippet_dynamic" data-name="GuiaBH">
-                <h3 class="o_panel_title">GuiaBH</h3>
-                <div class="o_panel_body">
-                    <we-snippet data-name="GuiaBH - Carrossel de Destaques"
-                                data-snippet="s_guiabh_featured_carousel"
-                                data-thumbnail="/bhz_event_promo/static/description/featured_carousel.png"
-                                data-categories="dynamic,events,GuiaBH"/>
-                </div>
-            </div>
+            <we-snippet
+                data-name="GuiaBH - Carrossel de Destaques"
+                data-snippet="bhz_event_promo.s_guiabh_featured_carousel"
+                data-thumbnail="/bhz_event_promo/static/description/featured_carousel.png"
+                data-categories="Events,Dynamic,GuiaBH"/>
         </xpath>
     </template>
+
 </odoo>

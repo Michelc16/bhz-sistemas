@@ -64,35 +64,23 @@ class CineartMovie(models.Model):
 
     def action_sync_now(self):
         self.ensure_one()
-        message_lines = []
-        Movie = self.sudo()
-        categories = [
-            ("now", _("Em cartaz")),
-            ("premiere", _("Estreias da semana")),
-            ("soon", _("Em breve")),
-        ]
-        for code, label in categories:
-            try:
-                result = Movie._sync_category(Movie.CINEART_ROUTES.get(code), code, raise_on_error=True)
-            except UserError:
-                raise
-            except Exception as err:
-                _logger.exception("Erro inesperado ao sincronizar categoria %s via botão", code)
-                raise UserError(_("Falha ao sincronizar %(cat)s: %(msg)s") % {"cat": label, "msg": err})
+        return self.env["guiabh.cineart.movie"].action_sync_all()
 
-            if result.get("valid"):
+    @api.model
+    def action_sync_all(self):
+        Movie = self.sudo()
+        results = Movie._run_sync(raise_on_error=True)
+        message_lines = []
+        for entry in results:
+            if entry["valid"]:
                 message_lines.append(
-                    _("%(cat)s: %(count)s itens (%(created)s novos, %(updated)s atualizados, %(inactive)s inativos)")
-                    % {
-                        "cat": label,
-                        "count": result.get("count", 0),
-                        "created": result.get("created", 0),
-                        "updated": result.get("updated", 0),
-                        "inactive": result.get("inactivated", 0),
-                    }
+                    _(
+                        "%(cat)s: %(count)s itens (%(created)s novos, %(updated)s atualizados, %(inactive)s inativados)"
+                    )
+                    % entry
                 )
             else:
-                message_lines.append(_("%s: sem mudanças (falha ou poucos itens)") % label)
+                message_lines.append(_("%(cat)s: sem mudanças (falha ou poucos itens)") % entry)
 
         return {
             "type": "ir.actions.client",
@@ -112,12 +100,15 @@ class CineartMovie(models.Model):
     @api.model
     def cron_sync_all(self):
         """Cron: sincroniza as 3 categorias."""
-        for code in ("now", "premiere", "soon"):
-            url = self.CINEART_ROUTES.get(code)
-            try:
-                self._sync_category(url, code)
-            except Exception:
-                _logger.exception("Erro ao sincronizar categoria %s via cron", code)
+        results = self.sudo()._run_sync(raise_on_error=False)
+        for entry in results:
+            if entry["valid"]:
+                _logger.info(
+                    "Cineart cron sync OK: categoria=%(cat)s total=%(count)s criados=%(created)s atualizados=%(updated)s inativados=%(inactive)s",
+                    entry,
+                )
+            else:
+                _logger.warning("Cineart cron sync falhou/parcial para %(cat)s (itens=%(count)s)", entry)
 
     @api.model
     def sync_category(self, category):
@@ -223,6 +214,37 @@ class CineartMovie(models.Model):
             "updated": updated,
             "inactivated": inactivated,
         }
+
+    def _run_sync(self, raise_on_error=False):
+        categories = [
+            ("now", _("Em cartaz")),
+            ("premiere", _("Estreias da semana")),
+            ("soon", _("Em breve")),
+        ]
+        results = []
+        for code, label in categories:
+            url = self.CINEART_ROUTES.get(code)
+            try:
+                data = self._sync_category(url, code, raise_on_error=raise_on_error) or {}
+            except UserError:
+                raise
+            except Exception as err:
+                _logger.exception("Erro inesperado ao sincronizar categoria %s", code)
+                if raise_on_error:
+                    raise UserError(_("Falha inesperada ao sincronizar %(cat)s: %(msg)s") % {"cat": label, "msg": err})
+                data = {"valid": False, "count": 0, "created": 0, "updated": 0, "inactivated": 0}
+
+            results.append(
+                {
+                    "cat": label,
+                    "valid": data.get("valid", False),
+                    "count": data.get("count", 0),
+                    "created": data.get("created", 0),
+                    "updated": data.get("updated", 0),
+                    "inactive": data.get("inactivated", 0),
+                }
+            )
+        return results
 
     # -------- PARSER --------
     @api.model

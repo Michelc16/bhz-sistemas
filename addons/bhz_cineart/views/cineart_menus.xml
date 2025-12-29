@@ -5,4 +5,19 @@
     <menuitem id="menu_guiabh_cineart_root" name="Cineart" parent="menu_guiabh_root" sequence="20"/>
     <menuitem id="menu_guiabh_cineart_movies" name="Filmes (Sync)" parent="menu_guiabh_cineart_root"
               action="action_guiabh_cineart_movie" sequence="10"/>
+
+    <record id="action_guiabh_cineart_sync_manual" model="ir.actions.server">
+        <field name="name">Sincronizar filmes (Cineart)</field>
+        <field name="model_id" ref="model_guiabh_cineart_movie"/>
+        <field name="binding_model_id" ref="model_guiabh_cineart_movie"/>
+        <field name="binding_type">action</field>
+        <field name="state">code</field>
+        <field name="code">action = env['guiabh.cineart.movie'].action_sync_all()</field>
+    </record>
+
+    <menuitem id="menu_guiabh_cineart_sync"
+              name="Sincronizar filmes"
+              parent="menu_guiabh_cineart_root"
+              action="action_guiabh_cineart_sync_manual"
+              sequence="20"/>
 </odoo>
