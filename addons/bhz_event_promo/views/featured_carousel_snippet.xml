@@ -10,13 +10,6 @@
             <div class="container">
                 <t t-set="featured_events" t-value="request.env['event.event'].guiabh_get_featured_events(12)"/>
 
-                <t t-if="request.debug">
-                    <p class="small text-muted mb-2">
-                        Eventos destaque carregados:
-                        <t t-esc="len(featured_events)"/>
-                    </p>
-                </t>
-
                 <t t-if="featured_events">
                     <t t-set="carousel_id" t-value="'guiabh_featured_carousel_%s' % (request.env.uid or 0)"/>
 

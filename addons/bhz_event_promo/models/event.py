@@ -172,24 +172,55 @@ class EventEvent(models.Model):
     @api.model
     def guiabh_get_featured_events(self, limit=12):
         """Return events flagged as featured for website snippets."""
-        domain = []
-        website = getattr(request, "website", False)
-        if website:
-            domain += list(website.website_domain())
-        domain += [
+        domain = [
             ("show_on_public_agenda", "=", True),
             ("is_featured", "=", True),
         ]
+
+        website = getattr(request, "website", False)
+        if website and "website_id" in self._fields:
+            domain += ["|", ("website_id", "=", False), ("website_id", "=", website.id)]
+
+        Stage = self.env["event.stage"].sudo() if "stage_id" in self._fields else False
+        if Stage:
+            announced_stage = Stage.search(
+                [("name", "in", ["Anunciado", "Announced"])],
+                order="sequence asc",
+                limit=1,
+            )
+            if announced_stage and announced_stage.sequence:
+                domain.append(("stage_id.sequence", ">=", announced_stage.sequence))
+            elif announced_stage:
+                domain.append(("stage_id", "in", announced_stage.ids))
+
+        if "state" in self._fields:
+            state_field = self._fields["state"]
+            selection_values = {value for value, _label in (state_field.selection or [])}
+            if "cancel" in selection_values:
+                domain.append(("state", "!=", "cancel"))
+
+        now = fields.Datetime.now()
+        if "date_end" in self._fields:
+            domain += [
+                "|",
+                ("date_end", "=", False),
+                ("date_end", ">=", now),
+            ]
+        elif "date_begin" in self._fields:
+            domain.append(("date_begin", ">=", now))
+
         if "website_published" in self._fields and "is_published" in self._fields:
-            domain += ["|", ("website_published", "=", True), ("is_published", "=", True)]
+            domain += [
+                "|",
+                ("website_published", "=", True),
+                ("is_published", "=", True),
+            ]
         elif "website_published" in self._fields:
-            domain += [("website_published", "=", True)]
+            domain.append(("website_published", "=", True))
         elif "is_published" in self._fields:
-            domain += [("is_published", "=", True)]
-        return (
-            self.sudo()
-            .search(domain, limit=limit, order="date_begin asc, id desc")
-        )
+            domain.append(("is_published", "=", True))
+
+        return self.sudo().search(domain, limit=limit, order="date_begin asc, id desc")
 
     @api.model
     def cron_auto_cleanup_events(self):
