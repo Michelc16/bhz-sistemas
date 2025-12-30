@@ -6,21 +6,21 @@
                  data-name="GuiaBH - Carrossel de Destaques">
             <div class="container">
                 <t t-set="events"
-                   t-value="request.env['event.event'].sudo().search([
-                       ('is_featured','=',True),
-                       ('show_on_public_agenda','=',True),
-                       ('website_published','=',True)
-                   ], limit=10)"/>
+                   t-value="request.env['event.event'].guiabh_get_featured_events(12)"/>
 
                 <t t-if="events">
-                    <t t-set="carousel_id" t-value="'guiabh_featured_%s' % (request.env.context.get('snippet_key') or request.env.uid)"/>
+                    <t t-set="snippet_key" t-value="request.env.context.get('snippet_key') or request.env.uid or 0"/>
+                    <t t-set="website_id" t-value="request.website and request.website.id or 0"/>
+                    <t t-set="carousel_id" t-value="'guiabh_featured_%s_%s' % (snippet_key, website_id)"/>
                     <div class="carousel slide"
                          t-att-id="carousel_id"
                          data-bs-ride="carousel"
                          data-bs-interval="5000"
-                         data-bs-wrap="true">
+                         data-bs-wrap="true"
+                         data-bs-pause="false"
+                         data-bs-touch="true">
                         <div class="carousel-inner">
-                            <t t-foreach="events" t-as="event" t-index="idx">
+                            <t t-foreach="events" t-as="event" t-foreach-index="idx">
                                 <div class="carousel-item" t-att-class="'active' if idx == 0 else ''">
                                     <a t-att-href="'/agenda/event/%s' % event.id">
                                         <img class="d-block w-100"
