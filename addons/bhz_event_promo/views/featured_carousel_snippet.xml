@@ -12,9 +12,9 @@
                 <t t-set="items_count" t-value="len(featured_events)"/>
 
                 <t t-if="items_count">
-                    <t t-set="snippet_key" t-value="request.env.context.get('snippet_key') or ''"/>
-                    <t t-set="path_token" t-value="(request.httprequest.path or '/').replace('/', '_')"/>
-                    <t t-set="carousel_id" t-value="'guiabh_featured_%s_%s' % (snippet_key or request.env.uid or 0, path_token)"/>
+                    <t t-set="snippet_key" t-value="request.env.context.get('snippet_key') or request.env.uid or 0"/>
+                    <t t-set="website_id" t-value="request.website and request.website.id or 0"/>
+                    <t t-set="carousel_id" t-value="'guiabh_featured_%s_%s' % (snippet_key, website_id)"/>
 
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h2 class="h4 mb-0">Eventos em destaque</h2>
