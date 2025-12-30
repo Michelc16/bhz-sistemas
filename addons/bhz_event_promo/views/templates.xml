@@ -129,7 +129,7 @@
                                         </t>
 
                                         <p class="text-muted mb-2">
-                                            <t t-esc="ev.date_begin.strftime('%d/%m/%Y %H:%M') if ev.date_begin else ''"/>
+                                            <t t-esc="ev._format_datetime_display(ev.date_begin)"/>
                                             <t t-if="ev.address_id and ev.address_id.city"> • <t t-esc="ev.address_id.city"/></t>
                                             <t t-if="ev.neighborhood"> • <t t-esc="ev.neighborhood"/></t>
                                         </p>
@@ -256,7 +256,7 @@
                                                 <t t-esc="ev.name"/>
                                             </a>
                                             <small class="text-muted">
-                                                <t t-esc="ev.date_begin.strftime('%H:%M') if ev.date_begin else ''"/>
+                                                <t t-esc="ev._format_datetime_display(ev.date_begin, '%H:%M')"/>
                                                 <t t-if="ev.venue_partner_id"> • <t t-esc="ev.venue_partner_id.name"/></t>
                                             </small>
                                             <t t-call="bhz_event_promo.bhz_event_badges">
@@ -320,8 +320,8 @@
                     </t>
                     <p class="text-muted mb-4">
                         <t t-if="event.date_begin">
-                            <t t-esc="event.date_begin.strftime('%d/%m/%Y %H:%M')"/>
-                            <t t-if="event.date_end"> - <t t-esc="event.date_end.strftime('%d/%m/%Y %H:%M')"/></t>
+                            <t t-esc="event._format_datetime_display(event.date_begin)"/>
+                            <t t-if="event.date_end"> - <t t-esc="event._format_datetime_display(event.date_end)"/></t>
                         </t>
                         <br/>
                         <t t-if="event.venue_partner_id">
