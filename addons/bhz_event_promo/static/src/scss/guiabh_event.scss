@@ -150,14 +150,13 @@
 .bhz-event-detail {
   .bhz-event-detail-cover {
     width: 100%;
-    aspect-ratio: 1536 / 1024;
-    object-fit: cover;
-    max-height: none;
-    height: auto;
+    height: 420px;
+    max-height: 420px;
+    object-fit: contain;
+    background: #000;
   }
   .bhz-event-detail-cover.placeholder {
-    aspect-ratio: 1536 / 1024;
-    height: auto;
+    height: 420px;
     background: repeating-linear-gradient(
       45deg,
       rgba(0, 0, 0, 0.04),
