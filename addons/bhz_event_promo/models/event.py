@@ -345,6 +345,7 @@ class EventEvent(models.Model):
                 if self._is_announced_stage(stage):
                     vals.update(self._prepare_announced_publication_vals())
         records = super().create(vals_list)
+        records._propagate_promo_to_standard()
         announced_records = records.filtered(lambda ev: self._is_announced_stage(ev.stage_id))
         if announced_records:
             self._log_announced_publication(announced_records, source="create")
@@ -362,7 +363,8 @@ class EventEvent(models.Model):
             return super().write(vals)
 
         vals_to_write = dict(vals)
-        self._sync_cover_images(vals_to_write)
+        if not self.env.context.get("_bhz_skip_promo_sync"):
+            self._sync_cover_images(vals_to_write)
         publish_stage = False
         if "stage_id" in vals_to_write and vals_to_write.get("stage_id"):
             stage = self.env["event.stage"].browse(vals_to_write["stage_id"])
@@ -370,6 +372,8 @@ class EventEvent(models.Model):
                 vals_to_write.update(self._prepare_announced_publication_vals())
                 publish_stage = stage
         result = super().write(vals_to_write)
+        if not self.env.context.get("_bhz_skip_promo_sync"):
+            self._propagate_promo_to_standard()
         if publish_stage:
             self._log_announced_publication(self, stage=publish_stage, source="write")
         return result
@@ -397,6 +401,20 @@ class EventEvent(models.Model):
         for field_name in ("image_1920", "cover_image"):
             if field_name in self._fields and field_name not in vals:
                 vals[field_name] = promo
+
+    def _propagate_promo_to_standard(self):
+        """Ensure existing records without image get promo cover pushed to defaults."""
+        if not self:
+            return
+        for record in self:
+            if not record.promo_cover_image:
+                continue
+            updates = {}
+            for field_name in ("image_1920", "cover_image"):
+                if field_name in record._fields and not getattr(record, field_name):
+                    updates[field_name] = record.promo_cover_image
+            if updates:
+                record.with_context(_bhz_skip_promo_sync=True).write(updates)
 
     # ---------------------------------------------------------- Datetime helper
     def _get_display_timezone(self):
