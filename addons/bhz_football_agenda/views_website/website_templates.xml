@@ -19,7 +19,7 @@
                                    t-att-class="'btn btn-outline-primary ' + ('' if selected_team else 'active')">
                                     Todos
                                 </a>
-                                <t t-foreach="teams" t-as="tteam">
+                                <t t-foreach="featured_teams" t-as="tteam">
                                     <a class="btn btn-outline-primary"
                                        t-attf-href="/futebol/agenda/{{ tteam.slug }}"
                                        t-att-class="'btn btn-outline-primary ' + ('active' if (selected_team and selected_team.id == tteam.id) else '')">
@@ -108,14 +108,14 @@
                                                                 <div class="d-flex align-items-center gap-2 flex-wrap">
                                                                     <div class="d-flex align-items-center gap-2">
                                                                         <t t-if="m.get('home_team_logo')">
-                                                                            <img t-att-src="m.get('home_team_logo')" alt="" class="rounded" style="width:36px; height:36px; object-fit:contain;"/>
+                                                                            <img t-att-src="m.get('home_team_logo')" alt="" class="rounded" style="width:48px; height:48px; object-fit:contain;"/>
                                                                         </t>
                                                                         <strong><t t-esc="m.get('home_team_name')"/></strong>
                                                                     </div>
                                                                     <span class="mx-1">x</span>
                                                                     <div class="d-flex align-items-center gap-2">
                                                                         <t t-if="m.get('away_team_logo')">
-                                                                            <img t-att-src="m.get('away_team_logo')" alt="" class="rounded" style="width:36px; height:36px; object-fit:contain;"/>
+                                                                            <img t-att-src="m.get('away_team_logo')" alt="" class="rounded" style="width:48px; height:48px; object-fit:contain;"/>
                                                                         </t>
                                                                         <strong><t t-esc="m.get('away_team_name')"/></strong>
                                                                     </div>
