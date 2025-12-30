@@ -10,7 +10,7 @@
 
                 <t t-if="events">
                     <t t-set="snippet_key" t-value="request.env.context.get('snippet_key') or request.env.uid or 0"/>
-                    <t t-set="website_id" t-value="(getattr(request, 'website', False) and request.website.id) or 0"/>
+                    <t t-set="website_id" t-value="request.env.context.get('website_id') or 0"/>
                     <t t-set="carousel_id" t-value="'guiabh_featured_%s_%s' % (snippet_key, website_id)"/>
                     <div class="carousel slide"
                          t-att-id="carousel_id"
