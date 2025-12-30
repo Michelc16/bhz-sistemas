@@ -371,3 +371,18 @@ class EventEvent(models.Model):
         if publish_stage:
             self._log_announced_publication(self, stage=publish_stage, source="write")
         return result
+
+    # ---------------------------------------------------------- Registration URL
+    def _normalize_external_url(self, url):
+        if not url:
+            return False
+        url = url.strip()
+        if not url:
+            return False
+        if not url.lower().startswith(("http://", "https://")):
+            url = "https://" + url
+        return url
+
+    def _get_external_registration_url(self):
+        self.ensure_one()
+        return self._normalize_external_url(self.registration_external_url)

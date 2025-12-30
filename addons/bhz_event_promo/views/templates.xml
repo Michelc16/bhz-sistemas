@@ -148,10 +148,13 @@
                                             <t t-if="ev.registration_mode != 'disclosure_only'">
                                                 <t t-set="primary_href" t-value="detail_url"/>
                                                 <t t-set="primary_target" t-value="False"/>
-                                                <t t-if="ev.registration_mode == 'external' and ev.registration_external_url">
-                                                    <t t-set="primary_href" t-value="ev.registration_external_url"/>
+                                            <t t-if="ev.registration_mode == 'external'">
+                                                <t t-set="external_href" t-value="ev._get_external_registration_url()"/>
+                                                <t t-if="external_href">
+                                                    <t t-set="primary_href" t-value="external_href"/>
                                                     <t t-set="primary_target" t-value="'_blank'"/>
                                                 </t>
+                                            </t>
                                                 <a class="btn btn-primary w-100"
                                                    t-att-href="primary_href"
                                                    t-att-target="primary_target"
@@ -351,9 +354,12 @@
                         <t t-if="event.registration_mode != 'disclosure_only'">
                             <t t-set="button_href" t-value="register_url"/>
                             <t t-set="button_target" t-value="False"/>
-                            <t t-if="event.registration_mode == 'external' and event.registration_external_url">
-                                <t t-set="button_href" t-value="event.registration_external_url"/>
-                                <t t-set="button_target" t-value="'_blank'"/>
+                            <t t-if="event.registration_mode == 'external'">
+                                <t t-set="external_href" t-value="event._get_external_registration_url()"/>
+                                <t t-if="external_href">
+                                    <t t-set="button_href" t-value="external_href"/>
+                                    <t t-set="button_target" t-value="'_blank'"/>
+                                </t>
                             </t>
                             <a class="btn btn-primary btn-lg bhz-ext-register bhz-event-cta"
                                t-att-href="button_href"
