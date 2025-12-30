@@ -298,19 +298,21 @@
                 <a href="/agenda" class="btn btn-link mb-3">&#8592; Voltar para Agenda</a>
                 <div class="bg-white shadow-sm rounded-4 p-4 p-lg-5">
                     <div class="bhz-event-hero mb-4">
-                        <t t-if="event.promo_cover_image">
-                            <img class="img-fluid rounded-4 bhz-event-detail-cover"
-                                 t-att-src="'/web/image/event.event/%s/promo_cover_image' % event.id"
-                                 t-att-alt="event.name"/>
-                        </t>
-                        <t t-elif="event.image_1920">
-                            <img class="img-fluid rounded-4 bhz-event-detail-cover"
-                                 t-att-src="'/web/image/event.event/%s/image_1920' % event.id"
-                                 t-att-alt="event.name"/>
-                        </t>
-                        <t t-else="">
-                            <div class="bhz-event-detail-cover placeholder rounded-4"></div>
-                        </t>
+                        <div class="bhz-event-cover-wrapper rounded-4">
+                            <t t-if="event.promo_cover_image">
+                                <img class="img-fluid bhz-event-detail-cover"
+                                     t-att-src="'/web/image/event.event/%s/promo_cover_image' % event.id"
+                                     t-att-alt="event.name"/>
+                            </t>
+                            <t t-elif="event.image_1920">
+                                <img class="img-fluid bhz-event-detail-cover"
+                                     t-att-src="'/web/image/event.event/%s/image_1920' % event.id"
+                                     t-att-alt="event.name"/>
+                            </t>
+                            <t t-else="">
+                                <div class="bhz-event-detail-cover placeholder"></div>
+                            </t>
+                        </div>
                     </div>
                     <h1 class="mb-3"><t t-esc="event.name"/></h1>
                     <t t-call="bhz_event_promo.bhz_event_badges">
