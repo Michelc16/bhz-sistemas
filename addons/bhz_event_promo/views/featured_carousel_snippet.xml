@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="s_guiabh_featured_carousel" name="GuiaBH - Carrossel de Destaques">
+        <section class="s_guiabh_featured_carousel py-5"
+                 data-snippet="bhz_event_promo.s_guiabh_featured_carousel"
+                 data-name="GuiaBH - Carrossel de Destaques">
+            <div class="container">
+                <t t-set="events"
+                   t-value="request.env['event.event'].sudo().search([
+                       ('is_featured','=',True),
+                       ('show_on_public_agenda','=',True),
+                       ('website_published','=',True)
+                   ], limit=10)"/>
+
+                <t t-if="events">
+                    <t t-set="carousel_id" t-value="'guiabh_featured_%s' % (request.env.context.get('snippet_key') or request.env.uid)"/>
+                    <div class="carousel slide"
+                         t-att-id="carousel_id"
+                         data-bs-ride="carousel"
+                         data-bs-interval="5000"
+                         data-bs-wrap="true">
+                        <div class="carousel-inner">
+                            <t t-foreach="events" t-as="event" t-index="idx">
+                                <div class="carousel-item" t-att-class="'active' if idx == 0 else ''">
+                                    <a t-att-href="'/agenda/event/%s' % event.id">
+                                        <img class="d-block w-100"
+                                             t-att-src="'/web/image/event.event/%s/promo_cover_image' % event.id"
+                                             t-att-alt="event.name or ''"/>
+                                    </a>
+                                </div>
+                            </t>
+                        </div>
+                        <button class="carousel-control-prev" type="button"
+                                t-att-data-bs-target="'#%s' % carousel_id"
+                                data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon"/>
+                        </button>
+                        <button class="carousel-control-next" type="button"
+                                t-att-data-bs-target="'#%s' % carousel_id"
+                                data-bs-slide="next">
+                            <span class="carousel-control-next-icon"/>
+                        </button>
+                    </div>
+                </t>
+                <t t-else="">
+                    <div class="alert alert-secondary mb-0 text-center">
+                        Nenhum evento em destaque no momento.
+                    </div>
+                </t>
+            </div>
+        </section>
+    </template>
+</odoo>
