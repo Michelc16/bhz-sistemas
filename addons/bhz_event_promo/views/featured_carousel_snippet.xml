@@ -14,18 +14,22 @@
                     <t t-set="carousel_id" t-value="'guiabh_featured_%s_%s' % (snippet_key, website_id)"/>
                     <div class="carousel slide"
                          t-att-id="carousel_id"
-                         data-guiabh-interval="5000"
-                         data-guiabh-wrap="true">
+                         data-bs-ride="carousel"
+                         data-bs-interval="5000"
+                         data-bs-wrap="true"
+                         data-bs-pause="false"
+                         data-bs-touch="true">
                         <div class="carousel-indicators" t-if="len(events) &gt; 1">
                             <t t-foreach="events" t-as="event" t-index="idx">
                                 <button type="button"
-                                        t-att-data-guiabh-slide-to="idx"
+                                        t-att-data-bs-target="'#%s' % carousel_id"
+                                        t-att-data-bs-slide-to="idx"
                                         t-att-class="'active' if idx == 0 else ''"
                                         aria-label="Slide"/>
                             </t>
                         </div>
                         <div class="carousel-inner">
-                            <t t-foreach="events" t-as="event" t-foreach-index="idx">
+                            <t t-foreach="events" t-as="event" t-index="idx">
                                 <div class="carousel-item" t-att-class="'active' if idx == 0 else ''">
                                     <a t-att-href="'/agenda/event/%s' % event.id">
                                         <img class="d-block w-100"
@@ -37,12 +41,16 @@
                         </div>
                         <t t-if="len(events) &gt; 1">
                             <button class="carousel-control-prev" type="button"
-                                    data-guiabh-control="prev">
-                                <span class="carousel-control-prev-icon"/>
+                                    t-att-data-bs-target="'#%s' % carousel_id"
+                                    data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"/>
+                                <span class="visually-hidden">Anterior</span>
                             </button>
                             <button class="carousel-control-next" type="button"
-                                    data-guiabh-control="next">
-                                <span class="carousel-control-next-icon"/>
+                                    t-att-data-bs-target="'#%s' % carousel_id"
+                                    data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"/>
+                                <span class="visually-hidden">Próximo</span>
                             </button>
                         </t>
                     </div>
