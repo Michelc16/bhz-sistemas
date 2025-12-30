@@ -103,6 +103,10 @@
   }
   .carousel-item {
     min-height: 420px;
+    display: none;
+  }
+  .carousel-item.active {
+    display: block;
   }
   .guiabh-slide-bg {
     width: 100%;
