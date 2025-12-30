@@ -62,27 +62,8 @@
 }
 
 .s_guiabh_featured_carousel {
-  .carousel-card {
-    position: relative;
-    color: inherit;
-  }
-  .carousel-card img,
-  .guiabh-carousel-placeholder {
-    min-height: 320px;
-    max-height: 420px;
-    object-fit: cover;
-  }
-  .guiabh-carousel-placeholder {
-    background: repeating-linear-gradient(
-      45deg,
-      rgba(0, 0, 0, 0.03),
-      rgba(0, 0, 0, 0.03) 12px,
-      rgba(0, 0, 0, 0.08) 12px,
-      rgba(0, 0, 0, 0.08) 24px
-    );
-    color: var(--bs-secondary-color);
-    text-align: center;
-  }
+  position: relative;
+
   .carousel-caption {
     position: absolute;
     left: 0;
@@ -91,48 +72,69 @@
     background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.65) 100%);
     color: #fff;
     padding: 1.5rem;
-    border-bottom-left-radius: 1rem;
-    border-bottom-right-radius: 1rem;
-  }
-  .carousel-controls .btn {
-    width: 36px;
-    height: 36px;
-    border-radius: 999px;
-    line-height: 1;
-    padding: 0;
-  }
-.guiabh-featured-carousel {
-  position: relative;
-
-  .carousel-item {
-    display: none;
-    min-height: 420px;
   }
 
-  .carousel-item.active {
-    display: block;
-  }
+  .guiabh-featured-carousel {
+    position: relative;
 
-  .carousel-indicators {
-    position: absolute;
-    bottom: 1rem;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 0.5rem;
+    .carousel-item {
+      min-height: 420px;
+    }
 
-    button {
-      width: 12px;
-      height: 12px;
-      border-radius: 999px;
-      border: 0;
-      background-color: rgba(255, 255, 255, 0.4);
-      &.active {
-        background-color: #fff;
+    &:not(.is-js) .carousel-item:first-child {
+      display: block;
+    }
+
+    &.is-js {
+      .carousel-item {
+        display: none;
+      }
+      .carousel-item.active {
+        display: block;
       }
     }
+
+    .carousel-indicators {
+      position: absolute;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 0.5rem;
+      button {
+        width: 12px;
+        height: 12px;
+        border-radius: 999px;
+        border: 0;
+        background-color: rgba(255, 255, 255, 0.4);
+        &.active {
+          background-color: #fff;
+        }
+      }
+    }
+
+    .carousel-control-prev,
+    .carousel-control-next {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 0;
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.45);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .carousel-control-prev {
+      left: 1rem;
+    }
+    .carousel-control-next {
+      right: 1rem;
+    }
   }
-}
 
   .guiabh-slide-bg {
     width: 100%;

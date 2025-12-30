@@ -4,18 +4,21 @@ import publicWidget from '@web/legacy/js/public/public_widget';
 
 publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
     selector: '.guiabh-featured-carousel',
+    disabledInEditableMode: false,
 
     start() {
         this.items = Array.from(this.el.querySelectorAll('.carousel-item'));
         this.indicators = Array.from(this.el.querySelectorAll('[data-slide-to]'));
         this.currentIndex = 0;
-        this.intervalMs = parseInt(this.el.dataset.interval || '5000', 10);
-        if (this.items.length) {
-            this.items[0].classList.add('active');
-            if (this.indicators[0]) {
-                this.indicators[0].classList.add('active');
-            }
+        this.interval = parseInt(this.el.dataset.interval || '5000', 10);
+
+        if (!this.items.length) {
+            return this._super(...arguments);
         }
+
+        this.el.classList.add('is-js');
+        this._show(0);
+
         if (this.items.length > 1) {
             this._bindControls();
             this._startAutoplay();
@@ -46,10 +49,10 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
     },
 
     _startAutoplay() {
-        if (this.intervalMs <= 0) {
+        if (this.interval <= 0) {
             return;
         }
-        this._timer = setInterval(() => this._show(this.currentIndex + 1), this.intervalMs);
+        this._timer = setInterval(() => this._show(this.currentIndex + 1), this.interval);
     },
 
     _restartAutoplay() {
@@ -63,15 +66,11 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         if (!this.items.length) {
             return;
         }
-        this.items[this.currentIndex].classList.remove('active');
-        if (this.indicators[this.currentIndex]) {
-            this.indicators[this.currentIndex].classList.remove('active');
-        }
+        this.items[this.currentIndex]?.classList.remove('active');
+        this.indicators[this.currentIndex]?.classList.remove('active');
         this.currentIndex = (index + this.items.length) % this.items.length;
         this.items[this.currentIndex].classList.add('active');
-        if (this.indicators[this.currentIndex]) {
-            this.indicators[this.currentIndex].classList.add('active');
-        }
+        this.indicators[this.currentIndex]?.classList.add('active');
     },
 
     destroy() {
