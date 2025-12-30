@@ -386,3 +386,20 @@ class EventEvent(models.Model):
     def _get_external_registration_url(self):
         self.ensure_one()
         return self._normalize_external_url(self.registration_external_url)
+
+    # ---------------------------------------------------------- Datetime helper
+    def _get_display_timezone(self):
+        website = getattr(request, "website", False)
+        if website and website.tz:
+            return website.tz
+        return self.env.context.get("tz") or self.env.user.tz or "UTC"
+
+    def _localize_datetime(self, dt):
+        if not dt:
+            return False
+        tz = self._get_display_timezone()
+        return fields.Datetime.context_timestamp(self.with_context(tz=tz), dt)
+
+    def _format_datetime_display(self, dt, fmt="%d/%m/%Y %H:%M"):
+        localized = self._localize_datetime(dt)
+        return localized.strftime(fmt) if localized else ""
