@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ir_cron_guiabh_cineart_sync" model="ir.cron">
+        <field name="name">Cineart - Sincronizar filmes</field>
+        <field name="model_id" ref="model_guiabh_cineart_movie"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_sync_all()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="user_id" ref="base.user_admin"/>
+        <field name="nextcall" eval="(DateTime.now() + relativedelta(days=1)).replace(hour=6, minute=0, second=0, microsecond=0)"/>
+        <field name="active">True</field>
+    </record>
+</odoo>

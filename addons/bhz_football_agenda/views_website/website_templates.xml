@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <template id="page_football_agenda" name="Agenda de Jogos (BHZ Futebol)">
+            <t t-call="website.layout">
+                <t t-set="pageName" t-value="'Agenda de Jogos'"/>
+                <div class="container py-5">
+                    <div class="row align-items-center mb-4">
+                        <div class="col-12 col-lg-8">
+                            <h1 class="mb-2">Agenda de Jogos</h1>
+                            <p class="text-muted mb-0">
+                                Cruzeiro, Atlético-MG e América-MG — próximos jogos e informações.
+                            </p>
+                        </div>
+                        <div class="col-12 col-lg-4 mt-3 mt-lg-0">
+                            <div class="d-flex gap-2 justify-content-lg-end flex-wrap">
+                                <a class="btn btn-outline-primary"
+                                   t-attf-href="/futebol/agenda"
+                                   t-att-class="'btn btn-outline-primary ' + ('' if selected_team else 'active')">
+                                    Todos
+                                </a>
+                                <t t-foreach="teams" t-as="tteam">
+                                    <a class="btn btn-outline-primary"
+                                       t-attf-href="/futebol/agenda/{{ tteam.slug }}"
+                                       t-att-class="'btn btn-outline-primary ' + ('active' if (selected_team and selected_team.id == tteam.id) else '')">
+                                        <t t-esc="tteam.name"/>
+                                    </a>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                    <form class="card shadow-sm mb-4" method="get" action="/futebol/agenda">
+                        <div class="card-body row g-3">
+                            <div class="col-12 col-md-4">
+                                <label class="form-label">Data inicial</label>
+                                <input type="date" class="form-control" name="date_from" t-att-value="filters.get('date_from')"/>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label class="form-label">Data final</label>
+                                <input type="date" class="form-control" name="date_to" t-att-value="filters.get('date_to')"/>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label class="form-label">Time</label>
+                                <select class="form-select" name="team_id">
+                                    <option value="">Todos os times</option>
+                                    <t t-foreach="teams" t-as="team">
+                                        <option t-att-value="team.id" t-att-selected="str(team.id) == (filters.get('team_id') or '') and 'selected' or False">
+                                            <t t-esc="team.name"/>
+                                        </option>
+                                    </t>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">Competição</label>
+                                <select class="form-select" name="competition">
+                                    <option value="">Todas</option>
+                                    <t t-foreach="competitions" t-as="competition">
+                                        <option t-att-value="competition" t-att-selected="competition == filters.get('competition') and 'selected' or False">
+                                            <t t-esc="competition"/>
+                                        </option>
+                                    </t>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-6 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <t t-if="not groups">
+                                <div class="alert alert-info mb-0">
+                                    Nenhum jogo encontrado para os filtros selecionados.
+                                </div>
+                            </t>
+                            <t t-if="groups">
+                                <t t-foreach="groups" t-as="group">
+                                    <div class="mb-4">
+                                        <h3 class="h5 mb-3" t-esc="group.get('label')"/>
+                                        <div class="table-responsive">
+                                            <table class="table align-middle mb-0">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Data/Hora</th>
+                                                        <th>Jogo</th>
+                                                        <th>Competição</th>
+                                                        <th>Local</th>
+                                                        <th>Transmissão</th>
+                                                        <th>Ingressos</th>
+                                                        <th>Calendário</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <t t-foreach="group.get('items')" t-as="m">
+                                                        <tr>
+                                                            <td style="white-space:nowrap;">
+                                                                <div class="d-flex align-items-center gap-2 flex-wrap">
+                                                                    <span><t t-esc="m.get('match_datetime_str')"/></span>
+                                                                    <t t-if="m.get('badge_label') == 'Hoje'">
+                                                                        <span class="badge bg-success text-white">Hoje</span>
+                                                                    </t>
+                                                                    <t t-if="m.get('badge_label') == 'Amanhã'">
+                                                                        <span class="badge bg-primary text-white">Amanhã</span>
+                                                                    </t>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="d-flex align-items-center gap-2 flex-wrap">
+                                                                    <div class="d-flex align-items-center gap-2">
+                                                                        <t t-if="m.get('home_team_logo')">
+                                                                            <img t-att-src="m.get('home_team_logo')" alt="" class="rounded" style="width:36px; height:36px; object-fit:contain;"/>
+                                                                        </t>
+                                                                        <strong><t t-esc="m.get('home_team_name')"/></strong>
+                                                                    </div>
+                                                                    <span class="mx-1">x</span>
+                                                                    <div class="d-flex align-items-center gap-2">
+                                                                        <t t-if="m.get('away_team_logo')">
+                                                                            <img t-att-src="m.get('away_team_logo')" alt="" class="rounded" style="width:36px; height:36px; object-fit:contain;"/>
+                                                                        </t>
+                                                                        <strong><t t-esc="m.get('away_team_name')"/></strong>
+                                                                    </div>
+                                                                </div>
+                                                                <t t-if="m.get('round_name')">
+                                                                    <div class="text-muted small"><t t-esc="m.get('round_name')"/></div>
+                                                                </t>
+                                                            </td>
+                                                            <td>
+                                                                <t t-esc="m.get('competition') or '-'"/>
+                                                            </td>
+                                                            <td>
+                                                                <t t-esc="m.get('stadium') or '-'"/>
+                                                                <t t-if="m.get('city')">
+                                                                    <div class="text-muted small"><t t-esc="m.get('city')"/></div>
+                                                                </t>
+                                                            </td>
+                                                            <td>
+                                                                <t t-esc="m.get('broadcast') or '-'"/>
+                                                            </td>
+                                                            <td>
+                                                                <t t-if="m.get('ticket_url')">
+                                                                    <a class="btn btn-sm btn-primary" t-att-href="m.get('ticket_url')" target="_blank" rel="noopener">
+                                                                        Comprar
+                                                                    </a>
+                                                                </t>
+                                                                <t t-if="not m.get('ticket_url')">-</t>
+                                                            </td>
+                                                            <td>
+                                                                <t t-if="m.get('gcal_url')">
+                                                                    <a class="btn btn-sm btn-outline-secondary"
+                                                                       t-att-href="m.get('gcal_url')"
+                                                                       target="_blank" rel="noopener">
+                                                                        Adicionar ao Google Calendar
+                                                                    </a>
+                                                                </t>
+                                                                <t t-if="not m.get('gcal_url')">-</t>
+                                                            </td>
+                                                        </tr>
+                                                    </t>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </t>
+                            </t>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-muted small">
+                        Dica: você pode cadastrar/atualizar os jogos no menu <strong>BHZ Futebol → Jogos</strong>.
+                    </div>
+                </div>
+            </t>
+        </template>
+    </data>
+</odoo>

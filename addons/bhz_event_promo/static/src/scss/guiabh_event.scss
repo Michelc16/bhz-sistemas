@@ -1,0 +1,195 @@
+.guiabh-agenda {
+  .guiabh-event-card {
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .guiabh-cover {
+    height: 190px;
+    object-fit: cover;
+  }
+
+  .guiabh-cover.placeholder {
+    height: 190px;
+    background: rgba(255,255,255,.06);
+  }
+
+  .guiabh-view-tabs .nav-link {
+    border-radius: 999px;
+    color: var(--bs-body-color);
+    &.active {
+      background-color: var(--bs-primary);
+      color: #fff;
+    }
+  }
+
+  .guiabh-badges .badge {
+    font-size: 0.75rem;
+    letter-spacing: 0.02em;
+  }
+
+  .guiabh-filters select[multiple] {
+    min-height: 110px;
+  }
+
+  .guiabh-calendar {
+    .table {
+      background: rgba(0, 0, 0, 0.02);
+    }
+    td {
+      height: 120px;
+      vertical-align: top;
+      padding: 0.5rem;
+    }
+    .guiabh-calendar-events {
+      margin: 0;
+      padding-left: 0;
+      li {
+        text-align: left;
+        font-size: 0.85rem;
+        line-height: 1.2;
+        margin-bottom: 0.25rem;
+      }
+    }
+  }
+
+  .guiabh-week-card {
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    padding: 1rem;
+    background-color: rgba(255, 255, 255, 0.7);
+  }
+}
+
+.s_guiabh_featured_carousel {
+  position: relative;
+
+  .carousel-caption {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.65) 100%);
+    color: #fff;
+    padding: 1.5rem;
+  }
+
+  .guiabh-featured-carousel {
+    position: relative;
+
+    .carousel-item {
+      min-height: 420px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--bs-body-bg, #fff);
+    }
+
+    &:not(.is-js) .carousel-item:first-child {
+      display: block;
+    }
+
+    &.is-js {
+      .carousel-item {
+        display: none;
+      }
+      .carousel-item.active {
+        display: block;
+      }
+    }
+
+    .carousel-indicators {
+      position: absolute;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 0.5rem;
+      button {
+        width: 12px;
+        height: 12px;
+        border-radius: 999px;
+        border: 0;
+        background-color: rgba(255, 255, 255, 0.4);
+        &.active {
+          background-color: #fff;
+        }
+      }
+    }
+
+    .carousel-control-prev,
+    .carousel-control-next {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 0;
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.45);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .carousel-control-prev {
+      left: 1rem;
+    }
+    .carousel-control-next {
+      right: 1rem;
+    }
+  }
+
+  .guiabh-slide-bg {
+    width: 100%;
+    height: 420px;
+    object-fit: contain;
+    background-color: transparent;
+  }
+}
+
+.bhz-ext-register {
+  max-width: 760px;
+}
+
+.bhz-event-detail {
+  .bhz-event-cover-wrapper {
+    width: 100%;
+    height: 420px;
+    background-color: var(--bs-body-bg, #fff);
+    overflow: hidden;
+  }
+  .bhz-event-detail-cover {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background-color: transparent;
+  }
+  .bhz-event-detail-cover.placeholder {
+    height: 100%;
+    background: repeating-linear-gradient(
+      45deg,
+      rgba(0, 0, 0, 0.04),
+      rgba(0, 0, 0, 0.04) 10px,
+      rgba(0, 0, 0, 0.08) 10px,
+      rgba(0, 0, 0, 0.08) 20px
+    );
+  }
+  .bhz-badges .badge {
+    font-size: 0.85rem;
+  }
+  .bhz-event-description p {
+    line-height: 1.6;
+  }
+  .bhz-event-cta-box {
+    text-align: center;
+  }
+  .bhz-event-cta {
+    display: inline-flex;
+    width: auto;
+    min-width: unset;
+    justify-content: center;
+    padding-left: 1.75rem;
+    padding-right: 1.75rem;
+  }
+}

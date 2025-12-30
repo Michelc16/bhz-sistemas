@@ -1,0 +1,409 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Página Agenda -->
+    <template id="bhz_agenda_page" name="GuiaBH Agenda">
+        <t t-call="website.layout">
+            <div class="container mt-4 mb-5 guiabh-agenda">
+                <!-- BHZ_EVENT_PROMO_ACTIVE -->
+                <div class="row mb-3 align-items-center">
+                    <div class="col-12 col-lg-7">
+                        <h1 class="mb-1">Agenda de Eventos</h1>
+                        <p class="text-muted mb-0">Encontre shows, festivais, teatro, congressos e muito mais.</p>
+                    </div>
+
+                    <div class="col-12 col-lg-5 mt-3 mt-lg-0 d-flex justify-content-lg-end">
+                        <ul class="nav nav-pills guiabh-view-tabs">
+                            <li class="nav-item">
+                                <a t-attf-class="nav-link #{'active' if view_mode == 'list' else ''}" t-att-href="view_urls.get('list')">Lista</a>
+                            </li>
+                            <li class="nav-item">
+                                <a t-attf-class="nav-link #{'active' if view_mode == 'month' else ''}" t-att-href="view_urls.get('month')">Mês</a>
+                            </li>
+                            <li class="nav-item">
+                                <a t-attf-class="nav-link #{'active' if view_mode == 'week' else ''}" t-att-href="view_urls.get('week')">Semana</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <form method="get" t-att-action="filter_action" class="guiabh-filters row g-3 mb-4 align-items-end">
+                    <input type="hidden" name="view" t-att-value="view_mode"/>
+                    <input type="hidden" name="y" t-if="view_mode == 'month' and month_info" t-att-value="month_info.get('year')"/>
+                    <input type="hidden" name="m" t-if="view_mode == 'month' and month_info" t-att-value="month_info.get('month')"/>
+                    <input type="hidden" name="date" t-if="view_mode == 'week' and week_info" t-att-value="week_info.get('current_date').isoformat()"/>
+                    <div class="col-12 col-md-4 col-lg-3">
+                        <label class="form-label fw-semibold">Categoria</label>
+                        <select name="category" class="form-select">
+                            <option value="">Todas</option>
+                            <t t-foreach="categories" t-as="cat">
+                                <option t-att-value="cat.id" t-att-selected="active_category == cat.id">
+                                    <t t-esc="cat.name"/>
+                                </option>
+                            </t>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-4 col-lg-3">
+                        <label class="form-label fw-semibold">Buscar</label>
+                        <input type="text" name="search" class="form-control" placeholder="Nome ou descrição" t-att-value="search"/>
+                    </div>
+                    <div class="col-6 col-md-2 col-lg-2">
+                        <label class="form-label fw-semibold">Preço</label>
+                        <select name="price" class="form-select">
+                            <option value="all" t-att-selected="price_filter == 'all'">Todos</option>
+                            <option value="free" t-att-selected="price_filter == 'free'">Gratuitos</option>
+                            <option value="paid" t-att-selected="price_filter == 'paid'">Pagos</option>
+                        </select>
+                    </div>
+                    <div class="col-6 col-md-2 col-lg-2">
+                        <label class="form-label fw-semibold">Local</label>
+                        <select name="venue" class="form-select">
+                            <option value="">Todos</option>
+                            <t t-foreach="available_venues" t-as="venue">
+                                <option t-att-value="venue.id" t-att-selected="venue_filter == venue.id">
+                                    <t t-esc="venue.name"/>
+                                </option>
+                            </t>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-4 col-lg-2">
+                        <label class="form-label fw-semibold">Bairro</label>
+                        <input type="text" name="neighborhood" class="form-control" placeholder="Savassi..." t-att-value="neighborhood_filter"/>
+                    </div>
+                    <div class="col-12 col-md-4 col-lg-3">
+                        <label class="form-label fw-semibold">Tags</label>
+                        <select name="tag" class="form-select" multiple="multiple">
+                            <t t-foreach="available_tags" t-as="tag">
+                                <option t-att-value="tag.id" t-att-selected="tag.id in tag_filter">
+                                    <t t-esc="tag.name"/>
+                                </option>
+                            </t>
+                        </select>
+                    </div>
+                    <div class="col-6 col-md-2 col-lg-2">
+                        <div class="form-check mt-4">
+                            <input class="form-check-input" type="checkbox" name="featured" value="1" t-att-checked="featured_filter and 'checked' or False" id="filterFeatured"/>
+                            <label class="form-check-label" for="filterFeatured">Somente destaques</label>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4 col-lg-3 text-md-end">
+                        <button class="btn btn-primary w-100 mb-2" type="submit">Aplicar filtros</button>
+                        <a class="btn btn-link w-100" t-att-href="filter_action">Limpar filtros</a>
+                    </div>
+                </form>
+
+                <t t-if="view_mode == 'list'">
+                    <div class="row g-3">
+                        <t t-if="not events">
+                            <div class="col-12">
+                                <div class="alert alert-info mb-0">Nenhum evento encontrado para esse filtro.</div>
+                            </div>
+                        </t>
+
+                        <t t-foreach="events" t-as="ev">
+                            <t t-set="detail_url" t-value="'/agenda/event/%s' % ev.id"/>
+                            <div class="col-12 col-md-6 col-lg-4">
+                                <div class="card h-100 guiabh-event-card">
+
+                                    <!-- Capa -->
+                                    <t t-if="ev.promo_cover_image">
+                                        <img class="card-img-top guiabh-cover"
+                                             t-att-src="'/web/image/event.event/%s/promo_cover_image' % ev.id"
+                                             t-att-alt="ev.name"/>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="guiabh-cover placeholder"></div>
+                                    </t>
+
+                                    <div class="card-body d-flex flex-column">
+                                        <div class="d-flex justify-content-between align-items-start gap-2">
+                                            <h5 class="card-title mb-1">
+                                                <a t-att-href="detail_url" class="text-decoration-none">
+                                                    <t t-esc="ev.name"/>
+                                                </a>
+                                            </h5>
+                                        </div>
+
+                                        <t t-call="bhz_event_promo.bhz_event_badges">
+                                            <t t-set="event_record" t-value="ev"/>
+                                        </t>
+
+                                        <p class="text-muted mb-2">
+                                            <t t-esc="ev.date_begin.strftime('%d/%m/%Y %H:%M') if ev.date_begin else ''"/>
+                                            <t t-if="ev.address_id and ev.address_id.city"> • <t t-esc="ev.address_id.city"/></t>
+                                            <t t-if="ev.neighborhood"> • <t t-esc="ev.neighborhood"/></t>
+                                        </p>
+
+                                        <t t-if="ev.venue_partner_id">
+                                            <p class="small text-uppercase text-muted mb-1">
+                                                <t t-esc="ev.venue_partner_id.name"/>
+                                            </p>
+                                        </t>
+
+                                        <t t-if="ev.promo_short_description">
+                                            <p class="mb-2"><t t-esc="ev.promo_short_description"/></p>
+                                        </t>
+
+                                        <div class="mt-auto d-flex gap-2">
+                                            <t t-if="ev.registration_mode != 'disclosure_only'">
+                                                <t t-set="primary_href" t-value="detail_url"/>
+                                                <t t-set="primary_target" t-value="False"/>
+                                            <t t-if="ev.registration_mode == 'external'">
+                                                <t t-set="external_href" t-value="ev._get_external_registration_url()"/>
+                                                <t t-if="external_href">
+                                                    <t t-set="primary_href" t-value="external_href"/>
+                                                    <t t-set="primary_target" t-value="'_blank'"/>
+                                                </t>
+                                            </t>
+                                                <a class="btn btn-primary w-100"
+                                                   t-att-href="primary_href"
+                                                   t-att-target="primary_target"
+                                                   t-att-rel="primary_target and 'noopener' or False">
+                                                    <t t-esc="ev.registration_button_label or 'Inscrever-se'"/>
+                                                </a>
+                                            </t>
+
+                                            <a class="btn btn-outline-secondary"
+                                               t-att-href="detail_url">Detalhes</a>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </t>
+
+                <t t-if="view_mode == 'month' and month_info">
+                    <t t-call="bhz_event_promo.bhz_agenda_month"/>
+                </t>
+
+                <t t-if="view_mode == 'week' and week_info">
+                    <t t-call="bhz_event_promo.bhz_agenda_week"/>
+                </t>
+            </div>
+        </t>
+    </template>
+
+    <template id="bhz_agenda_month">
+        <div class="guiabh-calendar guiabh-calendar-month">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <a class="btn btn-outline-secondary btn-sm" t-att-href="month_info.get('prev_url')">◀ Mês anterior</a>
+                <h4 class="mb-0 text-center flex-grow-1">
+                    <t t-esc="month_info.get('label')"/>
+                </h4>
+                <a class="btn btn-outline-secondary btn-sm" t-att-href="month_info.get('next_url')">Próximo mês ▶</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered text-center align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <t t-foreach="['Seg','Ter','Qua','Qui','Sex','Sáb','Dom']" t-as="dow">
+                                <th><t t-esc="dow"/></th>
+                            </t>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="month_info.get('weeks')" t-as="week">
+                            <tr>
+                                <t t-foreach="week" t-as="day">
+                                    <td t-attf-class="#{'text-muted' if not day.get('in_month') else ''}">
+                                        <div class="fw-semibold">
+                                            <t t-esc="day.get('date').day"/>
+                                        </div>
+                                        <t t-if="day.get('events')">
+                                            <ul class="list-unstyled guiabh-calendar-events">
+                                                <t t-foreach="day.get('events')" t-as="ev">
+                                                    <li>
+                                                        <a t-att-href="'/agenda/event/%s' % ev.id">
+                                                            <t t-esc="ev.name"/>
+                                                        </a>
+                                                    </li>
+                                                </t>
+                                            </ul>
+                                        </t>
+                                    </td>
+                                </t>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </template>
+
+    <template id="bhz_agenda_week">
+        <div class="guiabh-calendar guiabh-calendar-week">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <a class="btn btn-outline-secondary btn-sm" t-att-href="week_info.get('prev_url')">◀ Semana anterior</a>
+                <h4 class="mb-0 flex-grow-1 text-center">
+                    <t t-esc="week_info.get('label')"/>
+                </h4>
+                <a class="btn btn-outline-secondary btn-sm" t-att-href="week_info.get('next_url')">Próxima semana ▶</a>
+            </div>
+            <div class="row g-3">
+                <t t-foreach="week_info.get('days')" t-as="day">
+                    <div class="col-12 col-md-6 col-lg-3">
+                        <div class="guiabh-week-card h-100">
+                            <div class="fw-bold mb-2">
+                                <t t-esc="day.get('label')"/>
+                            </div>
+                            <t t-if="day.get('events')">
+                                <ul class="list-unstyled mb-0">
+                                    <t t-foreach="day.get('events')" t-as="ev">
+                                        <li class="mb-2">
+                                            <a t-att-href="'/agenda/event/%s' % ev.id" class="fw-semibold d-block">
+                                                <t t-esc="ev.name"/>
+                                            </a>
+                                            <small class="text-muted">
+                                                <t t-esc="ev.date_begin.strftime('%H:%M') if ev.date_begin else ''"/>
+                                                <t t-if="ev.venue_partner_id"> • <t t-esc="ev.venue_partner_id.name"/></t>
+                                            </small>
+                                            <t t-call="bhz_event_promo.bhz_event_badges">
+                                                <t t-set="event_record" t-value="ev"/>
+                                            </t>
+                                        </li>
+                                    </t>
+                                </ul>
+                            </t>
+                            <t t-else="">
+                                <p class="text-muted mb-0">Sem eventos.</p>
+                            </t>
+                        </div>
+                    </div>
+                </t>
+            </div>
+        </div>
+    </template>
+
+    <template id="bhz_event_badges">
+        <t t-if="event_record">
+            <div class="guiabh-badges mb-2 d-flex flex-wrap gap-2">
+                <span class="badge text-bg-warning text-uppercase" t-if="event_record.is_featured">Destaque</span>
+                <span class="badge text-bg-info text-uppercase" t-if="event_record.is_sponsored">Patrocinado</span>
+                <span class="badge text-bg-success" t-if="event_record.ticket_kind == 'free'">Gratuito</span>
+                <span class="badge text-bg-primary" t-if="event_record.ticket_kind == 'paid'">Pago</span>
+                <span class="badge text-bg-secondary" t-if="event_record.is_accessible_pcd">Acessível PCD</span>
+                <span class="badge text-bg-dark" t-if="event_record.age_rating">
+                    <t t-esc="dict([('l','Livre'),('10','10+'),('12','12+'),('14','14+'),('16','16+'),('18','18+')]).get(event_record.age_rating, 'Livre')"/>
+                </span>
+            </div>
+        </t>
+    </template>
+
+    <template id="bhz_event_detail_content" name="GuiaBH Event Detail Content">
+        <section class="bhz-event-detail py-5 py-lg-5">
+            <!-- BHZ_EVENT_PROMO_ACTIVE -->
+            <div class="container">
+                <a href="/agenda" class="btn btn-link mb-3">&#8592; Voltar para Agenda</a>
+                <div class="bg-white shadow-sm rounded-4 p-4 p-lg-5">
+                    <div class="bhz-event-hero mb-4">
+                        <div class="bhz-event-cover-wrapper rounded-4">
+                            <t t-if="event.promo_cover_image">
+                                <img class="img-fluid bhz-event-detail-cover"
+                                     t-att-src="'/web/image/event.event/%s/promo_cover_image' % event.id"
+                                     t-att-alt="event.name"/>
+                            </t>
+                            <t t-elif="event.image_1920">
+                                <img class="img-fluid bhz-event-detail-cover"
+                                     t-att-src="'/web/image/event.event/%s/image_1920' % event.id"
+                                     t-att-alt="event.name"/>
+                            </t>
+                            <t t-else="">
+                                <div class="bhz-event-detail-cover placeholder"></div>
+                            </t>
+                        </div>
+                    </div>
+                    <h1 class="mb-3"><t t-esc="event.name"/></h1>
+                    <t t-call="bhz_event_promo.bhz_event_badges">
+                        <t t-set="event_record" t-value="event"/>
+                    </t>
+                    <p class="text-muted mb-4">
+                        <t t-if="event.date_begin">
+                            <t t-esc="event.date_begin.strftime('%d/%m/%Y %H:%M')"/>
+                            <t t-if="event.date_end"> - <t t-esc="event.date_end.strftime('%d/%m/%Y %H:%M')"/></t>
+                        </t>
+                        <br/>
+                        <t t-if="event.venue_partner_id">
+                            <strong><t t-esc="event.venue_partner_id.name"/></strong>
+                        </t>
+                        <t t-if="event.address_id and event.address_id.city">
+                            • <t t-esc="event.address_id.city"/>
+                        </t>
+                        <t t-if="event.neighborhood">
+                            • <t t-esc="event.neighborhood"/>
+                        </t>
+                    </p>
+                    <div class="row g-3 mb-4">
+                        <div class="col-12 col-md-6">
+                            <strong>Categoria:</strong>
+                            <span>
+                                <t t-esc="event.promo_category_id.name or event.event_type_id.name or 'Outros'"/>
+                            </span>
+                        </div>
+                        <div class="col-12 col-md-6" t-if="event.producer_name">
+                            <strong>Produtor:</strong>
+                            <span><t t-esc="event.producer_name"/></span>
+                        </div>
+                        <div class="col-12 col-md-6" t-if="event.venue_partner_id">
+                            <strong>Local:</strong>
+                            <span><t t-esc="event.venue_partner_id.display_name"/></span>
+                        </div>
+                    </div>
+                    <t t-set="register_url"
+                       t-value="(event.website_url and '%s/register' % event.website_url.rstrip('/')) or ('/event/%s/register' % event.id)"/>
+                    <div class="my-4 bhz-event-cta-box">
+                        <t t-if="event.registration_mode != 'disclosure_only'">
+                            <t t-set="button_href" t-value="register_url"/>
+                            <t t-set="button_target" t-value="False"/>
+                            <t t-if="event.registration_mode == 'external'">
+                                <t t-set="external_href" t-value="event._get_external_registration_url()"/>
+                                <t t-if="external_href">
+                                    <t t-set="button_href" t-value="external_href"/>
+                                    <t t-set="button_target" t-value="'_blank'"/>
+                                </t>
+                            </t>
+                            <a class="btn btn-primary btn-lg bhz-ext-register bhz-event-cta"
+                               t-att-href="button_href"
+                               t-att-target="button_target"
+                               t-att-rel="button_target and 'noopener' or False">
+                                <t t-esc="event.registration_button_label or 'Inscrever-se'"/>
+                            </a>
+                        </t>
+                    </div>
+                    <div class="bhz-event-description">
+                        <div class="oe_structure oe_empty"
+                             id="bhz_event_editor_content"
+                             data-oe-model="event.event"
+                             data-oe-field="promo_description_html"
+                             t-att-data-oe-id="event.id">
+                            <t t-set="fallback_text" t-value="event.subtitle or event.promo_short_description"/>
+                            <t t-if="event.promo_description_html">
+                                <t t-raw="event.promo_description_html"/>
+                            </t>
+                            <t t-elif="fallback_text">
+                                <p><t t-esc="fallback_text"/></p>
+                            </t>
+                            <t t-else="">
+                                <p class="text-muted">Mais detalhes em breve.</p>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </template>
+
+    <template id="bhz_event_detail" name="GuiaBH Event Detail">
+        <t t-call="website.layout">
+            <t t-set="main_object" t-value="event"/>
+            <div id="wrap"
+                 class="oe_structure"
+                 data-oe-model="event.event"
+                 t-att-data-oe-id="event.id">
+                <t t-call="bhz_event_promo.bhz_event_detail_content"/>
+            </div>
+        </t>
+    </template>
+
+</odoo>

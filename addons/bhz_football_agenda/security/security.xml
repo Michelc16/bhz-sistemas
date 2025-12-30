@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Grupo básico: quem pode gerenciar agenda -->
+    <record id="group_bhz_football_manager" model="res.groups">
+        <field name="name">BHZ Futebol - Gerenciar Agenda</field>
+    </record>
+</odoo>
