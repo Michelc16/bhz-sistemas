@@ -21,6 +21,11 @@ class BhzFootballAgendaController(http.Controller):
         Match = request.env["bhz.football.match"].sudo()
 
         teams = Team.search([("website_published", "=", True), ("active", "=", True)], order="name asc")
+        featured_slugs = ["cruzeiro", "atletico-mg", "america-mg"]
+        slug_map = {team.slug: team for team in teams}
+        featured_teams = [slug_map[slug] for slug in featured_slugs if slug in slug_map]
+        if not featured_teams:
+            featured_teams = teams[:3]
 
         selected_team = None
         domain = [
@@ -212,6 +217,7 @@ class BhzFootballAgendaController(http.Controller):
             "bhz_football_agenda.page_football_agenda",
             {
                 "teams": teams,
+                "featured_teams": featured_teams,
                 "selected_team": selected_team,
                 "groups": groups,
                 "competitions": competitions,
