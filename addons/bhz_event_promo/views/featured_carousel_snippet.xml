@@ -9,15 +9,15 @@
                  data-categories="Events">
             <div class="container">
                 <t t-set="featured_events" t-value="request.env['event.event'].guiabh_get_featured_events(12)"/>
-                <t t-set="items" t-value="list(enumerate(featured_events))"/>
+                <t t-set="items_count" t-value="len(featured_events)"/>
 
-                <t t-if="items">
-                    <t t-set="snippet_key" t-value="request.env.context.get('snippet_key')"/>
+                <t t-if="items_count">
+                    <t t-set="snippet_key" t-value="request.env.context.get('snippet_key') or ''"/>
                     <t t-set="carousel_id" t-value="'guiabh_featured_%s' % (snippet_key or request.env.uid or 0)"/>
 
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h2 class="h4 mb-0">Eventos em destaque</h2>
-                        <div class="carousel-controls d-none d-md-flex gap-2" t-if="len(items) &gt; 1">
+                        <div class="carousel-controls d-none d-md-flex gap-2" t-if="items_count &gt; 1">
                             <button class="btn btn-outline-secondary btn-sm"
                                     t-att-data-bs-target="'#%s' % carousel_id"
                                     data-bs-slide="prev">
@@ -32,16 +32,15 @@
                     </div>
 
                     <div class="carousel slide"
+                         t-att-id="carousel_id"
                          data-bs-ride="carousel"
                          data-bs-interval="5000"
                          data-bs-pause="false"
-                         data-bs-touch="true"
                          data-bs-wrap="true"
-                         t-att-id="carousel_id">
+                         data-bs-touch="true">
 
-                        <div class="carousel-indicators" t-if="len(items) &gt; 1">
-                            <t t-foreach="items" t-as="it">
-                                <t t-set="idx" t-value="it[0]"/>
+                        <div class="carousel-indicators" t-if="items_count &gt; 1">
+                            <t t-foreach="featured_events" t-as="event" t-index="idx">
                                 <button type="button"
                                         t-att-data-bs-target="'#%s' % carousel_id"
                                         t-att-data-bs-slide-to="idx"
@@ -52,10 +51,7 @@
                         </div>
 
                         <div class="carousel-inner">
-                            <t t-foreach="items" t-as="it">
-                                <t t-set="idx" t-value="it[0]"/>
-                                <t t-set="event" t-value="it[1]"/>
-
+                            <t t-foreach="featured_events" t-as="event" t-index="idx">
                                 <div class="carousel-item" t-att-class="'active' if idx == 0 else ''">
                                     <t t-set="detail_url" t-value="'/agenda/event/%s' % event.id"/>
                                     <a class="carousel-card d-block text-decoration-none" t-att-href="detail_url">
@@ -82,7 +78,7 @@
                             </t>
                         </div>
 
-                        <t t-if="len(items) &gt; 1">
+                        <t t-if="items_count &gt; 1">
                             <button class="carousel-control-prev" type="button"
                                     t-att-data-bs-target="'#%s' % carousel_id" data-bs-slide="prev">
                                 <span class="carousel-control-prev-icon" aria-hidden="true"/>

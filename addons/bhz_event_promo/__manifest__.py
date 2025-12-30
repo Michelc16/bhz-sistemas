@@ -13,13 +13,13 @@
         "views/event_views.xml",
         "views/website_menu.xml",
         "views/templates.xml",
-        "views/snippets/options.xml",
         "views/featured_carousel_snippet.xml",
         "views/bhz_event_import_views.xml",
     ],
     "assets": {
         "web.assets_frontend": [
             "bhz_event_promo/static/src/scss/guiabh_event.scss",
+            "bhz_event_promo/static/src/js/guiabh_featured_carousel.js",
         ],
     },
     "installable": True,
