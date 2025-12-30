@@ -338,6 +338,7 @@ class EventEvent(models.Model):
     def create(self, vals_list):
         stage_model = self.env["event.stage"]
         for vals in vals_list:
+            self._sync_cover_images(vals)
             stage_id = vals.get("stage_id")
             if stage_id:
                 stage = stage_model.browse(stage_id)
@@ -361,6 +362,7 @@ class EventEvent(models.Model):
             return super().write(vals)
 
         vals_to_write = dict(vals)
+        self._sync_cover_images(vals_to_write)
         publish_stage = False
         if "stage_id" in vals_to_write and vals_to_write.get("stage_id"):
             stage = self.env["event.stage"].browse(vals_to_write["stage_id"])
@@ -386,6 +388,15 @@ class EventEvent(models.Model):
     def _get_external_registration_url(self):
         self.ensure_one()
         return self._normalize_external_url(self.registration_external_url)
+
+    def _sync_cover_images(self, vals):
+        """Copy promo cover image into standard fields for generic snippets."""
+        promo = vals.get("promo_cover_image")
+        if not promo:
+            return
+        for field_name in ("image_1920", "cover_image"):
+            if field_name in self._fields and field_name not in vals:
+                vals[field_name] = promo
 
     # ---------------------------------------------------------- Datetime helper
     def _get_display_timezone(self):
