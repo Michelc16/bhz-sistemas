@@ -1,0 +1,12 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_bhz_place_manager,bhz.place manager,model_bhz_place,bhz_city_places.group_bhz_place_manager,1,1,1,1
+access_bhz_place_editor,bhz.place editor,model_bhz_place,bhz_city_places.group_bhz_place_editor,1,1,1,0
+
+access_bhz_place_category_manager,bhz.place.category manager,model_bhz_place_category,bhz_city_places.group_bhz_place_manager,1,1,1,1
+access_bhz_place_category_editor,bhz.place.category editor,model_bhz_place_category,bhz_city_places.group_bhz_place_editor,1,1,1,0
+
+access_bhz_place_tag_manager,bhz.place.tag manager,model_bhz_place_tag,bhz_city_places.group_bhz_place_manager,1,1,1,1
+access_bhz_place_tag_editor,bhz.place.tag editor,model_bhz_place_tag,bhz_city_places.group_bhz_place_editor,1,1,1,0
+
+access_bhz_place_city_manager,bhz.place.city manager,model_bhz_place_city,bhz_city_places.group_bhz_place_manager,1,1,1,1
+access_bhz_place_city_editor,bhz.place.city editor,model_bhz_place_city,bhz_city_places.group_bhz_place_editor,1,1,1,0

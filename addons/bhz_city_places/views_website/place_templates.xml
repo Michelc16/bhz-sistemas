@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="place_list_page" name="Lista de Locais">
+        <t t-call="website.layout">
+            <div class="container my-4">
+                <div class="row">
+                    <div class="col-12">
+                        <h1 class="mb-3">Locais</h1>
+                        <p class="text-muted">Encontre bares, restaurantes, parques, museus e muito mais.</p>
+                    </div>
+                </div>
+
+                <!-- Filtros -->
+                <form class="row g-2 mb-4" method="get" action="/lugares">
+                    <div class="col-12 col-lg-4">
+                        <input class="form-control" type="text" name="q" t-att-value="q" placeholder="Buscar por nome ou descrição..."/>
+                    </div>
+
+                    <div class="col-6 col-lg-2">
+                        <select class="form-select" name="category">
+                            <option value="">Categoria</option>
+                            <t t-foreach="categories" t-as="c">
+                                <option t-att-value="c.id" t-att-selected="category == c.id"><t t-esc="c.name"/></option>
+                            </t>
+                        </select>
+                    </div>
+
+                    <div class="col-6 col-lg-2">
+                        <select class="form-select" name="city">
+                            <option value="">Cidade</option>
+                            <t t-foreach="cities" t-as="ct">
+                                <option t-att-value="ct.id" t-att-selected="city == ct.id"><t t-esc="ct.name"/></option>
+                            </t>
+                        </select>
+                    </div>
+
+                    <div class="col-6 col-lg-2">
+                        <select class="form-select" name="tag">
+                            <option value="">Tag</option>
+                            <t t-foreach="tags" t-as="tg">
+                                <option t-att-value="tg.id" t-att-selected="tag == tg.id"><t t-esc="tg.name"/></option>
+                            </t>
+                        </select>
+                    </div>
+
+                    <div class="col-6 col-lg-2 d-grid">
+                        <button class="btn btn-primary" type="submit">Filtrar</button>
+                    </div>
+                </form>
+
+                <!-- Lista -->
+                <div class="row g-3">
+                    <t t-if="not places">
+                        <div class="col-12">
+                            <div class="alert alert-info mb-0">Nenhum local encontrado.</div>
+                        </div>
+                    </t>
+
+                    <t t-foreach="places" t-as="p">
+                        <div class="col-12 col-md-6 col-lg-4">
+                            <a class="text-decoration-none" t-att-href="'/lugares/%s' % p.id">
+                                <div class="card h-100 shadow-sm">
+                                    <t t-if="p.image_1920">
+                                        <img class="card-img-top" t-att-src="'/web/image/bhz.place/%s/image_1920' % p.id"
+                                             alt="Imagem do local" style="height: 180px; object-fit: cover;"/>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="bg-light" style="height: 180px;"></div>
+                                    </t>
+
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <h5 class="card-title mb-1"><t t-esc="p.name"/></h5>
+                                        </div>
+                                        <div class="text-muted small mb-2">
+                                            <t t-if="p.category_id"><t t-esc="p.category_id.name"/></t>
+                                            <t t-if="p.city_id"> • <t t-esc="p.city_id.name"/></t>
+                                            <t t-if="p.neighborhood"> • <t t-esc="p.neighborhood"/></t>
+                                        </div>
+                                        <p class="card-text" t-if="p.short_description">
+                                            <t t-esc="p.short_description"/>
+                                        </p>
+
+                                        <div class="mt-2" t-if="p.tag_ids">
+                                            <t t-foreach="p.tag_ids" t-as="t1">
+                                                <span class="badge text-bg-secondary me-1"><t t-esc="t1.name"/></span>
+                                            </t>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </t>
+                </div>
+
+                <!-- Paginação -->
+                <div class="mt-4">
+                    <t t-call="website.pager">
+                        <t t-set="pager" t-value="pager"/>
+                    </t>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="place_detail_page" name="Detalhe do Local">
+        <t t-call="website.layout">
+            <div class="container my-4">
+                <div class="row g-4">
+                    <div class="col-12 col-lg-7">
+                        <h1 class="mb-2"><t t-esc="place.name"/></h1>
+
+                        <div class="text-muted mb-3">
+                            <t t-if="place.category_id"><t t-esc="place.category_id.name"/></t>
+                            <t t-if="place.city_id"> • <t t-esc="place.city_id.name"/></t>
+                            <t t-if="place.neighborhood"> • <t t-esc="place.neighborhood"/></t>
+                        </div>
+
+                        <t t-if="place.image_1920">
+                            <img class="img-fluid rounded shadow-sm mb-3"
+                                 t-att-src="'/web/image/bhz.place/%s/image_1920' % place.id"
+                                 alt="Imagem do local"/>
+                        </t>
+
+                        <t t-if="place.short_description">
+                            <p class="lead"><t t-esc="place.short_description"/></p>
+                        </t>
+
+                        <div t-if="place.description_html" class="mt-3">
+                            <t t-raw="place.description_html"/>
+                        </div>
+
+                        <div class="mt-3" t-if="place.tag_ids">
+                            <t t-foreach="place.tag_ids" t-as="t2">
+                                <span class="badge text-bg-secondary me-1"><t t-esc="t2.name"/></span>
+                            </t>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-lg-5">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">Informações</h5>
+
+                                <ul class="list-unstyled mb-0">
+                                    <li t-if="place.opening_hours"><strong>Horário:</strong> <t t-esc="place.opening_hours"/></li>
+                                    <li t-if="place.price_range"><strong>Preço:</strong> <t t-esc="place.price_range"/></li>
+
+                                    <li t-if="place.phone"><strong>Telefone:</strong> <t t-esc="place.phone"/></li>
+                                    <li t-if="place.mobile"><strong>WhatsApp:</strong> <t t-esc="place.mobile"/></li>
+                                    <li t-if="place.email"><strong>E-mail:</strong> <t t-esc="place.email"/></li>
+
+                                    <li t-if="place.website">
+                                        <strong>Link:</strong>
+                                        <a t-att-href="place.website" target="_blank" rel="noopener">Abrir</a>
+                                    </li>
+
+                                    <li t-if="place.street or place.street2 or place.zip" class="mt-2">
+                                        <strong>Endereço:</strong>
+                                        <div>
+                                            <t t-if="place.street"><t t-esc="place.street"/></t>
+                                            <t t-if="place.street2">, <t t-esc="place.street2"/></t>
+                                            <t t-if="place.zip"> - <t t-esc="place.zip"/></t>
+                                        </div>
+                                    </li>
+
+                                    <li t-if="place.maps_url" class="mt-2">
+                                        <a class="btn btn-outline-primary w-100" t-att-href="place.maps_url"
+                                           target="_blank" rel="noopener">Ver no Google Maps</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <a href="/lugares" class="btn btn-link p-0">← Voltar para a lista</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>
