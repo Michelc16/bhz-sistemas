@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="s_guiabh_featured_carousel" name="GuiaBH - Carrossel de Destaques">
-        <section class="s_guiabh_featured_carousel py-5"
+        <section class="s_guiabh_featured_carousel oe_snippet_body py-5"
                  data-snippet="bhz_event_promo.s_guiabh_featured_carousel"
                  data-name="GuiaBH - Carrossel de Destaques">
             <div class="container">
