@@ -28,7 +28,7 @@
                             string="Abrir no site"
                             type="object"
                             class="btn btn-primary"
-                            attrs="{'invisible': [('website_published','=',False)]}"/>
+                            invisible="not website_published"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
