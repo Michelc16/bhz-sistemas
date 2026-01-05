@@ -8,6 +8,10 @@ export class GuiabhFootballMatches extends Interaction {
     static selector = ".s_guiabh_football_matches";
 
     setup() {
+        this.isEditMode = !!this.el.closest(".o_editable");
+        if (this.isEditMode) {
+            return;
+        }
         this.limit = parseInt(this.el.dataset.limit || "6", 10);
         this.gridEl = this.el.querySelector(".js-guiabh-football-grid");
         this.emptyEl = this.el.querySelector(".js-guiabh-football-empty");
@@ -22,6 +26,9 @@ export class GuiabhFootballMatches extends Interaction {
     }
 
     start() {
+        if (this.isEditMode) {
+            return;
+        }
         if (this.el.isConnected) {
             this.attrObserver.observe(this.el, {
                 attributes: true,
@@ -35,6 +42,7 @@ export class GuiabhFootballMatches extends Interaction {
         if (this.attrObserver) {
             this.attrObserver.disconnect();
         }
+        this.attrObserver = null;
     }
 
     _parseTeamIds(rawValue) {
@@ -64,7 +72,7 @@ export class GuiabhFootballMatches extends Interaction {
     }
 
     async fetchAndRender() {
-        if (!this.gridEl) {
+        if (this.isEditMode || !this.gridEl) {
             return;
         }
         const teamIds = this._parseTeamIds(this.el.dataset.teamIds);

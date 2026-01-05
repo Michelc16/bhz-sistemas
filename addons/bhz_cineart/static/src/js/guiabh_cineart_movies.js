@@ -8,6 +8,10 @@ export class GuiabhCineartMovies extends Interaction {
     static selector = ".s_guiabh_cineart_movies";
 
     setup() {
+        this.isEditMode = !!this.el.closest(".o_editable");
+        if (this.isEditMode) {
+            return;
+        }
         this.limit = parseInt(this.el.dataset.limit || "8", 10);
         this.gridEl = this.el.querySelector(".js-guiabh-cineart-grid");
         this.emptyEl = this.el.querySelector(".js-guiabh-cineart-empty");
@@ -22,6 +26,9 @@ export class GuiabhCineartMovies extends Interaction {
     }
 
     start() {
+        if (this.isEditMode) {
+            return;
+        }
         if (this.el.isConnected) {
             this.attrObserver.observe(this.el, {
                 attributes: true,
@@ -35,6 +42,7 @@ export class GuiabhCineartMovies extends Interaction {
         if (this.attrObserver) {
             this.attrObserver.disconnect();
         }
+        this.attrObserver = null;
     }
 
     _parseIds(rawValue) {
@@ -64,7 +72,7 @@ export class GuiabhCineartMovies extends Interaction {
     }
 
     async fetchAndRender() {
-        if (!this.gridEl) {
+        if (this.isEditMode || !this.gridEl) {
             return;
         }
         const categoryIds = this._parseIds(this.el.dataset.categoryIds);

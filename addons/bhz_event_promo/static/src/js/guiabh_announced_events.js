@@ -8,6 +8,10 @@ export class GuiabhAnnouncedEvents extends Interaction {
     static selector = ".s_guiabh_announced_events";
 
     setup() {
+        this.isEditMode = !!this.el.closest(".o_editable");
+        if (this.isEditMode) {
+            return;
+        }
         this.limit = parseInt(this.el.dataset.limit || "12", 10);
         this.gridEl = this.el.querySelector(".js-guiabh-announced-grid");
         this.emptyEl = this.el.querySelector(".js-guiabh-announced-empty");
@@ -22,6 +26,9 @@ export class GuiabhAnnouncedEvents extends Interaction {
     }
 
     start() {
+        if (this.isEditMode) {
+            return;
+        }
         if (this.el.isConnected) {
             this.categoryObserver.observe(this.el, {
                 attributes: true,
@@ -35,6 +42,7 @@ export class GuiabhAnnouncedEvents extends Interaction {
         if (this.categoryObserver) {
             this.categoryObserver.disconnect();
         }
+        this.categoryObserver = null;
     }
 
     _parseCategoryEntry(entry) {
@@ -67,7 +75,7 @@ export class GuiabhAnnouncedEvents extends Interaction {
     }
 
     async fetchAndRender() {
-        if (!this.gridEl) {
+        if (this.isEditMode || !this.gridEl) {
             return;
         }
         const params = {
