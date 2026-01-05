@@ -102,18 +102,15 @@
         <field name="model">bhz.place</field>
         <field name="arch" type="xml">
             <search>
-                <query>
-                    <field name="name" string="Nome"/>
-                    <field name="category_id"/>
-                    <field name="city_id"/>
-                    <field name="tag_ids"/>
-                </query>
+                <field name="name" string="Nome"/>
+                <field name="category_id"/>
+                <field name="city_id"/>
+                <field name="tag_ids"/>
                 <filter string="Publicados" name="published" domain="[('website_published','=',True)]"/>
                 <filter string="Arquivados" name="archived" domain="[('active','=',False)]"/>
-                <group expand="0" string="Agrupar por">
-                    <filter string="Categoria" name="group_category" context="{'group_by': 'category_id'}"/>
-                    <filter string="Cidade" name="group_city" context="{'group_by': 'city_id'}"/>
-                </group>
+                <separator/>
+                <filter string="Categoria" name="group_category" context="{'group_by': 'category_id'}"/>
+                <filter string="Cidade" name="group_city" context="{'group_by': 'city_id'}"/>
             </search>
         </field>
     </record>
