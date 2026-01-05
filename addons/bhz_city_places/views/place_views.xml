@@ -109,8 +109,8 @@
                 <filter string="Publicados" name="published" domain="[('website_published','=',True)]"/>
                 <filter string="Arquivados" name="archived" domain="[('active','=',False)]"/>
                 <group expand="0" string="Agrupar por">
-                    <filter string="Categoria" context="{'group_by':'category_id'}"/>
-                    <filter string="Cidade" context="{'group_by':'city_id'}"/>
+                    <filter string="Categoria" name="group_category" context="{'group_by': 'category_id'}"/>
+                    <filter string="Cidade" name="group_city" context="{'group_by': 'city_id'}"/>
                 </group>
             </search>
         </field>
