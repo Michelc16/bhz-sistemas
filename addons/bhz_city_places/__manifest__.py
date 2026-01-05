@@ -12,6 +12,7 @@
         "views/place_views.xml",
         "views/menus.xml",
         "views_website/place_templates.xml",
+        "views_website/website_menu.xml",
     ],
     "application": True,
     "installable": True,
