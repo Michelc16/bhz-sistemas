@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <menuitem id="menu_bhz_places_root" name="Guia de Locais" sequence="10"
-              groups="bhz_city_places.group_bhz_place_editor"/>
+              groups="base.group_system"/>
 
     <menuitem id="menu_bhz_places" name="Locais" parent="menu_bhz_places_root"
               action="action_bhz_places" sequence="10"/>
