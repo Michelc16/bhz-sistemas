@@ -4,7 +4,7 @@
         <field name="name">bhz.place.tree</field>
         <field name="model">bhz.place</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
                 <field name="category_id"/>
@@ -14,7 +14,7 @@
                 <field name="website_id"/>
                 <field name="company_id"/>
                 <field name="active"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -119,7 +119,7 @@
     <record id="action_bhz_places" model="ir.actions.act_window">
         <field name="name">Locais</field>
         <field name="res_model">bhz.place</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_bhz_place_search"/>
         <field name="context">{}</field>
     </record>
@@ -127,18 +127,18 @@
     <record id="action_bhz_place_categories" model="ir.actions.act_window">
         <field name="name">Categorias</field>
         <field name="res_model">bhz.place.category</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 
     <record id="action_bhz_place_tags" model="ir.actions.act_window">
         <field name="name">Tags</field>
         <field name="res_model">bhz.place.tag</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 
     <record id="action_bhz_place_cities" model="ir.actions.act_window">
         <field name="name">Cidades</field>
         <field name="res_model">bhz.place.city</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 </odoo>
