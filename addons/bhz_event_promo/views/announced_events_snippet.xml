@@ -3,7 +3,9 @@
     <template id="s_guiabh_announced_events" name="GuiaBH - Eventos Anunciados">
         <section class="s_guiabh_announced_events py-5"
                  data-snippet="bhz_event_promo.s_guiabh_announced_events"
-                 data-name="GuiaBH - Eventos Anunciados">
+                 data-name="GuiaBH - Eventos Anunciados"
+                 data-category-ids="[]"
+                 data-limit="12">
             <div class="container">
                 <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 align-items-lg-center mb-4">
                     <div>
@@ -18,80 +20,82 @@
 
                 <t t-set="events" t-value="request.env['event.event'].guiabh_get_announced_events(12)"/>
 
-                <t t-if="events">
-                    <div class="row g-4 guiabh-announced-grid">
-                        <t t-foreach="events" t-as="event">
-                            <t t-set="detail_url" t-value="'/agenda/event/%s' % event.id"/>
-                            <div class="col-12 col-md-6 col-lg-4">
-                                <article class="guiabh-announced-card h-100">
-                                    <div class="guiabh-announced-cover position-relative">
-                                        <img t-att-src="'/web/image/event.event/%s/promo_cover_image' % event.id"
-                                             t-att-alt="event.name or ''"/>
-                                        <t t-if="event.date_begin">
-                                            <t t-set="local_dt" t-value="event._localize_datetime(event.date_begin)"/>
-                                            <t t-if="local_dt">
-                                                <div class="guiabh-date-pill text-center">
-                                                    <div class="guiabh-date-month">
-                                                        <t t-esc="local_dt.strftime('%b').upper()"/>
-                                                    </div>
-                                                    <div class="guiabh-date-day">
-                                                        <t t-esc="local_dt.strftime('%d')"/>
-                                                    </div>
-                                                </div>
-                                            </t>
-                                        </t>
-                                    </div>
-                                    <div class="guiabh-announced-body">
-                                        <p class="guiabh-announced-time text-muted small mb-1">
-                                            <t t-if="event.date_begin">
-                                                <t t-esc="event._format_datetime_display(event.date_begin, '%H:%M (%Z)')"/>
-                                            </t>
-                                            <t t-if="event.date_end">
-                                                <t t-esc="' - %s' % event._format_datetime_display(event.date_end, '%H:%M (%Z)')"/>
-                                            </t>
-                                        </p>
-                                        <h5 class="mb-2 text-uppercase">
-                                            <a t-att-href="detail_url" class="stretched-link text-decoration-none">
-                                                <t t-esc="event.name"/>
-                                            </a>
-                                        </h5>
-                                        <t t-if="event.promo_short_description">
-                                            <p class="mb-2 text-muted small">
-                                                <t t-esc="event.promo_short_description"/>
-                                            </p>
-                                        </t>
-                                        <p class="guiabh-announced-location mb-0 fw-semibold text-muted">
-                                            <t t-if="event.venue_partner_id">
-                                                --<t t-esc="event.venue_partner_id.name"/>--
-                                            </t>
-                                            <t t-elif="event.address_id">
-                                                --<t t-esc="event.address_id.name or event.address_id.city or ''"/>--
-                                            </t>
-                                            <t t-else="">
-                                                --LOCAL A DIVULGAR--
-                                            </t>
-                                        </p>
-                                        <t t-if="event.tag_ids">
-                                            <ul class="guiabh-announced-tags list-unstyled d-flex flex-wrap gap-2 mt-3 mb-0">
-                                                <t t-foreach="event.tag_ids" t-as="tag">
-                                                    <li class="badge bg-light text-dark border">
-                                                        <t t-esc="tag.name"/>
-                                                    </li>
-                                                </t>
-                                            </ul>
-                                        </t>
-                                    </div>
-                                </article>
-                            </div>
-                        </t>
-                    </div>
-                </t>
-                <t t-else="">
-                    <div class="alert alert-secondary text-center mb-0">
-                        Nenhum evento anunciado com imagem disponível no momento.
-                    </div>
-                </t>
+                <div class="row g-4 guiabh-announced-grid js-guiabh-announced-grid">
+                    <t t-call="bhz_event_promo.guiabh_announced_events_cards">
+                        <t t-set="events" t-value="events"/>
+                    </t>
+                </div>
+                <div t-attf-class="alert alert-secondary text-center mb-0 js-guiabh-announced-empty #{'d-none' if events else ''}">
+                    Nenhum evento anunciado com imagem disponível no momento.
+                </div>
             </div>
         </section>
+    </template>
+
+    <template id="guiabh_announced_events_cards" name="GuiaBH - Cards de eventos">
+        <t t-foreach="events" t-as="event">
+            <t t-set="detail_url" t-value="'/agenda/event/%s' % event.id"/>
+            <div class="col-12 col-md-6 col-lg-4">
+                <article class="guiabh-announced-card h-100">
+                    <div class="guiabh-announced-cover position-relative">
+                        <img t-att-src="'/web/image/event.event/%s/promo_cover_image' % event.id"
+                             t-att-alt="event.name or ''"/>
+                        <t t-if="event.date_begin">
+                            <t t-set="local_dt" t-value="event._localize_datetime(event.date_begin)"/>
+                            <t t-if="local_dt">
+                                <div class="guiabh-date-pill text-center">
+                                    <div class="guiabh-date-month">
+                                        <t t-esc="local_dt.strftime('%b').upper()"/>
+                                    </div>
+                                    <div class="guiabh-date-day">
+                                        <t t-esc="local_dt.strftime('%d')"/>
+                                    </div>
+                                </div>
+                            </t>
+                        </t>
+                    </div>
+                    <div class="guiabh-announced-body">
+                        <p class="guiabh-announced-time text-muted small mb-1">
+                            <t t-if="event.date_begin">
+                                <t t-esc="event._format_datetime_display(event.date_begin, '%H:%M (%Z)')"/>
+                            </t>
+                            <t t-if="event.date_end">
+                                <t t-esc="' - %s' % event._format_datetime_display(event.date_end, '%H:%M (%Z)')"/>
+                            </t>
+                        </p>
+                        <h5 class="mb-2 text-uppercase">
+                            <a t-att-href="detail_url" class="stretched-link text-decoration-none">
+                                <t t-esc="event.name"/>
+                            </a>
+                        </h5>
+                        <t t-if="event.promo_short_description">
+                            <p class="mb-2 text-muted small">
+                                <t t-esc="event.promo_short_description"/>
+                            </p>
+                        </t>
+                        <p class="guiabh-announced-location mb-0 fw-semibold text-muted">
+                            <t t-if="event.venue_partner_id">
+                                --<t t-esc="event.venue_partner_id.name"/>--
+                            </t>
+                            <t t-elif="event.address_id">
+                                --<t t-esc="event.address_id.name or event.address_id.city or ''"/>--
+                            </t>
+                            <t t-else="">
+                                --LOCAL A DIVULGAR--
+                            </t>
+                        </p>
+                        <t t-if="event.tag_ids">
+                            <ul class="guiabh-announced-tags list-unstyled d-flex flex-wrap gap-2 mt-3 mb-0">
+                                <t t-foreach="event.tag_ids" t-as="tag">
+                                    <li class="badge bg-light text-dark border">
+                                        <t t-esc="tag.name"/>
+                                    </li>
+                                </t>
+                            </ul>
+                        </t>
+                    </div>
+                </article>
+            </div>
+        </t>
     </template>
 </odoo>

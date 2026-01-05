@@ -174,6 +174,7 @@ class EventEvent(models.Model):
         require_announced=True,
         require_featured=False,
         require_image=False,
+        category_ids=None,
     ):
         domain = [("show_on_public_agenda", "=", True)]
 
@@ -182,6 +183,11 @@ class EventEvent(models.Model):
 
         if require_image and "promo_cover_image" in self._fields:
             domain.append(("promo_cover_image", "!=", False))
+
+        if category_ids and "promo_category_id" in self._fields:
+            category_ids = [int(cid) for cid in category_ids if cid]
+            if category_ids:
+                domain.append(("promo_category_id", "in", category_ids))
 
         website = getattr(request, "website", False)
         if website and "website_id" in self._fields:
@@ -237,9 +243,12 @@ class EventEvent(models.Model):
         return self.sudo().search(domain, limit=limit, order="date_begin asc, id desc")
 
     @api.model
-    def guiabh_get_announced_events(self, limit=12):
+    def guiabh_get_announced_events(self, limit=12, category_ids=None):
         """Return announced events with promotional images for snippets."""
-        domain = self._prepare_public_events_domain(require_image=True)
+        domain = self._prepare_public_events_domain(
+            require_image=True,
+            category_ids=category_ids,
+        )
         return self.sudo().search(domain, limit=limit, order="date_begin asc, id desc")
 
     @api.model

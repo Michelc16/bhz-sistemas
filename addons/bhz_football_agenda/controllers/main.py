@@ -1,4 +1,5 @@
 from collections import OrderedDict
+import json
 from datetime import datetime, time, timedelta
 from urllib.parse import urlencode
 
@@ -224,3 +225,46 @@ class BhzFootballAgendaController(http.Controller):
                 "filters": filters,
             },
         )
+
+    @http.route(
+        "/bhz_football/snippet/matches",
+        type="json",
+        auth="public",
+        website=True,
+    )
+    def snippet_matches_data(self, team_ids=None, limit=6):
+        limit = self._sanitize_limit(limit)
+        parsed_team_ids = self._parse_team_ids(team_ids)
+        Match = request.env["bhz.football.match"].sudo()
+        matches = Match.guiabh_get_upcoming_matches(team_ids=parsed_team_ids, limit=limit)
+        cards = Match._prepare_match_card_data(matches)
+        html = request.env["ir.ui.view"]._render_template(
+            "bhz_football_agenda.guiabh_football_match_cards",
+            {"matches_data": cards},
+        )
+        return {"html": html, "has_matches": bool(cards)}
+
+    def _sanitize_limit(self, limit):
+        try:
+            limit_value = int(limit)
+        except (ValueError, TypeError):
+            limit_value = 6
+        return max(1, min(limit_value, 20))
+
+    def _parse_team_ids(self, team_ids):
+        if isinstance(team_ids, str):
+            try:
+                team_ids = json.loads(team_ids)
+            except ValueError:
+                team_ids = []
+        parsed = []
+        for entry in team_ids or []:
+            try:
+                if isinstance(entry, dict):
+                    entry = entry.get("id")
+                entry_id = int(entry)
+            except (ValueError, TypeError):
+                continue
+            if entry_id:
+                parsed.append(entry_id)
+        return parsed

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="bhz_event_promo.GuiabhAnnouncedEventsOption" name="GuiaBH - Eventos">
+        <BuilderRow label.translate="Categorias">
+            <BuilderMany2Many
+                model="'event.type'"
+                fields="['name']"
+                dataAttributeAction="'categoryIds'"
+            />
+        </BuilderRow>
+    </t>
+
+</templates>

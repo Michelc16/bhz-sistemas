@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import calendar
+import json
 import logging
 from collections import defaultdict
 from datetime import date, datetime, time, timedelta
@@ -204,6 +205,52 @@ class GuiaBHAgendaController(http.Controller):
                 "event": event,
             },
         )
+
+    @http.route(
+        "/bhz_event_promo/snippet/announced_events",
+        type="json",
+        auth="public",
+        website=True,
+    )
+    def snippet_announced_events_data(self, category_ids=None, limit=12):
+        limit = self._sanitize_limit(limit)
+        parsed_category_ids = self._parse_category_ids(category_ids)
+        events = (
+            request.env["event.event"]
+            .sudo()
+            .guiabh_get_announced_events(limit=limit, category_ids=parsed_category_ids)
+        )
+        html = request.env["ir.ui.view"]._render_template(
+            "bhz_event_promo.guiabh_announced_events_cards",
+            {"events": events},
+        )
+        return {"html": html, "has_events": bool(events)}
+
+    def _sanitize_limit(self, limit):
+        try:
+            limit_value = int(limit)
+        except (ValueError, TypeError):
+            limit_value = 12
+        return max(1, min(limit_value, 24))
+
+    def _parse_category_ids(self, category_ids):
+        raw_ids = category_ids or []
+        if isinstance(raw_ids, str):
+            try:
+                raw_ids = json.loads(raw_ids)
+            except ValueError:
+                raw_ids = []
+        parsed = []
+        for entry in raw_ids:
+            if isinstance(entry, dict):
+                entry = entry.get("id")
+            try:
+                entry_id = int(entry)
+            except (ValueError, TypeError):
+                continue
+            if entry_id:
+                parsed.append(entry_id)
+        return parsed
 
     def _build_domain(self, filters, base_domain=None):
         domain = list(base_domain or self._base_agenda_domain())

@@ -1,3 +1,6 @@
+from datetime import timedelta
+from urllib.parse import urlencode
+
 from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
@@ -49,3 +52,101 @@ class FootballMatch(models.Model):
                 )
                 if duplicate:
                     raise ValidationError("Já existe um jogo com este ID externo.")
+
+    @api.model
+    def guiabh_get_upcoming_matches(self, team_ids=None, limit=6):
+        domain = [
+            ("website_published", "=", True),
+            ("active", "=", True),
+        ]
+        now = fields.Datetime.now()
+        domain.append(("match_datetime", ">=", now))
+        if team_ids:
+            valid_ids = [tid for tid in team_ids if isinstance(tid, int)]
+            if valid_ids:
+                domain.append(("team_ids", "in", valid_ids))
+        return self.search(domain, order="match_datetime asc, id asc", limit=limit)
+
+    @api.model
+    def _prepare_match_card_data(self, matches):
+        if not matches:
+            return []
+        user = self.env.user
+        tz_name = self.env.context.get("tz") or user.tz or "UTC"
+        tz_user = user.with_context(tz=tz_name)
+        today_local = fields.Date.context_today(tz_user)
+        tomorrow_local = today_local + timedelta(days=1)
+
+        def _badge(local_dt):
+            if not local_dt:
+                return ""
+            current_date = local_dt.date()
+            if current_date == today_local:
+                return "Hoje"
+            if current_date == tomorrow_local:
+                return "Amanhã"
+            return ""
+
+        def _logo(team):
+            if not team or not team.id or not team.logo:
+                return False
+            return f"/web/image/{team._name}/{team.id}/logo"
+
+        def _gcal(match):
+            start_dt = match.match_datetime
+            if not start_dt:
+                return False
+            end_dt = start_dt + timedelta(hours=2)
+            start_str = start_dt.strftime("%Y%m%dT%H%M%SZ")
+            end_str = end_dt.strftime("%Y%m%dT%H%M%SZ")
+            title = f"{match.home_team_id.name} x {match.away_team_id.name}"
+            if match.competition:
+                title += f" - {match.competition}"
+            location_parts = [part for part in [match.stadium, match.city] if part]
+            location = " - ".join(location_parts)
+            details_parts = []
+            if match.broadcast:
+                details_parts.append(f"Transmissão: {match.broadcast}")
+            if match.ticket_url:
+                details_parts.append(f"Ingressos: {match.ticket_url}")
+            if match.round_name:
+                details_parts.append(f"Rodada: {match.round_name}")
+            details = "\n".join(filter(None, details_parts))
+
+            return "https://calendar.google.com/calendar/render?%s" % urlencode(
+                {
+                    "action": "TEMPLATE",
+                    "text": title,
+                    "dates": f"{start_str}/{end_str}",
+                    "details": details,
+                    "location": location,
+                }
+            )
+
+        prepared = []
+        for match in matches:
+            match_dt = match.match_datetime
+            local_dt = (
+                fields.Datetime.context_timestamp(tz_user, match_dt) if match_dt else False
+            )
+            prepared.append(
+                {
+                    "id": match.id,
+                    "home_team_name": match.home_team_id.name,
+                    "home_team_logo": _logo(match.home_team_id),
+                    "away_team_name": match.away_team_id.name,
+                    "away_team_logo": _logo(match.away_team_id),
+                    "competition": match.competition,
+                    "stadium": match.stadium,
+                    "city": match.city,
+                    "round_name": match.round_name,
+                    "broadcast": match.broadcast,
+                    "ticket_url": match.ticket_url,
+                    "match_datetime_label": local_dt.strftime("%d/%m/%Y %H:%M")
+                    if local_dt
+                    else "",
+                    "badge_label": _badge(local_dt),
+                    "gcal_url": _gcal(match),
+                }
+            )
+        return prepared

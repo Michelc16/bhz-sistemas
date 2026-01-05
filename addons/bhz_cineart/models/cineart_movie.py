@@ -65,6 +65,16 @@ class CineartMovie(models.Model):
         return self.env["guiabh.cineart.movie"].action_sync_all_now()
 
     @api.model
+    def guiabh_get_movies(self, categories=None, limit=12):
+        domain = [("active", "=", True)]
+        if categories:
+            valid_codes = {code for code, _label in self._fields["category"].selection}
+            filtered = [code for code in categories if code in valid_codes]
+            if filtered:
+                domain.append(("category", "in", filtered))
+        return self.search(domain, order="category asc, name asc, id desc", limit=limit)
+
+    @api.model
     def action_sync_all_now(self):
         results = self.sudo()._run_sync(raise_on_error=True)
         return self._build_sync_notification(results, _("Sincronização concluída"))

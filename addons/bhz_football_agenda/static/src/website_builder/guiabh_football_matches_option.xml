@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="bhz_football_agenda.GuiabhFootballMatchesOption" name="Jogos de Futebol">
+        <BuilderRow label.translate="Times">
+            <BuilderMany2Many
+                model="'bhz.football.team'"
+                fields="['name']"
+                dataAttributeAction="'teamIds'"
+            />
+        </BuilderRow>
+    </t>
+
+</templates>

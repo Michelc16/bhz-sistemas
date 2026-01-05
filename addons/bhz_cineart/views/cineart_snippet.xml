@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="s_guiabh_cineart_movies" name="GuiaBH - Filmes Cineart">
+        <section class="s_guiabh_cineart_movies py-5"
+                 data-snippet="bhz_cineart.s_guiabh_cineart_movies"
+                 data-name="GuiaBH - Filmes Cineart"
+                 data-category-ids="[]"
+                 data-limit="8">
+            <div class="container">
+                <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 align-items-lg-center mb-4">
+                    <div>
+                        <p class="text-uppercase fw-semibold text-muted mb-1 small">Destaques Cineart</p>
+                        <h2 class="mb-1">Filmes em cartaz e estreias selecionadas.</h2>
+                        <p class="text-muted mb-0">Atualizado automaticamente com as últimas sincronizações.</p>
+                    </div>
+                    <a href="/cineart" class="btn btn-outline-primary align-self-start align-self-lg-end">
+                        Ver todos
+                    </a>
+                </div>
+
+                <t t-set="movies" t-value="request.env['guiabh.cineart.movie'].guiabh_get_movies(limit=8)"/>
+
+                <div class="row g-4 js-guiabh-cineart-grid">
+                    <t t-call="bhz_cineart.guiabh_cineart_movie_cards">
+                        <t t-set="movies" t-value="movies"/>
+                    </t>
+                </div>
+                <div t-attf-class="alert alert-secondary text-center mb-0 js-guiabh-cineart-empty #{'d-none' if movies else ''}">
+                    Nenhum filme disponível no momento.
+                </div>
+            </div>
+        </section>
+    </template>
+
+    <template id="guiabh_cineart_movie_cards" name="GuiaBH - Cartas de Filmes">
+        <t t-set="category_labels"
+           t-value="dict(request.env['guiabh.cineart.movie'].fields_get(['category'])['category']['selection'])"/>
+        <t t-foreach="movies" t-as="movie">
+            <div class="col-12 col-sm-6 col-lg-3">
+                <article class="guiabh-cineart-card h-100">
+                    <t t-if="movie.poster_image">
+                        <img class="guiabh-cineart-cover"
+                             t-att-src="'/web/image/guiabh.cineart.movie/%s/poster_image' % movie.id"
+                             t-att-alt="movie.name or ''"/>
+                    </t>
+                    <t t-elif="movie.poster_url">
+                        <img class="guiabh-cineart-cover"
+                             t-att-src="movie.poster_url"
+                             t-att-alt="movie.name or ''"/>
+                    </t>
+                    <t t-else="">
+                        <div class="guiabh-cineart-cover placeholder d-flex align-items-center justify-content-center text-muted">
+                            Sem imagem
+                        </div>
+                    </t>
+                    <div class="guiabh-cineart-body">
+                        <p class="text-muted small mb-1 text-uppercase">
+                            <t t-esc="category_labels.get(movie.category, 'Filme')"/>
+                        </p>
+                        <h5 class="mb-2">
+                            <t t-esc="movie.name"/>
+                        </h5>
+                        <t t-if="movie.genre">
+                            <p class="mb-1 text-muted small">
+                                <t t-esc="movie.genre"/>
+                            </p>
+                        </t>
+                        <div class="d-flex flex-wrap gap-2">
+                            <t t-if="movie.age_rating">
+                                <span class="badge text-bg-danger">
+                                    <t t-esc="movie.age_rating"/>
+                                </span>
+                            </t>
+                            <t t-if="movie.release_date">
+                                <span class="badge text-bg-warning text-dark">
+                                    <t t-esc="movie.release_date"/>
+                                </span>
+                            </t>
+                        </div>
+                        <t t-if="movie.cineart_url">
+                            <div class="mt-3">
+                                <a class="btn btn-sm btn-outline-primary w-100"
+                                   t-att-href="movie.cineart_url"
+                                   target="_blank"
+                                   rel="noopener">
+                                    Ver detalhes
+                                </a>
+                            </div>
+                        </t>
+                    </div>
+                </article>
+            </div>
+        </t>
+    </template>
+</odoo>

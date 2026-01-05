@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="bhz_football_snippets" inherit_id="website.snippets" name="GuiaBH Futebol - Snippets">
+        <xpath expr="//snippets[@id='snippet_structure']/*[1]" position="before">
+            <t t-snippet="bhz_football_agenda.s_guiabh_football_matches"
+               string="GuiaBH - Jogos de Futebol"
+               group="content">
+                <keywords>guiabh futebol jogos partidas agenda cruzeiro atletico america</keywords>
+            </t>
+        </xpath>
+    </template>
+</odoo>

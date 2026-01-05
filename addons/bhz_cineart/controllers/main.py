@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import json
+
 from odoo import http
 from odoo.http import request
 
@@ -28,3 +30,51 @@ class GuiaBHCineartController(http.Controller):
             'soon_movies': soon,
             'premiere_movies': premiere,
         })
+
+    @http.route(
+        "/bhz_cineart/snippet/movies",
+        type="json",
+        auth="public",
+        website=True,
+    )
+    def snippet_movies_data(self, category_ids=None, limit=8):
+        limit = self._sanitize_limit(limit)
+        category_codes = self._map_category_codes(category_ids)
+        movies = (
+            request.env["guiabh.cineart.movie"]
+            .sudo()
+            .guiabh_get_movies(categories=category_codes, limit=limit)
+        )
+        html = request.env["ir.ui.view"]._render_template(
+            "bhz_cineart.guiabh_cineart_movie_cards",
+            {"movies": movies},
+        )
+        return {"html": html, "has_movies": bool(movies)}
+
+    def _sanitize_limit(self, limit):
+        try:
+            limit_value = int(limit)
+        except (ValueError, TypeError):
+            limit_value = 8
+        return max(1, min(limit_value, 24))
+
+    def _map_category_codes(self, category_ids):
+        ids = []
+        if isinstance(category_ids, str):
+            try:
+                category_ids = json.loads(category_ids)
+            except ValueError:
+                category_ids = []
+        for entry in category_ids or []:
+            try:
+                if isinstance(entry, dict):
+                    entry = entry.get("id")
+                entry_id = int(entry)
+            except (ValueError, TypeError):
+                continue
+            if entry_id:
+                ids.append(entry_id)
+        if not ids:
+            return []
+        categories = request.env["guiabh.cineart.category"].sudo().browse(ids)
+        return [item.code for item in categories if item.code]

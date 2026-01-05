@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="s_guiabh_football_matches" name="GuiaBH - Jogos de Futebol">
+        <section class="s_guiabh_football_matches py-5"
+                 data-snippet="bhz_football_agenda.s_guiabh_football_matches"
+                 data-name="GuiaBH - Jogos de Futebol"
+                 data-team-ids="[]"
+                 data-limit="6">
+            <div class="container">
+                <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 align-items-lg-center mb-4">
+                    <div>
+                        <p class="text-uppercase fw-semibold text-muted mb-1 small">Agenda Tríplice</p>
+                        <h2 class="mb-1">Cruzeiro, Atlético e América na mesma vitrine.</h2>
+                        <p class="text-muted mb-0">Programe-se com os próximos confrontos e links úteis.</p>
+                    </div>
+                    <a href="/futebol/agenda" class="btn btn-outline-primary align-self-start align-self-lg-end">
+                        Ver agenda completa
+                    </a>
+                </div>
+
+                <t t-set="matches" t-value="request.env['bhz.football.match'].guiabh_get_upcoming_matches(limit=6)"/>
+                <t t-set="match_cards" t-value="request.env['bhz.football.match']._prepare_match_card_data(matches)"/>
+
+                <div class="row g-4 js-guiabh-football-grid">
+                    <t t-call="bhz_football_agenda.guiabh_football_match_cards">
+                        <t t-set="matches_data" t-value="match_cards"/>
+                    </t>
+                </div>
+                <div t-attf-class="alert alert-secondary text-center mb-0 js-guiabh-football-empty #{'d-none' if match_cards else ''}">
+                    Nenhum jogo encontrado para exibir.
+                </div>
+            </div>
+        </section>
+    </template>
+
+    <template id="guiabh_football_match_cards" name="GuiaBH - Cartas de Jogos">
+        <t t-foreach="matches_data" t-as="match">
+            <div class="col-12 col-md-6">
+                <article class="guiabh-football-card h-100 d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="text-muted small text-uppercase">
+                            <t t-esc="match.get('competition') or 'Partida'"/>
+                        </div>
+                        <t t-if="match.get('badge_label')">
+                            <span class="badge bg-primary text-white">
+                                <t t-esc="match.get('badge_label')"/>
+                            </span>
+                        </t>
+                    </div>
+                    <h5 class="mb-1">
+                        <t t-esc="match.get('match_datetime_label')"/>
+                    </h5>
+                    <div class="d-flex align-items-center gap-3 my-3 flex-wrap">
+                        <div class="d-flex align-items-center gap-2">
+                            <t t-if="match.get('home_team_logo')">
+                                <img t-att-src="match.get('home_team_logo')" alt="" class="rounded" style="width:48px; height:48px; object-fit:contain;"/>
+                            </t>
+                            <strong><t t-esc="match.get('home_team_name')"/></strong>
+                        </div>
+                        <span class="fw-bold">x</span>
+                        <div class="d-flex align-items-center gap-2">
+                            <t t-if="match.get('away_team_logo')">
+                                <img t-att-src="match.get('away_team_logo')" alt="" class="rounded" style="width:48px; height:48px; object-fit:contain;"/>
+                            </t>
+                            <strong><t t-esc="match.get('away_team_name')"/></strong>
+                        </div>
+                    </div>
+                    <p class="mb-1 text-muted small">
+                        <t t-esc="match.get('round_name')"/>
+                    </p>
+                    <p class="mb-1">
+                        <t t-esc="match.get('stadium') or '-'"/>
+                        <t t-if="match.get('city')">
+                            <span class="text-muted">• <t t-esc="match.get('city')"/></span>
+                        </t>
+                    </p>
+                    <p class="mb-3 text-muted small">
+                        <t t-if="match.get('broadcast')">Transmissão: <t t-esc="match.get('broadcast')"/></t>
+                        <t t-if="not match.get('broadcast')">Transmissão a confirmar</t>
+                    </p>
+                    <div class="d-flex flex-wrap gap-2 mt-auto">
+                        <t t-if="match.get('ticket_url')">
+                            <a class="btn btn-sm btn-primary"
+                               t-att-href="match.get('ticket_url')"
+                               target="_blank"
+                               rel="noopener">
+                                Ingressos
+                            </a>
+                        </t>
+                        <t t-if="match.get('gcal_url')">
+                            <a class="btn btn-sm btn-outline-secondary"
+                               t-att-href="match.get('gcal_url')"
+                               target="_blank"
+                               rel="noopener">
+                                Google Calendar
+                            </a>
+                        </t>
+                    </div>
+                </article>
+            </div>
+        </t>
+    </template>
+</odoo>
