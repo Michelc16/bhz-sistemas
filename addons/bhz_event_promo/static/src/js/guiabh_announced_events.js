@@ -88,7 +88,10 @@ export class GuiabhAnnouncedEvents extends Interaction {
     _updateContent({ html, has_events }) {
         if (this.gridEl && typeof html === "string") {
             this.gridEl.innerHTML = html;
-            this.services["public.interactions"].startInteractions(this.gridEl);
+            const interactionsService = this.services && this.services["public.interactions"];
+            if (interactionsService && interactionsService.startInteractions) {
+                interactionsService.startInteractions(this.gridEl);
+            }
         }
         if (this.emptyEl) {
             this.emptyEl.classList.toggle("d-none", !!has_events);
