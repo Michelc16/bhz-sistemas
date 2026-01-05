@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="s_guiabh_cineart_movies" name="GuiaBH - Filmes Cineart">
-        <section class="s_guiabh_cineart_movies py-5"
+        <section class="s_guiabh_cineart_movies oe_snippet_body py-5"
                  data-snippet="bhz_cineart.s_guiabh_cineart_movies"
                  data-name="GuiaBH - Filmes Cineart"
                  data-category-ids="[]"

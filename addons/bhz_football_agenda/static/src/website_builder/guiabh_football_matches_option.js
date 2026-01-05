@@ -15,7 +15,20 @@ class GuiabhFootballMatchesOptionPlugin extends Plugin {
     static id = "guiabhFootballMatchesOption";
     resources = {
         builder_options: [withSequence(SNIPPET_SPECIFIC, GuiabhFootballMatchesOption)],
+        on_snippet_dropped_handlers: (params) => this.onSnippetDropped(params),
     };
+
+    onSnippetDropped({ snippetEl }) {
+        if (!snippetEl.matches(GuiabhFootballMatchesOption.selector)) {
+            return;
+        }
+        if (!snippetEl.dataset.limit) {
+            snippetEl.dataset.limit = "6";
+        }
+        if (!snippetEl.dataset.teamIds) {
+            snippetEl.dataset.teamIds = "[]";
+        }
+    }
 }
 
 registry

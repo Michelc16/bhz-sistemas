@@ -15,7 +15,20 @@ class GuiabhCineartMoviesOptionPlugin extends Plugin {
     static id = "guiabhCineartMoviesOption";
     resources = {
         builder_options: [withSequence(SNIPPET_SPECIFIC, GuiabhCineartMoviesOption)],
+        on_snippet_dropped_handlers: (params) => this.onSnippetDropped(params),
     };
+
+    onSnippetDropped({ snippetEl }) {
+        if (!snippetEl.matches(GuiabhCineartMoviesOption.selector)) {
+            return;
+        }
+        if (!snippetEl.dataset.limit) {
+            snippetEl.dataset.limit = "8";
+        }
+        if (!snippetEl.dataset.categoryIds) {
+            snippetEl.dataset.categoryIds = "[]";
+        }
+    }
 }
 
 registry

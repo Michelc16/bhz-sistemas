@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="s_guiabh_football_matches" name="GuiaBH - Jogos de Futebol">
-        <section class="s_guiabh_football_matches py-5"
+        <section class="s_guiabh_football_matches oe_snippet_body py-5"
                  data-snippet="bhz_football_agenda.s_guiabh_football_matches"
                  data-name="GuiaBH - Jogos de Futebol"
                  data-team-ids="[]"
