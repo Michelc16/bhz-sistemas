@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from odoo import api, fields, models
+from odoo import fields, models
 
 
 class BhzPlaceCategory(models.Model):
@@ -59,7 +59,6 @@ class BhzPlace(models.Model):
 
     # Publicação no site
     website_published = fields.Boolean(string="Publicado no Website", default=False, tracking=True)
-    website_url = fields.Char(string="URL no Website", compute="_compute_website_url", store=False)
 
     # Classificação
     category_id = fields.Many2one("bhz.place.category", string="Categoria", index=True, tracking=True)
@@ -99,10 +98,10 @@ class BhzPlace(models.Model):
         string="Faixa de preço",
     )
 
-    @api.depends("id")
-    def _compute_website_url(self):
-        for rec in self:
-            if rec.id:
-                rec.website_url = f"/lugares/{rec.id}"
-            else:
-                rec.website_url = False
+    def action_open_website(self):
+        self.ensure_one()
+        return {
+            "type": "ir.actions.act_url",
+            "url": f"/lugares/{self.id}",
+            "target": "self",
+        }

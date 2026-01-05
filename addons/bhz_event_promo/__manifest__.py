@@ -13,6 +13,7 @@
         "views/event_views.xml",
         "views/website_menu.xml",
         "views/templates.xml",
+        "views/announced_events_snippet.xml",
         "views/featured_carousel_snippet.xml",
         "views/snippets/options.xml",
         "views/bhz_event_import_views.xml",

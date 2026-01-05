@@ -23,15 +23,19 @@
         <field name="model">bhz.place</field>
         <field name="arch" type="xml">
             <form string="Local">
+                <header>
+                    <button name="action_open_website"
+                            string="Abrir no site"
+                            type="object"
+                            class="btn btn-primary"
+                            attrs="{'invisible': [('website_published','=',False)]}"/>
+                </header>
                 <sheet>
                     <div class="oe_title">
                         <h1><field name="name" placeholder="Nome do local"/></h1>
                         <div class="o_row">
                             <field name="website_published" class="oe_inline"/>
                             <field name="active" class="oe_inline"/>
-                        </div>
-                        <div class="text-muted" attrs="{'invisible': [('website_url','=',False)]}">
-                            <span>URL: </span><field name="website_url" readonly="1"/>
                         </div>
                     </div>
 

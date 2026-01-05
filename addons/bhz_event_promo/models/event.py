@@ -169,20 +169,26 @@ class EventEvent(models.Model):
             """
         )
 
-    @api.model
-    def guiabh_get_featured_events(self, limit=12):
-        """Return events flagged as featured for website snippets."""
-        domain = [
-            ("show_on_public_agenda", "=", True),
-            ("is_featured", "=", True),
-        ]
+    def _prepare_public_events_domain(
+        self,
+        require_announced=True,
+        require_featured=False,
+        require_image=False,
+    ):
+        domain = [("show_on_public_agenda", "=", True)]
+
+        if require_featured and "is_featured" in self._fields:
+            domain.append(("is_featured", "=", True))
+
+        if require_image and "promo_cover_image" in self._fields:
+            domain.append(("promo_cover_image", "!=", False))
 
         website = getattr(request, "website", False)
         if website and "website_id" in self._fields:
             domain += ["|", ("website_id", "=", False), ("website_id", "=", website.id)]
 
-        Stage = self.env["event.stage"].sudo() if "stage_id" in self._fields else False
-        if Stage:
+        if require_announced and "stage_id" in self._fields:
+            Stage = self.env["event.stage"].sudo()
             announced_stage = Stage.search(
                 [("name", "in", ["Anunciado", "Announced"])],
                 order="sequence asc",
@@ -222,6 +228,18 @@ class EventEvent(models.Model):
         elif "is_published" in self._fields:
             domain.append(("is_published", "=", True))
 
+        return domain
+
+    @api.model
+    def guiabh_get_featured_events(self, limit=12):
+        """Return events flagged as featured for website snippets."""
+        domain = self._prepare_public_events_domain(require_featured=True)
+        return self.sudo().search(domain, limit=limit, order="date_begin asc, id desc")
+
+    @api.model
+    def guiabh_get_announced_events(self, limit=12):
+        """Return announced events with promotional images for snippets."""
+        domain = self._prepare_public_events_domain(require_image=True)
         return self.sudo().search(domain, limit=limit, order="date_begin asc, id desc")
 
     @api.model
