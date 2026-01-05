@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="s_guiabh_announced_events" name="GuiaBH - Eventos Anunciados">
-        <section class="s_guiabh_announced_events oe_snippet_body py-5"
+        <section class="s_guiabh_announced_events py-5"
                  data-snippet="bhz_event_promo.s_guiabh_announced_events"
                  data-name="GuiaBH - Eventos Anunciados"
                  data-category-ids="[]"
