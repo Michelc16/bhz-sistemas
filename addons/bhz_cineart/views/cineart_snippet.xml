@@ -5,7 +5,8 @@
                  data-snippet="bhz_cineart.s_guiabh_cineart_movies"
                  data-name="GuiaBH - Filmes Cineart"
                  data-category-ids="[]"
-                 data-limit="8">
+                 data-limit="8"
+                 data-order-mode="recent">
             <div class="container">
                 <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 align-items-lg-center mb-4">
                     <div>
@@ -18,7 +19,7 @@
                     </a>
                 </div>
 
-                <t t-set="movies" t-value="request.env['guiabh.cineart.movie'].guiabh_get_movies(limit=8)"/>
+                <t t-set="movies" t-value="request.env['guiabh.cineart.movie'].guiabh_get_movies(limit=8, order_mode='recent')"/>
 
                 <div class="row g-4 js-guiabh-cineart-grid">
                     <t t-call="bhz_cineart.guiabh_cineart_movie_cards">

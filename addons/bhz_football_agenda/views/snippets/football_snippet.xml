@@ -5,7 +5,8 @@
                  data-snippet="bhz_football_agenda.s_guiabh_football_matches"
                  data-name="GuiaBH - Jogos de Futebol"
                  data-team-ids="[]"
-                 data-limit="6">
+                 data-limit="6"
+                 data-order-mode="recent">
             <div class="container">
                 <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 align-items-lg-center mb-4">
                     <div>
@@ -18,7 +19,7 @@
                     </a>
                 </div>
 
-                <t t-set="matches" t-value="request.env['bhz.football.match'].guiabh_get_upcoming_matches(limit=6)"/>
+                <t t-set="matches" t-value="request.env['bhz.football.match'].guiabh_get_upcoming_matches(limit=6, order_mode='recent')"/>
                 <t t-set="match_cards" t-value="request.env['bhz.football.match']._prepare_match_card_data(matches)"/>
 
                 <div class="row g-4 js-guiabh-football-grid">

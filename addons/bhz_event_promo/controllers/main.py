@@ -208,13 +208,14 @@ class GuiaBHAgendaController(http.Controller):
         auth="public",
         website=True,
     )
-    def snippet_announced_events_data(self, category_ids=None, limit=12):
+    def snippet_announced_events_data(self, category_ids=None, limit=12, order_mode="recent"):
         limit = self._sanitize_limit(limit)
+        order_mode = self._sanitize_order_mode(order_mode)
         parsed_category_ids = self._parse_category_ids(category_ids)
         events = (
             request.env["event.event"]
             .sudo()
-            .guiabh_get_announced_events(limit=limit, category_ids=parsed_category_ids)
+            .guiabh_get_announced_events(limit=limit, category_ids=parsed_category_ids, order_mode=order_mode)
         )
         html = request.env["ir.ui.view"]._render_template(
             "bhz_event_promo.guiabh_announced_events_cards",
@@ -228,6 +229,13 @@ class GuiaBHAgendaController(http.Controller):
         except (ValueError, TypeError):
             limit_value = 12
         return max(1, min(limit_value, 24))
+
+    def _sanitize_order_mode(self, order_mode):
+        if isinstance(order_mode, str):
+            lowered = order_mode.lower()
+            if lowered in ("recent", "popular"):
+                return lowered
+        return "recent"
 
     def _parse_category_ids(self, category_ids):
         raw_ids = category_ids or []

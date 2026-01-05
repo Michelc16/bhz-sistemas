@@ -37,13 +37,14 @@ class GuiaBHCineartController(http.Controller):
         auth="public",
         website=True,
     )
-    def snippet_movies_data(self, category_ids=None, limit=8):
+    def snippet_movies_data(self, category_ids=None, limit=8, order_mode="recent"):
         limit = self._sanitize_limit(limit)
+        order_mode = self._sanitize_order_mode(order_mode)
         category_codes = self._map_category_codes(category_ids)
         movies = (
             request.env["guiabh.cineart.movie"]
             .sudo()
-            .guiabh_get_movies(categories=category_codes, limit=limit)
+            .guiabh_get_movies(categories=category_codes, limit=limit, order_mode=order_mode)
         )
         html = request.env["ir.ui.view"]._render_template(
             "bhz_cineart.guiabh_cineart_movie_cards",
@@ -57,6 +58,13 @@ class GuiaBHCineartController(http.Controller):
         except (ValueError, TypeError):
             limit_value = 8
         return max(1, min(limit_value, 24))
+
+    def _sanitize_order_mode(self, order_mode):
+        if isinstance(order_mode, str):
+            lowered = order_mode.lower()
+            if lowered in ("recent", "popular"):
+                return lowered
+        return "recent"
 
     def _map_category_codes(self, category_ids):
         ids = []

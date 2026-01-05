@@ -46,6 +46,11 @@ class CineartMovie(models.Model):
     active = fields.Boolean(string="Ativo", default=True)
     poster_image = fields.Image(string="Cartaz (imagem)", max_width=1024, max_height=1024)
     last_sync = fields.Datetime(string="Última sincronização", readonly=True)
+    website_visit_count = fields.Integer(
+        string="Visualizações no site",
+        default=0,
+        help="Controle opcional de popularidade para ordenar os destaques.",
+    )
 
     _sql_constraints = [
         ("cineart_url_unique", "unique(cineart_url)", "Já existe um filme com este link do Cineart."),
@@ -65,14 +70,21 @@ class CineartMovie(models.Model):
         return self.env["guiabh.cineart.movie"].action_sync_all_now()
 
     @api.model
-    def guiabh_get_movies(self, categories=None, limit=12):
+    def guiabh_get_movies(self, categories=None, limit=12, order_mode="recent"):
         domain = [("active", "=", True)]
         if categories:
             valid_codes = {code for code, _label in self._fields["category"].selection}
             filtered = [code for code in categories if code in valid_codes]
             if filtered:
                 domain.append(("category", "in", filtered))
-        return self.search(domain, order="category asc, name asc, id desc", limit=limit)
+        order = self._get_snippet_order(order_mode)
+        return self.search(domain, order=order, limit=limit)
+
+    def _get_snippet_order(self, order_mode):
+        allowed = (order_mode or "recent").lower()
+        if allowed == "popular":
+            return "website_visit_count desc, category asc, name asc, id desc"
+        return "category asc, name asc, id desc"
 
     @api.model
     def action_sync_all_now(self):

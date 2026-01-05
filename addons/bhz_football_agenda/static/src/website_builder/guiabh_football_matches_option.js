@@ -28,6 +28,9 @@ class GuiabhFootballMatchesOptionPlugin extends Plugin {
         if (!snippetEl.dataset.teamIds) {
             snippetEl.dataset.teamIds = "[]";
         }
+        if (!snippetEl.dataset.orderMode) {
+            snippetEl.dataset.orderMode = "recent";
+        }
     }
 }
 

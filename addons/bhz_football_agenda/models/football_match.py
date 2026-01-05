@@ -24,6 +24,11 @@ class FootballMatch(models.Model):
     broadcast = fields.Char(string="Transmissão")
     ticket_url = fields.Char(string="Link de ingressos")
     notes = fields.Text(string="Observações")
+    website_visit_count = fields.Integer(
+        string="Visualizações no site",
+        default=0,
+        help="Usado para ordenar os jogos mais vistos no site.",
+    )
 
     # Publicação
     website_published = fields.Boolean(default=True, string="Publicado no site")
@@ -54,7 +59,7 @@ class FootballMatch(models.Model):
                     raise ValidationError("Já existe um jogo com este ID externo.")
 
     @api.model
-    def guiabh_get_upcoming_matches(self, team_ids=None, limit=6):
+    def guiabh_get_upcoming_matches(self, team_ids=None, limit=6, order_mode="recent"):
         domain = [
             ("website_published", "=", True),
             ("active", "=", True),
@@ -64,8 +69,19 @@ class FootballMatch(models.Model):
         if team_ids:
             valid_ids = [tid for tid in team_ids if isinstance(tid, int)]
             if valid_ids:
-                domain.append(("team_ids", "in", valid_ids))
-        return self.search(domain, order="match_datetime asc, id asc", limit=limit)
+                domain += [
+                    "|",
+                    ("home_team_id", "in", valid_ids),
+                    ("away_team_id", "in", valid_ids),
+                ]
+        order = self._get_snippet_order(order_mode)
+        return self.search(domain, order=order, limit=limit)
+
+    def _get_snippet_order(self, order_mode):
+        allowed = (order_mode or "recent").lower()
+        if allowed == "popular":
+            return "website_visit_count desc, match_datetime asc, id asc"
+        return "match_datetime asc, id asc"
 
     @api.model
     def _prepare_match_card_data(self, matches):

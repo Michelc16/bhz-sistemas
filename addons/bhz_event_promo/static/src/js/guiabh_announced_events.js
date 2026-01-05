@@ -12,12 +12,27 @@ export class GuiabhAnnouncedEvents extends Interaction {
         if (this.isEditMode) {
             return;
         }
-        this.limit = parseInt(this.el.dataset.limit || "12", 10);
+        this.limit = this._parseLimit(this.el.dataset.limit);
+        this.orderMode = this._getOrderMode();
         this.gridEl = this.el.querySelector(".js-guiabh-announced-grid");
         this.emptyEl = this.el.querySelector(".js-guiabh-announced-empty");
         this.categoryObserver = new MutationObserver((mutations) => {
             for (const mutation of mutations) {
-                if (mutation.attributeName === "data-category-ids") {
+                if (!mutation.attributeName) {
+                    continue;
+                }
+                const attrName = mutation.attributeName;
+                if (attrName === "data-category-ids") {
+                    this.fetchAndRender();
+                    break;
+                }
+                if (attrName === "data-limit") {
+                    this.limit = this._parseLimit(this.el.dataset.limit);
+                    this.fetchAndRender();
+                    break;
+                }
+                if (attrName === "data-order-mode") {
+                    this.orderMode = this._getOrderMode();
                     this.fetchAndRender();
                     break;
                 }
@@ -32,7 +47,7 @@ export class GuiabhAnnouncedEvents extends Interaction {
         if (this.el.isConnected) {
             this.categoryObserver.observe(this.el, {
                 attributes: true,
-                attributeFilter: ["data-category-ids"],
+                attributeFilter: ["data-category-ids", "data-limit", "data-order-mode"],
             });
         }
         return this.fetchAndRender();
@@ -74,13 +89,30 @@ export class GuiabhAnnouncedEvents extends Interaction {
         }
     }
 
+    _parseLimit(value) {
+        const base = parseInt(value || "12", 10);
+        if (Number.isNaN(base)) {
+            return 12;
+        }
+        return Math.min(Math.max(base, 1), 24);
+    }
+
+    _getOrderMode() {
+        const allowed = ["recent", "popular"];
+        const raw = (this.el.dataset.orderMode || "recent").toLowerCase();
+        return allowed.includes(raw) ? raw : "recent";
+    }
+
     async fetchAndRender() {
         if (this.isEditMode || !this.gridEl) {
             return;
         }
+        this.limit = this._parseLimit(this.el.dataset.limit);
+        this.orderMode = this._getOrderMode();
         const params = {
             limit: this.limit,
             category_ids: this._getCategoryIds(),
+            order_mode: this.orderMode,
         };
         try {
             const result = await rpc("/bhz_event_promo/snippet/announced_events", params);

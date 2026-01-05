@@ -232,11 +232,12 @@ class BhzFootballAgendaController(http.Controller):
         auth="public",
         website=True,
     )
-    def snippet_matches_data(self, team_ids=None, limit=6):
+    def snippet_matches_data(self, team_ids=None, limit=6, order_mode="recent"):
         limit = self._sanitize_limit(limit)
+        order_mode = self._sanitize_order_mode(order_mode)
         parsed_team_ids = self._parse_team_ids(team_ids)
         Match = request.env["bhz.football.match"].sudo()
-        matches = Match.guiabh_get_upcoming_matches(team_ids=parsed_team_ids, limit=limit)
+        matches = Match.guiabh_get_upcoming_matches(team_ids=parsed_team_ids, limit=limit, order_mode=order_mode)
         cards = Match._prepare_match_card_data(matches)
         html = request.env["ir.ui.view"]._render_template(
             "bhz_football_agenda.guiabh_football_match_cards",
@@ -250,6 +251,13 @@ class BhzFootballAgendaController(http.Controller):
         except (ValueError, TypeError):
             limit_value = 6
         return max(1, min(limit_value, 20))
+
+    def _sanitize_order_mode(self, order_mode):
+        if isinstance(order_mode, str):
+            lowered = order_mode.lower()
+            if lowered in ("recent", "popular"):
+                return lowered
+        return "recent"
 
     def _parse_team_ids(self, team_ids):
         if isinstance(team_ids, str):

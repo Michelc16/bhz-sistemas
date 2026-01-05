@@ -96,6 +96,11 @@ class EventEvent(models.Model):
         default=True,
         help="Se marcado, aparece na página /agenda.",
     )
+    bhz_website_visit_count = fields.Integer(
+        string="Visualizações no site (GuiaBH)",
+        default=0,
+        help="Usado para ordenar os eventos mais acessados nos blocos do site.",
+    )
     auto_remove_after_event = fields.Selection(
         [
             ("none", "Não fazer nada"),
@@ -243,13 +248,20 @@ class EventEvent(models.Model):
         return self.sudo().search(domain, limit=limit, order="date_begin asc, id desc")
 
     @api.model
-    def guiabh_get_announced_events(self, limit=12, category_ids=None):
+    def guiabh_get_announced_events(self, limit=12, category_ids=None, order_mode="recent"):
         """Return announced events with promotional images for snippets."""
         domain = self._prepare_public_events_domain(
             require_image=True,
             category_ids=category_ids,
         )
-        return self.sudo().search(domain, limit=limit, order="date_begin asc, id desc")
+        order = self._get_announced_events_order(order_mode)
+        return self.sudo().search(domain, limit=limit, order=order)
+
+    def _get_announced_events_order(self, order_mode):
+        allowed = (order_mode or "recent").lower()
+        if allowed == "popular":
+            return "bhz_website_visit_count desc, date_begin asc, id desc"
+        return "date_begin asc, id desc"
 
     @api.model
     def cron_auto_cleanup_events(self):

@@ -28,6 +28,9 @@ class GuiabhAnnouncedEventsOptionPlugin extends Plugin {
         if (!snippetEl.dataset.categoryIds) {
             snippetEl.dataset.categoryIds = "[]";
         }
+        if (!snippetEl.dataset.orderMode) {
+            snippetEl.dataset.orderMode = "recent";
+        }
     }
 }
 

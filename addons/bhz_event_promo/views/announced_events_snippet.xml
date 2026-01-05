@@ -5,7 +5,8 @@
                  data-snippet="bhz_event_promo.s_guiabh_announced_events"
                  data-name="GuiaBH - Eventos Anunciados"
                  data-category-ids="[]"
-                 data-limit="12">
+                 data-limit="12"
+                 data-order-mode="recent">
             <div class="container">
                 <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 align-items-lg-center mb-4">
                     <div>
@@ -18,7 +19,7 @@
                     </a>
                 </div>
 
-                <t t-set="events" t-value="request.env['event.event'].guiabh_get_announced_events(12)"/>
+                <t t-set="events" t-value="request.env['event.event'].guiabh_get_announced_events(limit=12, order_mode='recent')"/>
 
                 <div class="row g-4 guiabh-announced-grid js-guiabh-announced-grid">
                     <t t-call="bhz_event_promo.guiabh_announced_events_cards">
