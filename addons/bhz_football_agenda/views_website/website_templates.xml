@@ -12,22 +12,6 @@
                                 Cruzeiro, Atlético-MG e América-MG — próximos jogos e informações.
                             </p>
                         </div>
-                        <div class="col-12 col-lg-4 mt-3 mt-lg-0">
-                            <div class="d-flex gap-2 justify-content-lg-end flex-wrap">
-                                <a class="btn btn-outline-primary"
-                                   href="/futebol/agenda"
-                                   t-att-class="'btn btn-outline-primary ' + ('active' if not selected_slug else '')">
-                                    Todos
-                                </a>
-                                <t t-foreach="featured_filters" t-as="filter_btn">
-                                    <a class="btn btn-outline-primary"
-                                       t-attf-href="/futebol/agenda?team={{ filter_btn['slug'] }}"
-                                       t-att-class="'btn btn-outline-primary ' + ('active' if selected_slug == filter_btn['slug'] else '')">
-                                        <t t-esc="filter_btn['label']"/>
-                                    </a>
-                                </t>
-                            </div>
-                        </div>
                     </div>
                     <form class="card shadow-sm mb-4" method="get" action="/futebol/agenda">
                         <div class="card-body row g-3">

@@ -16,9 +16,9 @@ class GuiabhFeaturedCarouselOption extends BaseOptionComponent {
     }
 
     _readInterval() {
-        const section = this.el;
-        const carousel = section.querySelector(".guiabh-featured-carousel");
-        const raw = carousel?.dataset.interval || section.dataset.interval || "5000";
+        const section = this.el || document.createElement("div");
+        const carousel = section.querySelector?.(".guiabh-featured-carousel");
+        const raw = carousel?.dataset.interval || section.dataset?.interval || "5000";
         const parsed = parseInt(raw, 10);
         return Number.isNaN(parsed) ? 5000 : parsed;
     }
