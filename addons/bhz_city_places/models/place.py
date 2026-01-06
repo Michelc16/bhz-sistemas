@@ -92,7 +92,13 @@ class BhzPlace(models.Model):
     neighborhood = fields.Char(string="Bairro")
 
     # Conteúdo e mídia
-    short_description = fields.Char(string="Descrição curta", tracking=True)
+    short_description = fields.Html(
+        string="Descrição curta",
+        sanitize=True,
+        translate=False,
+        tracking=True,
+        help="Texto breve usado em destaques. Permite formatação básica para ajustar a estrutura.",
+    )
     description_html = fields.Html(string="Descrição completa")
     image_1920 = fields.Image(string="Imagem", max_width=1920, max_height=1920)
 

@@ -63,7 +63,7 @@
                     <notebook>
                         <page string="Conteúdo">
                             <group>
-                                <field name="short_description"/>
+                                <field name="short_description" widget="html"/>
                             </group>
                             <field name="description_html" widget="html"/>
                         </page>
