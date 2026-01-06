@@ -9,7 +9,7 @@ export class GuiabhCineartMovies extends Interaction {
 
     setup() {
         this.isEditMode = this._isWebsiteEditorActive();
-        if (this.isEditMode) {
+        if (this._shouldDisableDynamicBehavior()) {
             return;
         }
         this.limit = this._parseLimit(this.el.dataset.limit);
@@ -41,7 +41,7 @@ export class GuiabhCineartMovies extends Interaction {
     }
 
     start() {
-        if (this.isEditMode) {
+        if (this._shouldDisableDynamicBehavior()) {
             return;
         }
         if (this.el.isConnected) {
@@ -101,7 +101,7 @@ export class GuiabhCineartMovies extends Interaction {
     }
 
     async fetchAndRender() {
-        if (this.isEditMode || !this.gridEl) {
+        if (this._shouldDisableDynamicBehavior() || !this.gridEl) {
             return;
         }
         this.limit = this._parseLimit(this.el.dataset.limit);
@@ -138,15 +138,31 @@ export class GuiabhCineartMovies extends Interaction {
     _isWebsiteEditorActive() {
         const body = document.body;
         const html = document.documentElement;
-        const hasEditorClass =
-            body?.classList?.contains("editor_enable") ||
-            body?.classList?.contains("o_web_editor") ||
-            body?.classList?.contains("o_website_editor") ||
-            html?.classList?.contains("o_web_editor") ||
-            html?.classList?.contains("o_website_editor");
-        const hasManipulator = !!document.getElementById("oe_manipulators");
-        const hasEditableAncestor = !!this.el.closest(".o_editable, .oe_editable");
+        const editClassHints = [
+            "editor_enable",
+            "o_web_editor",
+            "o_website_editor",
+            "o_edit_mode",
+            "o_we_edit_mode",
+            "o_editable_mode",
+            "o_builder_edit_mode",
+            "o_editable",
+        ];
+        const hasEditorClass = editClassHints.some(
+            (cls) => body?.classList?.contains(cls) || html?.classList?.contains(cls)
+        );
+        const hasManipulator =
+            !!document.getElementById("oe_manipulators") ||
+            !!document.querySelector(".o_web_editor, .o_we_website_top_actions");
+        const hasEditableAncestor = !!this.el.closest(
+            ".o_editable, .oe_editable, .oe_structure, [contenteditable='true']"
+        );
         return hasEditorClass || hasManipulator || hasEditableAncestor;
+    }
+
+    _shouldDisableDynamicBehavior() {
+        this.isEditMode = this._isWebsiteEditorActive();
+        return this.isEditMode;
     }
 }
 
