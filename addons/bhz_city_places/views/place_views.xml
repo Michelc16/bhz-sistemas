@@ -7,6 +7,7 @@
             <list>
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
+                <field name="stage_id"/>
                 <field name="category_id"/>
                 <field name="city_id"/>
                 <field name="neighborhood"/>
@@ -29,6 +30,7 @@
                             type="object"
                             class="btn btn-primary"
                             invisible="not website_published"/>
+                    <field name="stage_id" widget="statusbar" options="{'clickable': True}"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
@@ -42,6 +44,7 @@
                     <group>
                         <group>
                             <field name="category_id"/>
+                            <field name="stage_id"/>
                             <field name="tag_ids" widget="many2many_tags"/>
                             <field name="city_id"/>
                             <field name="neighborhood"/>
@@ -109,6 +112,7 @@
                 <filter string="Publicados" name="published" domain="[('website_published','=',True)]"/>
                 <filter string="Arquivados" name="archived" domain="[('active','=',False)]"/>
                 <separator/>
+                <filter string="Etapa" name="group_stage" context="{'group_by': 'stage_id'}"/>
                 <filter string="Categoria" name="group_category" context="{'group_by': 'category_id'}"/>
                 <filter string="Cidade" name="group_city" context="{'group_by': 'city_id'}"/>
             </search>

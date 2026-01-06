@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from odoo import fields, models
+from odoo import api, fields, models
 
 
 class BhzPlaceCategory(models.Model):
@@ -32,6 +32,22 @@ class BhzPlaceCity(models.Model):
     active = fields.Boolean(default=True)
 
 
+class BhzPlaceStage(models.Model):
+    _name = "bhz.place.stage"
+    _description = "Etapa do Local"
+    _order = "sequence, id"
+
+    name = fields.Char(required=True, translate=False)
+    sequence = fields.Integer(default=10)
+    is_published_stage = fields.Boolean(
+        string="Publicar nesta etapa",
+        help="Quando ativo, os locais nesta etapa serão publicados automaticamente no site.",
+    )
+    fold = fields.Boolean(string="Recolher no kanban", default=False)
+    color = fields.Integer(string="Cor")
+    active = fields.Boolean(default=True)
+
+
 class BhzPlace(models.Model):
     _name = "bhz.place"
     _description = "Local"
@@ -59,6 +75,14 @@ class BhzPlace(models.Model):
 
     # Publicação no site
     website_published = fields.Boolean(string="Publicado no Website", default=False, tracking=True)
+    stage_id = fields.Many2one(
+        "bhz.place.stage",
+        string="Etapa",
+        tracking=True,
+        copy=False,
+        index=True,
+        default=lambda self: self._default_stage_id(),
+    )
 
     # Classificação
     category_id = fields.Many2one("bhz.place.category", string="Categoria", index=True, tracking=True)
@@ -105,3 +129,30 @@ class BhzPlace(models.Model):
             "url": f"/lugares/{self.id}",
             "target": "self",
         }
+
+    @api.model
+    def _default_stage_id(self):
+        return self.env.ref("bhz_city_places.stage_bhz_place_draft", raise_if_not_found=False)
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        default_stage = self._default_stage_id()
+        for vals in vals_list:
+            if not vals.get("stage_id") and default_stage:
+                vals["stage_id"] = default_stage.id
+            stage = None
+            stage_id = vals.get("stage_id")
+            if stage_id:
+                stage = self.env["bhz.place.stage"].browse(stage_id)
+            if stage and "website_published" not in vals:
+                vals["website_published"] = stage.is_published_stage
+        records = super().create(vals_list)
+        return records
+
+    def write(self, vals):
+        res = super().write(vals)
+        if "stage_id" in vals and "website_published" not in vals:
+            for record in self:
+                if record.stage_id:
+                    record.website_published = record.stage_id.is_published_stage
+        return res

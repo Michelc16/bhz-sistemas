@@ -9,6 +9,7 @@
     "data": [
         "security/security.xml",
         "security/ir.model.access.csv",
+        "data/place_stage_data.xml",
         "views/place_views.xml",
         "views/menus.xml",
         "views_website/place_templates.xml",

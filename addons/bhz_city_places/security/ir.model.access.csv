@@ -11,6 +11,10 @@ access_bhz_place_tag_manager,bhz.place.tag manager,model_bhz_place_tag,bhz_city_
 access_bhz_place_tag_editor,bhz.place.tag editor,model_bhz_place_tag,bhz_city_places.group_bhz_place_editor,1,1,1,0
 access_bhz_place_tag_admin,bhz.place.tag admin,model_bhz_place_tag,base.group_system,1,1,1,1
 
+access_bhz_place_stage_manager,bhz.place.stage manager,model_bhz_place_stage,bhz_city_places.group_bhz_place_manager,1,1,1,1
+access_bhz_place_stage_editor,bhz.place.stage editor,model_bhz_place_stage,bhz_city_places.group_bhz_place_editor,1,1,0,0
+access_bhz_place_stage_admin,bhz.place.stage admin,model_bhz_place_stage,base.group_system,1,1,1,1
+
 access_bhz_place_city_manager,bhz.place.city manager,model_bhz_place_city,bhz_city_places.group_bhz_place_manager,1,1,1,1
 access_bhz_place_city_editor,bhz.place.city editor,model_bhz_place_city,bhz_city_places.group_bhz_place_editor,1,1,1,0
 access_bhz_place_city_admin,bhz.place.city admin,model_bhz_place_city,base.group_system,1,1,1,1

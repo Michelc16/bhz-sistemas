@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="stage_bhz_place_draft" model="bhz.place.stage">
+        <field name="name">Rascunho</field>
+        <field name="sequence" eval="1"/>
+        <field name="is_published_stage" eval="False"/>
+        <field name="fold" eval="False"/>
+        <field name="color" eval="2"/>
+    </record>
+
+    <record id="stage_bhz_place_review" model="bhz.place.stage">
+        <field name="name">Revisão</field>
+        <field name="sequence" eval="5"/>
+        <field name="is_published_stage" eval="False"/>
+        <field name="fold" eval="False"/>
+        <field name="color" eval="4"/>
+    </record>
+
+    <record id="stage_bhz_place_announced" model="bhz.place.stage">
+        <field name="name">Anunciado</field>
+        <field name="sequence" eval="10"/>
+        <field name="is_published_stage" eval="True"/>
+        <field name="fold" eval="False"/>
+        <field name="color" eval="6"/>
+    </record>
+</odoo>
