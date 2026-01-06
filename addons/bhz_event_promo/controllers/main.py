@@ -223,6 +223,34 @@ class GuiaBHAgendaController(http.Controller):
         )
         return {"html": html, "has_events": bool(events)}
 
+    @http.route(
+        "/bhz_event_promo/snippet/featured_events",
+        type="json",
+        auth="public",
+        website=True,
+    )
+    def snippet_featured_events(self, limit=12):
+        limit = self._sanitize_limit(limit)
+        events = (
+            request.env["event.event"]
+            .sudo()
+            .guiabh_get_featured_events(limit=limit)
+        )
+        slides = request.env["ir.ui.view"]._render_template(
+            "bhz_event_promo.guiabh_featured_carousel_slides",
+            {"events": events},
+        )
+        indicators = request.env["ir.ui.view"]._render_template(
+            "bhz_event_promo.guiabh_featured_carousel_indicators",
+            {"events": events},
+        )
+        return {
+            "slides": slides,
+            "indicators": indicators,
+            "has_events": bool(events),
+            "has_multiple": len(events) > 1,
+        }
+
     def _sanitize_limit(self, limit):
         try:
             limit_value = int(limit)
