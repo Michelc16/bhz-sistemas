@@ -4,6 +4,12 @@
         <field name="model">meli.order</field>
         <field name="arch" type="xml">
             <list>
+                <header>
+                    <button name="action_manual_sync_orders"
+                            type="object"
+                            string="Sincronizar pedidos"
+                            class="btn btn-primary"/>
+                </header>
                 <field name="name"/>
                 <field name="account_id"/>
                 <field name="buyer_name"/>

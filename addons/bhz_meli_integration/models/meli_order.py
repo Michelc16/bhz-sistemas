@@ -184,3 +184,17 @@ class MeliOrder(models.Model):
         }
         so = self.env["sale.order"].create(so_vals)
         meli_order.sale_order_id = so.id
+
+    def action_manual_sync_orders(self):
+        """Ação acionada pelo botão para sincronizar pedidos manualmente."""
+        self.env["meli.order"].sudo().cron_fetch_orders()
+        return {
+            "type": "ir.actions.client",
+            "tag": "display_notification",
+            "params": {
+                "title": "Mercado Livre",
+                "message": "Sincronização de pedidos iniciada em segundo plano.",
+                "type": "success",
+                "sticky": False,
+            },
+        }

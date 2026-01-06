@@ -27,6 +27,12 @@
         <field name="model">meli.product</field>
         <field name="arch" type="xml">
             <list>
+                <header>
+                    <button name="action_manual_sync_products"
+                            type="object"
+                            string="Sincronizar produtos"
+                            class="btn btn-primary"/>
+                </header>
                 <field name="name"/>
                 <field name="account_id"/>
                 <field name="product_id"/>
