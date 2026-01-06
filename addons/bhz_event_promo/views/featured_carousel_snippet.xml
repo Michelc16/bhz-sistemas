@@ -4,7 +4,8 @@
         <section class="s_guiabh_featured_carousel oe_snippet_body py-5"
                  data-snippet="bhz_event_promo.s_guiabh_featured_carousel"
                  data-name="GuiaBH - Carrossel de Destaques"
-                 data-limit="12">
+                 data-limit="12"
+                 data-interval="5000">
             <div class="container">
                 <t t-set="events"
                    t-value="request.env['event.event'].guiabh_get_featured_events(12)"/>
@@ -14,6 +15,8 @@
                 <div class="guiabh-featured-carousel carousel slide o_not_editable"
                      t-att-id="carousel_id"
                      data-interval="5000"
+                     data-bs-interval="5000"
+                     data-bs-ride="carousel"
                      contenteditable="false">
                     <div class="carousel-inner">
                         <t t-call="bhz_event_promo.guiabh_featured_carousel_slides">

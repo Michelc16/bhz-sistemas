@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="bhz_event_promo.GuiabhFeaturedCarouselOption" name="Carrossel de Destaques">
+        <BuilderRow label.translate="Tempo entre slides (ms)">
+            <div class="o_we_number_input w-100">
+                <input type="number"
+                       min="1000"
+                       max="20000"
+                       step="500"
+                       t-att-value="component.interval"
+                       t-on-input="component.onIntervalInput"
+                       t-on-change="component.onIntervalChange"
+                       class="form-control"/>
+            </div>
+        </BuilderRow>
+    </t>
+
+</templates>

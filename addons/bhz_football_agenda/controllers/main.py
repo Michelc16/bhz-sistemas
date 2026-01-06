@@ -31,25 +31,33 @@ class BhzFootballAgendaController(http.Controller):
             [("website_published", "=", True), ("active", "=", True)] + company_domain,
             order="name asc",
         )
-        featured_slugs = ["cruzeiro", "atletico-mg", "america-mg"]
+        featured_filters = [
+            {"slug": "cruzeiro", "label": "Cruzeiro"},
+            {"slug": "atletico-mg", "label": "Atlético-MG"},
+            {"slug": "america-mg", "label": "América-MG"},
+        ]
         slug_map = {team.slug: team for team in teams}
-        featured_teams = [slug_map[slug] for slug in featured_slugs if slug in slug_map]
-        if not featured_teams:
+        featured_teams = [slug_map.get(item["slug"]) for item in featured_filters if item["slug"] in slug_map]
+        if not any(featured_teams):
             featured_teams = teams[:3]
 
         selected_team = None
+        selected_slug = (team_slug or request.params.get("team") or request.params.get("team_slug") or "").strip()
         domain = [
             ("website_published", "=", True),
             ("active", "=", True),
         ]
 
-        if team_slug:
+        if selected_slug:
             selected_team = Team.search(
-                [("slug", "=", team_slug), ("website_published", "=", True), ("active", "=", True)] + company_domain,
+                [("slug", "=", selected_slug), ("website_published", "=", True), ("active", "=", True)] + company_domain,
                 limit=1,
             )
             if selected_team:
                 domain.append(("team_ids", "in", selected_team.id))
+                selected_slug = selected_team.slug
+            else:
+                selected_slug = ""
 
         filters = {
             "date_from": request.params.get("date_from") or "",
@@ -94,7 +102,7 @@ class BhzFootballAgendaController(http.Controller):
                 date_to_dt,
                 filters["team_id"],
                 filters["competition"],
-                bool(team_slug),
+                bool(selected_slug),
             ]
         )
         if not has_filters:
@@ -235,8 +243,9 @@ class BhzFootballAgendaController(http.Controller):
             "bhz_football_agenda.page_football_agenda",
             {
                 "teams": teams,
-                "featured_teams": featured_teams,
+                "featured_filters": featured_filters,
                 "selected_team": selected_team,
+                "selected_slug": selected_slug,
                 "groups": groups,
                 "competitions": competitions,
                 "filters": filters,

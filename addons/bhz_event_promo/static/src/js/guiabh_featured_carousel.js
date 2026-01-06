@@ -8,17 +8,29 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
     disabledInEditableMode: false,
 
     start() {
+        this.sectionEl = this.el.closest(".s_guiabh_featured_carousel");
         this.carouselInner = this.el.querySelector('.carousel-inner');
         this.indicatorsWrapper = this.el.querySelector('.carousel-indicators');
         this.prevButton = this.el.querySelector('[data-action="prev"]');
         this.nextButton = this.el.querySelector('[data-action="next"]');
         this.emptyMessage = this.el.parentElement.querySelector('.js-guiabh-featured-empty');
-        this.interval = parseInt(this.el.dataset.interval || '5000', 10);
-        this.limit = parseInt(this.el.closest('.s_guiabh_featured_carousel')?.dataset.limit || '12', 10);
+        this.interval = this._readInterval();
+        this.limit = parseInt(this.sectionEl?.dataset.limit || '12', 10);
         this.currentIndex = 0;
         this.items = [];
         this.indicators = [];
         this._bindControls();
+        this._intervalListener = (ev) => {
+            const newVal = parseInt(ev.detail?.interval, 10);
+            if (Number.isNaN(newVal)) {
+                return;
+            }
+            this.interval = newVal;
+            this.el.dataset.interval = newVal;
+            this.el.dataset.bsInterval = newVal;
+            this._restartAutoplay();
+        };
+        this.el.addEventListener("guiabh-featured-interval-update", this._intervalListener);
         return Promise.all([this._fetchSlides(), this._super(...arguments)]);
     },
 
@@ -126,9 +138,29 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         this.el.dispatchEvent(new CustomEvent("content_changed", { bubbles: true }));
     },
 
+    _readInterval() {
+        const attr =
+            (this.sectionEl && this.sectionEl.dataset.interval) ||
+            this.el.dataset.interval ||
+            "5000";
+        const parsed = parseInt(attr, 10);
+        const interval = Number.isNaN(parsed) ? 5000 : parsed;
+        this.el.dataset.interval = interval;
+        this.el.dataset.bsInterval = interval;
+        if (interval > 0) {
+            this.el.dataset.bsRide = "carousel";
+        } else {
+            this.el.dataset.bsRide = "false";
+        }
+        return interval;
+    },
+
     destroy() {
         if (this._timer) {
             clearInterval(this._timer);
+        }
+        if (this._intervalListener) {
+            this.el.removeEventListener("guiabh-featured-interval-update", this._intervalListener);
         }
         return this._super(...arguments);
     },
