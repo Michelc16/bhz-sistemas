@@ -2,6 +2,8 @@
 <templates xml:space="preserve">
 
     <t t-name="bhz_cineart.GuiabhCineartMoviesOption" name="Filmes Cineart">
+        <t t-set="website_company_id"
+           t-value="request.website.company_id.id if request.website and request.website.company_id else False"/>
         <BuilderRow label.translate="Quantidade de itens">
             <BuilderNumberInput
                 dataAttributeAction="'limit'"
@@ -23,7 +25,7 @@
             <BuilderMany2Many
                 model="'guiabh.cineart.category'"
                 fields="['name']"
-                context="{'allowed_company_ids': [request.website.company_id.id] if request.website and request.website.company_id else []}"
+                context="{'allowed_company_ids': website_company_id and [website_company_id] or []}"
                 dataAttributeAction="'categoryIds'"
             />
         </BuilderRow>
