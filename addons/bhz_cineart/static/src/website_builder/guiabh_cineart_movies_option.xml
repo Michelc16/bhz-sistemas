@@ -23,6 +23,7 @@
             <BuilderMany2Many
                 model="'guiabh.cineart.category'"
                 fields="['name']"
+                context="{'allowed_company_ids': [request.website.company_id.id] if request.website and request.website.company_id else []}"
                 dataAttributeAction="'categoryIds'"
             />
         </BuilderRow>
