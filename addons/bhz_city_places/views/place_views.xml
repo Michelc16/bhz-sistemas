@@ -35,8 +35,10 @@
                 <sheet>
                     <div class="oe_title">
                         <h1><field name="name" placeholder="Nome do local"/></h1>
-                        <div class="o_row">
+                        <div class="o_row gap-2 align-items-center">
+                            <label for="website_published" class="o_form_label">Publicado no site</label>
                             <field name="website_published" class="oe_inline"/>
+                            <label for="active" class="o_form_label ms-3">Registro ativo</label>
                             <field name="active" class="oe_inline"/>
                         </div>
                     </div>
