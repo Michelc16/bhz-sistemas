@@ -6,6 +6,8 @@
                  data-name="GuiaBH - Carrossel de Destaques"
                  data-limit="12">
             <div class="container">
+                <t t-set="events"
+                   t-value="request.env['event.event'].guiabh_get_featured_events(12)"/>
                 <t t-set="snippet_key" t-value="request.env.context.get('snippet_key') or request.env.uid or 0"/>
                 <t t-set="website_id" t-value="request.env.context.get('website_id') or 0"/>
                 <t t-set="carousel_id" t-value="'guiabh_featured_%s_%s' % (snippet_key, website_id)"/>
@@ -13,9 +15,17 @@
                      t-att-id="carousel_id"
                      data-interval="5000"
                      contenteditable="false">
-                    <div class="carousel-inner"></div>
+                    <div class="carousel-inner">
+                        <t t-call="bhz_event_promo.guiabh_featured_carousel_slides">
+                            <t t-set="events" t-value="events"/>
+                        </t>
+                        <t t-if="events">
+                            <script type="text/javascript">document.currentScript.parentElement.firstElementChild?.classList.add('active');</script>
+                        </t>
+                    </div>
                     <div class="o_carousel_controllers">
-                        <button class="carousel-control-prev o_not_editable d-none"
+                        <button class="carousel-control-prev o_not_editable"
+                                t-attf-class="carousel-control-prev o_not_editable #{'d-none' if len(events) &lt;= 1 else ''}"
                                 type="button"
                                 data-action="prev"
                                 aria-label="Anterior"
@@ -24,8 +34,13 @@
                             <span class="carousel-control-prev-icon" aria-hidden="true"/>
                             <span class="visually-hidden">Anterior</span>
                         </button>
-                        <div class="carousel-indicators d-none"></div>
-                        <button class="carousel-control-next o_not_editable d-none"
+                        <div t-attf-class="carousel-indicators #{'' if len(events) &gt; 1 else 'd-none'}">
+                            <t t-call="bhz_event_promo.guiabh_featured_carousel_indicators">
+                                <t t-set="events" t-value="events"/>
+                            </t>
+                        </div>
+                        <button class="carousel-control-next o_not_editable"
+                                t-attf-class="carousel-control-next o_not_editable #{'d-none' if len(events) &lt;= 1 else ''}"
                                 type="button"
                                 data-action="next"
                                 aria-label="Próximo"
@@ -36,7 +51,7 @@
                         </button>
                     </div>
                 </div>
-                <div class="alert alert-secondary mb-0 text-center js-guiabh-featured-empty d-none">
+                <div t-attf-class="alert alert-secondary mb-0 text-center js-guiabh-featured-empty #{'d-none' if events else ''}">
                     Nenhum evento em destaque no momento.
                 </div>
             </div>
@@ -44,8 +59,8 @@
     </template>
 
     <template id="guiabh_featured_carousel_slides" name="GuiaBH - Slides do carrossel">
-        <t t-foreach="events" t-as="event">
-            <div class="carousel-item">
+        <t t-foreach="events" t-as="event" t-index="idx">
+            <div t-attf-class="carousel-item #{'active' if idx == 0 else ''}">
                 <a t-att-href="'/agenda/event/%s' % event.id">
                     <img class="d-block w-100 guiabh-slide-bg"
                          t-att-src="'/web/image/event.event/%s/promo_cover_image' % event.id"
@@ -57,7 +72,9 @@
 
     <template id="guiabh_featured_carousel_indicators" name="GuiaBH - Indicadores do carrossel">
         <t t-foreach="events" t-as="event" t-index="idx">
-            <button type="button" t-att-data-slide-to="idx"></button>
+            <button type="button"
+                    t-att-data-slide-to="idx"
+                    t-attf-class="#{'active' if idx == 0 else ''}"></button>
         </t>
     </template>
 </odoo>
