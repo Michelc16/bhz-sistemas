@@ -155,3 +155,17 @@ class MeliProduct(models.Model):
             _logger.info("[ML] Conta %s: %s anúncios sincronizados", account.name, account_imported)
 
         _logger.info("[ML] Importação de anúncios finalizada. Total sincronizado: %s", total_imported)
+
+    def action_manual_sync_products(self):
+        """Botão manual para sincronizar anúncios do Mercado Livre."""
+        self.env["meli.product"].sudo().cron_fetch_items()
+        return {
+            "type": "ir.actions.client",
+            "tag": "display_notification",
+            "params": {
+                "title": "Mercado Livre",
+                "message": "Sincronização de produtos iniciada em segundo plano.",
+                "type": "success",
+                "sticky": False,
+            },
+        }

@@ -8,7 +8,7 @@ export class GuiabhCineartMovies extends Interaction {
     static selector = ".s_guiabh_cineart_movies";
 
     setup() {
-        this.isEditMode = !!this.el.closest(".o_editable");
+        this.isEditMode = this._isWebsiteEditorActive();
         if (this.isEditMode) {
             return;
         }
@@ -133,6 +133,20 @@ export class GuiabhCineartMovies extends Interaction {
         if (this.emptyEl) {
             this.emptyEl.classList.toggle("d-none", !!has_movies);
         }
+    }
+
+    _isWebsiteEditorActive() {
+        const body = document.body;
+        const html = document.documentElement;
+        const hasEditorClass =
+            body?.classList?.contains("editor_enable") ||
+            body?.classList?.contains("o_web_editor") ||
+            body?.classList?.contains("o_website_editor") ||
+            html?.classList?.contains("o_web_editor") ||
+            html?.classList?.contains("o_website_editor");
+        const hasManipulator = !!document.getElementById("oe_manipulators");
+        const hasEditableAncestor = !!this.el.closest(".o_editable, .oe_editable");
+        return hasEditorClass || hasManipulator || hasEditableAncestor;
     }
 }
 
