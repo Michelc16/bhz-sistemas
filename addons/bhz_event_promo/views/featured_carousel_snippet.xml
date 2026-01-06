@@ -9,19 +9,32 @@
                 <t t-set="snippet_key" t-value="request.env.context.get('snippet_key') or request.env.uid or 0"/>
                 <t t-set="website_id" t-value="request.env.context.get('website_id') or 0"/>
                 <t t-set="carousel_id" t-value="'guiabh_featured_%s_%s' % (snippet_key, website_id)"/>
-                <div class="guiabh-featured-carousel"
+                <div class="guiabh-featured-carousel carousel slide o_not_editable"
                      t-att-id="carousel_id"
-                     data-interval="5000">
+                     data-interval="5000"
+                     contenteditable="false">
                     <div class="carousel-inner"></div>
-                    <div class="carousel-indicators d-none"></div>
-                    <button class="carousel-control-prev d-none" type="button" data-action="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"/>
-                        <span class="visually-hidden">Anterior</span>
-                    </button>
-                    <button class="carousel-control-next d-none" type="button" data-action="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"/>
-                        <span class="visually-hidden">Próximo</span>
-                    </button>
+                    <div class="o_carousel_controllers">
+                        <button class="carousel-control-prev o_not_editable d-none"
+                                type="button"
+                                data-action="prev"
+                                aria-label="Anterior"
+                                title="Anterior"
+                                contenteditable="false">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"/>
+                            <span class="visually-hidden">Anterior</span>
+                        </button>
+                        <div class="carousel-indicators d-none"></div>
+                        <button class="carousel-control-next o_not_editable d-none"
+                                type="button"
+                                data-action="next"
+                                aria-label="Próximo"
+                                title="Próximo"
+                                contenteditable="false">
+                            <span class="carousel-control-next-icon" aria-hidden="true"/>
+                            <span class="visually-hidden">Próximo</span>
+                        </button>
+                    </div>
                 </div>
                 <div class="alert alert-secondary mb-0 text-center js-guiabh-featured-empty d-none">
                     Nenhum evento em destaque no momento.
