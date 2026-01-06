@@ -9,9 +9,6 @@ export class GuiabhCineartMovies extends Interaction {
 
     setup() {
         this.isEditMode = this._isWebsiteEditorActive();
-        if (this._shouldDisableDynamicBehavior()) {
-            return;
-        }
         this.limit = this._parseLimit(this.el.dataset.limit);
         this.orderMode = this._getOrderMode();
         this.gridEl = this.el.querySelector(".js-guiabh-cineart-grid");
@@ -41,9 +38,6 @@ export class GuiabhCineartMovies extends Interaction {
     }
 
     start() {
-        if (this._shouldDisableDynamicBehavior()) {
-            return;
-        }
         if (this.el.isConnected) {
             this.attrObserver.observe(this.el, {
                 attributes: true,
@@ -101,7 +95,7 @@ export class GuiabhCineartMovies extends Interaction {
     }
 
     async fetchAndRender() {
-        if (this._shouldDisableDynamicBehavior() || !this.gridEl) {
+        if (!this.gridEl) {
             return;
         }
         this.limit = this._parseLimit(this.el.dataset.limit);
@@ -133,6 +127,7 @@ export class GuiabhCineartMovies extends Interaction {
         if (this.emptyEl) {
             this.emptyEl.classList.toggle("d-none", !!has_movies);
         }
+        this._notifyContentChanged();
     }
 
     _isWebsiteEditorActive() {
@@ -160,9 +155,15 @@ export class GuiabhCineartMovies extends Interaction {
         return hasEditorClass || hasManipulator || hasEditableAncestor;
     }
 
-    _shouldDisableDynamicBehavior() {
-        this.isEditMode = this._isWebsiteEditorActive();
-        return this.isEditMode;
+    _notifyContentChanged() {
+        if (!this._isWebsiteEditorActive()) {
+            return;
+        }
+        this.el.dispatchEvent(
+            new CustomEvent("content_changed", {
+                bubbles: true,
+            })
+        );
     }
 }
 
