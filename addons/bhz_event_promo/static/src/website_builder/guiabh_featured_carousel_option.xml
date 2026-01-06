@@ -8,9 +8,9 @@
                        min="1000"
                        max="20000"
                        step="500"
-                       t-att-value="component.interval"
-                       t-on-input="component.onIntervalInput"
-                       t-on-change="component.onIntervalChange"
+                       t-att-value="this.interval"
+                       t-on-input="this.onIntervalInput"
+                       t-on-change="this.onIntervalChange"
                        class="form-control"/>
             </div>
         </BuilderRow>
