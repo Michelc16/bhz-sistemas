@@ -17,6 +17,7 @@ class CineartMovie(models.Model):
     _name = "guiabh.cineart.movie"
     _description = "Cineart - Filmes"
     _order = "category, name"
+    _check_company_auto = True
 
     BASE_URL = "https://cineart.com.br/"
     CINEART_ROUTES = {
@@ -46,6 +47,12 @@ class CineartMovie(models.Model):
     active = fields.Boolean(string="Ativo", default=True)
     poster_image = fields.Image(string="Cartaz (imagem)", max_width=1024, max_height=1024)
     last_sync = fields.Datetime(string="Última sincronização", readonly=True)
+    company_id = fields.Many2one(
+        "res.company",
+        string="Empresa",
+        default=lambda self: self.env.company,
+        index=True,
+    )
     website_visit_count = fields.Integer(
         string="Visualizações no site",
         default=0,
@@ -70,13 +77,22 @@ class CineartMovie(models.Model):
         return self.env["guiabh.cineart.movie"].action_sync_all_now()
 
     @api.model
-    def guiabh_get_movies(self, categories=None, limit=12, order_mode="recent"):
+    def guiabh_get_movies(self, categories=None, limit=12, order_mode="recent", company_id=None):
         domain = [("active", "=", True)]
         if categories:
             valid_codes = {code for code, _label in self._fields["category"].selection}
             filtered = [code for code in categories if code in valid_codes]
             if filtered:
                 domain.append(("category", "in", filtered))
+        companies = []
+        if company_id:
+            companies = [company_id]
+        else:
+            companies = self.env.context.get("allowed_company_ids") or [self.env.company.id]
+        if companies:
+            if False not in companies:
+                companies.append(False)
+            domain.append(("company_id", "in", companies))
         order = self._get_snippet_order(order_mode)
         return self.search(domain, order=order, limit=limit)
 

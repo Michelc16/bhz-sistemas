@@ -7,6 +7,7 @@
     "license": "LGPL-3",
     "depends": ["base", "website"],
     "data": [
+        "security/security.xml",
         "security/ir.model.access.csv",
         "data/cineart_category_data.xml",
         "data/ir_cron.xml",

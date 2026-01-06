@@ -10,6 +10,12 @@ class BhzPlaceCategory(models.Model):
     name = fields.Char(required=True, index=True)
     sequence = fields.Integer(default=10)
     active = fields.Boolean(default=True)
+    company_id = fields.Many2one(
+        "res.company",
+        string="Empresa",
+        default=lambda self: self.env.company,
+        index=True,
+    )
 
 
 class BhzPlaceTag(models.Model):
@@ -19,6 +25,12 @@ class BhzPlaceTag(models.Model):
 
     name = fields.Char(required=True, index=True)
     active = fields.Boolean(default=True)
+    company_id = fields.Many2one(
+        "res.company",
+        string="Empresa",
+        default=lambda self: self.env.company,
+        index=True,
+    )
 
 
 class BhzPlaceCity(models.Model):
@@ -30,6 +42,12 @@ class BhzPlaceCity(models.Model):
     state_id = fields.Many2one("res.country.state", string="Estado")
     country_id = fields.Many2one("res.country", string="País", default=lambda self: self.env.ref("base.br"))
     active = fields.Boolean(default=True)
+    company_id = fields.Many2one(
+        "res.company",
+        string="Empresa",
+        default=lambda self: self.env.company,
+        index=True,
+    )
 
 
 class BhzPlaceStage(models.Model):
@@ -46,6 +64,12 @@ class BhzPlaceStage(models.Model):
     fold = fields.Boolean(string="Recolher no kanban", default=False)
     color = fields.Integer(string="Cor")
     active = fields.Boolean(default=True)
+    company_id = fields.Many2one(
+        "res.company",
+        string="Empresa",
+        default=lambda self: self.env.company,
+        index=True,
+    )
 
 
 class BhzPlace(models.Model):
@@ -54,6 +78,8 @@ class BhzPlace(models.Model):
     _inherit = ["mail.thread", "mail.activity.mixin"]
     _order = "sequence, name"
     _rec_name = "name"
+
+    _check_company_auto = True
 
     # Organização / controle
     name = fields.Char(required=True, tracking=True, index=True)

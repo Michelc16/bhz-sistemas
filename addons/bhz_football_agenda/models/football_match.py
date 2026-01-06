@@ -8,6 +8,7 @@ class FootballMatch(models.Model):
     _name = "bhz.football.match"
     _description = "Jogo de Futebol"
     _order = "match_datetime asc"
+    _check_company_auto = True
 
     # Times
     home_team_id = fields.Many2one("bhz.football.team", required=True, string="Mandante")
@@ -34,6 +35,12 @@ class FootballMatch(models.Model):
     website_published = fields.Boolean(default=True, string="Publicado no site")
     active = fields.Boolean(default=True)
     external_id = fields.Char(string="ID externo", index=True)
+    company_id = fields.Many2one(
+        "res.company",
+        string="Empresa",
+        default=lambda self: self.env.company,
+        index=True,
+    )
 
     # Ajuda para filtrar por “time envolvido”
     team_ids = fields.Many2many(
@@ -59,11 +66,20 @@ class FootballMatch(models.Model):
                     raise ValidationError("Já existe um jogo com este ID externo.")
 
     @api.model
-    def guiabh_get_upcoming_matches(self, team_ids=None, limit=6, order_mode="recent"):
+    def guiabh_get_upcoming_matches(self, team_ids=None, limit=6, order_mode="recent", company_id=None):
         domain = [
             ("website_published", "=", True),
             ("active", "=", True),
         ]
+        companies = False
+        if company_id:
+            companies = [company_id]
+        else:
+            companies = self.env.context.get("allowed_company_ids") or [self.env.company.id]
+        if companies:
+            if False not in companies:
+                companies.append(False)
+            domain.append(("company_id", "in", companies))
         now = fields.Datetime.now()
         domain.append(("match_datetime", ">=", now))
         if team_ids:

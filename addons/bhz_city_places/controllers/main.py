@@ -13,13 +13,16 @@ class BhzPlacesWebsite(http.Controller):
         sitemap=True,
     )
     def places_list(self, page=1, q=None, category=None, city=None, tag=None, **kw):
+        website = request.website
+        company = website.company_id
         Place = request.env["bhz.place"].sudo()
 
         domain = [("website_published", "=", True), ("active", "=", True)]
 
         # Restringe por website quando houver multi-site
-        website = request.website
         domain += ["|", ("website_id", "=", False), ("website_id", "=", website.id)]
+        if company:
+            domain.append(("company_id", "in", [False, company.id]))
 
         if q:
             domain += ["|", ("name", "ilike", q), ("short_description", "ilike", q)]
@@ -42,9 +45,12 @@ class BhzPlacesWebsite(http.Controller):
 
         places = Place.search(domain, limit=page_size, offset=pager["offset"], order="sequence, name")
 
-        categories = request.env["bhz.place.category"].sudo().search([("active", "=", True)], order="sequence, name")
-        cities = request.env["bhz.place.city"].sudo().search([("active", "=", True)], order="name")
-        tags = request.env["bhz.place.tag"].sudo().search([("active", "=", True)], order="name")
+        extra_domain = [("active", "=", True)]
+        if company:
+            extra_domain = [("active", "=", True), ("company_id", "in", [False, company.id])]
+        categories = request.env["bhz.place.category"].sudo().search(list(extra_domain), order="sequence, name")
+        cities = request.env["bhz.place.city"].sudo().search(list(extra_domain), order="name")
+        tags = request.env["bhz.place.tag"].sudo().search(list(extra_domain), order="name")
 
         values = {
             "places": places,
@@ -67,12 +73,16 @@ class BhzPlacesWebsite(http.Controller):
         sitemap=True,
     )
     def place_detail(self, place_id, **kw):
+        website = request.website
+        company = website.company_id
         place = request.env["bhz.place"].sudo().browse(place_id)
         if not place.exists() or not place.website_published or not place.active:
             return request.not_found()
 
         # Restringe por website quando houver multi-site
-        if place.website_id and place.website_id.id != request.website.id:
+        if place.website_id and place.website_id.id != website.id:
+            return request.not_found()
+        if company and place.company_id and place.company_id.id != company.id:
             return request.not_found()
 
         return request.render("bhz_city_places.place_detail_page", {"place": place})

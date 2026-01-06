@@ -6,6 +6,7 @@
         <field name="is_published_stage" eval="False"/>
         <field name="fold" eval="False"/>
         <field name="color" eval="2"/>
+        <field name="company_id" eval="False"/>
     </record>
 
     <record id="stage_bhz_place_review" model="bhz.place.stage">
@@ -14,6 +15,7 @@
         <field name="is_published_stage" eval="False"/>
         <field name="fold" eval="False"/>
         <field name="color" eval="4"/>
+        <field name="company_id" eval="False"/>
     </record>
 
     <record id="stage_bhz_place_announced" model="bhz.place.stage">
@@ -22,5 +24,6 @@
         <field name="is_published_stage" eval="True"/>
         <field name="fold" eval="False"/>
         <field name="color" eval="6"/>
+        <field name="company_id" eval="False"/>
     </record>
 </odoo>
