@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="privilege_bhz_city_places" model="res.groups.privilege">
+            <field name="name">BHZ Locais</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="group_bhz_place_manager" model="res.groups">
+            <field name="name">BHZ Locais - Gerente</field>
+            <field name="privilege_id" ref="bhz_city_places.privilege_bhz_city_places"/>
+            <field name="implied_ids" eval="[(4, ref('group_bhz_place_editor'))]"/>
+        </record>
+
+        <record id="group_bhz_place_editor" model="res.groups">
+            <field name="name">BHZ Locais - Editor</field>
+            <field name="privilege_id" ref="bhz_city_places.privilege_bhz_city_places"/>
+        </record>
+
+        <record id="rule_bhz_place_company" model="ir.rule">
+            <field name="name">Locais por empresa</field>
+            <field name="model_id" ref="model_bhz_place"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="rule_bhz_place_category_company" model="ir.rule">
+            <field name="name">Categorias de locais por empresa</field>
+            <field name="model_id" ref="model_bhz_place_category"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="rule_bhz_place_tag_company" model="ir.rule">
+            <field name="name">Tags de locais por empresa</field>
+            <field name="model_id" ref="model_bhz_place_tag"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="rule_bhz_place_city_company" model="ir.rule">
+            <field name="name">Cidades de locais por empresa</field>
+            <field name="model_id" ref="model_bhz_place_city"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="rule_bhz_place_stage_company" model="ir.rule">
+            <field name="name">Etapas de locais por empresa</field>
+            <field name="model_id" ref="model_bhz_place_stage"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+    </data>
+</odoo>

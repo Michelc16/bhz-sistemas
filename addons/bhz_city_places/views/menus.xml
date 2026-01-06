@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_bhz_places_root" name="Guia de Locais" sequence="10"
+              groups="base.group_system"/>
+
+    <menuitem id="menu_bhz_places" name="Locais" parent="menu_bhz_places_root"
+              action="action_bhz_places" sequence="10"/>
+
+    <menuitem id="menu_bhz_places_cities" name="Cidades" parent="menu_bhz_places_root"
+              action="action_bhz_place_cities" sequence="20"/>
+
+    <menuitem id="menu_bhz_places_categories" name="Categorias" parent="menu_bhz_places_root"
+              action="action_bhz_place_categories" sequence="30"/>
+
+    <menuitem id="menu_bhz_places_tags" name="Tags" parent="menu_bhz_places_root"
+              action="action_bhz_place_tags" sequence="40"/>
+</odoo>

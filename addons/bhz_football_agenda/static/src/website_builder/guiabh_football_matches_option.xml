@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="bhz_football_agenda.GuiabhFootballMatchesOption" name="Jogos de Futebol">
+        <BuilderRow label.translate="Quantidade de itens">
+            <BuilderNumberInput
+                dataAttributeAction="'limit'"
+                min="1"
+                max="24"
+            />
+        </BuilderRow>
+        <BuilderRow label.translate="Ordenação">
+            <BuilderSelect dataAttributeAction="'orderMode'">
+                <BuilderSelectItem dataAttributeActionValue="'recent'">
+                    Próximos jogos
+                </BuilderSelectItem>
+                <BuilderSelectItem dataAttributeActionValue="'popular'">
+                    Mais visualizados
+                </BuilderSelectItem>
+            </BuilderSelect>
+        </BuilderRow>
+        <BuilderRow label.translate="Times">
+            <BuilderMany2Many
+                model="'bhz.football.team'"
+                fields="['name']"
+                dataAttributeAction="'teamIds'"
+            />
+        </BuilderRow>
+    </t>
+
+</templates>

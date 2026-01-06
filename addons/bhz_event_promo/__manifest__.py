@@ -13,6 +13,7 @@
         "views/event_views.xml",
         "views/website_menu.xml",
         "views/templates.xml",
+        "views/announced_events_snippet.xml",
         "views/featured_carousel_snippet.xml",
         "views/snippets/options.xml",
         "views/bhz_event_import_views.xml",
@@ -21,6 +22,10 @@
         "web.assets_frontend": [
             "bhz_event_promo/static/src/scss/guiabh_event.scss",
             "bhz_event_promo/static/src/js/guiabh_featured_carousel.js",
+            "bhz_event_promo/static/src/js/guiabh_announced_events.js",
+        ],
+        "website.website_builder_assets": [
+            "bhz_event_promo/static/src/website_builder/**/*",
         ],
     },
     "installable": True,

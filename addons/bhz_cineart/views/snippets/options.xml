@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="bhz_cineart_snippets" inherit_id="website.snippets" name="GuiaBH Cineart - Snippets">
+        <xpath expr="//snippets[@id='snippet_structure']/*[1]" position="before">
+            <t t-snippet="bhz_cineart.s_guiabh_cineart_movies"
+               string="GuiaBH - Filmes Cineart"
+               group="content">
+                <keywords>guiabh cineart filmes cinema cartaz estreia</keywords>
+            </t>
+        </xpath>
+    </template>
+</odoo>

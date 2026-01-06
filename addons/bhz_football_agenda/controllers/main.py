@@ -1,4 +1,5 @@
 from collections import OrderedDict
+import json
 from datetime import datetime, time, timedelta
 from urllib.parse import urlencode
 
@@ -17,10 +18,19 @@ class BhzFootballAgendaController(http.Controller):
         "/futebol/agenda/<string:team_slug>",
     ], type="http", auth="public", website=True, sitemap=True)
     def football_agenda(self, team_slug=None, **kwargs):
+        website = request.website
+        company = website.company_id
+        company_domain = []
+        if company:
+            company_domain = [("company_id", "in", [False, company.id])]
+
         Team = request.env["bhz.football.team"].sudo()
         Match = request.env["bhz.football.match"].sudo()
 
-        teams = Team.search([("website_published", "=", True), ("active", "=", True)], order="name asc")
+        teams = Team.search(
+            [("website_published", "=", True), ("active", "=", True)] + company_domain,
+            order="name asc",
+        )
         featured_slugs = ["cruzeiro", "atletico-mg", "america-mg"]
         slug_map = {team.slug: team for team in teams}
         featured_teams = [slug_map[slug] for slug in featured_slugs if slug in slug_map]
@@ -34,7 +44,10 @@ class BhzFootballAgendaController(http.Controller):
         ]
 
         if team_slug:
-            selected_team = Team.search([("slug", "=", team_slug), ("website_published", "=", True), ("active", "=", True)], limit=1)
+            selected_team = Team.search(
+                [("slug", "=", team_slug), ("website_published", "=", True), ("active", "=", True)] + company_domain,
+                limit=1,
+            )
             if selected_team:
                 domain.append(("team_ids", "in", selected_team.id))
 
@@ -86,6 +99,9 @@ class BhzFootballAgendaController(http.Controller):
         )
         if not has_filters:
             domain.append(("match_datetime", ">=", fields.Datetime.to_string(fields.Datetime.now())))
+
+        if company_domain:
+            domain += list(company_domain)
 
         matches = Match.search(domain, order="match_datetime asc", limit=100)
 
@@ -210,6 +226,8 @@ class BhzFootballAgendaController(http.Controller):
             ("website_published", "=", True),
             ("active", "=", True),
         ]
+        if company_domain:
+            base_comp_domain += company_domain
         competition_groups = Match.read_group(base_comp_domain, ["competition"], ["competition"])
         competitions = sorted(filter(None, (grp["competition"] for grp in competition_groups)))
 
@@ -224,3 +242,61 @@ class BhzFootballAgendaController(http.Controller):
                 "filters": filters,
             },
         )
+
+    @http.route(
+        "/bhz_football/snippet/matches",
+        type="json",
+        auth="public",
+        website=True,
+    )
+    def snippet_matches_data(self, team_ids=None, limit=6, order_mode="recent"):
+        limit = self._sanitize_limit(limit)
+        order_mode = self._sanitize_order_mode(order_mode)
+        parsed_team_ids = self._parse_team_ids(team_ids)
+        Match = request.env["bhz.football.match"].sudo()
+        company = request.website.company_id
+        company_id = company and company.id or False
+        matches = Match.guiabh_get_upcoming_matches(
+            team_ids=parsed_team_ids,
+            limit=limit,
+            order_mode=order_mode,
+            company_id=company_id,
+        )
+        cards = Match._prepare_match_card_data(matches)
+        html = request.env["ir.ui.view"]._render_template(
+            "bhz_football_agenda.guiabh_football_match_cards",
+            {"matches_data": cards},
+        )
+        return {"html": html, "has_matches": bool(cards)}
+
+    def _sanitize_limit(self, limit):
+        try:
+            limit_value = int(limit)
+        except (ValueError, TypeError):
+            limit_value = 6
+        return max(1, min(limit_value, 20))
+
+    def _sanitize_order_mode(self, order_mode):
+        if isinstance(order_mode, str):
+            lowered = order_mode.lower()
+            if lowered in ("recent", "popular"):
+                return lowered
+        return "recent"
+
+    def _parse_team_ids(self, team_ids):
+        if isinstance(team_ids, str):
+            try:
+                team_ids = json.loads(team_ids)
+            except ValueError:
+                team_ids = []
+        parsed = []
+        for entry in team_ids or []:
+            try:
+                if isinstance(entry, dict):
+                    entry = entry.get("id")
+                entry_id = int(entry)
+            except (ValueError, TypeError):
+                continue
+            if entry_id:
+                parsed.append(entry_id)
+        return parsed

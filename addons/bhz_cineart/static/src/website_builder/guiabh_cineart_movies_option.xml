@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="bhz_cineart.GuiabhCineartMoviesOption" name="Filmes Cineart">
+        <BuilderRow label.translate="Quantidade de itens">
+            <BuilderNumberInput
+                dataAttributeAction="'limit'"
+                min="1"
+                max="24"
+            />
+        </BuilderRow>
+        <BuilderRow label.translate="Ordenação">
+            <BuilderSelect dataAttributeAction="'orderMode'">
+                <BuilderSelectItem dataAttributeActionValue="'recent'">
+                    Publicações recentes
+                </BuilderSelectItem>
+                <BuilderSelectItem dataAttributeActionValue="'popular'">
+                    Publicações mais visualizadas
+                </BuilderSelectItem>
+            </BuilderSelect>
+        </BuilderRow>
+        <BuilderRow label.translate="Categorias">
+            <BuilderMany2Many
+                model="'guiabh.cineart.category'"
+                fields="['name']"
+                dataAttributeAction="'categoryIds'"
+            />
+        </BuilderRow>
+    </t>
+
+</templates>

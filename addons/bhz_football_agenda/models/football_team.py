@@ -9,6 +9,12 @@ class FootballTeam(models.Model):
     name = fields.Char(required=True)
     slug = fields.Char(required=True, index=True)
     active = fields.Boolean(default=True)
+    company_id = fields.Many2one(
+        "res.company",
+        string="Empresa",
+        default=lambda self: self.env.company,
+        index=True,
+    )
 
     logo = fields.Image(string="Logo", max_width=512, max_height=512)
     website_published = fields.Boolean(default=True, string="Publicado no site")

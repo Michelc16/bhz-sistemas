@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_bhz_place_tree" model="ir.ui.view">
+        <field name="name">bhz.place.tree</field>
+        <field name="model">bhz.place</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="stage_id"/>
+                <field name="category_id"/>
+                <field name="city_id"/>
+                <field name="neighborhood"/>
+                <field name="website_published"/>
+                <field name="website_id"/>
+                <field name="company_id"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_bhz_place_form" model="ir.ui.view">
+        <field name="name">bhz.place.form</field>
+        <field name="model">bhz.place</field>
+        <field name="arch" type="xml">
+            <form string="Local">
+                <header>
+                    <button name="action_open_website"
+                            string="Abrir no site"
+                            type="object"
+                            class="btn btn-primary"
+                            invisible="not website_published"/>
+                    <field name="stage_id" widget="statusbar" options="{'clickable': True}"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Nome do local"/></h1>
+                        <div class="o_row gap-2 align-items-center">
+                            <label for="website_published" class="o_form_label">Publicado no site</label>
+                            <field name="website_published" class="oe_inline"/>
+                            <label for="active" class="o_form_label ms-3">Registro ativo</label>
+                            <field name="active" class="oe_inline"/>
+                        </div>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="category_id" domain="[('company_id','in', [False, company_id])]" />
+                            <field name="stage_id" domain="[('company_id','in', [False, company_id])]" />
+                            <field name="tag_ids" widget="many2many_tags" domain="[('company_id','in', [False, company_id])]" />
+                            <field name="city_id" domain="[('company_id','in', [False, company_id])]" />
+                            <field name="neighborhood"/>
+                            <field name="opening_hours"/>
+                            <field name="price_range"/>
+                        </group>
+                        <group>
+                            <field name="website_id"/>
+                            <field name="company_id"/>
+                            <field name="sequence"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Conteúdo">
+                            <group>
+                                <field name="short_description" widget="html"/>
+                            </group>
+                            <field name="description_html" widget="html"/>
+                        </page>
+
+                        <page string="Imagem">
+                            <field name="image_1920" widget="image" class="oe_avatar"
+                                   options="{'preview_image': 'image_1920'}"/>
+                        </page>
+
+                        <page string="Contato/Endereço">
+                            <group>
+                                <group>
+                                    <field name="phone"/>
+                                    <field name="mobile"/>
+                                    <field name="email"/>
+                                    <field name="website"/>
+                                </group>
+                                <group>
+                                    <field name="street"/>
+                                    <field name="street2"/>
+                                    <field name="zip"/>
+                                    <field name="maps_url"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Geolocalização">
+                            <group>
+                                <field name="latitude"/>
+                                <field name="longitude"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_bhz_place_search" model="ir.ui.view">
+        <field name="name">bhz.place.search</field>
+        <field name="model">bhz.place</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" string="Nome"/>
+                <field name="category_id"/>
+                <field name="city_id"/>
+                <field name="tag_ids"/>
+                <filter string="Publicados" name="published" domain="[('website_published','=',True)]"/>
+                <filter string="Arquivados" name="archived" domain="[('active','=',False)]"/>
+                <separator/>
+                <filter string="Etapa" name="group_stage" context="{'group_by': 'stage_id'}"/>
+                <filter string="Categoria" name="group_category" context="{'group_by': 'category_id'}"/>
+                <filter string="Cidade" name="group_city" context="{'group_by': 'city_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_bhz_places" model="ir.actions.act_window">
+        <field name="name">Locais</field>
+        <field name="res_model">bhz.place</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_bhz_place_search"/>
+        <field name="context">{}</field>
+    </record>
+
+    <record id="action_bhz_place_categories" model="ir.actions.act_window">
+        <field name="name">Categorias</field>
+        <field name="res_model">bhz.place.category</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_bhz_place_tags" model="ir.actions.act_window">
+        <field name="name">Tags</field>
+        <field name="res_model">bhz.place.tag</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_bhz_place_cities" model="ir.actions.act_window">
+        <field name="name">Cidades</field>
+        <field name="res_model">bhz.place.city</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

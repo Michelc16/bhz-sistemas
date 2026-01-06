@@ -1,0 +1,32 @@
+.s_guiabh_cineart_movies {
+  background-color: rgba(0, 0, 0, 0.02);
+
+  .guiabh-cineart-card {
+    border-radius: 18px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: #fff;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  }
+
+  .guiabh-cineart-cover {
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+
+  .guiabh-cineart-cover.placeholder {
+    height: 260px;
+  }
+
+  .guiabh-cineart-body {
+    padding: 1.25rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+}

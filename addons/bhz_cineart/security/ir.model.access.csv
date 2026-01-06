@@ -1,2 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_guiabh_cineart_movie_user,access_guiabh_cineart_movie_user,model_guiabh_cineart_movie,base.group_user,1,1,1,1
+access_guiabh_cineart_category_user,access_guiabh_cineart_category_user,model_guiabh_cineart_category,base.group_user,1,0,0,0

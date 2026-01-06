@@ -13,6 +13,11 @@
                group="guiabh">
                 <keywords>guiabh carrossel destaque destaques evento eventos</keywords>
             </t>
+            <t t-snippet="bhz_event_promo.s_guiabh_announced_events"
+               string="GuiaBH - Eventos Anunciados"
+               group="guiabh">
+                <keywords>guiabh eventos anunciados cards lista agenda</keywords>
+            </t>
         </xpath>
     </template>
 </odoo>

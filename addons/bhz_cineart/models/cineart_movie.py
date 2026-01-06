@@ -17,6 +17,7 @@ class CineartMovie(models.Model):
     _name = "guiabh.cineart.movie"
     _description = "Cineart - Filmes"
     _order = "category, name"
+    _check_company_auto = True
 
     BASE_URL = "https://cineart.com.br/"
     CINEART_ROUTES = {
@@ -46,6 +47,17 @@ class CineartMovie(models.Model):
     active = fields.Boolean(string="Ativo", default=True)
     poster_image = fields.Image(string="Cartaz (imagem)", max_width=1024, max_height=1024)
     last_sync = fields.Datetime(string="Última sincronização", readonly=True)
+    company_id = fields.Many2one(
+        "res.company",
+        string="Empresa",
+        default=lambda self: self.env.company,
+        index=True,
+    )
+    website_visit_count = fields.Integer(
+        string="Visualizações no site",
+        default=0,
+        help="Controle opcional de popularidade para ordenar os destaques.",
+    )
 
     _sql_constraints = [
         ("cineart_url_unique", "unique(cineart_url)", "Já existe um filme com este link do Cineart."),
@@ -65,8 +77,33 @@ class CineartMovie(models.Model):
         return self.env["guiabh.cineart.movie"].action_sync_all_now()
 
     @api.model
+    def guiabh_get_movies(self, categories=None, limit=12, order_mode="recent", company_id=None):
+        domain = [("active", "=", True)]
+        if categories:
+            valid_codes = {code for code, _label in self._fields["category"].selection}
+            filtered = [code for code in categories if code in valid_codes]
+            if filtered:
+                domain.append(("category", "in", filtered))
+        companies = []
+        if company_id:
+            companies = [company_id]
+        else:
+            companies = self.env.context.get("allowed_company_ids") or [self.env.company.id]
+        if companies:
+            domain.append(("company_id", "in", companies))
+        order = self._get_snippet_order(order_mode)
+        return self.search(domain, order=order, limit=limit)
+
+    def _get_snippet_order(self, order_mode):
+        allowed = (order_mode or "recent").lower()
+        if allowed == "popular":
+            return "website_visit_count desc, category asc, name asc, id desc"
+        return "category asc, name asc, id desc"
+
+    @api.model
     def action_sync_all_now(self):
-        results = self.sudo()._run_sync(raise_on_error=True)
+        company = self.env.company
+        results = self.sudo()._run_sync(company=company, raise_on_error=True)
         return self._build_sync_notification(results, _("Sincronização concluída"))
 
     def _build_sync_notification(self, results, title):
@@ -98,16 +135,23 @@ class CineartMovie(models.Model):
 
     @api.model
     def cron_sync_all(self):
-        results = self.sudo()._run_sync(raise_on_error=False)
-        for entry in results:
-            if entry["valid"]:
-                _logger.info(
-                    "Cineart cron sync OK: categoria=%(cat)s total=%(count)s criados=%(created)s atualizados=%(updated)s inativados=%(inactive)s",
-                    entry,
+        companies = self.env["res.company"].search([])
+        aggregated = []
+        for company in companies:
+            sync_results = self.sudo()._run_sync(company=company, raise_on_error=False)
+            aggregated.extend(sync_results)
+            for entry in sync_results:
+                log_fun = _logger.info if entry.get("valid") else _logger.warning
+                log_fun(
+                    "Cineart cron sync (%s) categoria=%s total=%s criados=%s atualizados=%s inativados=%s",
+                    company.name,
+                    entry.get("cat"),
+                    entry.get("count"),
+                    entry.get("created"),
+                    entry.get("updated"),
+                    entry.get("inactive"),
                 )
-            else:
-                _logger.warning("Cineart cron sync falhou/parcial para %(cat)s (itens=%(count)s)", entry)
-        return results
+        return aggregated
 
     @api.model
     def sync_category(self, category):
@@ -230,7 +274,19 @@ class CineartMovie(models.Model):
             "inactivated": inactivated,
         }
 
-    def _run_sync(self, raise_on_error=False):
+    def _run_sync(self, company=None, raise_on_error=False):
+        company = company or self.env.company
+        if not company:
+            return []
+        allowed_company_ids = [company.id]
+        self.env["guiabh.cineart.category"].sudo()._ensure_company_categories(company)
+        env = self.with_company(company).with_context(
+            allowed_company_ids=allowed_company_ids,
+            force_company=company.id,
+        )
+        return env._run_sync_internal(raise_on_error=raise_on_error)
+
+    def _run_sync_internal(self, raise_on_error=False):
         categories = [
             ("now", _("Em cartaz")),
             ("premiere", _("Estreias da semana")),

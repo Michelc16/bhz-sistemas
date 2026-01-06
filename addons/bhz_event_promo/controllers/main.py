@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import calendar
+import json
 import logging
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from datetime import date, datetime, time, timedelta
 
 from babel.dates import format_date
@@ -57,8 +58,6 @@ class GuiaBHAgendaController(http.Controller):
 
         venues = self._get_available_venues(base_domain)
         categories = request.env["event.type"].sudo().search([], order="name asc")
-        tags = request.env["event.tag"].sudo().search([], order="name asc")
-
         base_path = request.httprequest.path
         base_params, multi_params = self._build_base_query(filters)
         view_urls = self._build_view_urls(base_path, base_params, multi_params, filters)
@@ -73,13 +72,12 @@ class GuiaBHAgendaController(http.Controller):
             "featured_filter": filters["featured"],
             "neighborhood_filter": filters["neighborhood"],
             "venue_filter": filters["venue_id"],
-            "tag_filter": filters["tag_ids"],
-            "available_tags": tags,
             "available_venues": venues,
             "filter_action": base_path,
             "view_urls": view_urls,
             "base_query": base_params,
             "multi_query": multi_params,
+            "category_groups": [],
         }
 
         if filters["view"] == self.MONTH_VIEW:
@@ -88,6 +86,8 @@ class GuiaBHAgendaController(http.Controller):
         elif filters["view"] == self.WEEK_VIEW:
             week_info = self._build_week_info(events, filters, base_path, base_params, multi_params)
             context.update({"week_info": week_info})
+        elif filters["view"] == self.LIST_VIEW:
+            context["category_groups"] = self._group_events_by_category(events)
 
         return request.render("bhz_event_promo.bhz_agenda_page", context)
 
@@ -131,8 +131,6 @@ class GuiaBHAgendaController(http.Controller):
         featured = (args.get("featured") or "").lower() in ("1", "true", "yes", "y", "sim")
         neighborhood = (args.get("neighborhood") or "").strip()
         venue_id = self._parse_int(args.get("venue"))
-        tag_ids = [tag_id for tag_id in (self._parse_int(v) for v in args.getlist("tag")) if tag_id]
-
         filters = {
             "view": view,
             "category_id": category_id,
@@ -141,7 +139,6 @@ class GuiaBHAgendaController(http.Controller):
             "featured": featured,
             "neighborhood": neighborhood,
             "venue_id": venue_id,
-            "tag_ids": tag_ids,
         }
 
         if view == self.MONTH_VIEW:
@@ -205,6 +202,60 @@ class GuiaBHAgendaController(http.Controller):
             },
         )
 
+    @http.route(
+        "/bhz_event_promo/snippet/announced_events",
+        type="json",
+        auth="public",
+        website=True,
+    )
+    def snippet_announced_events_data(self, category_ids=None, limit=12, order_mode="recent"):
+        limit = self._sanitize_limit(limit)
+        order_mode = self._sanitize_order_mode(order_mode)
+        parsed_category_ids = self._parse_category_ids(category_ids)
+        events = (
+            request.env["event.event"]
+            .sudo()
+            .guiabh_get_announced_events(limit=limit, category_ids=parsed_category_ids, order_mode=order_mode)
+        )
+        html = request.env["ir.ui.view"]._render_template(
+            "bhz_event_promo.guiabh_announced_events_cards",
+            {"events": events},
+        )
+        return {"html": html, "has_events": bool(events)}
+
+    def _sanitize_limit(self, limit):
+        try:
+            limit_value = int(limit)
+        except (ValueError, TypeError):
+            limit_value = 12
+        return max(1, min(limit_value, 24))
+
+    def _sanitize_order_mode(self, order_mode):
+        if isinstance(order_mode, str):
+            lowered = order_mode.lower()
+            if lowered in ("recent", "popular"):
+                return lowered
+        return "recent"
+
+    def _parse_category_ids(self, category_ids):
+        raw_ids = category_ids or []
+        if isinstance(raw_ids, str):
+            try:
+                raw_ids = json.loads(raw_ids)
+            except ValueError:
+                raw_ids = []
+        parsed = []
+        for entry in raw_ids:
+            if isinstance(entry, dict):
+                entry = entry.get("id")
+            try:
+                entry_id = int(entry)
+            except (ValueError, TypeError):
+                continue
+            if entry_id:
+                parsed.append(entry_id)
+        return parsed
+
     def _build_domain(self, filters, base_domain=None):
         domain = list(base_domain or self._base_agenda_domain())
         if filters["category_id"]:
@@ -221,8 +272,6 @@ class GuiaBHAgendaController(http.Controller):
             domain.append(("neighborhood", "ilike", filters["neighborhood"]))
         if filters["venue_id"]:
             domain.append(("venue_partner_id", "=", filters["venue_id"]))
-        for tag_id in filters["tag_ids"]:
-            domain.append(("tag_ids", "in", tag_id))
         return domain
 
     def _build_month_info(self, events, filters, base_path, base_params, multi_params):
@@ -344,6 +393,33 @@ class GuiaBHAgendaController(http.Controller):
                 day_cursor += timedelta(days=1)
         return mapping
 
+    def _group_events_by_category(self, events):
+        groups = OrderedDict()
+        for event in events:
+            category = event.promo_category_id or getattr(event, "event_type_id", False)
+            category_id = category.id if category else False
+            key = category_id or 0
+            if key not in groups:
+                groups[key] = {
+                    "category_id": category_id,
+                    "category": category,
+                    "category_name": category.name if category else "Outros eventos",
+                    "events": [],
+                }
+            groups[key]["events"].append(event)
+
+        def sort_key(group):
+            category = group["category"]
+            if category:
+                sequence = getattr(category, "sequence", 0) or 0
+                name = (category.name or "").lower()
+            else:
+                sequence = 9999
+                name = "zzz"
+            return (sequence, name)
+
+        return sorted(groups.values(), key=sort_key)
+
     def _build_base_query(self, filters):
         params = {}
         if filters["category_id"]:
@@ -359,8 +435,6 @@ class GuiaBHAgendaController(http.Controller):
         if filters["venue_id"]:
             params["venue"] = str(filters["venue_id"])
         multi = {}
-        if filters["tag_ids"]:
-            multi["tag"] = [str(tag_id) for tag_id in filters["tag_ids"]]
         return params, multi
 
     def _serialize_for_log(self, events):

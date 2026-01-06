@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="rule_guiabh_cineart_movie_company" model="ir.rule">
+            <field name="name">Filmes Cineart por empresa</field>
+            <field name="model_id" ref="model_guiabh_cineart_movie"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        <record id="rule_guiabh_cineart_category_company" model="ir.rule">
+            <field name="name">Categorias Cineart por empresa</field>
+            <field name="model_id" ref="model_guiabh_cineart_category"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+    </data>
+</odoo>
