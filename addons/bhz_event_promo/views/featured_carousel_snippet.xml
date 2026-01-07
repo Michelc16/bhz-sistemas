@@ -13,9 +13,11 @@
                 <t t-set="website_id" t-value="request.env.context.get('website_id') or 0"/>
                 <t t-set="carousel_id" t-value="'guiabh_featured_%s_%s' % (snippet_key, website_id)"/>
                 <t t-set="carousel_target" t-value="'#%s' % carousel_id"/>
-                <div class="guiabh-featured-carousel"
+                <div class="guiabh-featured-carousel carousel slide"
                      t-att-id="carousel_id"
                      data-interval="5000"
+                     data-bs-ride="false"
+                     data-bs-interval="5000"
                      contenteditable="false">
                     <div class="carousel-inner">
                         <t t-call="bhz_event_promo.guiabh_featured_carousel_slides">
@@ -31,6 +33,8 @@
                                 t-attf-class="carousel-control-prev #{'d-none' if len(events) &lt;= 1 else ''}"
                                 type="button"
                                 data-action="prev"
+                                data-bs-slide="prev"
+                                t-attf-data-bs-target="{{ carousel_target }}"
                                 aria-label="Anterior"
                                 title="Anterior"
                                 contenteditable="false">
@@ -48,6 +52,8 @@
                                 t-attf-class="carousel-control-next #{'d-none' if len(events) &lt;= 1 else ''}"
                                 type="button"
                                 data-action="next"
+                                data-bs-slide="next"
+                                t-attf-data-bs-target="{{ carousel_target }}"
                                 aria-label="Próximo"
                                 title="Próximo"
                                 contenteditable="false">
@@ -80,6 +86,7 @@
         <t t-foreach="events" t-as="event" t-index="idx">
             <button type="button"
                     t-att-data-slide-to="idx"
+                    t-attf-data-bs-target="{{ carousel_target or '' }}"
                     t-attf-class="#{'active' if idx == 0 else ''}"></button>
         </t>
     </template>
