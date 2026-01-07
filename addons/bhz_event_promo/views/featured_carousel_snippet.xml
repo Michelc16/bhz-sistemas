@@ -27,8 +27,8 @@
                         </t>
                     </div>
                     <div class="o_carousel_controllers">
-                        <button class="carousel-control-prev o_not_editable"
-                                t-attf-class="carousel-control-prev o_not_editable #{'d-none' if len(events) &lt;= 1 else ''}"
+                        <button class="carousel-control-prev"
+                                t-attf-class="carousel-control-prev #{'d-none' if len(events) &lt;= 1 else ''}"
                                 type="button"
                                 data-action="prev"
                                 aria-label="Anterior"
@@ -44,8 +44,8 @@
                                 <t t-set="carousel_target" t-value="carousel_target"/>
                             </t>
                         </div>
-                        <button class="carousel-control-next o_not_editable"
-                                t-attf-class="carousel-control-next o_not_editable #{'d-none' if len(events) &lt;= 1 else ''}"
+                        <button class="carousel-control-next"
+                                t-attf-class="carousel-control-next #{'d-none' if len(events) &lt;= 1 else ''}"
                                 type="button"
                                 data-action="next"
                                 aria-label="Próximo"
