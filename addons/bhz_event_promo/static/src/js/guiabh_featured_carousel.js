@@ -35,7 +35,7 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
     },
 
     async _fetchSlides() {
-        const params = { limit: this.limit };
+        const params = { limit: this.limit, carousel_id: this.el.id };
         try {
             const payload = await rpc("/bhz_event_promo/snippet/featured_events", params);
             if (!payload || this.isDestroyed) {
@@ -55,6 +55,10 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         if (this.indicatorsWrapper && typeof indicators === "string") {
             this.indicatorsWrapper.innerHTML = indicators;
         }
+        this.carouselInner = this.el.querySelector(".carousel-inner");
+        this.indicatorsWrapper = this.el.querySelector(".carousel-indicators");
+        this.prevButton = this.el.querySelector('[data-action="prev"]');
+        this.nextButton = this.el.querySelector('[data-action="next"]');
         this.items = Array.from(this.carouselInner?.querySelectorAll(".carousel-item") || []);
         this.indicators = Array.from(this.indicatorsWrapper?.querySelectorAll("[data-slide-to]") || []);
         this.currentIndex = 0;
@@ -85,28 +89,32 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
     },
 
     _bindControls() {
-        this.prevButton?.addEventListener('click', (ev) => {
-            ev.preventDefault();
-            this._show(this.currentIndex - 1);
-            this._restartAutoplay();
-        });
-        this.nextButton?.addEventListener('click', (ev) => {
-            ev.preventDefault();
-            this._show(this.currentIndex + 1);
-            this._restartAutoplay();
-        });
-        this.el.addEventListener('click', (ev) => {
-            const indicator = ev.target.closest('[data-slide-to]');
-            if (!indicator || !this.indicators.includes(indicator)) {
+        this._controlsHandler = (ev) => {
+            const prev = ev.target.closest('[data-action="prev"]');
+            if (prev && this.el.contains(prev)) {
+                ev.preventDefault();
+                this._show(this.currentIndex - 1);
+                this._restartAutoplay();
                 return;
             }
-            ev.preventDefault();
-            const idx = this.indicators.indexOf(indicator);
-            if (idx >= 0) {
-                this._show(idx);
+            const next = ev.target.closest('[data-action="next"]');
+            if (next && this.el.contains(next)) {
+                ev.preventDefault();
+                this._show(this.currentIndex + 1);
                 this._restartAutoplay();
+                return;
             }
-        });
+            const indicator = ev.target.closest('[data-slide-to]');
+            if (indicator && this.indicators.includes(indicator)) {
+                ev.preventDefault();
+                const idx = this.indicators.indexOf(indicator);
+                if (idx >= 0) {
+                    this._show(idx);
+                    this._restartAutoplay();
+                }
+            }
+        };
+        this.el.addEventListener('click', this._controlsHandler);
     },
 
     _startAutoplay() {
@@ -161,6 +169,9 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         }
         if (this._intervalListener) {
             this.el.removeEventListener("guiabh-featured-interval-update", this._intervalListener);
+        }
+        if (this._controlsHandler) {
+            this.el.removeEventListener('click', this._controlsHandler);
         }
         return this._super(...arguments);
     },

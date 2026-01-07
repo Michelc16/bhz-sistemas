@@ -12,6 +12,7 @@
                 <t t-set="snippet_key" t-value="request.env.context.get('snippet_key') or request.env.uid or 0"/>
                 <t t-set="website_id" t-value="request.env.context.get('website_id') or 0"/>
                 <t t-set="carousel_id" t-value="'guiabh_featured_%s_%s' % (snippet_key, website_id)"/>
+                <t t-set="carousel_target" t-value="'#%s' % carousel_id"/>
                 <div class="guiabh-featured-carousel carousel slide o_not_editable"
                      t-att-id="carousel_id"
                      data-interval="5000"
@@ -21,6 +22,7 @@
                     <div class="carousel-inner">
                         <t t-call="bhz_event_promo.guiabh_featured_carousel_slides">
                             <t t-set="events" t-value="events"/>
+                            <t t-set="carousel_target" t-value="carousel_target"/>
                         </t>
                         <t t-if="events">
                             <script type="text/javascript">document.currentScript.parentElement.firstElementChild?.classList.add('active');</script>
@@ -31,6 +33,7 @@
                                 t-attf-class="carousel-control-prev o_not_editable #{'d-none' if len(events) &lt;= 1 else ''}"
                                 type="button"
                                 data-action="prev"
+                                t-attf-data-bs-target="{{ carousel_target }}"
                                 aria-label="Anterior"
                                 title="Anterior"
                                 contenteditable="false">
@@ -40,12 +43,14 @@
                         <div t-attf-class="carousel-indicators #{'' if len(events) &gt; 1 else 'd-none'}">
                             <t t-call="bhz_event_promo.guiabh_featured_carousel_indicators">
                                 <t t-set="events" t-value="events"/>
+                                <t t-set="carousel_target" t-value="carousel_target"/>
                             </t>
                         </div>
                         <button class="carousel-control-next o_not_editable"
                                 t-attf-class="carousel-control-next o_not_editable #{'d-none' if len(events) &lt;= 1 else ''}"
                                 type="button"
                                 data-action="next"
+                                t-attf-data-bs-target="{{ carousel_target }}"
                                 aria-label="Próximo"
                                 title="Próximo"
                                 contenteditable="false">
@@ -77,6 +82,7 @@
         <t t-foreach="events" t-as="event" t-index="idx">
             <button type="button"
                     t-att-data-slide-to="idx"
+                    t-attf-data-bs-target="{{ carousel_target or '' }}"
                     t-attf-class="#{'active' if idx == 0 else ''}"></button>
         </t>
     </template>
