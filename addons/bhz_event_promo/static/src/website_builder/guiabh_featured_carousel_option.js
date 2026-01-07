@@ -42,7 +42,12 @@ class GuiabhFeaturedCarouselOption extends BaseOptionComponent {
 
     _applyInterval(value) {
         const section = this.el;
-        const carousel = section.querySelector(".guiabh-featured-carousel");
+        if (!section) {
+            return;
+        }
+        const carousel = section.querySelector
+            ? section.querySelector(".guiabh-featured-carousel")
+            : null;
         const valStr = String(value);
         section.dataset.interval = valStr;
         if (carousel) {
