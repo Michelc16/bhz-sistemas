@@ -302,7 +302,8 @@
                                      t-att-src="'/web/image/event.event/%s/promo_cover_image' % event.id"
                                      t-att-alt="event.name"/>
                             </t>
-                            <t t-elif="event.image_1920">
+                            <t t-set="event_image_1920" t-value="getattr(event, 'image_1920', False)"/>
+                            <t t-elif="event_image_1920">
                                 <img class="img-fluid bhz-event-detail-cover"
                                      t-att-src="'/web/image/event.event/%s/image_1920' % event.id"
                                      t-att-alt="event.name"/>
