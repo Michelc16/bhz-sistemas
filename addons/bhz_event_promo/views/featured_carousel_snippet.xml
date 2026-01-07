@@ -13,7 +13,7 @@
                 <t t-set="website_id" t-value="request.env.context.get('website_id') or 0"/>
                 <t t-set="carousel_id" t-value="'guiabh_featured_%s_%s' % (snippet_key, website_id)"/>
                 <t t-set="carousel_target" t-value="'#%s' % carousel_id"/>
-                <div class="guiabh-featured-carousel slide"
+                <div class="guiabh-featured-carousel"
                      t-att-id="carousel_id"
                      data-interval="5000"
                      contenteditable="false">
