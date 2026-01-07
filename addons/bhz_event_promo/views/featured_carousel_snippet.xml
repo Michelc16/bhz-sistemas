@@ -17,7 +17,7 @@
                      t-att-id="carousel_id"
                      data-interval="5000"
                      data-bs-interval="5000"
-                     data-bs-ride="carousel"
+                     data-bs-ride="false"
                      contenteditable="false">
                     <div class="carousel-inner">
                         <t t-call="bhz_event_promo.guiabh_featured_carousel_slides">
