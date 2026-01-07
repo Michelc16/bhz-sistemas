@@ -297,8 +297,9 @@
                 <div class="bg-white shadow-sm rounded-4 p-4 p-lg-5">
                     <div class="bhz-event-hero mb-4">
                         <div class="bhz-event-cover-wrapper rounded-4">
-                            <t t-set="event_image_1920" t-value="getattr(event, 'image_1920', False)"/>
-                            <t t-if="event.promo_cover_image">
+                            <t t-set="has_promo_cover" t-value="'promo_cover_image' in event._fields"/>
+                            <t t-set="event_image_1920" t-value="event.image_1920 if 'image_1920' in event._fields else False"/>
+                            <t t-if="has_promo_cover and event.promo_cover_image">
                                 <img class="img-fluid bhz-event-detail-cover"
                                      t-att-src="'/web/image/event.event/%s/promo_cover_image' % event.id"
                                      t-att-alt="event.name"/>
