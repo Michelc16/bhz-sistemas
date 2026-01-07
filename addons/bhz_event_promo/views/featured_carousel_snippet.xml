@@ -13,9 +13,10 @@
                 <t t-set="website_id" t-value="request.env.context.get('website_id') or 0"/>
                 <t t-set="carousel_id" t-value="'guiabh_featured_%s_%s' % (snippet_key, website_id)"/>
                 <t t-set="carousel_target" t-value="'#%s' % carousel_id"/>
-                <div class="guiabh-featured-carousel carousel slide"
+                <div class="guiabh-featured-carousel slide"
                      t-att-id="carousel_id"
-                     data-interval="5000">
+                     data-interval="5000"
+                     contenteditable="false">
                     <div class="carousel-inner">
                         <t t-call="bhz_event_promo.guiabh_featured_carousel_slides">
                             <t t-set="events" t-value="events"/>
@@ -26,27 +27,30 @@
                         </t>
                     </div>
                     <div class="o_carousel_controllers">
-                        <button class="carousel-control-prev"
-                                t-attf-class="carousel-control-prev #{'d-none' if len(events) &lt;= 1 else ''}"
+                        <button class="carousel-control-prev o_not_editable"
+                                t-attf-class="carousel-control-prev o_not_editable #{'d-none' if len(events) &lt;= 1 else ''}"
                                 type="button"
                                 data-action="prev"
                                 aria-label="Anterior"
-                                title="Anterior">
+                                title="Anterior"
+                                contenteditable="false">
                             <span class="carousel-control-prev-icon" aria-hidden="true"/>
                             <span class="visually-hidden">Anterior</span>
                         </button>
-                        <div t-attf-class="carousel-indicators #{'' if len(events) &gt; 1 else 'd-none'}">
+                        <div t-attf-class="carousel-indicators #{'' if len(events) &gt; 1 else 'd-none'}"
+                             contenteditable="false">
                             <t t-call="bhz_event_promo.guiabh_featured_carousel_indicators">
                                 <t t-set="events" t-value="events"/>
                                 <t t-set="carousel_target" t-value="carousel_target"/>
                             </t>
                         </div>
-                        <button class="carousel-control-next"
-                                t-attf-class="carousel-control-next #{'d-none' if len(events) &lt;= 1 else ''}"
+                        <button class="carousel-control-next o_not_editable"
+                                t-attf-class="carousel-control-next o_not_editable #{'d-none' if len(events) &lt;= 1 else ''}"
                                 type="button"
                                 data-action="next"
                                 aria-label="Próximo"
-                                title="Próximo">
+                                title="Próximo"
+                                contenteditable="false">
                             <span class="carousel-control-next-icon" aria-hidden="true"/>
                             <span class="visually-hidden">Próximo</span>
                         </button>
@@ -69,7 +73,8 @@
                          t-att-data-oe-model="'event.event'"
                          t-att-data-oe-id="event.id"
                          data-oe-field="promo_cover_image"
-                         data-oe-type="binary"/>
+                         data-oe-type="binary"
+                         draggable="false"/>
                 </a>
             </div>
         </t>
