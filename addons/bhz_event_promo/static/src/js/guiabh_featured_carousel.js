@@ -58,6 +58,18 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         this.nextButton = this.el.querySelector(".carousel-control-next");
         this.items = Array.from(this.carouselInner?.querySelectorAll(".carousel-item") || []);
         this.indicators = Array.from(this.indicatorsWrapper?.querySelectorAll("button[data-bs-slide-to]") || []);
+        if (this.items.length) {
+            const hasActiveSlide = this.items.some((item) => item.classList.contains("active"));
+            if (!hasActiveSlide) {
+                this.items[0].classList.add("active");
+            }
+        }
+        if (this.indicators.length) {
+            const hasActiveIndicator = this.indicators.some((item) => item.classList.contains("active"));
+            if (!hasActiveIndicator) {
+                this.indicators[0].classList.add("active");
+            }
+        }
 
         if (this.emptyMessage) {
             this.emptyMessage.classList.toggle("d-none", !!has_events);
