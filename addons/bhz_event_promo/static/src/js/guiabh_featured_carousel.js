@@ -122,15 +122,6 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
             return;
         }
         this._timer = setInterval(() => this._show(this.currentIndex + 1), this.interval);
-        if (this.bootstrapCarousel) {
-            this.bootstrapCarousel.dispose();
-        }
-        if (window.Carousel) {
-            this.bootstrapCarousel = window.Carousel.getOrCreateInstance(this.el, {
-                interval: this.interval,
-                ride: this.interval > 0 ? "carousel" : false,
-            });
-        }
     },
 
     _restartAutoplay() {
@@ -152,9 +143,6 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
             indicator.classList.toggle("active", idx === newIndex);
         });
         this.currentIndex = newIndex;
-        if (this.bootstrapCarousel) {
-            this.bootstrapCarousel.to(this.currentIndex);
-        }
     },
 
     _notifyContentChanged() {
@@ -170,20 +158,13 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         const interval = Number.isNaN(parsed) ? 5000 : parsed;
         this.el.dataset.interval = interval;
         this.el.dataset.bsInterval = interval;
-        if (interval > 0) {
-            this.el.dataset.bsRide = "carousel";
-        } else {
-            this.el.dataset.bsRide = "false";
-        }
+        this.el.dataset.bsRide = "false";
         return interval;
     },
 
     destroy() {
         if (this._timer) {
             clearInterval(this._timer);
-        }
-        if (this.bootstrapCarousel) {
-            this.bootstrapCarousel.dispose();
         }
         if (this._intervalListener) {
             this.el.removeEventListener("guiabh-featured-interval-update", this._intervalListener);
