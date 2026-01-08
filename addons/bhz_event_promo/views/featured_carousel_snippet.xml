@@ -62,7 +62,9 @@
     </template>
 
     <template id="guiabh_featured_carousel_slides" name="GuiaBH - Slides do carrossel">
-        <t t-foreach="events" t-as="event" t-foreach-index="idx">
+        <t t-foreach="enumerate(events)" t-as="event_info">
+            <t t-set="idx" t-value="event_info[0]"/>
+            <t t-set="event" t-value="event_info[1]"/>
             <div t-attf-class="carousel-item #{'active' if idx == 0 else ''}">
                 <a t-att-href="'/agenda/event/%s' % event.id">
                     <img class="d-block w-100 guiabh-slide-bg"
@@ -75,7 +77,8 @@
     </template>
 
     <template id="guiabh_featured_carousel_indicators" name="GuiaBH - Indicadores do carrossel">
-        <t t-foreach="events" t-as="event" t-foreach-index="idx">
+        <t t-foreach="enumerate(events)" t-as="event_info">
+            <t t-set="idx" t-value="event_info[0]"/>
             <button type="button"
                     t-attf-data-bs-slide-to="{{ idx }}"
                     t-attf-data-bs-target="{{ carousel_target or '' }}"
