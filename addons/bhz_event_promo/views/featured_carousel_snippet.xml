@@ -21,12 +21,12 @@
                         <t t-foreach="enumerate(events)" t-as="ev_info">
                             <t t-set="idx" t-value="ev_info[0]"/>
                             <t t-set="ev" t-value="ev_info[1]"/>
-                            <button type="button"
-                                    t-att-data-bs-target="'#%s' % target_id"
-                                    t-att-data-bs-slide-to="idx"
-                                    t-att-class="idx == 0 and 'active' or False"
-                                    t-att-aria-current="idx == 0 and 'true' or False"
-                                    t-att-aria-label="'Slide %s' % (idx + 1)"/>
+                                <button type="button"
+                                        t-att-data-bs-target="'#%s' % target_id"
+                                        t-att-data-bs-slide-to="idx"
+                                        t-attf-class="#{'active' if idx == 0 else ''}"
+                                        t-att-aria-current="idx == 0 and 'true' or False"
+                                        t-att-aria-label="'Slide %s' % (idx + 1)"/>
                         </t>
                     </div>
                     </t>
@@ -35,7 +35,7 @@
                         <t t-foreach="enumerate(events)" t-as="ev_info">
                             <t t-set="idx" t-value="ev_info[0]"/>
                             <t t-set="ev" t-value="ev_info[1]"/>
-                            <div class="carousel-item" t-att-class="idx == 0 and 'active' or False">
+                            <div t-attf-class="carousel-item #{'active' if idx == 0 else ''}">
                                 <a t-att-href="'/agenda/event/%s' % ev.id">
                                     <img class="d-block w-100 guiabh-featured-img"
                                          t-att-alt="ev.name or ''"
