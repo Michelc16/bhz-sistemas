@@ -11,6 +11,7 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         this.sectionEl = this.el.closest(".s_guiabh_featured_carousel");
         this.carouselInner = this.el.querySelector(".carousel-inner");
         this.indicatorsWrapper = this.el.querySelector(".carousel-indicators");
+        this.controllerWrapper = this.el.querySelector(".o_carousel_controllers");
         this.prevButton = this.el.querySelector(".carousel-control-prev");
         this.nextButton = this.el.querySelector(".carousel-control-next");
         this.emptyMessage = this.el.parentElement.querySelector(".js-guiabh-featured-empty");
@@ -54,6 +55,7 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         }
         this.carouselInner = this.el.querySelector(".carousel-inner");
         this.indicatorsWrapper = this.el.querySelector(".carousel-indicators");
+        this.controllerWrapper = this.el.querySelector(".o_carousel_controllers");
         this.prevButton = this.el.querySelector(".carousel-control-prev");
         this.nextButton = this.el.querySelector(".carousel-control-next");
         this.items = Array.from(this.carouselInner?.querySelectorAll(".carousel-item") || []);
@@ -79,6 +81,7 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         this.indicatorsWrapper?.classList.toggle("d-none", !hasMultipleActive);
         this.prevButton?.classList.toggle("d-none", !hasMultipleActive);
         this.nextButton?.classList.toggle("d-none", !hasMultipleActive);
+        this.controllerWrapper?.classList.toggle("d-none", !hasMultipleActive);
 
         this._refreshCarousel(hasMultipleActive);
         this._notifyContentChanged();

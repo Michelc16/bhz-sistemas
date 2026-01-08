@@ -24,15 +24,10 @@
                             <t t-set="events" t-value="events"/>
                             <t t-set="carousel_target" t-value="carousel_target"/>
                         </t>
-                        <t t-if="events">
-                            <script type="text/javascript">document.currentScript.parentElement.firstElementChild?.classList.add('active');</script>
-                        </t>
                     </div>
-                    <div class="o_carousel_controllers">
+                    <div t-attf-class="o_carousel_controllers #{'d-none' if len(events) &lt;= 1 else ''}">
                         <button class="carousel-control-prev"
-                                t-attf-class="carousel-control-prev #{'d-none' if len(events) &lt;= 1 else ''}"
                                 type="button"
-                                data-action="prev"
                                 data-bs-slide="prev"
                                 t-attf-data-bs-target="{{ carousel_target }}"
                                 aria-label="Anterior"
@@ -41,17 +36,14 @@
                             <span class="carousel-control-prev-icon" aria-hidden="true"/>
                             <span class="visually-hidden">Anterior</span>
                         </button>
-                        <div t-attf-class="carousel-indicators #{'' if len(events) &gt; 1 else 'd-none'}"
-                             contenteditable="false">
+                        <div class="carousel-indicators" contenteditable="false">
                             <t t-call="bhz_event_promo.guiabh_featured_carousel_indicators">
                                 <t t-set="events" t-value="events"/>
                                 <t t-set="carousel_target" t-value="carousel_target"/>
                             </t>
                         </div>
                         <button class="carousel-control-next"
-                                t-attf-class="carousel-control-next #{'d-none' if len(events) &lt;= 1 else ''}"
                                 type="button"
-                                data-action="next"
                                 data-bs-slide="next"
                                 t-attf-data-bs-target="{{ carousel_target }}"
                                 aria-label="Próximo"
@@ -85,9 +77,11 @@
     <template id="guiabh_featured_carousel_indicators" name="GuiaBH - Indicadores do carrossel">
         <t t-foreach="events" t-as="event" t-index="idx">
             <button type="button"
-                    t-att-data-slide-to="idx"
+                    t-attf-data-bs-slide-to="{{ idx }}"
                     t-attf-data-bs-target="{{ carousel_target or '' }}"
-                    t-attf-class="#{'active' if idx == 0 else ''}"></button>
+                    t-attf-class="#{'active' if idx == 0 else ''}"
+                    t-attf-aria-label="Slide {{ idx + 1 }}"
+                    t-att-aria-current="idx == 0 and 'true' or False"></button>
         </t>
     </template>
 </odoo>
