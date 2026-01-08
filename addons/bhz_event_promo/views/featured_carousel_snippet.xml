@@ -17,25 +17,25 @@
                      t-att-data-bs-interval="events and len(events) &gt; 1 and interval or None">
 
                     <t t-if="events and len(events) &gt; 1">
-                        <div class="carousel-indicators o_not_editable" contenteditable="false">
-                            <t t-foreach="enumerate(events)" t-as="ev_info">
-                                <t t-set="idx" t-value="ev_info[0]"/>
-                                <t t-set="ev" t-value="ev_info[1]"/>
-                                <button type="button"
-                                        t-att-data-bs-target="'#%s' % target_id"
-                                        t-att-data-bs-slide-to="idx"
-                                        t-attf-class="#{'active' if idx == 0 else ''}"
-                                        t-att-aria-current="'true' if idx == 0 else None"
-                                        t-att-aria-label="'Slide %s' % (idx + 1)"/>
-                            </t>
-                        </div>
+                    <div class="carousel-indicators o_not_editable" contenteditable="false">
+                        <t t-foreach="enumerate(events)" t-as="ev_info">
+                            <t t-set="idx" t-value="ev_info[0]"/>
+                            <t t-set="ev" t-value="ev_info[1]"/>
+                            <button type="button"
+                                    t-att-data-bs-target="'#%s' % target_id"
+                                    t-att-data-bs-slide-to="idx"
+                                    t-att-class="idx == 0 and 'active' or False"
+                                    t-att-aria-current="idx == 0 and 'true' or False"
+                                    t-att-aria-label="'Slide %s' % (idx + 1)"/>
+                        </t>
+                    </div>
                     </t>
 
                     <div class="carousel-inner">
                         <t t-foreach="enumerate(events)" t-as="ev_info">
                             <t t-set="idx" t-value="ev_info[0]"/>
                             <t t-set="ev" t-value="ev_info[1]"/>
-                            <div t-attf-class="carousel-item #{'active' if idx == 0 else ''}">
+                            <div class="carousel-item" t-att-class="idx == 0 and 'active' or False">
                                 <a t-att-href="'/agenda/event/%s' % ev.id">
                                     <img class="d-block w-100 guiabh-featured-img"
                                          t-att-alt="ev.name or ''"
