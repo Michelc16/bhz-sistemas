@@ -84,6 +84,7 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         this.controllerWrapper?.classList.toggle("d-none", !hasMultipleActive);
 
         this._refreshCarousel(hasMultipleActive);
+        this._applyIntervalToInstance();
         this._notifyContentChanged();
     },
 
@@ -95,17 +96,20 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         if (!this.items.length) {
             return;
         }
-        if (window.bootstrap?.Carousel) {
-            const interval = has_multiple ? this.interval : false;
-            this._bootstrapCarousel = new window.bootstrap.Carousel(this.el, {
-                interval,
-                ride: false,
-                pause: "hover",
-                wrap: true,
-            });
-            if (!interval) {
-                this._bootstrapCarousel.pause();
-            }
+        if (!window.bootstrap?.Carousel) {
+            return;
+        }
+        const interval = has_multiple ? this.interval : false;
+        this._bootstrapCarousel = new window.bootstrap.Carousel(this.el, {
+            interval,
+            ride: false,
+            pause: "hover",
+            wrap: true,
+        });
+        if (!interval) {
+            this._bootstrapCarousel.pause();
+        } else {
+            this._bootstrapCarousel.cycle();
         }
     },
 
