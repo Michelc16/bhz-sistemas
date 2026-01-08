@@ -9,7 +9,7 @@
             <div class="container">
                 <t t-set="events" t-value="request.env['event.event'].guiabh_get_featured_events(12)"/>
                 <t t-set="uniq" t-value="request.env['ir.qweb']._get_view_cache_key()"/>
-                <t t-set="interval" t-value="int(context.get('interval') or 5000)"/>
+                <t t-set="interval" t-value="int(request.env.context.get('interval') or 5000)"/>
                 <t t-set="target_id" t-value="'guiabhFeaturedCarousel%s' % uniq"/>
                 <div t-attf-id="{{ target_id }}"
                      class="carousel slide guiabh-featured-carousel"
