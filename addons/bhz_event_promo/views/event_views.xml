@@ -50,6 +50,14 @@
                         </group>
                     </group>
 
+                    <separator string="Integração externa"/>
+                    <group>
+                        <field name="external_source"/>
+                        <field name="external_id"/>
+                        <field name="external_url"/>
+                        <field name="external_last_sync" readonly="1"/>
+                    </group>
+
                     <separator string="Local / Bairro"/>
                     <group>
                         <field name="venue_partner_id"/>

@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
 import logging
+import base64
+import json
+from datetime import datetime
+from urllib.parse import urlparse
 
+import pytz
+import requests
 from odoo import api, fields, models
 from odoo.http import request
 
@@ -101,6 +107,14 @@ class EventEvent(models.Model):
         default=0,
         help="Usado para ordenar os eventos mais acessados nos blocos do site.",
     )
+    external_source = fields.Char(string="Fonte externa", index=True)
+    external_id = fields.Char(string="ID externo", index=True)
+    external_url = fields.Char(string="URL do evento externo")
+    external_last_sync = fields.Datetime(string="Última sincronização externa")
+
+    _sql_constraints = [
+        ("bhz_event_external_unique", "unique(external_source, external_id)", "A combinação de Fonte externa e ID externo deve ser única."),
+    ]
     auto_remove_after_event = fields.Selection(
         [
             ("none", "Não fazer nada"),
@@ -471,3 +485,151 @@ class EventEvent(models.Model):
     def _format_datetime_display(self, dt, fmt="%d/%m/%Y %H:%M"):
         localized = self._localize_datetime(dt)
         return localized.strftime(fmt) if localized else ""
+
+    # ---------------------------------------------------------- API helpers
+    @api.model
+    def _api_parse_datetime(self, value, tz_name="UTC"):
+        if not value:
+            return False
+        try:
+            dt = fields.Datetime.from_string(value)
+        except Exception:
+            # try raw iso
+            dt = datetime.fromisoformat(value)
+        if not dt:
+            return False
+        if not dt.tzinfo:
+            try:
+                tz = pytz.timezone(tz_name or "UTC")
+            except Exception:
+                tz = pytz.UTC
+            dt = tz.localize(dt)
+        return dt.astimezone(pytz.UTC).replace(tzinfo=None)
+
+    @api.model
+    def _api_download_image(self, url, timeout=10):
+        if not url:
+            return False
+        parsed = urlparse(url)
+        if not parsed.scheme:
+            return False
+        try:
+            resp = requests.get(url, timeout=timeout, stream=True)
+            resp.raise_for_status()
+            content = resp.content
+            if len(content) > 5 * 1024 * 1024:
+                raise ValueError("Imagem maior que 5MB")
+            return base64.b64encode(content)
+        except Exception as err:
+            _logger.warning("API import: falha ao baixar imagem %s (%s)", url, err)
+            return False
+
+    @api.model
+    def _api_extract_image(self, payload):
+        image_b64 = payload.get("image_base64") or False
+        if image_b64:
+            try:
+                base64.b64decode(image_b64)
+                return image_b64
+            except Exception:
+                raise ValueError("image_base64 inválida")
+        image_url = payload.get("image_url")
+        if image_url:
+            downloaded = self._api_download_image(image_url)
+            if downloaded:
+                return downloaded.decode() if isinstance(downloaded, bytes) else downloaded
+        return False
+
+    @api.model
+    def _api_find_category(self, name):
+        if not name:
+            return False
+        Type = self.env["event.type"].sudo()
+        rec = Type.search([("name", "=", name)], limit=1)
+        if rec:
+            return rec.id
+        return Type.create({"name": name}).id
+
+    @api.model
+    def _api_prepare_vals(self, payload):
+        required = ["title", "start_datetime", "external_source", "external_id"]
+        for key in required:
+            if not payload.get(key):
+                raise ValueError(f"Campo obrigatório ausente: {key}")
+
+        timezone = payload.get("timezone") or "UTC"
+        date_begin = self._api_parse_datetime(payload.get("start_datetime"), timezone)
+        if not date_begin:
+            raise ValueError("start_datetime inválido")
+        date_end_raw = payload.get("end_datetime")
+        date_end = self._api_parse_datetime(date_end_raw, timezone) if date_end_raw else False
+
+        vals = {
+            "name": payload.get("title"),
+            "date_begin": date_begin,
+            "date_end": date_end,
+            "promo_short_description": payload.get("short_description"),
+            "promo_description_html": payload.get("description_html"),
+            "promo_category_id": self._api_find_category(payload.get("category")),
+            "producer_name": payload.get("organizer_name"),
+            "external_source": payload.get("external_source"),
+            "external_id": payload.get("external_id"),
+            "external_url": payload.get("external_url"),
+            "external_last_sync": fields.Datetime.now(),
+            "registration_external_url": payload.get("tickets_url"),
+            "show_on_public_agenda": True,
+        }
+        if payload.get("tickets_url"):
+            vals["registration_mode"] = "external"
+
+        if payload.get("website_id"):
+            vals["website_id"] = int(payload["website_id"])
+
+        vals["is_featured"] = bool(payload.get("featured"))
+
+        image_val = self._api_extract_image(payload)
+        if image_val:
+            vals["promo_cover_image"] = image_val
+
+        if payload.get("published"):
+            vals.update(self._prepare_announced_publication_vals())
+
+        if payload.get("published"):
+            announced_stage = self._get_announced_stage_sequence()
+            if announced_stage and "stage_id" in self._fields and not payload.get("stage_id"):
+                stage = self.env["event.stage"].sudo().search(
+                    [("sequence", ">=", announced_stage)], limit=1, order="sequence asc, id asc"
+                )
+                if stage:
+                    vals["stage_id"] = stage.id
+
+        return vals
+
+    @api.model
+    def bhz_api_upsert_event(self, payload):
+        """Create/update event based on external_source + external_id."""
+        if not isinstance(payload, dict):
+            raise ValueError("Payload inválido")
+        source = payload.get("external_source")
+        ext_id = payload.get("external_id")
+        vals = self._api_prepare_vals(payload)
+        Event = self.sudo()
+        existing = Event.search(
+            [("external_source", "=", source), ("external_id", "=", ext_id)],
+            limit=1,
+        )
+        if existing:
+            existing.write(vals)
+            record = existing
+            action = "updated"
+        else:
+            record = Event.create(vals)
+            action = "created"
+        _logger.info(
+            "API upsert %s event external=%s/%s -> id=%s",
+            action,
+            source,
+            ext_id,
+            record.id,
+        )
+        return record
