@@ -73,11 +73,11 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
             }
         }
 
+        const hasEvents = this.items.length > 0;
+        const hasMultipleActive = this.items.length > 1;
         if (this.emptyMessage) {
-            this.emptyMessage.classList.toggle("d-none", !!has_events);
+            this.emptyMessage.classList.toggle("d-none", hasEvents);
         }
-
-        const hasMultipleActive = has_events && has_multiple;
         this.indicatorsWrapper?.classList.toggle("d-none", !hasMultipleActive);
         this.prevButton?.classList.toggle("d-none", !hasMultipleActive);
         this.nextButton?.classList.toggle("d-none", !hasMultipleActive);
