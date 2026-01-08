@@ -11,7 +11,7 @@
                 <t t-set="uniq" t-value="request.env['ir.qweb']._get_view_cache_key()"/>
                 <t t-set="interval" t-value="int(request.env.context.get('interval') or 5000)"/>
                 <t t-set="target_id" t-value="'guiabhFeaturedCarousel%s' % uniq"/>
-                <div t-attf-id="{{ target_id }}"
+                <div t-att-id="target_id"
                      class="carousel slide guiabh-featured-carousel"
                      t-att-data-bs-ride="events and len(events) &gt; 1 and 'carousel' or None"
                      t-att-data-bs-interval="events and len(events) &gt; 1 and interval or None">
