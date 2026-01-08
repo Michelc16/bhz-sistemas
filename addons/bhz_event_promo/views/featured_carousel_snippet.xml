@@ -62,8 +62,8 @@
     </template>
 
     <template id="guiabh_featured_carousel_slides" name="GuiaBH - Slides do carrossel">
-        <t t-foreach="events" t-as="event" t-index="idx">
-            <div t-attf-class="carousel-item #{'active' if idx == 0 else ''}">
+        <t t-foreach="events" t-as="event">
+            <div t-attf-class="carousel-item #{'active' if loop.first else ''}">
                 <a t-att-href="'/agenda/event/%s' % event.id">
                     <img class="d-block w-100 guiabh-slide-bg"
                          t-att-src="'/web/image/event.event/%s/promo_cover_image' % event.id"
@@ -75,13 +75,13 @@
     </template>
 
     <template id="guiabh_featured_carousel_indicators" name="GuiaBH - Indicadores do carrossel">
-        <t t-foreach="events" t-as="event" t-index="idx">
+        <t t-foreach="events" t-as="event">
             <button type="button"
-                    t-attf-data-bs-slide-to="{{ idx }}"
+                    t-attf-data-bs-slide-to="{{ loop.index0 }}"
                     t-attf-data-bs-target="{{ carousel_target or '' }}"
-                    t-attf-class="#{'active' if idx == 0 else ''}"
-                    t-attf-aria-label="Slide {{ idx + 1 }}"
-                    t-att-aria-current="idx == 0 and 'true' or False"></button>
+                    t-attf-class="#{'active' if loop.first else ''}"
+                    t-attf-aria-label="Slide {{ loop.index }}"
+                    t-att-aria-current="loop.first and 'true' or False"></button>
         </t>
     </template>
 </odoo>
