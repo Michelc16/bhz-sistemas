@@ -72,7 +72,7 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         }
 
         const hasEvents = this.items.length > 0;
-        const hasMultipleActive = this.items.length > 1;
+        const hasMultipleActive = this.items.length > 1 && this.indicators.length >= this.items.length;
         if (this.emptyMessage) {
             this.emptyMessage.classList.toggle("d-none", hasEvents);
         }
@@ -89,7 +89,11 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
             this._bootstrapCarousel.dispose();
             this._bootstrapCarousel = null;
         }
-        if (!this.items.length) {
+        if (!has_multiple || !this.items.length) {
+            return;
+        }
+        if (has_multiple && this.indicators.length < this.items.length) {
+            console.warn("Carousel indicators mismatch slides; skipping bootstrap init");
             return;
         }
         if (!window.bootstrap?.Carousel) {
