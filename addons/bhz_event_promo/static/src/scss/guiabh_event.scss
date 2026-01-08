@@ -79,6 +79,9 @@
     .carousel-item {
       min-height: clamp(240px, 45vw, 520px);
       background-color: var(--bs-body-bg, #fff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .carousel-indicators {
@@ -126,7 +129,7 @@
   .guiabh-featured-img {
     width: 100%;
     height: clamp(240px, 45vw, 520px);
-    object-fit: cover;
+    object-fit: contain;
     background-color: #f7f7f7;
   }
 }
