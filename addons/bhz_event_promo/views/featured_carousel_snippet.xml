@@ -43,19 +43,6 @@
                                 </a>
                             </div>
                         </t>
-                        <script type="text/javascript">
-                            (function () {
-                                const carousel = document.currentScript.closest('.carousel');
-                                const firstSlide = carousel?.querySelector('.carousel-item');
-                                if (firstSlide && !carousel.querySelector('.carousel-item.active')) {
-                                    firstSlide.classList.add('active');
-                                }
-                                const firstIndicator = carousel?.querySelector('.carousel-indicators button');
-                                if (firstIndicator && !carousel.querySelector('.carousel-indicators .active')) {
-                                    firstIndicator.classList.add('active');
-                                }
-                            })();
-                        </script>
                     </div>
 
                     <button t-attf-class="carousel-control-prev o_not_editable #{'d-none' if not events or len(events) &lt;= 1 else ''}"
