@@ -7,84 +7,56 @@
                  data-limit="12"
                  data-interval="5000">
             <div class="container">
-                <t t-set="events"
-                   t-value="request.env['event.event'].guiabh_get_featured_events(12)"/>
-                <t t-set="snippet_key" t-value="request.env.context.get('snippet_key') or request.env.uid or 0"/>
-                <t t-set="website_id" t-value="request.env.context.get('website_id') or 0"/>
-                <t t-set="carousel_id" t-value="'guiabh_featured_%s_%s' % (snippet_key, website_id)"/>
-                <t t-set="carousel_target" t-value="'#%s' % carousel_id"/>
-                <div class="guiabh-featured-carousel carousel slide"
-                     t-att-id="carousel_id"
-                     data-interval="5000"
-                     data-bs-ride="false"
-                     data-bs-interval="5000"
-                     contenteditable="false">
-                    <div class="carousel-inner">
-                        <t t-call="bhz_event_promo.guiabh_featured_carousel_slides">
-                            <t t-set="events" t-value="events"/>
-                            <t t-set="carousel_target" t-value="carousel_target"/>
+                <t t-set="events" t-value="request.env['event.event'].guiabh_get_featured_events(12)"/>
+                <t t-set="uniq" t-value="request.env['ir.qweb']._get_cache_key()"/>
+                <t t-set="interval" t-value="int(context.get('interval') or 5000)"/>
+                <t t-set="target_id" t-value="'guiabhFeaturedCarousel%s' % uniq"/>
+                <div t-attf-id="{{ target_id }}"
+                     class="carousel slide guiabh-featured-carousel"
+                     t-att-data-bs-ride="events and len(events) &gt; 1 and 'carousel' or None"
+                     t-att-data-bs-interval="events and len(events) &gt; 1 and interval or None">
+
+                    <div class="carousel-indicators o_not_editable" contenteditable="false">
+                        <t t-foreach="events" t-as="ev">
+                            <button type="button"
+                                    t-att-data-bs-target="'#%s' % target_id"
+                                    t-att-data-bs-slide-to="loop.index0"
+                                    t-attf-class="#{'active' if loop.index0 == 0 else ''}"
+                                    t-att-aria-current="'true' if loop.index0 == 0 else None"
+                                    t-att-aria-label="'Slide %s' % (loop.index0 + 1)"/>
                         </t>
                     </div>
-                    <div t-attf-class="o_carousel_controllers #{'d-none' if len(events) &lt;= 1 else ''}">
-                        <button class="carousel-control-prev"
-                                type="button"
-                                data-bs-slide="prev"
-                                t-attf-data-bs-target="{{ carousel_target }}"
-                                aria-label="Anterior"
-                                title="Anterior"
-                                contenteditable="false">
-                            <span class="carousel-control-prev-icon" aria-hidden="true"/>
-                            <span class="visually-hidden">Anterior</span>
-                        </button>
-                        <div class="carousel-indicators" contenteditable="false">
-                            <t t-call="bhz_event_promo.guiabh_featured_carousel_indicators">
-                                <t t-set="events" t-value="events"/>
-                                <t t-set="carousel_target" t-value="carousel_target"/>
-                            </t>
-                        </div>
-                        <button class="carousel-control-next"
-                                type="button"
-                                data-bs-slide="next"
-                                t-attf-data-bs-target="{{ carousel_target }}"
-                                aria-label="Próximo"
-                                title="Próximo"
-                                contenteditable="false">
-                            <span class="carousel-control-next-icon" aria-hidden="true"/>
-                            <span class="visually-hidden">Próximo</span>
-                        </button>
+
+                    <div class="carousel-inner">
+                        <t t-foreach="events" t-as="ev">
+                            <div t-attf-class="carousel-item #{'active' if loop.index0 == 0 else ''}">
+                                <a t-att-href="'/agenda/event/%s' % ev.id">
+                                    <img class="d-block w-100 guiabh-featured-img"
+                                         t-att-alt="ev.name or ''"
+                                         t-att-src="ev.promo_cover_image and ('/web/image/event.event/%s/promo_cover_image' % ev.id) or ('/web/image/event.event/%s/image_1920' % ev.id)"/>
+                                </a>
+                            </div>
+                        </t>
                     </div>
+
+                    <button class="carousel-control-prev o_not_editable" type="button"
+                            t-att-data-bs-target="'#%s' % target_id"
+                            data-bs-slide="prev" contenteditable="false">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"/>
+                        <span class="visually-hidden">Anterior</span>
+                    </button>
+                    <button class="carousel-control-next o_not_editable" type="button"
+                            t-att-data-bs-target="'#%s' % target_id"
+                            data-bs-slide="next" contenteditable="false">
+                        <span class="carousel-control-next-icon" aria-hidden="true"/>
+                        <span class="visually-hidden">Próximo</span>
+                    </button>
                 </div>
-                <div t-attf-class="alert alert-secondary mb-0 text-center js-guiabh-featured-empty #{'d-none' if events else ''}">
+
+                <div t-if="not events" class="alert alert-secondary mb-0 text-center js-guiabh-featured-empty">
                     Nenhum evento em destaque no momento.
                 </div>
             </div>
         </section>
-    </template>
-
-    <template id="guiabh_featured_carousel_slides" name="GuiaBH - Slides do carrossel">
-        <t t-foreach="enumerate(events)" t-as="event_info">
-            <t t-set="idx" t-value="event_info[0]"/>
-            <t t-set="event" t-value="event_info[1]"/>
-            <div t-attf-class="carousel-item #{'active' if idx == 0 else ''}">
-                <a t-att-href="'/agenda/event/%s' % event.id">
-                    <img class="d-block w-100 guiabh-slide-bg"
-                         t-att-src="'/web/image/event.event/%s/promo_cover_image' % event.id"
-                         t-att-alt="event.name or ''"
-                         draggable="false"/>
-                </a>
-            </div>
-        </t>
-    </template>
-
-    <template id="guiabh_featured_carousel_indicators" name="GuiaBH - Indicadores do carrossel">
-        <t t-foreach="enumerate(events)" t-as="event_info">
-            <t t-set="idx" t-value="event_info[0]"/>
-            <button type="button"
-                    t-attf-data-bs-slide-to="{{ idx }}"
-                    t-attf-data-bs-target="{{ carousel_target or '' }}"
-                    t-attf-class="#{'active' if idx == 0 else ''}"
-                    t-attf-aria-label="Slide {{ idx + 1 }}"
-                    t-att-aria-current="idx == 0 and 'true' or False"></button>
-        </t>
     </template>
 </odoo>
