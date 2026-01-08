@@ -139,7 +139,6 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         const interval = Number.isNaN(parsed) ? 5000 : parsed;
         this.el.dataset.interval = interval;
         this.el.dataset.bsInterval = interval;
-        this.el.dataset.bsRide = "false";
         return interval;
     },
 
