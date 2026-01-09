@@ -4,7 +4,6 @@ import json
 
 from odoo import fields, http
 from odoo.http import request
-from odoo.tools import image_data_uri
 
 
 class GuiaBHWebsite(http.Controller):
@@ -207,7 +206,7 @@ class GuiaBHWebsite(http.Controller):
         events = request.env['guiabh.event'].search(domain, order='is_featured desc, start_datetime asc', limit=limit)
         data = []
         for ev in events:
-            cover = ev.cover_image and image_data_uri(ev.cover_image) or '/bhz_guiabh_website/static/src/img/placeholders/event_placeholder.svg'
+            cover = ev.cover_image and f"/web/image/guiabh.event/{ev.id}/cover_image" or '/bhz_guiabh_website/static/src/img/placeholders/event_placeholder.svg'
             data.append({
                 'name': ev.name,
                 'slug': ev.slug,
@@ -242,7 +241,7 @@ class GuiaBHWebsite(http.Controller):
         places = request.env['guiabh.place'].search(domain, order='is_featured desc, name asc', limit=limit)
         data = []
         for pl in places:
-            cover = pl.cover_image and image_data_uri(pl.cover_image) or '/bhz_guiabh_website/static/src/img/placeholders/place_placeholder.svg'
+            cover = pl.cover_image and f"/web/image/guiabh.place/{pl.id}/cover_image" or '/bhz_guiabh_website/static/src/img/placeholders/place_placeholder.svg'
             data.append({
                 'name': pl.name,
                 'slug': pl.slug,
