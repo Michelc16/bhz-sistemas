@@ -97,7 +97,7 @@
                             <field name="end_datetime"/>
                             <field name="price_type"/>
                             <field name="currency_id" groups="base.group_multi_currency"/>
-                            <field name="min_price" attrs="{'invisible':[('price_type','!=','paid')]}"/>
+                            <field name="min_price" modifiers="{'invisible': [['price_type','!=','paid']]}"/>
                             <field name="ticket_url"/>
                         </group>
                     </group>
