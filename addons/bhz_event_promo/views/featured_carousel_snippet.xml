@@ -8,29 +8,14 @@
                  data-interval="5000">
             <div class="container">
                 <t t-set="events" t-value="request.env['event.event'].guiabh_get_featured_events(12)"/>
-                <t t-set="uniq" t-value="str(request.env.context.get('snippet_key') or request.env.uid or 0).replace(' ', '').replace(',', '').replace('(', '').replace(')', '').replace(\"'\", '').replace(':', '').replace('.', '')"/>
+                <t t-set="uniq_raw" t-value="request.env.context.get('snippet_key') or request.env.uid or 0"/>
+                <t t-set="uniq" t-value="''.join([c for c in str(uniq_raw) if c.isalnum()]) or '1'"/>
                 <t t-set="interval" t-value="int(request.env.context.get('interval') or 5000)"/>
                 <t t-set="target_id" t-value="'guiabhFeaturedCarousel%s' % uniq"/>
                 <div t-att-id="target_id"
                      class="carousel slide guiabh-featured-carousel"
                      t-att-data-bs-ride="events and len(events) &gt; 1 and 'carousel' or None"
                      t-att-data-bs-interval="events and len(events) &gt; 1 and interval or None">
-
-                    <div class="carousel-indicators o_not_editable"
-                         t-att-class="(not events or len(events) &lt;= 1) and 'd-none' or False"
-                         contenteditable="false">
-                        <t t-foreach="enumerate(events)" t-as="ev_info">
-                            <t t-set="idx" t-value="ev_info[0]"/>
-                            <t t-set="ev" t-value="ev_info[1]"/>
-                            <button type="button"
-                                    t-att-data-bs-target="'#%s' % target_id"
-                                    t-att-data-bs-slide-to="idx"
-                                    t-attf-class="#{'active' if idx == 0 else ''}"
-                                    t-att-aria-current="idx == 0 and 'true' or False"
-                                    t-att-aria-label="'Slide %s' % (idx + 1)"/>
-                        </t>
-                    </div>
-
                     <div class="carousel-inner">
                         <t t-foreach="enumerate(events)" t-as="ev_info">
                             <t t-set="idx" t-value="ev_info[0]"/>
@@ -59,6 +44,20 @@
                         <span class="carousel-control-next-icon" aria-hidden="true"/>
                         <span class="visually-hidden">Próximo</span>
                     </button>
+
+                    <div class="carousel-indicators indicators-below o_not_editable"
+                         t-att-class="(not events or len(events) &lt;= 1) and 'd-none' or False"
+                         contenteditable="false">
+                        <t t-foreach="enumerate(events)" t-as="ev_info">
+                            <t t-set="idx" t-value="ev_info[0]"/>
+                            <button type="button"
+                                    t-att-data-bs-target="'#%s' % target_id"
+                                    t-att-data-bs-slide-to="idx"
+                                    t-attf-class="#{'active' if idx == 0 else ''}"
+                                    t-att-aria-current="idx == 0 and 'true' or False"
+                                    t-att-aria-label="'Slide %s' % (idx + 1)"/>
+                        </t>
+                    </div>
                 </div>
 
                 <div t-if="not events" class="alert alert-secondary mb-0 text-center js-guiabh-featured-empty">
