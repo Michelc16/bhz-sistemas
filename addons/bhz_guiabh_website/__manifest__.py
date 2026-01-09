@@ -14,7 +14,6 @@
         'security/ir.model.access.csv',
         'data/demo.xml',
         'data/website_menu.xml',
-        'views/website_assets.xml',
         'views/website_routes.xml',
         'views/guiabh_taxonomy_views.xml',
         'views/guiabh_event_views.xml',
@@ -26,6 +25,11 @@
     'demo': [],
     'application': True,
     'installable': True,
-    'assets': {},
+    'assets': {
+        'web.assets_frontend': [
+            'bhz_guiabh_website/static/src/scss/guiabh.scss',
+            'bhz_guiabh_website/static/src/js/guiabh.js',
+        ],
+    },
     'images': ['static/description/icon.png'],
 }
