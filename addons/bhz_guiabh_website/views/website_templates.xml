@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <data>
     <!-- Cartões reutilizáveis -->
-    <template id="guiabh_event_card">
+    <template id="guiabh_event_card" name="Cartão Evento">
       <div class="guiabh-card" itemscope="itemscope" itemtype="https://schema.org/Event">
         <div class="cover">
           <img t-att-src="event.cover_image and '/web/image/guiabh.event/%s/cover_image' % event.id or '/bhz_guiabh_website/static/src/img/placeholders/event_placeholder.svg'" loading="lazy" t-att-alt="event.name" itemprop="image"/>
@@ -28,7 +27,7 @@
       </div>
     </template>
 
-    <template id="guiabh_place_card">
+    <template id="guiabh_place_card" name="Cartão Lugar">
       <div class="guiabh-card" itemscope="itemscope" itemtype="https://schema.org/Place">
         <div class="cover">
           <img t-att-src="place.cover_image and '/web/image/guiabh.place/%s/cover_image' % place.id or '/bhz_guiabh_website/static/src/img/placeholders/place_placeholder.svg'" loading="lazy" t-att-alt="place.name" itemprop="image"/>
@@ -456,5 +455,4 @@
         </section>
       </t>
     </template>
-  </data>
 </odoo>
