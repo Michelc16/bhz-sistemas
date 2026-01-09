@@ -8,7 +8,7 @@
     'license': 'LGPL-3',
     'category': 'Website',
     'version': '1.0.0',
-    'depends': ['base', 'web', 'website', 'website_theme_install'],
+    'depends': ['base', 'web', 'website'],
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
