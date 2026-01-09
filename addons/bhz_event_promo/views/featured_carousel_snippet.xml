@@ -16,8 +16,8 @@
                      t-att-data-bs-ride="events and len(events) &gt; 1 and 'carousel' or None"
                      t-att-data-bs-interval="events and len(events) &gt; 1 and interval or None">
 
-                    <div class="carousel-indicators o_not_editable"
-                         t-att-class="(not events or len(events) &lt;= 1) and 'd-none' or False"
+                    <div class="carousel-indicators o_not_editable indicators-below"
+                         t-att-class="(not events or len(events) &lt;= 1) and 'carousel-indicators o_not_editable indicators-below d-none' or 'carousel-indicators o_not_editable indicators-below'"
                          contenteditable="false">
                         <t t-foreach="enumerate(events)" t-as="ev_info">
                             <t t-set="idx" t-value="ev_info[0]"/>
