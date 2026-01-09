@@ -2,7 +2,7 @@
 <odoo>
     <!-- Cards reutilizáveis -->
     <template id="guiabh_event_card">
-        <div class="guiabh-card" itemscope itemtype="https://schema.org/Event">
+        <div class="guiabh-card" itemscope="" itemtype="https://schema.org/Event">
             <div class="cover">
                 <img t-att-src="event.cover_image and '/web/image/guiabh.event/%s/cover_image' % event.id or '/bhz_guiabh_website/static/src/img/placeholders/event_placeholder.svg'" loading="lazy" t-att-alt="event.name" itemprop="image"/>
                 <div class="badge" t-if="event.is_featured">Destaque</div>
@@ -30,7 +30,7 @@
     </template>
 
     <template id="guiabh_place_card">
-        <div class="guiabh-card" itemscope itemtype="https://schema.org/Place">
+        <div class="guiabh-card" itemscope="" itemtype="https://schema.org/Place">
             <div class="cover">
                 <img t-att-src="place.cover_image and '/web/image/guiabh.place/%s/cover_image' % place.id or '/bhz_guiabh_website/static/src/img/placeholders/place_placeholder.svg'" loading="lazy" t-att-alt="place.name" itemprop="image"/>
                 <div class="badge" t-if="place.is_featured">Popular</div>
