@@ -269,7 +269,7 @@
                   <span class="guiabh-chip" t-if="event.region_id.name"><i class="fa fa-map-marker"/> <t t-esc="event.region_id.name"/></span>
                   <span class="guiabh-chip" t-if="event.category_id.name"><i class="fa fa-tag"/> <t t-esc="event.category_id.name"/></span>
                   <span class="guiabh-chip" t-if="event.price_type == 'free'">Gratuito</span>
-                  <span class="guiabh-chip" t-if="event.price_type == 'paid'"><t t-esc="'A partir de %s%s' % (event.currency_id and event.currency_id.symbol or 'R$', event.min_price or '')"/></t>
+                  <span class="guiabh-chip" t-if="event.price_type == 'paid'"><t t-esc="'A partir de %s%s' % (event.currency_id and event.currency_id.symbol or 'R$', event.min_price or '')"/></span>
                 </div>
                 <div class="my-3">
                   <strong>Local:</strong> <t t-esc="event.venue_name"/>
