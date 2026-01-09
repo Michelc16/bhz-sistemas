@@ -1,5 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
+  <data>
     <!-- Menu raiz -->
     <menuitem id="menu_guiabh_root" name="GuiaBH" sequence="5"/>
 
@@ -123,4 +124,5 @@
             </form>
         </field>
     </record>
+  </data>
 </odoo>

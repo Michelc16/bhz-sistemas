@@ -1,5 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
+  <data>
     <record id="rule_guiabh_event_public" model="ir.rule">
         <field name="name">Eventos publicados (público)</field>
         <field name="model_id" ref="model_guiabh_event"/>
@@ -71,4 +72,5 @@
         <field name="perm_create" eval="False"/>
         <field name="perm_unlink" eval="False"/>
     </record>
+  </data>
 </odoo>

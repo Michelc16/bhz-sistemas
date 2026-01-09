@@ -1,5 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
+  <data>
     <record id="action_guiabh_place" model="ir.actions.act_window">
         <field name="name">Lugares</field>
         <field name="res_model">guiabh.place</field>
@@ -108,4 +109,5 @@
             </form>
         </field>
     </record>
+  </data>
 </odoo>

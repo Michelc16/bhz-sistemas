@@ -1,5 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
+  <data>
     <!-- Ações -->
     <record id="action_guiabh_region" model="ir.actions.act_window">
         <field name="name">Regiões</field>
@@ -144,4 +145,5 @@
             </form>
         </field>
     </record>
+  </data>
 </odoo>

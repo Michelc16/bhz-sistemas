@@ -1,5 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
+  <data>
     <!-- Regiões -->
     <record id="region_savassi" model="guiabh.region">
         <field name="name">Savassi</field>
@@ -246,4 +247,5 @@
         <field name="website_published" eval="True"/>
         <field name="cover_image" type="base64" file="bhz_guiabh_website/static/src/img/placeholders/event_placeholder.svg"/>
     </record>
+  </data>
 </odoo>
