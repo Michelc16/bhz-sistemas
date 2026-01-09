@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Páginas específicas podem ser adicionadas aqui; rotas principais são controladas por controllers. -->
+</odoo>

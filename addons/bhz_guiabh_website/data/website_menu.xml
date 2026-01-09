@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo noupdate="1">
+    <record id="menu_guiabh_nav_eventos" model="website.menu">
+        <field name="name">Eventos</field>
+        <field name="url">/eventos</field>
+        <field name="website_id" ref="website.default_website"/>
+        <field name="parent_id" ref="website.main_menu"/>
+        <field name="sequence" eval="10"/>
+    </record>
+
+    <record id="menu_guiabh_nav_lugares" model="website.menu">
+        <field name="name">Lugares</field>
+        <field name="url">/lugares</field>
+        <field name="website_id" ref="website.default_website"/>
+        <field name="parent_id" ref="website.main_menu"/>
+        <field name="sequence" eval="20"/>
+    </record>
+
+    <record id="menu_guiabh_nav_oquefazer" model="website.menu">
+        <field name="name">O que fazer</field>
+        <field name="url">/eventos</field>
+        <field name="website_id" ref="website.default_website"/>
+        <field name="parent_id" ref="website.main_menu"/>
+        <field name="sequence" eval="30"/>
+    </record>
+
+    <record id="menu_guiabh_nav_guias" model="website.menu">
+        <field name="name">Guias</field>
+        <field name="url">/guias/fim-de-semana</field>
+        <field name="website_id" ref="website.default_website"/>
+        <field name="parent_id" ref="website.main_menu"/>
+        <field name="sequence" eval="40"/>
+    </record>
+
+    <record id="menu_guiabh_sub_today" model="website.menu">
+        <field name="name">Hoje</field>
+        <field name="url">/eventos?when=today</field>
+        <field name="parent_id" ref="menu_guiabh_nav_oquefazer"/>
+        <field name="website_id" ref="website.default_website"/>
+    </record>
+
+    <record id="menu_guiabh_sub_weekend" model="website.menu">
+        <field name="name">Fim de semana</field>
+        <field name="url">/eventos?when=weekend</field>
+        <field name="parent_id" ref="menu_guiabh_nav_oquefazer"/>
+        <field name="website_id" ref="website.default_website"/>
+    </record>
+
+    <record id="menu_guiabh_sub_free" model="website.menu">
+        <field name="name">Gratuitos</field>
+        <field name="url">/eventos?free=1</field>
+        <field name="parent_id" ref="menu_guiabh_nav_oquefazer"/>
+        <field name="website_id" ref="website.default_website"/>
+    </record>
+
+    <record id="menu_guiabh_sub_bares" model="website.menu">
+        <field name="name">Bares</field>
+        <field name="url" eval="'/lugares?tipo=%s' % ref('bhz_guiabh_website.place_type_bares')"/>
+        <field name="parent_id" ref="menu_guiabh_nav_lugares"/>
+        <field name="website_id" ref="website.default_website"/>
+    </record>
+
+    <record id="menu_guiabh_sub_restaurantes" model="website.menu">
+        <field name="name">Restaurantes</field>
+        <field name="url" eval="'/lugares?tipo=%s' % ref('bhz_guiabh_website.place_type_restaurantes')"/>
+        <field name="parent_id" ref="menu_guiabh_nav_lugares"/>
+        <field name="website_id" ref="website.default_website"/>
+    </record>
+
+    <record id="menu_guiabh_sub_cultura" model="website.menu">
+        <field name="name">Cultura</field>
+        <field name="url" eval="'/eventos?cat=%s' % ref('bhz_guiabh_website.event_cat_cultura')"/>
+        <field name="parent_id" ref="menu_guiabh_nav_eventos"/>
+        <field name="website_id" ref="website.default_website"/>
+    </record>
+</odoo>

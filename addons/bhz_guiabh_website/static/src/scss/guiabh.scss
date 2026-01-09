@@ -1,0 +1,81 @@
+// GuiaBH tema principal
+:root {
+  --guiabh-primary: #1f6feb;
+  --guiabh-secondary: #5ad1e8;
+  --guiabh-dark: #0b1224;
+  --guiabh-muted: #6b7280;
+  --guiabh-radius: 14px;
+  --guiabh-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
+}
+
+body.guia-bh {
+  font-family: 'Montserrat', 'Poppins', 'DM Sans', sans-serif;
+  color: #0f172a;
+  background: #f7f8fb;
+}
+
+.guia-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+@import 'components/navbar';
+@import 'components/hero';
+@import 'components/cards';
+@import 'components/chips';
+
+// Utilidades
+.guiabh-section-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  h2 {
+    margin: 0;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+  a {
+    color: var(--guiabh-primary);
+    font-weight: 600;
+  }
+}
+
+.guiabh-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--guiabh-muted);
+  font-size: 0.95rem;
+}
+
+.btn-guiabh {
+  background: linear-gradient(135deg, var(--guiabh-primary), var(--guiabh-secondary));
+  border: none;
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 12px;
+  font-weight: 700;
+  box-shadow: var(--guiabh-shadow);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 36px rgba(31, 111, 235, 0.28);
+    color: #fff;
+  }
+}
+
+.text-chip {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--guiabh-primary);
+}
+
+@media (max-width: 768px) {
+  .guia-container {
+    padding: 0 1rem;
+  }
+}
