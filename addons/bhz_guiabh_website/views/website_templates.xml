@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
+  <data>
     <!-- Cartões reutilizáveis -->
     <template id="guiabh_event_card" name="Cartão Evento">
       <div class="guiabh-card" itemscope="itemscope" itemtype="https://schema.org/Event">
@@ -20,7 +21,7 @@
           <p class="text-muted" itemprop="description"><t t-esc="event.short_description"/></p>
           <div class="footer">
             <span class="text-chip" t-if="event.price_type == 'free'">Gratuito</span>
-            <span class="text-chip" t-if="event.price_type == 'paid'"><t t-esc="'A partir de %s%s' % (event.currency_id and event.currency_id.symbol or 'R$', event.min_price or '')"/></span>
+            <span class="text-chip" t-if="event.price_type == 'paid'"><t t-esc="'A partir de %s%s' % (event.currency_id and event.currency_id.symbol or 'R$', event.min_price or '')"/></t>
             <a t-att-href="event.website_url or '/eventos/%s' % event.slug" class="btn btn-link">Ver detalhes</a>
           </div>
         </div>
@@ -93,9 +94,7 @@
                   <t t-call="bhz_guiabh_website.guiabh_event_card"/>
                 </t>
               </t>
-              <t t-else="">
-                <p>Cadastre eventos para vê-los aqui.</p>
-              </t>
+              <t t-else=""><p>Cadastre eventos para vê-los aqui.</p></t>
             </div>
           </div>
         </section>
@@ -107,9 +106,7 @@
               <a href="/eventos?ordenar=prox">Ordenar por data</a>
             </div>
             <div class="guiabh-grid">
-              <t t-foreach="upcoming_events" t-as="event">
-                <t t-call="bhz_guiabh_website.guiabh_event_card"/>
-              </t>
+              <t t-foreach="upcoming_events" t-as="event"><t t-call="bhz_guiabh_website.guiabh_event_card"/></t>
             </div>
           </div>
         </section>
@@ -121,9 +118,7 @@
               <a href="/lugares">Ver todos os lugares</a>
             </div>
             <div class="guiabh-grid">
-              <t t-foreach="featured_places" t-as="place">
-                <t t-call="bhz_guiabh_website.guiabh_place_card"/>
-              </t>
+              <t t-foreach="featured_places" t-as="place"><t t-call="bhz_guiabh_website.guiabh_place_card"/></t>
             </div>
           </div>
         </section>
@@ -222,13 +217,9 @@
           <div class="guia-container">
             <div class="guiabh-grid">
               <t t-if="events">
-                <t t-foreach="events" t-as="event">
-                  <t t-call="bhz_guiabh_website.guiabh_event_card"/>
-                </t>
+                <t t-foreach="events" t-as="event"><t t-call="bhz_guiabh_website.guiabh_event_card"/></t>
               </t>
-              <t t-else="">
-                <p>Nenhum evento encontrado com estes filtros.</p>
-              </t>
+              <t t-else=""><p>Nenhum evento encontrado com estes filtros.</p></t>
             </div>
             <t t-call="website.pager"/>
           </div>
@@ -278,7 +269,7 @@
                   <span class="guiabh-chip" t-if="event.region_id.name"><i class="fa fa-map-marker"/> <t t-esc="event.region_id.name"/></span>
                   <span class="guiabh-chip" t-if="event.category_id.name"><i class="fa fa-tag"/> <t t-esc="event.category_id.name"/></span>
                   <span class="guiabh-chip" t-if="event.price_type == 'free'">Gratuito</span>
-                  <span class="guiabh-chip" t-if="event.price_type == 'paid'"><t t-esc="'A partir de %s%s' % (event.currency_id and event.currency_id.symbol or 'R$', event.min_price or '')"/></span>
+                  <span class="guiabh-chip" t-if="event.price_type == 'paid'"><t t-esc="'A partir de %s%s' % (event.currency_id and event.currency_id.symbol or 'R$', event.min_price or '')"/></t>
                 </div>
                 <div class="my-3">
                   <strong>Local:</strong> <t t-esc="event.venue_name"/>
@@ -290,17 +281,11 @@
                 </div>
               </div>
             </div>
-            <div class="mt-5" id="sobre">
-              <t t-raw="event.description_html"/>
-            </div>
+            <div class="mt-5" id="sobre"><t t-raw="event.description_html"/></div>
             <div class="mt-5" t-if="related_events">
-              <div class="guiabh-section-title">
-                <h2>Eventos relacionados</h2>
-              </div>
+              <div class="guiabh-section-title"><h2>Eventos relacionados</h2></div>
               <div class="guiabh-grid">
-                <t t-foreach="related_events" t-as="event">
-                  <t t-call="bhz_guiabh_website.guiabh_event_card"/>
-                </t>
+                <t t-foreach="related_events" t-as="event"><t t-call="bhz_guiabh_website.guiabh_event_card"/></t>
               </div>
             </div>
           </div>
@@ -335,9 +320,7 @@
                     <option t-foreach="regions" t-as="reg" t-att-value="reg.id" t-att-selected="str(current_filters.get('reg')) == str(reg.id)"><t t-esc="reg.name"/></option>
                   </select>
                 </div>
-                <div class="col-md-2">
-                  <input type="text" class="form-control" name="tags" placeholder="IDs de tags" t-att-value="current_filters.get('tags') or ''" aria-label="Tags"/>
-                </div>
+                <div class="col-md-2"><input type="text" class="form-control" name="tags" placeholder="IDs de tags" t-att-value="current_filters.get('tags') or ''" aria-label="Tags"/></div>
                 <div class="col-md-1"><button class="btn btn-primary w-100" type="submit">Filtrar</button></div>
               </div>
             </form>
@@ -347,9 +330,7 @@
           <div class="guia-container">
             <div class="guiabh-grid">
               <t t-if="places">
-                <t t-foreach="places" t-as="place">
-                  <t t-call="bhz_guiabh_website.guiabh_place_card"/>
-                </t>
+                <t t-foreach="places" t-as="place"><t t-call="bhz_guiabh_website.guiabh_place_card"/></t>
               </t>
               <t t-else=""><p>Nenhum lugar encontrado com estes filtros.</p></t>
             </div>
@@ -455,4 +436,5 @@
         </section>
       </t>
     </template>
+  </data>
 </odoo>
