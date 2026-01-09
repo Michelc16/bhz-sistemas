@@ -12,8 +12,8 @@
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
-        'data/website_menu.xml',
         'data/demo.xml',
+        'data/website_menu.xml',
         'views/website_assets.xml',
         'views/website_routes.xml',
         'views/guiabh_taxonomy_views.xml',
