@@ -4,7 +4,6 @@
         <field name="name">Lugares</field>
         <field name="res_model">guiabh.place</field>
         <field name="view_mode">tree,kanban,form</field>
-        <field name="context">{'default_website_id': website_id}</field>
     </record>
 
     <menuitem id="menu_guiabh_places" name="Lugares" parent="menu_guiabh_root" action="action_guiabh_place" sequence="15"/>

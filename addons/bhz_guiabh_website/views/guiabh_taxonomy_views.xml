@@ -5,28 +5,24 @@
         <field name="name">Regiões</field>
         <field name="res_model">guiabh.region</field>
         <field name="view_mode">tree,form</field>
-        <field name="context">{'default_website_id': website_id}</field>
     </record>
 
     <record id="action_guiabh_event_category" model="ir.actions.act_window">
         <field name="name">Categorias de Eventos</field>
         <field name="res_model">guiabh.event.category</field>
         <field name="view_mode">tree,form</field>
-        <field name="context">{'default_website_id': website_id}</field>
     </record>
 
     <record id="action_guiabh_place_type" model="ir.actions.act_window">
         <field name="name">Tipos de Lugar</field>
         <field name="res_model">guiabh.place.type</field>
         <field name="view_mode">tree,form</field>
-        <field name="context">{'default_website_id': website_id}</field>
     </record>
 
     <record id="action_guiabh_tag" model="ir.actions.act_window">
         <field name="name">Tags</field>
         <field name="res_model">guiabh.tag</field>
         <field name="view_mode">tree,form</field>
-        <field name="context">{'default_website_id': website_id}</field>
     </record>
 
     <!-- Menus -->
