@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
+import re
 from odoo import api, fields, models
-from odoo.tools import slugify
 
 
 class GuiaBHEvent(models.Model):
@@ -40,8 +40,8 @@ class GuiaBHEvent(models.Model):
     @api.depends('name', 'website_id')
     def _compute_slug(self):
         for record in self:
-            base_value = record.slug or record.name
-            base_slug = slugify(base_value) or 'item'
+            base_value = (record.slug or record.name or '').strip()
+            base_slug = self._simple_slugify(base_value) or 'item'
             candidate = base_slug
             suffix = 1
             domain = [('id', '!=', record.id), ('website_id', '=', record.website_id.id if record.website_id else False)]
@@ -49,6 +49,13 @@ class GuiaBHEvent(models.Model):
                 candidate = f"{base_slug}-{suffix}"
                 suffix += 1
             record.slug = candidate
+
+    @staticmethod
+    def _simple_slugify(value):
+        value = (value or '').lower()
+        value = re.sub(r'[^a-z0-9]+', '-', value, flags=re.IGNORECASE)
+        value = re.sub(r'-+', '-', value).strip('-')
+        return value
 
     def _compute_website_url(self):
         super()._compute_website_url()
