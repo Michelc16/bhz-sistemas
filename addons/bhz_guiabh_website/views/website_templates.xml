@@ -21,7 +21,7 @@
           <p class="text-muted" itemprop="description"><t t-esc="event.short_description"/></p>
           <div class="footer">
             <span class="text-chip" t-if="event.price_type == 'free'">Gratuito</span>
-            <span class="text-chip" t-if="event.price_type == 'paid'"><t t-esc="'A partir de %s%s' % (event.currency_id and event.currency_id.symbol or 'R$', event.min_price or '')"/></t>
+            <span class="text-chip" t-if="event.price_type == 'paid'"><t t-esc="'A partir de %s%s' % (event.currency_id and event.currency_id.symbol or 'R$', event.min_price or '')"/></span>
             <a t-att-href="event.website_url or '/eventos/%s' % event.slug" class="btn btn-link">Ver detalhes</a>
           </div>
         </div>
