@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
+  <data>
     <!-- Snippet templates -->
     <template id="s_guiabh_hero_search" name="Hero GuiaBH" page="true">
         <section class="guiabh-hero" data-snippet="s_guiabh_hero_search" data-name="Hero GuiaBH" data-oe-shape-data='"{}"'>
@@ -128,4 +129,5 @@
             </we-snippet>
         </xpath>
     </template>
+  </data>
 </odoo>
