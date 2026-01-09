@@ -17,7 +17,7 @@
         <field name="name">guiabh.event.tree</field>
         <field name="model">guiabh.event</field>
         <field name="arch" type="xml">
-            <tree string="Eventos">
+            <list string="Eventos">
                 <field name="name"/>
                 <field name="start_datetime"/>
                 <field name="end_datetime"/>
@@ -28,7 +28,7 @@
                 <field name="is_featured"/>
                 <field name="website_published"/>
                 <field name="website_id"/>
-            </tree>
+            </list>
         </field>
     </record>
 

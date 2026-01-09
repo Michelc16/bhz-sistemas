@@ -37,11 +37,11 @@
         <field name="name">guiabh.region.tree</field>
         <field name="model">guiabh.region</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name"/>
                 <field name="active"/>
                 <field name="website_id"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -65,11 +65,11 @@
         <field name="name">guiabh.event.category.tree</field>
         <field name="model">guiabh.event.category</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name"/>
                 <field name="active"/>
                 <field name="website_id"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -93,11 +93,11 @@
         <field name="name">guiabh.place.type.tree</field>
         <field name="model">guiabh.place.type</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name"/>
                 <field name="active"/>
                 <field name="website_id"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -121,11 +121,11 @@
         <field name="name">guiabh.tag.tree</field>
         <field name="model">guiabh.tag</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name"/>
                 <field name="active"/>
                 <field name="website_id"/>
-            </tree>
+            </list>
         </field>
     </record>
 

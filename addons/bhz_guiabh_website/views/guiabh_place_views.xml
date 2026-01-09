@@ -12,7 +12,7 @@
         <field name="name">guiabh.place.tree</field>
         <field name="model">guiabh.place</field>
         <field name="arch" type="xml">
-            <tree string="Lugares">
+            <list string="Lugares">
                 <field name="name"/>
                 <field name="place_type_id"/>
                 <field name="region_id"/>
@@ -20,7 +20,7 @@
                 <field name="is_featured"/>
                 <field name="website_published"/>
                 <field name="website_id"/>
-            </tree>
+            </list>
         </field>
     </record>
 
