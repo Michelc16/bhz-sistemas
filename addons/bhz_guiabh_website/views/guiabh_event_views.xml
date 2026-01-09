@@ -49,7 +49,7 @@
                     <t t-name="kanban-box">
                         <div t-attf-class="oe_kanban_global_click o_kanban_card">
                             <div class="o_kanban_image">
-                                <img t-if="record.cover_image.raw_value" t-att-src="image_data_uri(record.cover_image.raw_value)" class="img img-fluid"/>
+                                <img t-if="record.cover_image.raw_value" t-att-src="image_data_uri(record.cover_image.raw_value)" class="img img-fluid" alt="Evento"/>
                                 <div t-else="" class="o_kanban_image_placeholder">Evento</div>
                                 <div class="badge badge-primary" t-if="record.is_featured.raw_value">Destaque</div>
                                 <div class="badge badge-success" t-if="record.website_published.raw_value">Publicado</div>

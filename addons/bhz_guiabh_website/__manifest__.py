@@ -20,6 +20,8 @@
         'views/guiabh_taxonomy_views.xml',
         'views/website_templates.xml',
         'views/website_pages.xml',
+    ],
+    'qweb': [
         'views/website_snippets.xml',
     ],
     'demo': [],
