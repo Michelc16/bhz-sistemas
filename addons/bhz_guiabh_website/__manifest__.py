@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     'name': 'BHZ GuiaBH Website',
     'summary': 'Site de eventos e lugares de BH com experiência moderna e conteúdo demo.',
