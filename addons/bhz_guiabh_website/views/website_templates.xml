@@ -11,7 +11,7 @@
         <div class="content">
           <div class="guiabh-meta">
             <i class="fa fa-calendar"></i>
-            <span itemprop="startDate" t-att-datetime="event.start_datetime"><t t-esc="format_datetime(event.start_datetime, tz='UTC', dt_format='medium')"/></span>
+            <span itemprop="startDate" t-att-datetime="event.start_datetime"><t t-esc="event.start_datetime"/></span>
           </div>
           <h3 itemprop="name"><t t-esc="event.name"/></h3>
           <div class="meta">
