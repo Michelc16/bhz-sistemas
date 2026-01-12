@@ -40,16 +40,18 @@
                     <t t-name="card">
                         <div class="oe_kanban_global_click o_kanban_card">
                             <div class="o_kanban_image">
-                                <img t-if="record.cover_image and record.cover_image.raw_value" t-att-src="'data:image/png;base64,%s' % record.cover_image.raw_value" class="img img-fluid" alt="Lugar"/>
+                                <t t-if="record.id and record.id.raw_value and record.cover_image">
+                                    <img t-att-src="'/web/image/guiabh.place/%s/cover_image' % record.id.raw_value" class="img img-fluid" alt="Lugar"/>
+                                </t>
                                 <div t-else="" class="o_kanban_image_placeholder">Lugar</div>
-                                <div class="badge badge-primary" t-if="record.is_featured.raw_value">Destaque</div>
-                                <div class="badge badge-success" t-if="record.website_published.raw_value">Publicado</div>
+                                <div class="badge badge-primary" t-if="record.is_featured and record.is_featured.raw_value">Destaque</div>
+                                <div class="badge badge-success" t-if="record.website_published and record.website_published.raw_value">Publicado</div>
                             </div>
                             <div class="o_kanban_details">
                                 <strong><field name="name"/></strong>
                                 <div class="text-muted"><field name="place_type_id"/></div>
                                 <div>
-                                    <span class="badge" t-if="record.region_id.raw_value"><field name="region_id"/></span>
+                                    <span class="badge" t-if="record.region_id and record.region_id.raw_value"><field name="region_id"/></span>
                                 </div>
                             </div>
                         </div>
