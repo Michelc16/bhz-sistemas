@@ -20,10 +20,10 @@ body.guia-bh {
   padding: 0 1.5rem;
 }
 
-@import 'components/navbar';
-@import 'components/hero';
-@import 'components/cards';
-@import 'components/chips';
+@import './components/navbar';
+@import './components/hero';
+@import './components/cards';
+@import './components/chips';
 
 // Utilidades
 .guiabh-section-title {
