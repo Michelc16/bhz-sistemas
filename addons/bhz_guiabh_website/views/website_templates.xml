@@ -13,7 +13,7 @@
             <div class="guiabh-meta">
               <i class="fa fa-calendar"></i>
               <time itemprop="startDate" t-att-datetime="event.start_datetime" class="text-muted">
-                <t t-esc="format_datetime(event.start_datetime, dt_format='medium')"/>
+                <t t-field="event.start_datetime" t-options="{'widget': 'datetime'}"/>
               </time>
             </div>
           </t>
@@ -263,10 +263,14 @@
                 <img class="img img-fluid rounded" t-att-src="event.cover_image and '/web/image/guiabh.event/%s/cover_image' % event.id or '/bhz_guiabh_website/static/src/img/placeholders/event_placeholder.svg'" t-att-alt="event.name" loading="lazy"/>
               </div>
               <div class="col-lg-5">
-                <div class="guiabh-meta mb-2">
-                  <i class="fa fa-calendar"></i>
-                  <span><t t-esc="format_datetime(event.start_datetime, dt_format='medium')"/></span>
-                </div>
+                <t t-if="event.start_datetime">
+                  <div class="guiabh-meta mb-2">
+                    <i class="fa fa-calendar"></i>
+                    <time t-att-datetime="event.start_datetime" class="text-muted small">
+                      <t t-field="event.start_datetime" t-options="{'widget': 'datetime'}"/>
+                    </time>
+                  </div>
+                </t>
                 <h1 class="mb-3"><t t-esc="event.name"/></h1>
                 <p class="text-muted"><t t-esc="event.short_description"/></p>
                 <div class="guiabh-chips">
