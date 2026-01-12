@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+  <data>
   <record id="view_bhz_dealer_car_tree" model="ir.ui.view">
     <field name="name">bhz.dealer.car.tree</field>
     <field name="model">bhz.dealer.car</field>
@@ -100,4 +101,5 @@
 
   <menuitem id="menu_bhz_dealer_root" name="BHZ Dealer" sequence="80"/>
   <menuitem id="menu_bhz_dealer_cars" name="Carros" parent="menu_bhz_dealer_root" action="action_bhz_dealer_cars" sequence="10"/>
+  </data>
 </odoo>
