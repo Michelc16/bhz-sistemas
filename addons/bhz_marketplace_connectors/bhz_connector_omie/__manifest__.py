@@ -5,7 +5,7 @@
     "summary": "Simulação de conector Omie",
     "author": "BHZ Sistemas",
     "license": "LGPL-3",
-    "depends": ["bhz_marketplace_connectors"],
+    "depends": ["bhz_marketplace_connectors.bhz_connector_base"],
     "data": [],
     "installable": True,
 }
