@@ -1,0 +1,9 @@
+<odoo>
+  <menuitem id="bhz_ai_root" name="BHZ AI" sequence="10" groups="bhz_ai_org.group_bhz_ai_operator,bhz_ai_org.group_bhz_ai_admin"/>
+
+  <menuitem id="bhz_ai_tasks_menu" name="Tasks" parent="bhz_ai_root" sequence="10"/>
+  <menuitem id="bhz_ai_agents_menu" name="Agents" parent="bhz_ai_root" sequence="20"/>
+  <menuitem id="bhz_ai_roles_menu" name="Roles" parent="bhz_ai_root" sequence="30" groups="bhz_ai_org.group_bhz_ai_admin"/>
+  <menuitem id="bhz_ai_tools_menu" name="Tools" parent="bhz_ai_root" sequence="40" groups="bhz_ai_org.group_bhz_ai_admin"/>
+  <menuitem id="bhz_ai_policies_menu" name="Policies" parent="bhz_ai_root" sequence="50" groups="bhz_ai_org.group_bhz_ai_admin"/>
+</odoo>

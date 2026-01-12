@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_bhz_ai_role,bhz.ai.role,model_bhz_ai_role,bhz_ai_org.group_bhz_ai_admin,1,1,1,1
+access_bhz_ai_agent,bhz.ai.agent,model_bhz_ai_agent,bhz_ai_org.group_bhz_ai_operator,1,1,1,0
+access_bhz_ai_tool,bhz.ai.tool,model_bhz_ai_tool,bhz_ai_org.group_bhz_ai_admin,1,1,1,1
+access_bhz_ai_policy,bhz.ai.policy,model_bhz_ai_policy,bhz_ai_org.group_bhz_ai_admin,1,1,1,1
+access_bhz_ai_task,bhz.ai.task,model_bhz_ai_task,bhz_ai_org.group_bhz_ai_operator,1,1,1,0
+access_bhz_ai_task_action,bhz.ai.task.action,model_bhz_ai_task_action,bhz_ai_org.group_bhz_ai_operator,1,1,1,0
