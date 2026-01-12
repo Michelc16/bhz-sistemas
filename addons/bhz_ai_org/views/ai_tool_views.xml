@@ -8,6 +8,7 @@
         <field name="code"/>
         <field name="risk_level"/>
         <field name="requires_approval"/>
+        <field name="is_destructive"/>
         <field name="active"/>
       </tree>
     </field>
@@ -30,6 +31,7 @@
           <group>
             <field name="risk_level"/>
             <field name="requires_approval"/>
+            <field name="is_destructive"/>
           </group>
           <group>
             <field name="model_name"/>

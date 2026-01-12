@@ -8,6 +8,7 @@ class BhzAiAgent(models.Model):
     _inherit = ["mail.thread", "mail.activity.mixin"]
     _order = "role_id desc, name"
 
+    code = fields.Char(required=True, index=True, help="Identificador curto do agente (usado em roteamento).")
     name = fields.Char(required=True, tracking=True)
     active = fields.Boolean(default=True)
     company_id = fields.Many2one("res.company", required=True, default=lambda self: self.env.company)
@@ -41,6 +42,10 @@ class BhzAiAgent(models.Model):
         ("execute_low", "Execute Low-Risk"),
         ("execute_all", "Execute All Allowed (subject to approvals)"),
     ], default="execute_low", required=True)
+
+    _sql_constraints = [
+        ("code_company_uniq", "unique(company_id, code)", "Já existe um agente com este código nesta empresa."),
+    ]
 
     def check_ready(self):
         for agent in self:

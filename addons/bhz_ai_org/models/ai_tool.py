@@ -23,6 +23,7 @@ class BhzAiTool(models.Model):
     ], default="medium", required=True)
 
     requires_approval = fields.Boolean(default=False)
+    is_destructive = fields.Boolean(default=False, help="Marque se a tool executa delete/unlink ou ação destrutiva.")
     sample_params_json = fields.Text(help="Exemplo de params em JSON (para documentação).")
 
     def validate_callable(self):

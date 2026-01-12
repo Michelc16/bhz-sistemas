@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 import json
+import ipaddress
+import socket
+from urllib.parse import urlparse
+
 import requests
 from odoo import api, models
 from odoo.exceptions import UserError
@@ -56,11 +60,98 @@ class BhzAiProviders(models.AbstractModel):
         raise UserError(f"Provider não suportado: {provider}")
 
     @api.model
-    def web_search(self, agent, query):
-        """Stub de busca web. Ideal: integrar SerpAPI/Bing/Google CSE/etc com allowlist."""
-        # Aqui você pluga seu provider real. Mantive stub para não “prometer” internet nativa.
-        return {
-            "query": query,
-            "results": [],
-            "note": "Web provider não configurado. Integre SerpAPI/Bing/CSE e aplique allowlist no policy.",
+    def web_search(self, agent, query, num_results=5):
+        """Busca via SerpAPI com allowlist de domínios e bloqueio de IPs privados."""
+        icp = self.env["ir.config_parameter"].sudo()
+        serp_key = icp.get_param("bhz_ai_org.serpapi_key", "").strip()
+
+        agent_rec = agent if hasattr(agent, "id") else self.env["bhz.ai.agent"].browse(agent)
+        policy = agent_rec.policy_id
+        allowlist_raw = (policy.web_allowlist_domains or "").strip() if policy else ""
+        allowlist = [d.strip().lower() for d in allowlist_raw.splitlines() if d.strip()]
+        block_private = bool(policy and policy.web_block_private_ips)
+
+        if not serp_key:
+            return {
+                "query": query,
+                "results": [],
+                "note": "SerpAPI não configurada em Configurações > BHZ AI Org.",
+            }
+
+        if not query:
+            return {"query": query, "results": [], "note": "Query vazia."}
+
+        try:
+            num = int(num_results)
+        except Exception:
+            num = 5
+        num = max(1, min(num, 20))
+
+        params = {
+            "engine": "google",
+            "q": query,
+            "api_key": serp_key,
+            "num": num,
         }
+
+        try:
+            resp = requests.get("https://serpapi.com/search.json", params=params, timeout=20)
+            resp.raise_for_status()
+            data = resp.json()
+            results = data.get("organic_results", []) or []
+        except Exception as e:
+            return {
+                "query": query,
+                "results": [],
+                "note": f"Erro ao consultar SerpAPI: {e}",
+            }
+
+        cleaned = []
+        for r in results:
+            url = (r.get("link") or "").strip()
+            title = r.get("title") or ""
+            snippet = r.get("snippet") or r.get("snippet_highlighted_words") or ""
+
+            if not url:
+                continue
+
+            parsed = urlparse(url)
+            hostname = parsed.hostname or ""
+            if allowlist:
+                host_l = hostname.lower()
+                if not any(host_l == d or host_l.endswith("." + d) for d in allowlist):
+                    continue
+
+            if block_private and hostname:
+                if self._is_private_host(hostname):
+                    continue
+
+            cleaned.append({
+                "title": title,
+                "url": url,
+                "snippet": snippet if isinstance(snippet, str) else " ".join(snippet),
+            })
+
+        return {"query": query, "results": cleaned}
+
+    @api.model
+    def _is_private_host(self, hostname):
+        """Bloqueia hosts privados/reservados."""
+        try:
+            # Se já for IP
+            ip_obj = ipaddress.ip_address(hostname)
+            return ip_obj.is_private or ip_obj.is_loopback or ip_obj.is_reserved
+        except ValueError:
+            pass
+
+        try:
+            infos = socket.getaddrinfo(hostname, None)
+            for fam, _, _, _, sockaddr in infos:
+                if fam in (socket.AF_INET, socket.AF_INET6):
+                    ip_obj = ipaddress.ip_address(sockaddr[0])
+                    if ip_obj.is_private or ip_obj.is_loopback or ip_obj.is_reserved:
+                        return True
+        except Exception:
+            # Em dúvida, não bloqueia mas também não falha o fluxo
+            return False
+        return False

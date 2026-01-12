@@ -20,6 +20,7 @@ class BhzAiTaskWizard(models.TransientModel):
         task = self.env["bhz.ai.task"].create({
             "name": "AI Task",
             "agent_id": self.agent_id.id,
+            "router_agent_id": self.agent_id.id,
             "user_input": self.user_input,
             "company_id": self.env.company.id,
             "requester_user_id": self.env.user.id,

@@ -15,6 +15,7 @@
 
             <field name="bhz_ai_ollama_url" attrs="{'invisible':[('bhz_ai_llm_provider','!=','ollama')]}"/>
             <field name="bhz_ai_ollama_model" attrs="{'invisible':[('bhz_ai_llm_provider','!=','ollama')]}"/>
+            <field name="bhz_ai_serpapi_key" password="True" string="SerpAPI Key"/>
           </group>
         </div>
       </xpath>

@@ -31,11 +31,25 @@
             <field name="agent_id"/>
             <field name="requester_user_id" readonly="1"/>
             <field name="approval_required" readonly="1"/>
+            <field name="has_destructive_actions" readonly="1"/>
             <field name="approved_by_id" readonly="1"/>
             <field name="approved_on" readonly="1"/>
           </group>
+          <div class="alert alert-danger" attrs="{'invisible':[('has_destructive_actions','=',False)]}">
+            Esta task contém tools destrutivas. Aprovação é obrigatória antes de executar.
+          </div>
 
           <notebook>
+            <page string="Memory">
+              <field name="memory_context" widget="text" readonly="1"/>
+            </page>
+            <page string="Routing">
+              <group>
+                <field name="router_agent_id"/>
+                <field name="assigned_agent_id" readonly="1"/>
+              </group>
+              <field name="routing_json" widget="text" readonly="1" string="Routing JSON"/>
+            </page>
             <page string="Input">
               <field name="user_input" placeholder="Descreva o que a IA deve fazer..."/>
             </page>

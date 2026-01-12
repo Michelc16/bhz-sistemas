@@ -24,6 +24,8 @@
         "views/ai_tool_views.xml",
         "views/ai_policy_views.xml",
         "views/ai_task_views.xml",
+        "views/ai_memory_views.xml",
+        "views/ai_audit_log_views.xml",
         "views/res_config_settings_views.xml",
     ],
     "application": True,
