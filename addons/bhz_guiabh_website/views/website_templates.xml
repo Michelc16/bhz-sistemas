@@ -9,10 +9,14 @@
           <div class="badge" t-if="event.is_featured">Destaque</div>
         </div>
         <div class="content">
-          <div class="guiabh-meta">
-            <i class="fa fa-calendar"></i>
-            <span itemprop="startDate" t-att-datetime="event.start_datetime"><t t-esc="event.start_datetime"/></span>
-          </div>
+          <t t-if="event.start_datetime">
+            <div class="guiabh-meta">
+              <i class="fa fa-calendar"></i>
+              <span itemprop="startDate" t-att-datetime="event.start_datetime">
+                <t t-field="event.start_datetime" t-options="{'widget': 'datetime'}"/>
+              </span>
+            </div>
+          </t>
           <h3 itemprop="name"><t t-esc="event.name"/></h3>
           <div class="meta">
             <span itemprop="location" t-if="event.venue_name"><i class="fa fa-map-marker"/> <t t-esc="event.venue_name"/></span>
