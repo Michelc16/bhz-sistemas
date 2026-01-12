@@ -19,9 +19,9 @@
     <field name="arch" type="xml">
       <form>
         <header>
-          <button name="action_plan" type="object" string="Plan" class="btn-primary" attrs="{'invisible':[('state','!=','draft')]}"/>
-          <button name="action_approve" type="object" string="Approve" class="btn-secondary" groups="bhz_ai_org.group_bhz_ai_approver" attrs="{'invisible':[('state','!=','waiting_approval')]}"/>
-          <button name="action_run_now" type="object" string="Run Now" class="btn-primary" attrs="{'invisible':[('state','!=','planned')]}"/>
+          <button name="action_plan" type="object" string="Plan" class="btn-primary"/>
+          <button name="action_approve" type="object" string="Approve" class="btn-secondary" groups="bhz_ai_org.group_bhz_ai_approver"/>
+          <button name="action_run_now" type="object" string="Run Now" class="btn-primary"/>
           <field name="state" widget="statusbar" statusbar_visible="draft,planned,waiting_approval,running,done,failed"/>
         </header>
 
@@ -35,7 +35,7 @@
             <field name="approved_by_id" readonly="1"/>
             <field name="approved_on" readonly="1"/>
           </group>
-          <div class="alert alert-danger" attrs="{'invisible':[('has_destructive_actions','=',False)]}">
+          <div class="alert alert-danger">
             Esta task contém tools destrutivas. Aprovação é obrigatória antes de executar.
           </div>
 

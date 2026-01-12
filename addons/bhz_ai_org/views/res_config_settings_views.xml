@@ -9,12 +9,12 @@
           <h2>BHZ AI Org</h2>
           <group>
             <field name="bhz_ai_llm_provider"/>
-            <field name="bhz_ai_openai_base_url" attrs="{'invisible':[('bhz_ai_llm_provider','!=','openai_compatible')]}"/>
-            <field name="bhz_ai_openai_api_key" password="True" attrs="{'invisible':[('bhz_ai_llm_provider','!=','openai_compatible')]}"/>
-            <field name="bhz_ai_openai_model" attrs="{'invisible':[('bhz_ai_llm_provider','!=','openai_compatible')]}"/>
+            <field name="bhz_ai_openai_base_url"/>
+            <field name="bhz_ai_openai_api_key" password="True"/>
+            <field name="bhz_ai_openai_model"/>
 
-            <field name="bhz_ai_ollama_url" attrs="{'invisible':[('bhz_ai_llm_provider','!=','ollama')]}"/>
-            <field name="bhz_ai_ollama_model" attrs="{'invisible':[('bhz_ai_llm_provider','!=','ollama')]}"/>
+            <field name="bhz_ai_ollama_url"/>
+            <field name="bhz_ai_ollama_model"/>
             <field name="bhz_ai_serpapi_key" password="True" string="SerpAPI Key"/>
           </group>
         </div>
