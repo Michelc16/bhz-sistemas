@@ -3,13 +3,13 @@
     <field name="name">bhz.ai.task.tree</field>
     <field name="model">bhz.ai.task</field>
     <field name="arch" type="xml">
-      <tree>
+      <list>
         <field name="name"/>
         <field name="state"/>
         <field name="agent_id"/>
         <field name="requester_user_id"/>
         <field name="create_date"/>
-      </tree>
+      </list>
     </field>
   </record>
 
@@ -58,12 +58,12 @@
             </page>
             <page string="Actions">
               <field name="action_ids">
-                <tree editable="bottom">
+                <list editable="bottom">
                   <field name="sequence"/>
                   <field name="tool_id"/>
                   <field name="state"/>
                   <field name="params_json"/>
-                </tree>
+                </list>
               </field>
             </page>
             <page string="Result">
@@ -79,7 +79,7 @@
   <record id="action_bhz_ai_task" model="ir.actions.act_window">
     <field name="name">AI Tasks</field>
     <field name="res_model">bhz.ai.task</field>
-    <field name="view_mode">tree,form</field>
+    <field name="view_mode">list,form</field>
   </record>
 
   <menuitem id="menu_bhz_ai_task_open" parent="bhz_ai_tasks_menu" action="action_bhz_ai_task" sequence="10"/>
