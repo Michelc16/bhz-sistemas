@@ -1,11 +1,11 @@
 <odoo>
 
-    <!-- TREE -->
+    <!-- LIST -->
     <record id="view_bhz_ifood_order_tree" model="ir.ui.view">
         <field name="name">bhz.ifood.order.tree</field>
         <field name="model">bhz.ifood.order</field>
         <field name="arch" type="xml">
-            <tree string="Pedidos iFood" default_order="id desc">
+            <list string="Pedidos iFood" default_order="id desc">
                 <field name="name"/>
                 <field name="ifood_order_id"/>
                 <field name="status"/>
@@ -14,7 +14,7 @@
                 <field name="total_amount"/>
                 <field name="state"/>
                 <field name="sale_order_id"/>
-            </tree>
+            </list>
         </field>
     </record>
 

@@ -1,11 +1,11 @@
 <odoo>
 
-    <!-- TREE -->
+    <!-- LIST -->
     <record id="view_bhz_ifood_account_tree" model="ir.ui.view">
         <field name="name">bhz.ifood.account.tree</field>
         <field name="model">bhz.ifood.account</field>
         <field name="arch" type="xml">
-            <tree string="Contas iFood" default_order="id desc">
+            <list string="Contas iFood" default_order="id desc">
                 <field name="active" widget="boolean_toggle"/>
                 <field name="name"/>
                 <field name="company_id"/>
@@ -13,7 +13,7 @@
                 <field name="merchant_id"/>
                 <field name="webhook_enabled"/>
                 <field name="last_sync_at"/>
-            </tree>
+            </list>
         </field>
     </record>
 

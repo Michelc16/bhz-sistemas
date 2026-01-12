@@ -1,17 +1,17 @@
 <odoo>
 
-    <!-- TREE -->
+    <!-- LIST -->
     <record id="view_bhz_ifood_product_map_tree" model="ir.ui.view">
         <field name="name">bhz.ifood.product.map.tree</field>
         <field name="model">bhz.ifood.product.map</field>
         <field name="arch" type="xml">
-            <tree string="Mapa Produtos iFood" default_order="id desc">
+            <list string="Mapa Produtos iFood" default_order="id desc">
                 <field name="company_id"/>
                 <field name="account_id"/>
                 <field name="ifood_sku"/>
                 <field name="ifood_name"/>
                 <field name="product_id"/>
-            </tree>
+            </list>
         </field>
     </record>
 
