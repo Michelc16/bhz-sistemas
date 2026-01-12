@@ -66,7 +66,7 @@ class BhzIFoodAccount(models.Model):
         return "https://merchant-api.ifood.com.br"     # sandbox pode variar conforme portal
     
     def _cron_sync_orders(self):
-        for acc in self.search([("activer", "=", True)]):
+        for acc in self.search([("active", "=", True)]):
             try:
                 client = acc._client()
                 # janela simples: últimos 10 minutos
