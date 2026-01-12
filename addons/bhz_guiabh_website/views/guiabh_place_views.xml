@@ -37,7 +37,7 @@
                 <field name="website_published"/>
                 <field name="is_featured"/>
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div class="oe_kanban_global_click o_kanban_card">
                             <div class="o_kanban_image">
                                 <img t-if="record.cover_image.raw_value" t-att-src="image_data_uri(record.cover_image.raw_value)" class="img img-fluid" alt="Lugar"/>
