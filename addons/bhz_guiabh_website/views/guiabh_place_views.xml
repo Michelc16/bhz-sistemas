@@ -4,7 +4,7 @@
     <record id="action_guiabh_place" model="ir.actions.act_window">
         <field name="name">Lugares</field>
         <field name="res_model">guiabh.place</field>
-        <field name="view_mode">tree,kanban,form</field>
+        <field name="view_mode">kanban,tree,form</field>
     </record>
 
     <menuitem id="menu_guiabh_places" name="Lugares" parent="menu_guiabh_root" action="action_guiabh_place" sequence="15"/>
@@ -13,7 +13,7 @@
         <field name="name">guiabh.place.tree</field>
         <field name="model">guiabh.place</field>
         <field name="arch" type="xml">
-            <list string="Lugares">
+            <tree string="Lugares">
                 <field name="name"/>
                 <field name="place_type_id"/>
                 <field name="region_id"/>
@@ -21,7 +21,7 @@
                 <field name="is_featured"/>
                 <field name="website_published"/>
                 <field name="website_id"/>
-            </list>
+            </tree>
         </field>
     </record>
 

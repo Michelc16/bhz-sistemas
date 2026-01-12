@@ -8,7 +8,7 @@
     <record id="action_guiabh_event" model="ir.actions.act_window">
         <field name="name">Eventos</field>
         <field name="res_model">guiabh.event</field>
-        <field name="view_mode">tree,kanban,form</field>
+        <field name="view_mode">kanban,tree,form</field>
     </record>
 
     <menuitem id="menu_guiabh_events" name="Eventos" parent="menu_guiabh_root" action="action_guiabh_event" sequence="10"/>
@@ -18,7 +18,7 @@
         <field name="name">guiabh.event.tree</field>
         <field name="model">guiabh.event</field>
         <field name="arch" type="xml">
-            <list string="Eventos">
+            <tree string="Eventos">
                 <field name="name"/>
                 <field name="start_datetime"/>
                 <field name="end_datetime"/>
@@ -29,7 +29,7 @@
                 <field name="is_featured"/>
                 <field name="website_published"/>
                 <field name="website_id"/>
-            </list>
+            </tree>
         </field>
     </record>
 
