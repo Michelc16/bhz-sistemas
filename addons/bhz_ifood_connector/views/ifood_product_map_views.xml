@@ -1,0 +1,72 @@
+<odoo>
+
+    <!-- TREE -->
+    <record id="view_bhz_ifood_product_map_tree" model="ir.ui.view">
+        <field name="name">bhz.ifood.product.map.tree</field>
+        <field name="model">bhz.ifood.product.map</field>
+        <field name="arch" type="xml">
+            <tree string="Mapa Produtos iFood" default_order="id desc">
+                <field name="company_id"/>
+                <field name="account_id"/>
+                <field name="ifood_sku"/>
+                <field name="ifood_name"/>
+                <field name="product_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- FORM -->
+    <record id="view_bhz_ifood_product_map_form" model="ir.ui.view">
+        <field name="name">bhz.ifood.product.map.form</field>
+        <field name="model">bhz.ifood.product.map</field>
+        <field name="arch" type="xml">
+            <form string="Mapa Produto iFood">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="company_id"/>
+                            <field name="account_id"/>
+                        </group>
+                        <group>
+                            <field name="ifood_sku"/>
+                            <field name="ifood_name"/>
+                            <field name="product_id"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- SEARCH -->
+    <record id="view_bhz_ifood_product_map_search" model="ir.ui.view">
+        <field name="name">bhz.ifood.product.map.search</field>
+        <field name="model">bhz.ifood.product.map</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Mapas iFood">
+                <field name="ifood_sku"/>
+                <field name="ifood_name"/>
+                <field name="product_id"/>
+                <field name="company_id"/>
+                <field name="account_id"/>
+                <group expand="0" string="Agrupar por">
+                    <filter string="Empresa" name="group_company" context="{'group_by':'company_id'}"/>
+                    <filter string="Conta" name="group_account" context="{'group_by':'account_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ACTION -->
+    <record id="action_ifood_product_maps" model="ir.actions.act_window">
+        <field name="name">Mapa de Produtos</field>
+        <field name="res_model">bhz.ifood.product.map</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Mapeie o SKU do iFood para o produto do Odoo para importar itens corretamente.
+            </p>
+        </field>
+    </record>
+
+</odoo>

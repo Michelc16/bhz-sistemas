@@ -1,0 +1,9 @@
+<odoo>
+    <record id="seq_bhz_ifood_order" model="ir.sequence">
+        <field name="name">BHZ iFood Order</field>
+        <field name="code">bhz.ifood.order</field>
+        <field name="prefix">IFOOD/%(year)s/</field>
+        <field name="padding">6</field>
+        <field name="company_id" eval="False"/>
+    </record>
+</odoo>

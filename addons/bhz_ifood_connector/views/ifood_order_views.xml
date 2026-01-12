@@ -1,0 +1,115 @@
+<odoo>
+
+    <!-- TREE -->
+    <record id="view_bhz_ifood_order_tree" model="ir.ui.view">
+        <field name="name">bhz.ifood.order.tree</field>
+        <field name="model">bhz.ifood.order</field>
+        <field name="arch" type="xml">
+            <tree string="Pedidos iFood" default_order="id desc">
+                <field name="name"/>
+                <field name="ifood_order_id"/>
+                <field name="status"/>
+                <field name="company_id"/>
+                <field name="account_id"/>
+                <field name="total_amount"/>
+                <field name="state"/>
+                <field name="sale_order_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- FORM -->
+    <record id="view_bhz_ifood_order_form" model="ir.ui.view">
+        <field name="name">bhz.ifood.order.form</field>
+        <field name="model">bhz.ifood.order</field>
+        <field name="arch" type="xml">
+            <form string="Pedido iFood">
+                <header>
+                    <button name="action_import_to_sale"
+                            type="object"
+                            string="Importar para Venda"
+                            class="btn-primary"
+                            attrs="{'invisible': [('state','=','imported')]}"/>
+                    <field name="state" widget="statusbar" statusbar_visible="new,imported,error"/>
+                </header>
+
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="company_id"/>
+                            <field name="account_id"/>
+                            <field name="ifood_order_id"/>
+                            <field name="status"/>
+                        </group>
+                        <group>
+                            <field name="total_amount"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="sale_order_id" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Cliente e Entrega">
+                            <group>
+                                <group>
+                                    <field name="customer_name"/>
+                                    <field name="customer_phone"/>
+                                </group>
+                                <group>
+                                    <field name="delivery_address"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Payload (JSON)">
+                            <field name="raw_payload" nolabel="1" widget="text" placeholder="Payload bruto recebido do iFood"/>
+                        </page>
+                    </notebook>
+                </sheet>
+
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- SEARCH -->
+    <record id="view_bhz_ifood_order_search" model="ir.ui.view">
+        <field name="name">bhz.ifood.order.search</field>
+        <field name="model">bhz.ifood.order</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Pedidos iFood">
+                <field name="name"/>
+                <field name="ifood_order_id"/>
+                <field name="status"/>
+                <field name="company_id"/>
+                <field name="account_id"/>
+                <filter string="Novos" name="new" domain="[('state','=','new')]"/>
+                <filter string="Importados" name="imported" domain="[('state','=','imported')]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter string="Empresa" name="group_company" context="{'group_by':'company_id'}"/>
+                    <filter string="Conta" name="group_account" context="{'group_by':'account_id'}"/>
+                    <filter string="Estado" name="group_state" context="{'group_by':'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ACTION -->
+    <record id="action_ifood_orders" model="ir.actions.act_window">
+        <field name="name">Pedidos iFood</field>
+        <field name="res_model">bhz.ifood.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Quando chegarem eventos do iFood (webhook ou cron), os pedidos aparecem aqui.
+            </p>
+        </field>
+    </record>
+
+</odoo>

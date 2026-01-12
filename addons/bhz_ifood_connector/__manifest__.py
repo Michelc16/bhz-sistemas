@@ -1,0 +1,22 @@
+{
+    "name": "BHZ iFood Connector",
+    "version": "19.0.1.0.0",
+    "category": "Sales",
+    "summary": "Integração iFood (Pedidos) para Odoo",
+    "author": "BHZ Sistemas",
+    "license": "LGPL-3",
+    "depends": ["base", "sale_management", "mail", "web"],
+    "data": [
+        "security/security.xml",
+        "security/ir.model.access.csv",
+        "data/sequence.xml",
+        "data/ir_cron.xml",
+        "views/ifood_menu.xml",
+        "views/ifood_account_views.xml",
+        "views/ifood_order_views.xml",
+        "views/ifood_product_map_views.xml",
+        "views/res_config_settings_views.xml",
+    ],
+    "installable": True,
+    "application": True,
+}

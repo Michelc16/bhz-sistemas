@@ -1,0 +1,74 @@
+<odoo>
+
+    <!-- Campos relacionados em res.config.settings -->
+    <record id="view_res_config_settings_ifood_inherit" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.bhz_ifood_connector</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Tenta encaixar no app Vendas; se não existir o bloco, continua funcionando -->
+            <xpath expr="//div[contains(@class,'settings')]" position="inside">
+                <div class="app_settings_block" data-string="iFood" string="iFood">
+                    <h2>iFood</h2>
+
+                    <div class="row mt16 o_settings_container">
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane"/>
+                            <div class="o_setting_right_pane">
+                                <label string="Contas iFood"/>
+                                <div class="text-muted">
+                                    Gerencie credenciais, merchant_id, webhook e sincronização de pedidos.
+                                </div>
+                                <div class="mt8">
+                                    <button type="action"
+                                            name="%(bhz_ifood_connector.action_ifood_accounts)d"
+                                            class="btn btn-primary">
+                                        Abrir Contas iFood
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane"/>
+                            <div class="o_setting_right_pane">
+                                <label string="Pedidos iFood"/>
+                                <div class="text-muted">
+                                    Visualize os pedidos recebidos (webhook/polling) e importe para vendas.
+                                </div>
+                                <div class="mt8">
+                                    <button type="action"
+                                            name="%(bhz_ifood_connector.action_ifood_orders)d"
+                                            class="btn btn-secondary">
+                                        Abrir Pedidos
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane"/>
+                            <div class="o_setting_right_pane">
+                                <label string="Mapa de Produtos"/>
+                                <div class="text-muted">
+                                    Faça o vínculo SKU iFood → Produto Odoo para importar itens corretamente.
+                                </div>
+                                <div class="mt8">
+                                    <button type="action"
+                                            name="%(bhz_ifood_connector.action_ifood_product_maps)d"
+                                            class="btn btn-secondary">
+                                        Abrir Mapa de Produtos
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

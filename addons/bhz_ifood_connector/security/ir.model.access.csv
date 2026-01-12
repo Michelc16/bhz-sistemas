@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ifood_account,bhz.ifood.account,model_bhz_ifood_account,bhz_ifood_connector.group_ifood_manager,1,1,1,1
+access_ifood_order,bhz.ifood.order,model_bhz_ifood_order,bhz_ifood_connector.group_ifood_manager,1,1,1,1
+access_ifood_product_map,bhz.ifood.product.map,model_bhz_ifood_product_map,bhz_ifood_connector.group_ifood_manager,1,1,1,1

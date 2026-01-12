@@ -1,0 +1,135 @@
+<odoo>
+
+    <!-- TREE -->
+    <record id="view_bhz_ifood_account_tree" model="ir.ui.view">
+        <field name="name">bhz.ifood.account.tree</field>
+        <field name="model">bhz.ifood.account</field>
+        <field name="arch" type="xml">
+            <tree string="Contas iFood" default_order="id desc">
+                <field name="active" widget="boolean_toggle"/>
+                <field name="name"/>
+                <field name="company_id"/>
+                <field name="environment"/>
+                <field name="merchant_id"/>
+                <field name="webhook_enabled"/>
+                <field name="last_sync_at"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- FORM -->
+    <record id="view_bhz_ifood_account_form" model="ir.ui.view">
+        <field name="name">bhz.ifood.account.form</field>
+        <field name="model">bhz.ifood.account</field>
+        <field name="arch" type="xml">
+            <form string="Conta iFood">
+                <header>
+                    <button name="action_test_connection"
+                            type="object"
+                            string="Testar Conexão"
+                            class="btn-primary"/>
+                    <field name="active" widget="boolean_toggle"/>
+                </header>
+
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Ex: iFood - Loja Savassi"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="company_id"/>
+                            <field name="environment"/>
+                            <field name="merchant_id" placeholder="Merchant ID do iFood"/>
+                        </group>
+                        <group>
+                            <field name="webhook_enabled"/>
+                            <field name="last_sync_at" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Credenciais">
+                            <group>
+                                <group>
+                                    <field name="client_id"/>
+                                    <field name="client_secret" password="True"/>
+                                </group>
+                                <group>
+                                    <field name="refresh_token" readonly="1"/>
+                                    <field name="access_token" readonly="1"/>
+                                    <field name="token_expires_at" readonly="1"/>
+                                </group>
+                            </group>
+                            <label string="Dica: em produção, prefira armazenar Client Secret via variáveis/secret (Odoo.sh) e restringir acesso ao grupo iFood Manager."/>
+                        </page>
+
+                        <page string="Webhook">
+                            <group>
+                                <group>
+                                    <field name="webhook_secret"
+                                           placeholder="Use como token na URL do webhook e na validação da assinatura"/>
+                                </group>
+                                <group>
+                                    <label string="URL do Webhook (coloque no Portal iFood):"/>
+                                    <div>
+                                        <span>/ifood/webhook/</span>
+                                        <field name="webhook_secret" readonly="1"/>
+                                    </div>
+                                </group>
+                            </group>
+
+                            <separator string="Obs:"/>
+                            <p>
+                                Se você usar webhook, recomendo manter o cron de polling como fallback (ex.: a cada 5 min),
+                                caso algum evento falhe.
+                            </p>
+                        </page>
+
+                        <page string="Logs">
+                            <group>
+                                <field name="last_error" readonly="1" nolabel="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- SEARCH -->
+    <record id="view_bhz_ifood_account_search" model="ir.ui.view">
+        <field name="name">bhz.ifood.account.search</field>
+        <field name="model">bhz.ifood.account</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Contas iFood">
+                <field name="name"/>
+                <field name="merchant_id"/>
+                <field name="company_id"/>
+                <filter string="Ativas" name="active" domain="[('active','=',True)]"/>
+                <filter string="Webhook" name="webhook" domain="[('webhook_enabled','=',True)]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter string="Empresa" name="group_company" context="{'group_by':'company_id'}"/>
+                    <filter string="Ambiente" name="group_env" context="{'group_by':'environment'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ACTION -->
+    <record id="action_ifood_accounts" model="ir.actions.act_window">
+        <field name="name">Contas iFood</field>
+        <field name="res_model">bhz.ifood.account</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crie a primeira conta iFood para começar a importar pedidos.
+            </p>
+        </field>
+    </record>
+
+</odoo>
