@@ -3,12 +3,12 @@
     <field name="name">bhz.ai.role.tree</field>
     <field name="model">bhz.ai.role</field>
     <field name="arch" type="xml">
-      <tree>
+      <list>
         <field name="name"/>
         <field name="code"/>
         <field name="level"/>
         <field name="parent_id"/>
-      </tree>
+      </list>
     </field>
   </record>
 
