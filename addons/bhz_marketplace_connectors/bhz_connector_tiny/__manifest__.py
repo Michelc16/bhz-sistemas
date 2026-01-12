@@ -5,7 +5,7 @@
     "summary": "Simulação de conector Tiny ERP",
     "author": "BHZ Sistemas",
     "license": "LGPL-3",
-    "depends": ["bhz_marketplace_connectors.bhz_connector_base"],
+    "depends": ["bhz_connector_base"],
     "data": [],
     "installable": True,
 }

@@ -5,7 +5,7 @@
     "summary": "Simulação de conector Bling",
     "author": "BHZ Sistemas",
     "license": "LGPL-3",
-    "depends": ["bhz_marketplace_connectors.bhz_connector_base"],
+    "depends": ["bhz_connector_base"],
     "data": [],
     "installable": True,
 }

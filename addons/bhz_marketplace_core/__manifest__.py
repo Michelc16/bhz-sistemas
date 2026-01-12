@@ -5,7 +5,7 @@
     "summary": "Núcleo de marketplace multivendedor com sellers, API, portal e vitrine pública.",
     "author": "BHZ Sistemas",
     "license": "LGPL-3",
-    "depends": ["base", "product", "sale_management", "website", "portal", "mail"],
+    "depends": ["base", "product", "sale_management", "website", "portal", "mail", "bhz_web_fix"],
     "data": [
         "security/security.xml",
         "security/ir.model.access.csv",
