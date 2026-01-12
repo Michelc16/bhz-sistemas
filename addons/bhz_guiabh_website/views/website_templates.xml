@@ -12,9 +12,9 @@
           <t t-if="event.start_datetime">
             <div class="guiabh-meta">
               <i class="fa fa-calendar"></i>
-              <span itemprop="startDate" t-att-datetime="event.start_datetime">
-                <t t-field="event.start_datetime" t-options="{'widget': 'datetime'}"/>
-              </span>
+              <time itemprop="startDate" t-att-datetime="event.start_datetime" class="text-muted">
+                <t t-esc="format_datetime(event.start_datetime, dt_format='medium')"/>
+              </time>
             </div>
           </t>
           <h3 itemprop="name"><t t-esc="event.name"/></h3>
