@@ -44,6 +44,7 @@
                 <field name="start_datetime"/>
                 <field name="category_id"/>
                 <field name="region_id"/>
+                <field name="is_featured"/>
                 <field name="website_published"/>
                 <templates>
                     <t t-name="card">
