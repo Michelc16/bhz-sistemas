@@ -1,0 +1,76 @@
+<odoo>
+  <record id="view_bhz_marketplace_seller_tree" model="ir.ui.view">
+    <field name="name">bhz.marketplace.seller.tree</field>
+    <field name="model">bhz.marketplace.seller</field>
+    <field name="arch" type="xml">
+      <tree>
+        <field name="name"/>
+        <field name="partner_id"/>
+        <field name="user_id"/>
+        <field name="state"/>
+        <field name="shop_slug"/>
+        <field name="commission_rate"/>
+      </tree>
+    </field>
+  </record>
+
+  <record id="view_bhz_marketplace_seller_form" model="ir.ui.view">
+    <field name="name">bhz.marketplace.seller.form</field>
+    <field name="model">bhz.marketplace.seller</field>
+    <field name="arch" type="xml">
+      <form string="Seller">
+        <header>
+          <button name="action_set_pending" string="Enviar para aprovação" type="object" states="draft,rejected" class="btn-primary"/>
+          <button name="action_approve" string="Aprovar" type="object" states="pending"/>
+          <button name="action_reject" string="Rejeitar" type="object" states="pending"/>
+          <button name="action_suspend" string="Suspender" type="object" states="approved"/>
+          <field name="state" widget="statusbar" statusbar_visible="draft,pending,approved,rejected,suspended"/>
+        </header>
+        <sheet>
+          <group>
+            <group>
+              <field name="name"/>
+              <field name="partner_id"/>
+              <field name="user_id"/>
+              <field name="commission_rate"/>
+            </group>
+            <group>
+              <field name="shop_slug"/>
+              <field name="shop_title"/>
+              <field name="shop_description"/>
+              <field name="shop_logo" widget="image" class="oe_avatar"/>
+            </group>
+          </group>
+          <group>
+            <group>
+              <field name="kyc_doc" filename="kyc_filename"/>
+              <field name="kyc_filename"/>
+            </group>
+            <group string="Dados bancários">
+              <field name="payout_bank_name"/>
+              <field name="payout_bank_account"/>
+              <field name="payout_bank_holder"/>
+            </group>
+          </group>
+          <notebook>
+            <page string="Tokens API">
+              <field name="api_token_ids">
+                <tree editable="bottom">
+                  <field name="name"/>
+                  <field name="token" readonly="1"/>
+                  <field name="last_used_at"/>
+                </tree>
+              </field>
+            </page>
+          </notebook>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_bhz_marketplace_seller" model="ir.actions.act_window">
+    <field name="name">Sellers</field>
+    <field name="res_model">bhz.marketplace.seller</field>
+    <field name="view_mode">tree,form</field>
+  </record>
+</odoo>

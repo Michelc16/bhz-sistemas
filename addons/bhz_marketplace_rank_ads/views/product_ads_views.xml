@@ -1,0 +1,41 @@
+<odoo>
+  <record id="view_bhz_product_ads_tree" model="ir.ui.view">
+    <field name="name">bhz.product.ads.tree</field>
+    <field name="model">bhz.product.ads</field>
+    <field name="arch" type="xml">
+      <tree>
+        <field name="product_tmpl_id"/>
+        <field name="seller_id"/>
+        <field name="active"/>
+        <field name="budget"/>
+        <field name="spent"/>
+        <field name="boost"/>
+      </tree>
+    </field>
+  </record>
+
+  <record id="view_bhz_product_ads_form" model="ir.ui.view">
+    <field name="name">bhz.product.ads.form</field>
+    <field name="model">bhz.product.ads</field>
+    <field name="arch" type="xml">
+      <form string="Ads">
+        <sheet>
+          <group>
+            <field name="product_tmpl_id"/>
+            <field name="seller_id" readonly="1"/>
+            <field name="active"/>
+            <field name="budget"/>
+            <field name="spent"/>
+            <field name="boost"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_bhz_product_ads" model="ir.actions.act_window">
+    <field name="name">Ads</field>
+    <field name="res_model">bhz.product.ads</field>
+    <field name="view_mode">tree,form</field>
+  </record>
+</odoo>

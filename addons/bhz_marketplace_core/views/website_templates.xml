@@ -1,0 +1,30 @@
+<odoo>
+  <!-- Vitrine pública do seller -->
+  <template id="seller_public_page" name="Seller Public Page">
+    <t t-call="website.layout">
+      <div id="wrap" class="container py-4">
+        <h1><t t-esc="seller.shop_title or seller.name"/></h1>
+        <div class="mb-3 text-muted"><t t-esc="seller.shop_description"/></div>
+        <div class="row row-cols-1 row-cols-md-3 g-3">
+          <t t-foreach="products" t-as="p">
+            <div class="col">
+              <div class="card h-100">
+                <t t-if="p.image_1920">
+                  <img t-att-src="'/web/image/product.template/%s/image_1920' % p.id" class="card-img-top" alt=""/>
+                </t>
+                <div class="card-body">
+                  <h5 class="card-title"><t t-esc="p.name"/></h5>
+                  <p class="card-text"><t t-esc="p.list_price"/> <t t-esc="p.currency_id.symbol"/></p>
+                  <a t-att-href="'/shop/product/%s' % p.id" class="btn btn-primary">Ver produto</a>
+                </div>
+              </div>
+            </div>
+          </t>
+          <t t-if="not products">
+            <div class="alert alert-info">Nenhum produto publicado.</div>
+          </t>
+        </div>
+      </div>
+    </t>
+  </template>
+</odoo>

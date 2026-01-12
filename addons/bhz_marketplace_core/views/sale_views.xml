@@ -1,0 +1,30 @@
+<odoo>
+  <record id="view_order_form_bhz_marketplace" model="ir.ui.view">
+    <field name="name">sale.order.bhz.marketplace.form</field>
+    <field name="model">sale.order</field>
+    <field name="inherit_id" ref="sale.view_order_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//sheet/notebook/page[@name='order_lines']/field[@name='order_line']" position="attributes">
+        <attribute name="context">{'show_bhz_seller': True}</attribute>
+      </xpath>
+      <xpath expr="//sheet/notebook" position="inside">
+        <page string="Marketplace" name="bhz_marketplace">
+          <group>
+            <field name="bhz_seller_ids" readonly="1" widget="many2many_tags"/>
+          </group>
+        </page>
+      </xpath>
+    </field>
+  </record>
+
+  <record id="view_order_line_tree_bhz_marketplace" model="ir.ui.view">
+    <field name="name">sale.order.line.bhz.marketplace.tree</field>
+    <field name="model">sale.order.line</field>
+    <field name="inherit_id" ref="sale.view_order_line_tree"/>
+    <field name="arch" type="xml">
+      <xpath expr="//tree/field[@name='product_uom_qty']" position="before">
+        <field name="bhz_seller_id" groups="bhz_marketplace_core.group_marketplace_manager,bhz_marketplace_core.group_marketplace_seller"/>
+      </xpath>
+    </field>
+  </record>
+</odoo>

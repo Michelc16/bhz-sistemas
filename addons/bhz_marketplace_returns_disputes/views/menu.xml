@@ -1,0 +1,4 @@
+<odoo>
+  <menuitem id="menu_bhz_marketplace_after_sales" name="Pós-venda" parent="bhz_marketplace_core.menu_bhz_marketplace_root" sequence="70" groups="bhz_marketplace_returns_disputes.group_marketplace_after_sales"/>
+  <menuitem id="menu_bhz_marketplace_returns" name="Devoluções/Disputas" parent="menu_bhz_marketplace_after_sales" action="action_bhz_marketplace_return" sequence="10"/>
+</odoo>

@@ -1,0 +1,26 @@
+<odoo>
+  <template id="portal_my_marketplace_returns" name="Portal Marketplace Returns">
+    <t t-call="portal.portal_layout">
+      <t t-set="breadcrumbs" t-value="[(portal_url('/my'), 'Home'), ('Devoluções', False)]"/>
+      <div class="o_portal_wrap">
+        <h2>Devoluções e disputas</h2>
+        <table class="table table-sm">
+          <thead>
+            <tr><th>Pedido</th><th>Produto</th><th>Motivo</th><th>Status</th><th>Valor</th></tr>
+          </thead>
+          <tbody>
+            <t t-foreach="returns" t-as="r">
+              <tr>
+                <td><t t-esc="r.sale_order_id.name"/></td>
+                <td><t t-esc="r.sale_order_line_id.product_id.display_name"/></td>
+                <td><t t-esc="r.reason"/></td>
+                <td><t t-esc="r.state"/></td>
+                <td><t t-esc="r.refund_amount"/></td>
+              </tr>
+            </t>
+          </tbody>
+        </table>
+      </div>
+    </t>
+  </template>
+</odoo>

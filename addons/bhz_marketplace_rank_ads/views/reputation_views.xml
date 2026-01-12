@@ -1,0 +1,43 @@
+<odoo>
+  <record id="view_bhz_seller_reputation_tree" model="ir.ui.view">
+    <field name="name">bhz.seller.reputation.tree</field>
+    <field name="model">bhz.seller.reputation</field>
+    <field name="arch" type="xml">
+      <tree>
+        <field name="seller_id"/>
+        <field name="score"/>
+        <field name="total_orders"/>
+        <field name="late_ship_rate"/>
+        <field name="cancel_rate"/>
+        <field name="return_rate"/>
+        <field name="rating_avg"/>
+      </tree>
+    </field>
+  </record>
+
+  <record id="view_bhz_seller_reputation_form" model="ir.ui.view">
+    <field name="name">bhz.seller.reputation.form</field>
+    <field name="model">bhz.seller.reputation</field>
+    <field name="arch" type="xml">
+      <form string="Reputação do seller">
+        <sheet>
+          <group>
+            <field name="seller_id"/>
+            <field name="score" readonly="1"/>
+            <field name="total_orders"/>
+            <field name="late_ship_rate"/>
+            <field name="cancel_rate"/>
+            <field name="return_rate"/>
+            <field name="rating_avg"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_bhz_seller_reputation" model="ir.actions.act_window">
+    <field name="name">Reputação</field>
+    <field name="res_model">bhz.seller.reputation</field>
+    <field name="view_mode">tree,form</field>
+  </record>
+</odoo>

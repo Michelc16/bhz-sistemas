@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_shipment_manager,bhz.seller.shipment.manager,model_bhz_seller_shipment,bhz_marketplace_shipping.group_marketplace_logistics,1,1,1,1
+access_shipment_line_manager,bhz.seller.shipment.line.manager,model_bhz_seller_shipment_line,bhz_marketplace_shipping.group_marketplace_logistics,1,1,1,1
+access_shipment_seller,bhz.seller.shipment.seller,model_bhz_seller_shipment,bhz_marketplace_core.group_marketplace_seller,1,0,0,0
+access_shipment_line_seller,bhz.seller.shipment.line.seller,model_bhz_seller_shipment_line,bhz_marketplace_core.group_marketplace_seller,1,0,0,0

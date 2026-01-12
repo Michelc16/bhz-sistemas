@@ -1,0 +1,33 @@
+<odoo>
+  <!-- Seller can see only his seller -->
+  <record id="rule_seller_self" model="ir.rule">
+    <field name="name">Marketplace Seller: own</field>
+    <field name="model_id" ref="model_bhz_marketplace_seller"/>
+    <field name="domain_force">['|',('user_id','=',user.id),('partner_id','=',user.partner_id.id)]</field>
+    <field name="groups" eval="[(4, ref('bhz_marketplace_core.group_marketplace_seller'))]"/>
+  </record>
+
+  <!-- Products of seller -->
+  <record id="rule_product_seller" model="ir.rule">
+    <field name="name">Marketplace Products: seller</field>
+    <field name="model_id" ref="product.model_product_template"/>
+    <field name="domain_force">['|',('bhz_seller_id.user_id','=',user.id),('bhz_seller_id.partner_id','=',user.partner_id.id)]</field>
+    <field name="groups" eval="[(4, ref('bhz_marketplace_core.group_marketplace_seller'))]"/>
+  </record>
+
+  <!-- Sale order lines of seller -->
+  <record id="rule_sol_seller" model="ir.rule">
+    <field name="name">Sale order line: seller</field>
+    <field name="model_id" ref="sale.model_sale_order_line"/>
+    <field name="domain_force">['|',('bhz_seller_id.user_id','=',user.id),('bhz_seller_id.partner_id','=',user.partner_id.id)]</field>
+    <field name="groups" eval="[(4, ref('bhz_marketplace_core.group_marketplace_seller'))]"/>
+  </record>
+
+  <!-- Sale orders having lines of seller -->
+  <record id="rule_so_seller" model="ir.rule">
+    <field name="name">Sale order: seller</field>
+    <field name="model_id" ref="sale.model_sale_order"/>
+    <field name="domain_force">[('order_line.bhz_seller_id.user_id','=',user.id)]</field>
+    <field name="groups" eval="[(4, ref('bhz_marketplace_core.group_marketplace_seller'))]"/>
+  </record>
+</odoo>

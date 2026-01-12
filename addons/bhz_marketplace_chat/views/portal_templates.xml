@@ -1,0 +1,26 @@
+<odoo>
+  <template id="portal_my_marketplace_questions" name="Portal Marketplace Questions">
+    <t t-call="portal.portal_layout">
+      <t t-set="breadcrumbs" t-value="[(portal_url('/my'), 'Home'), ('Perguntas', False)]"/>
+      <div class="o_portal_wrap">
+        <h2>Perguntas dos seus produtos</h2>
+        <table class="table table-sm">
+          <thead>
+            <tr><th>Produto</th><th>Autor</th><th>Pergunta</th><th>Resposta</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <t t-foreach="questions" t-as="q">
+              <tr>
+                <td><t t-esc="q.product_tmpl_id.name"/></td>
+                <td><t t-esc="q.author_partner_id.name"/></td>
+                <td><t t-esc="q.question"/></td>
+                <td><t t-esc="q.answer or '-'"/></td>
+                <td><t t-esc="q.state"/></td>
+              </tr>
+            </t>
+          </tbody>
+        </table>
+      </div>
+    </t>
+  </template>
+</odoo>

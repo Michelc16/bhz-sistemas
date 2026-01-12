@@ -1,0 +1,29 @@
+<odoo>
+  <!-- Form de pergunta no produto -->
+  <template id="product_qa_block" inherit_id="website_sale.product" name="Q&A block">
+    <xpath expr="//div[@id='product_details']" position="after">
+      <div class="mt-4" id="bhz_qa">
+        <h3>Perguntas sobre o produto</h3>
+        <form action="/marketplace/qa/ask" method="post" class="mb-3">
+          <input type="hidden" name="product_tmpl_id" t-att-value="product.product_tmpl_id.id"/>
+          <div class="mb-2">
+            <textarea class="form-control" name="question" placeholder="Digite sua pergunta" required=""></textarea>
+          </div>
+          <button class="btn btn-outline-primary" type="submit">Enviar pergunta</button>
+        </form>
+        <t t-set="qa_list" t-value="request.env['bhz.product.question'].sudo().search([('product_tmpl_id','=',product.product_tmpl_id.id),('state','=','answered')], limit=10)"/>
+        <t t-if="qa_list">
+          <ul class="list-group">
+            <t t-foreach="qa_list" t-as="qa">
+              <li class="list-group-item">
+                <div class="fw-bold"><t t-esc="qa.question"/></div>
+                <div class="text-muted small">Resposta:</div>
+                <div><t t-esc="qa.answer"/></div>
+              </li>
+            </t>
+          </ul>
+        </t>
+      </div>
+    </xpath>
+  </template>
+</odoo>

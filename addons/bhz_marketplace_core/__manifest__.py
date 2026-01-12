@@ -1,0 +1,23 @@
+{
+    "name": "BHZ Marketplace Core",
+    "version": "19.0.1.0.0",
+    "category": "Website/Marketplace",
+    "summary": "Núcleo de marketplace multivendedor com sellers, API, portal e vitrine pública.",
+    "author": "BHZ Sistemas",
+    "license": "LGPL-3",
+    "depends": ["base", "product", "sale_management", "website", "portal", "mail"],
+    "data": [
+        "security/security.xml",
+        "security/ir.model.access.csv",
+        "security/record_rules.xml",
+        "views/menu.xml",
+        "views/seller_views.xml",
+        "views/api_token_views.xml",
+        "views/product_views.xml",
+        "views/sale_views.xml",
+        "views/portal_templates.xml",
+        "views/website_templates.xml",
+    ],
+    "application": True,
+    "installable": True,
+}

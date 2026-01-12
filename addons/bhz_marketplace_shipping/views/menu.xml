@@ -1,0 +1,4 @@
+<odoo>
+  <menuitem id="menu_bhz_marketplace_logistics" name="Logística" parent="bhz_marketplace_core.menu_bhz_marketplace_root" sequence="50" groups="bhz_marketplace_shipping.group_marketplace_logistics"/>
+  <menuitem id="menu_bhz_seller_shipments" name="Envios" parent="menu_bhz_marketplace_logistics" action="action_bhz_seller_shipment" sequence="10"/>
+</odoo>

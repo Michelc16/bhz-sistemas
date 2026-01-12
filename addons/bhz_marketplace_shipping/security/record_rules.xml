@@ -1,0 +1,15 @@
+<odoo>
+  <record id="rule_shipment_seller" model="ir.rule">
+    <field name="name">Shipment do seller</field>
+    <field name="model_id" ref="model_bhz_seller_shipment"/>
+    <field name="domain_force">[('seller_id.user_id','=',user.id)]</field>
+    <field name="groups" eval="[(4, ref('bhz_marketplace_core.group_marketplace_seller'))]"/>
+  </record>
+
+  <record id="rule_shipment_line_seller" model="ir.rule">
+    <field name="name">Shipment line do seller</field>
+    <field name="model_id" ref="model_bhz_seller_shipment_line"/>
+    <field name="domain_force">[('shipment_id.seller_id.user_id','=',user.id)]</field>
+    <field name="groups" eval="[(4, ref('bhz_marketplace_core.group_marketplace_seller'))]"/>
+  </record>
+</odoo>

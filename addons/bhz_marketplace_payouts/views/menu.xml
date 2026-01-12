@@ -1,0 +1,6 @@
+<odoo>
+  <menuitem id="menu_bhz_marketplace_finance" name="Financeiro" parent="bhz_marketplace_core.menu_bhz_marketplace_root" sequence="40" groups="bhz_marketplace_payouts.group_marketplace_finance"/>
+  <menuitem id="menu_bhz_marketplace_commission_rules" name="Regras de Comissão" parent="menu_bhz_marketplace_finance" action="action_bhz_marketplace_commission_rule" sequence="10"/>
+  <menuitem id="menu_bhz_marketplace_ledger" name="Ledger" parent="menu_bhz_marketplace_finance" action="action_bhz_seller_ledger_move" sequence="20"/>
+  <menuitem id="menu_bhz_marketplace_payout" name="Repasses" parent="menu_bhz_marketplace_finance" action="action_bhz_seller_payout" sequence="30"/>
+</odoo>

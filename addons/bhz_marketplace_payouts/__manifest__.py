@@ -1,0 +1,21 @@
+{
+    "name": "BHZ Marketplace Payouts",
+    "version": "19.0.1.0.0",
+    "category": "Website/Marketplace",
+    "summary": "Comissões, ledger e repasses para sellers do marketplace.",
+    "author": "BHZ Sistemas",
+    "license": "LGPL-3",
+    "depends": ["bhz_marketplace_core", "sale_management", "portal"],
+    "data": [
+        "security/security.xml",
+        "security/ir.model.access.csv",
+        "security/record_rules.xml",
+        "views/menu.xml",
+        "views/commission_rule_views.xml",
+        "views/ledger_move_views.xml",
+        "views/payout_views.xml",
+        "views/portal_templates.xml",
+    ],
+    "application": False,
+    "installable": True,
+}

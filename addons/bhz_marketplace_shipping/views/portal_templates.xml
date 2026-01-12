@@ -1,0 +1,25 @@
+<odoo>
+  <template id="portal_my_marketplace_shipments" name="Portal Marketplace Shipments">
+    <t t-call="portal.portal_layout">
+      <t t-set="breadcrumbs" t-value="[(portal_url('/my'), 'Home'), ('Envios', False)]"/>
+      <div class="o_portal_wrap">
+        <h2>Envios</h2>
+        <table class="table table-sm">
+          <thead>
+            <tr><th>Pedido</th><th>Seller</th><th>Status</th><th>Tracking</th></tr>
+          </thead>
+          <tbody>
+            <t t-foreach="shipments" t-as="sh">
+              <tr>
+                <td><t t-esc="sh.sale_order_id.name"/></td>
+                <td><t t-esc="sh.seller_id.name"/></td>
+                <td><t t-esc="sh.state"/></td>
+                <td><t t-esc="sh.tracking_code or '-'"/></td>
+              </tr>
+            </t>
+          </tbody>
+        </table>
+      </div>
+    </t>
+  </template>
+</odoo>

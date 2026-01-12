@@ -1,0 +1,22 @@
+<odoo>
+  <record id="view_product_form_bhz_marketplace" model="ir.ui.view">
+    <field name="name">product.template.bhz.marketplace.form</field>
+    <field name="model">product.template</field>
+    <field name="inherit_id" ref="product.product_template_only_form_view"/>
+    <field name="arch" type="xml">
+      <xpath expr="//page[@name='general_information']" position="after">
+        <page string="Marketplace" name="bhz_marketplace">
+          <group>
+            <field name="bhz_seller_id"/>
+            <field name="bhz_marketplace_state" readonly="1"/>
+          </group>
+          <group>
+            <button name="action_send_to_review" type="object" string="Enviar para análise" class="btn-secondary"/>
+            <button name="action_approve_marketplace" type="object" string="Aprovar e publicar" class="btn-primary" groups="bhz_marketplace_core.group_marketplace_manager"/>
+            <button name="action_reject_marketplace" type="object" string="Rejeitar" class="btn-secondary" groups="bhz_marketplace_core.group_marketplace_manager"/>
+          </group>
+        </page>
+      </xpath>
+    </field>
+  </record>
+</odoo>

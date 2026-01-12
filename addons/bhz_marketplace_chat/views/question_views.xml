@@ -1,0 +1,48 @@
+<odoo>
+  <record id="view_bhz_product_question_tree" model="ir.ui.view">
+    <field name="name">bhz.product.question.tree</field>
+    <field name="model">bhz.product.question</field>
+    <field name="arch" type="xml">
+      <tree>
+        <field name="product_tmpl_id"/>
+        <field name="seller_id"/>
+        <field name="author_partner_id"/>
+        <field name="state"/>
+        <field name="question"/>
+        <field name="answer"/>
+      </tree>
+    </field>
+  </record>
+
+  <record id="view_bhz_product_question_form" model="ir.ui.view">
+    <field name="name">bhz.product.question.form</field>
+    <field name="model">bhz.product.question</field>
+    <field name="arch" type="xml">
+      <form string="Pergunta de produto">
+        <header>
+          <button name="action_answered" string="Marcar respondida" type="object" states="pending"/>
+          <button name="action_hide" string="Ocultar" type="object" states="pending,answered"/>
+          <field name="state" widget="statusbar" statusbar_visible="pending,answered,hidden"/>
+        </header>
+        <sheet>
+          <group>
+            <field name="product_tmpl_id"/>
+            <field name="seller_id" readonly="1"/>
+            <field name="author_partner_id" readonly="1"/>
+            <field name="state"/>
+          </group>
+          <group>
+            <field name="question" widget="text"/>
+            <field name="answer" widget="text"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_bhz_product_question" model="ir.actions.act_window">
+    <field name="name">Perguntas</field>
+    <field name="res_model">bhz.product.question</field>
+    <field name="view_mode">tree,form</field>
+  </record>
+</odoo>

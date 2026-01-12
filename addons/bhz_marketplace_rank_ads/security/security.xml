@@ -1,0 +1,6 @@
+<odoo>
+  <record id="group_marketplace_growth" model="res.groups">
+    <field name="name">Marketplace Growth</field>
+    <field name="implied_ids" eval="[(4, ref('bhz_marketplace_core.group_marketplace_manager'))]"/>
+  </record>
+</odoo>

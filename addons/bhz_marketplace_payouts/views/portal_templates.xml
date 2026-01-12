@@ -1,0 +1,41 @@
+<odoo>
+  <template id="portal_my_marketplace_payouts" name="Portal Marketplace Payouts">
+    <t t-call="portal.portal_layout">
+      <t t-set="breadcrumbs" t-value="[(portal_url('/my'), 'Home'), ('Marketplace Payouts', False)]"/>
+      <div class="o_portal_wrap">
+        <h2>Extrato e Repasses</h2>
+        <h4>Movimentos</h4>
+        <table class="table table-sm">
+          <thead>
+            <tr><th>Data</th><th>Tipo</th><th>Ref</th><th>Valor</th></tr>
+          </thead>
+          <tbody>
+            <t t-foreach="moves" t-as="m">
+              <tr>
+                <td><t t-esc="m.date"/></td>
+                <td><t t-esc="m.move_type"/></td>
+                <td><t t-esc="m.ref"/></td>
+                <td><t t-esc="m.amount"/></td>
+              </tr>
+            </t>
+          </tbody>
+        </table>
+        <h4>Repasses</h4>
+        <table class="table table-sm">
+          <thead>
+            <tr><th>Período</th><th>Valor</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <t t-foreach="payouts" t-as="p">
+              <tr>
+                <td><t t-esc="p.date_from"/> - <t t-esc="p.date_to"/></td>
+                <td><t t-esc="p.amount"/></td>
+                <td><t t-esc="p.state"/></td>
+              </tr>
+            </t>
+          </tbody>
+        </table>
+      </div>
+    </t>
+  </template>
+</odoo>

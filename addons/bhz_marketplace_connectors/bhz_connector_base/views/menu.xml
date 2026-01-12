@@ -1,0 +1,5 @@
+<odoo>
+  <menuitem id="menu_bhz_marketplace_integrations" name="Integrações" parent="bhz_marketplace_core.menu_bhz_marketplace_root" sequence="90" groups="bhz_marketplace_connectors.group_marketplace_integrations"/>
+  <menuitem id="menu_bhz_connector_accounts" name="Contas ERP" parent="menu_bhz_marketplace_integrations" action="action_bhz_connector_account" sequence="10"/>
+  <menuitem id="menu_bhz_connector_jobs" name="Jobs" parent="menu_bhz_marketplace_integrations" action="action_bhz_connector_job" sequence="20"/>
+</odoo>

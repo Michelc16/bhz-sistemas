@@ -1,0 +1,40 @@
+<odoo>
+  <record id="view_bhz_marketplace_api_token_tree" model="ir.ui.view">
+    <field name="name">bhz.marketplace.api.token.tree</field>
+    <field name="model">bhz.marketplace.api.token</field>
+    <field name="arch" type="xml">
+      <tree>
+        <field name="name"/>
+        <field name="seller_id"/>
+        <field name="token"/>
+        <field name="last_used_at"/>
+      </tree>
+    </field>
+  </record>
+
+  <record id="view_bhz_marketplace_api_token_form" model="ir.ui.view">
+    <field name="name">bhz.marketplace.api.token.form</field>
+    <field name="model">bhz.marketplace.api.token</field>
+    <field name="arch" type="xml">
+      <form string="API Token">
+        <header>
+          <button name="action_rotate" string="Rotacionar" type="object" class="btn-secondary"/>
+        </header>
+        <sheet>
+          <group>
+            <field name="name"/>
+            <field name="seller_id"/>
+            <field name="token" readonly="1"/>
+            <field name="last_used_at" readonly="1"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_bhz_marketplace_api_token" model="ir.actions.act_window">
+    <field name="name">Tokens API</field>
+    <field name="res_model">bhz.marketplace.api.token</field>
+    <field name="view_mode">tree,form</field>
+  </record>
+</odoo>

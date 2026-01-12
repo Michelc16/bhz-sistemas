@@ -1,0 +1,53 @@
+<odoo>
+  <record id="view_bhz_marketplace_return_tree" model="ir.ui.view">
+    <field name="name">bhz.marketplace.return.tree</field>
+    <field name="model">bhz.marketplace.return</field>
+    <field name="arch" type="xml">
+      <tree>
+        <field name="sale_order_id"/>
+        <field name="sale_order_line_id"/>
+        <field name="seller_id"/>
+        <field name="reason"/>
+        <field name="refund_amount"/>
+        <field name="state"/>
+      </tree>
+    </field>
+  </record>
+
+  <record id="view_bhz_marketplace_return_form" model="ir.ui.view">
+    <field name="name">bhz.marketplace.return.form</field>
+    <field name="model">bhz.marketplace.return</field>
+    <field name="arch" type="xml">
+      <form string="Devolução/Disputa">
+        <header>
+          <button name="action_set_state" args="('seller_response',)" string="Aguardando vendedor" type="object" states="opened"/>
+          <button name="action_set_state" args="('mediation',)" string="Mediação" type="object" states="seller_response"/>
+          <button name="action_approve_refund" string="Aprovar reembolso" type="object" states="seller_response,mediation"/>
+          <button name="action_set_state" args="('rejected',)" string="Rejeitar" type="object" states="seller_response,mediation"/>
+          <field name="state" widget="statusbar" statusbar_visible="opened,seller_response,mediation,approved_refund,rejected,closed"/>
+        </header>
+        <sheet>
+          <group>
+            <field name="sale_order_id"/>
+            <field name="sale_order_line_id"/>
+            <field name="seller_id" readonly="1"/>
+            <field name="reason"/>
+            <field name="refund_amount"/>
+            <field name="currency_id"/>
+          </group>
+          <group>
+            <field name="description" widget="text"/>
+            <field name="evidence" filename="evidence_filename"/>
+            <field name="evidence_filename"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_bhz_marketplace_return" model="ir.actions.act_window">
+    <field name="name">Devoluções/Disputas</field>
+    <field name="res_model">bhz.marketplace.return</field>
+    <field name="view_mode">tree,form</field>
+  </record>
+</odoo>

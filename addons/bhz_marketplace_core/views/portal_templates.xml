@@ -1,0 +1,65 @@
+<odoo>
+  <template id="portal_my_marketplace_home" name="Portal Marketplace Home">
+    <t t-call="portal.portal_layout">
+      <t t-set="breadcrumbs" t-value="[(portal_url('/my'), 'Home'), ('Marketplace', False)]"/>
+      <div class="o_portal_wrap">
+        <h2>Marketplace</h2>
+        <div class="row">
+          <div class="col-6 col-md-3 mb-3">
+            <a class="btn btn-outline-primary w-100" href="/my/bhz/marketplace/products">Meus produtos</a>
+          </div>
+          <div class="col-6 col-md-3 mb-3">
+            <a class="btn btn-outline-primary w-100" href="/my/bhz/marketplace/orders">Meus pedidos</a>
+          </div>
+        </div>
+      </div>
+    </t>
+  </template>
+
+  <template id="portal_my_marketplace_products" name="Portal Marketplace Products">
+    <t t-call="portal.portal_layout">
+      <t t-set="breadcrumbs" t-value="[(portal_url('/my'), 'Home'), (portal_url('/my/bhz/marketplace'), 'Marketplace'), ('Produtos', False)]"/>
+      <div class="o_portal_wrap">
+        <h2>Meus produtos</h2>
+        <table class="table table-striped">
+          <thead>
+            <tr><th>Nome</th><th>Estado</th><th>Preço</th></tr>
+          </thead>
+          <tbody>
+            <t t-foreach="products" t-as="prod">
+              <tr>
+                <td><a t-att-href="'/web#id=%s&model=product.template&view_type=form' % prod.id"><t t-esc="prod.name"/></a></td>
+                <td><t t-esc="prod.bhz_marketplace_state"/></td>
+                <td><t t-esc="prod.list_price"/></td>
+              </tr>
+            </t>
+          </tbody>
+        </table>
+      </div>
+    </t>
+  </template>
+
+  <template id="portal_my_marketplace_orders" name="Portal Marketplace Orders">
+    <t t-call="portal.portal_layout">
+      <t t-set="breadcrumbs" t-value="[(portal_url('/my'), 'Home'), (portal_url('/my/bhz/marketplace'), 'Marketplace'), ('Pedidos', False)]"/>
+      <div class="o_portal_wrap">
+        <h2>Pedidos com meus produtos</h2>
+        <table class="table table-striped">
+          <thead>
+            <tr><th>Pedido</th><th>Cliente</th><th>Total</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <t t-foreach="orders" t-as="so">
+              <tr>
+                <td><a t-att-href="'/my/orders/%s' % so.id"><t t-esc="so.name"/></a></td>
+                <td><t t-esc="so.partner_id.name"/></td>
+                <td><t t-esc="so.amount_total"/></td>
+                <td><t t-esc="so.state"/></td>
+              </tr>
+            </t>
+          </tbody>
+        </table>
+      </div>
+    </t>
+  </template>
+</odoo>

@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_commission_rule_manager,bhz.marketplace.commission.rule.manager,model_bhz_marketplace_commission_rule,bhz_marketplace_payouts.group_marketplace_finance,1,1,1,1
+access_ledger_move_manager,bhz.seller.ledger.move.manager,model_bhz_seller_ledger_move,bhz_marketplace_payouts.group_marketplace_finance,1,1,1,1
+access_payout_manager,bhz.seller.payout.manager,model_bhz_seller_payout,bhz_marketplace_payouts.group_marketplace_finance,1,1,1,1
+access_ledger_move_seller,bhz.seller.ledger.move.seller,model_bhz_seller_ledger_move,bhz_marketplace_core.group_marketplace_seller,1,0,0,0
+access_payout_seller,bhz.seller.payout.seller,model_bhz_seller_payout,bhz_marketplace_core.group_marketplace_seller,1,0,0,0

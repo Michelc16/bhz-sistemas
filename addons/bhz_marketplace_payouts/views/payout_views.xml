@@ -1,0 +1,44 @@
+<odoo>
+  <record id="view_bhz_seller_payout_tree" model="ir.ui.view">
+    <field name="name">bhz.seller.payout.tree</field>
+    <field name="model">bhz.seller.payout</field>
+    <field name="arch" type="xml">
+      <tree>
+        <field name="seller_id"/>
+        <field name="date_from"/>
+        <field name="date_to"/>
+        <field name="amount"/>
+        <field name="state"/>
+      </tree>
+    </field>
+  </record>
+
+  <record id="view_bhz_seller_payout_form" model="ir.ui.view">
+    <field name="name">bhz.seller.payout.form</field>
+    <field name="model">bhz.seller.payout</field>
+    <field name="arch" type="xml">
+      <form string="Repasse">
+        <header>
+          <button name="action_set_ready" string="Marcar pronto" type="object" states="draft"/>
+          <button name="action_mark_paid" string="Marcar pago" type="object" states="ready"/>
+          <field name="state" widget="statusbar" statusbar_visible="draft,ready,paid,cancel"/>
+        </header>
+        <sheet>
+          <group>
+            <field name="seller_id"/>
+            <field name="date_from"/>
+            <field name="date_to"/>
+            <field name="amount" readonly="1"/>
+            <field name="currency_id"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_bhz_seller_payout" model="ir.actions.act_window">
+    <field name="name">Repasses</field>
+    <field name="res_model">bhz.seller.payout</field>
+    <field name="view_mode">tree,form</field>
+  </record>
+</odoo>
