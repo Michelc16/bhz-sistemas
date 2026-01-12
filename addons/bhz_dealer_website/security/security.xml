@@ -2,7 +2,6 @@
 <odoo>
   <record id="group_bhz_dealer_manager" model="res.groups">
     <field name="name">BHZ Dealer / Manager</field>
-    <field name="category_id" ref="base.module_category_website"/>
   </record>
 
   <record id="rule_bhz_dealer_car_company" model="ir.rule">
