@@ -83,7 +83,7 @@
                       <div class="content">
                           <h3>Roteiro gastronômico</h3>
                           <p class="text-muted">Escolha fácil para um date.</p>
-                          <div class="footer"><a t-att-href="'/lugares?tipo=%s' % ref('bhz_guiabh_website.place_type_restaurantes')" class="btn btn-link">Explorar</a></div>
+                            <div class="footer"><a href="/lugares?tipo=restaurantes" class="btn btn-link">Explorar</a></div>
                       </div>
                   </div>
                   <div class="guiabh-card">
@@ -91,7 +91,7 @@
                       <div class="content">
                           <h3>Ao ar livre</h3>
                           <p class="text-muted">Praças, parques e shows abertos.</p>
-                          <div class="footer"><a t-att-href="'/eventos?reg=%s' % ref('bhz_guiabh_website.region_pampulha')" class="btn btn-link">Ver opções</a></div>
+                            <div class="footer"><a href="/eventos?reg=pampulha" class="btn btn-link">Ver opções</a></div>
                       </div>
                   </div>
               </div>
