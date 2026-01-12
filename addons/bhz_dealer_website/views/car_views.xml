@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_bhz_dealer_car_tree" model="ir.ui.view">
+    <field name="name">bhz.dealer.car.tree</field>
+    <field name="model">bhz.dealer.car</field>
+    <field name="arch" type="xml">
+      <tree string="Carros">
+        <field name="is_featured"/>
+        <field name="name"/>
+        <field name="brand"/>
+        <field name="model"/>
+        <field name="year"/>
+        <field name="price"/>
+        <field name="condition"/>
+        <field name="fuel"/>
+        <field name="transmission"/>
+        <field name="active"/>
+      </tree>
+    </field>
+  </record>
+
+  <record id="view_bhz_dealer_car_form" model="ir.ui.view">
+    <field name="name">bhz.dealer.car.form</field>
+    <field name="model">bhz.dealer.car</field>
+    <field name="arch" type="xml">
+      <form string="Carro">
+        <sheet>
+          <div class="oe_title">
+            <h1><field name="name" placeholder="Ex: Corolla XEi 2022 Completo"/></h1>
+          </div>
+          <group>
+            <group>
+              <field name="company_id" groups="base.group_multi_company"/>
+              <field name="website_id"/>
+              <field name="is_featured"/>
+              <field name="active"/>
+            </group>
+            <group>
+              <field name="price"/>
+              <field name="condition"/>
+              <field name="mileage_km"/>
+              <field name="color"/>
+            </group>
+          </group>
+
+          <notebook>
+            <page string="Detalhes">
+              <group>
+                <group>
+                  <field name="brand"/>
+                  <field name="model"/>
+                  <field name="trim"/>
+                  <field name="year"/>
+                </group>
+                <group>
+                  <field name="fuel"/>
+                  <field name="transmission"/>
+                  <field name="doors"/>
+                  <field name="owners"/>
+                </group>
+              </group>
+              <group>
+                <field name="description" widget="html"/>
+              </group>
+              <group>
+                <field name="features" placeholder="Ar-condicionado&#10;Airbag&#10;Multimídia"/>
+              </group>
+            </page>
+
+            <page string="Imagens">
+              <group>
+                <field name="main_image" widget="image"/>
+              </group>
+              <field name="image_ids">
+                <tree editable="bottom">
+                  <field name="sequence"/>
+                  <field name="name"/>
+                  <field name="image" widget="image"/>
+                </tree>
+              </field>
+            </page>
+
+            <page string="Contato / CTA">
+              <group>
+                <field name="whatsapp"/>
+                <field name="lead_email_to"/>
+              </group>
+            </page>
+          </notebook>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_bhz_dealer_cars" model="ir.actions.act_window">
+    <field name="name">Carros</field>
+    <field name="res_model">bhz.dealer.car</field>
+    <field name="view_mode">tree,form</field>
+  </record>
+
+  <menuitem id="menu_bhz_dealer_root" name="BHZ Dealer" sequence="80"/>
+  <menuitem id="menu_bhz_dealer_cars" name="Carros" parent="menu_bhz_dealer_root" action="action_bhz_dealer_cars" sequence="10"/>
+</odoo>

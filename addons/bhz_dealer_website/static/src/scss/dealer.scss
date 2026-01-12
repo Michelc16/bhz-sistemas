@@ -1,0 +1,142 @@
+.bhz-dealer {
+  .bhz-hero {
+    padding: 64px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .bhz-hero-inner {
+    display: grid;
+    grid-template-columns: 1.2fr .8fr;
+    gap: 24px;
+    align-items: center;
+  }
+  .bhz-hero-title { font-size: 44px; line-height: 1.05; font-weight: 800; }
+  .bhz-hero-subtitle { font-size: 18px; opacity: .9; margin-top: 10px; }
+  .bhz-hero-search { display: flex; gap: 10px; margin-top: 18px; }
+  .bhz-hero-search .form-control { height: 46px; border-radius: 14px; }
+  .bhz-hero-search .btn { height: 46px; border-radius: 14px; padding: 0 18px; }
+  .bhz-hero-trust { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+  .bhz-pill { padding: 8px 12px; border-radius: 999px; background: rgba(0,0,0,.06); font-weight: 600; }
+
+  .bhz-hero-art { position: relative; min-height: 260px; }
+  .bhz-hero-glow {
+    position: absolute; inset: -60px;
+    background: radial-gradient(circle at 30% 30%, rgba(0,123,255,.35), transparent 55%),
+                radial-gradient(circle at 70% 40%, rgba(40,167,69,.25), transparent 55%);
+    filter: blur(14px);
+  }
+  .bhz-hero-box {
+    position: relative;
+    padding: 18px;
+    border-radius: 20px;
+    background: rgba(0,0,0,.78);
+    color: #fff;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 18px 60px rgba(0,0,0,.25);
+    max-width: 360px;
+    margin-left: auto;
+  }
+  .bhz-hero-box-title { font-weight: 800; font-size: 18px; }
+  .bhz-hero-box-sub { opacity: .85; margin-top: 6px; }
+
+  .bhz-section { padding: 44px 0; }
+  .bhz-section-head { display:flex; justify-content:space-between; align-items:flex-end; gap:16px; }
+  .bhz-section-head h1, .bhz-section-head h2 { margin: 0; font-weight: 800; }
+  .bhz-muted { opacity: .7; }
+  .bhz-link { text-decoration:none; font-weight:700; }
+
+  .bhz-grid {
+    margin-top: 18px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+  }
+
+  .bhz-car-card {
+    border-radius: 18px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 10px 30px rgba(0,0,0,.06);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .bhz-car-card:hover { transform: translateY(-2px); box-shadow: 0 18px 50px rgba(0,0,0,.10); }
+
+  .bhz-car-thumb { position: relative; aspect-ratio: 16/10; background: rgba(0,0,0,.04); }
+  .bhz-car-thumb img { width: 100%; height: 100%; object-fit: cover; display:block; }
+  .bhz-car-thumb--placeholder { height:100%; display:flex; align-items:center; justify-content:center; opacity:.6; font-weight:700; }
+
+  .bhz-badge {
+    position:absolute; left:12px; top:12px;
+    padding: 6px 10px; border-radius: 999px;
+    background: rgba(0,0,0,.75);
+    color: #fff; font-weight: 800; font-size: 12px;
+  }
+
+  .bhz-car-body { padding: 12px 12px 14px; }
+  .bhz-car-title { font-weight: 800; line-height: 1.2; }
+  .bhz-car-meta { margin-top: 6px; font-size: 13px; opacity: .75; display:flex; gap:8px; flex-wrap:wrap; }
+  .bhz-car-price { margin-top: 10px; font-size: 18px; font-weight: 900; }
+
+  .bhz-stock-layout { display:grid; grid-template-columns: 320px 1fr; gap: 18px; margin-top: 18px; }
+  .bhz-filters { position: sticky; top: 90px; align-self: start; border-radius: 18px; background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,.06); padding: 14px; }
+  .bhz-filter-form label { font-weight: 800; font-size: 13px; margin-top: 6px; }
+
+  .bhz-detail { display:grid; grid-template-columns: 1.1fr .9fr; gap: 18px; }
+  .bhz-detail-main { border-radius: 18px; overflow:hidden; background: rgba(0,0,0,.04); }
+  .bhz-detail-main img { width:100%; height:auto; display:block; }
+  .bhz-detail-gallery { display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; margin-top:10px; }
+  .bhz-detail-gallery img { width:100%; border-radius: 14px; aspect-ratio: 1/1; object-fit: cover; }
+
+  .bhz-detail-sub { opacity:.75; font-weight:700; }
+  .bhz-detail-price { font-size: 34px; font-weight: 900; margin: 10px 0 14px; }
+  .bhz-specs { display:grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 12px; border-radius: 18px; background: rgba(0,0,0,.04); }
+  .bhz-actions .btn { border-radius: 16px; }
+  .bhz-features { padding-left: 18px; }
+
+  .bhz-cta-inner {
+    border-radius: 22px;
+    padding: 18px;
+    background: rgba(0,0,0,.78);
+    color: #fff;
+    display:flex; justify-content:space-between; align-items:center; gap: 14px;
+  }
+
+  .s_car_showcase { padding: 44px 0; }
+  .s_dealer_banner { padding: 36px 0; }
+  .bhz-banner {
+    background: linear-gradient(135deg, #0d6efd, #6610f2);
+    color: #fff;
+    border-radius: 20px;
+    padding: 22px;
+    display:flex; align-items:center; justify-content:space-between; gap: 14px;
+    box-shadow: 0 12px 40px rgba(0,0,0,.12);
+  }
+  .bhz-trust {
+    display:grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+    margin-top: 10px;
+  }
+  .bhz-trust-item {
+    display:flex; gap:12px; align-items:center;
+    background:#fff; padding:12px; border-radius:14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.05);
+  }
+  .bhz-trust-item i { font-size:22px; color:#0d6efd; }
+  .bhz-trust-title { font-weight:800; }
+
+  .bhz-detail-gallery img { cursor: pointer; transition: transform .12s ease, box-shadow .12s ease; }
+  .bhz-detail-gallery img:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,.12); }
+
+  @media (max-width: 1200px) {
+    .bhz-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 992px) {
+    .bhz-hero-inner, .bhz-detail { grid-template-columns: 1fr; }
+    .bhz-stock-layout { grid-template-columns: 1fr; }
+    .bhz-filters { position: relative; top: auto; }
+    .bhz-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 576px) {
+    .bhz-grid { grid-template-columns: 1fr; }
+    .bhz-hero-search { flex-direction: column; }
+  }
+}

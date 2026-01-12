@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="menu_website_dealer_stock" model="website.menu">
+    <field name="name">Estoque</field>
+    <field name="url">/carros</field>
+    <field name="sequence">10</field>
+    <field name="parent_id" ref="website.main_menu"/>
+  </record>
+</odoo>

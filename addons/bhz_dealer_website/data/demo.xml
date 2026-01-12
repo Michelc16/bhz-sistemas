@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+  <record id="car_demo_1" model="bhz.dealer.car">
+    <field name="name">Honda Civic Touring 2021</field>
+    <field name="brand">Honda</field>
+    <field name="model">Civic</field>
+    <field name="trim">Touring</field>
+    <field name="year">2021</field>
+    <field name="price">129900</field>
+    <field name="mileage_km">42000</field>
+    <field name="fuel">gasoline</field>
+    <field name="transmission">auto</field>
+    <field name="condition">seminovo</field>
+    <field name="is_featured">True</field>
+    <field name="features">Teto solar
+Bancos em couro
+Multimídia</field>
+  </record>
+
+  <record id="car_demo_2" model="bhz.dealer.car">
+    <field name="name">Toyota Corolla XEi 2022</field>
+    <field name="brand">Toyota</field>
+    <field name="model">Corolla</field>
+    <field name="trim">XEi</field>
+    <field name="year">2022</field>
+    <field name="price">139900</field>
+    <field name="mileage_km">28000</field>
+    <field name="fuel">flex</field>
+    <field name="transmission">auto</field>
+    <field name="condition">seminovo</field>
+    <field name="is_featured">True</field>
+    <field name="features">Piloto automático
+Câmera de ré
+Sensores</field>
+  </record>
+</odoo>
