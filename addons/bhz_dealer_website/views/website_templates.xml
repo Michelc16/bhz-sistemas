@@ -106,7 +106,7 @@
 
   <!-- Snippet palette entries -->
   <template id="snippet_car_showcase_picker" inherit_id="website.snippets" name="Vitrine Carros Picker">
-    <xpath expr=\"//div[contains(@class,'o_panel_body')]\" position="inside">
+    <xpath expr="//div[@id='snippet_content']" position="inside">
       <t t-snippet="bhz_dealer_website.snippet_car_showcase" t-thumbnail="/web_editor/static/src/img/snippets_thumbnails/s_products_grid.svg"/>
       <t t-snippet="bhz_dealer_website.snippet_dealer_banner" t-thumbnail="/web_editor/static/src/img/snippets_thumbnails/s_call_to_action.svg"/>
       <t t-snippet="bhz_dealer_website.snippet_trust_strip" t-thumbnail="/web_editor/static/src/img/snippets_thumbnails/s_features.svg"/>
