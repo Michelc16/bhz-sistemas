@@ -29,7 +29,7 @@
                             type="object"
                             string="Importar para Venda"
                             class="btn-primary"
-                            attrs="{'invisible': [('state','=','imported')]}"/>
+                            invisible="state == 'imported'"/>
                     <field name="state" widget="statusbar" statusbar_visible="new,imported,error"/>
                 </header>
 
@@ -91,11 +91,9 @@
                 <field name="account_id"/>
                 <filter string="Novos" name="new" domain="[('state','=','new')]"/>
                 <filter string="Importados" name="imported" domain="[('state','=','imported')]"/>
-                <group expand="0" string="Agrupar por">
-                    <filter string="Empresa" name="group_company" context="{'group_by':'company_id'}"/>
-                    <filter string="Conta" name="group_account" context="{'group_by':'account_id'}"/>
-                    <filter string="Estado" name="group_state" context="{'group_by':'state'}"/>
-                </group>
+                <filter string="Agrupar por Empresa" name="group_company" context="{'group_by':'company_id'}"/>
+                <filter string="Agrupar por Conta" name="group_account" context="{'group_by':'account_id'}"/>
+                <filter string="Agrupar por Estado" name="group_state" context="{'group_by':'state'}"/>
             </search>
         </field>
     </record>
