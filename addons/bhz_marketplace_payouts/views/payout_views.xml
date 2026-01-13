@@ -19,8 +19,10 @@
     <field name="arch" type="xml">
       <form string="Repasse">
         <header>
-          <button name="action_set_ready" string="Marcar pronto" type="object" states="draft"/>
-          <button name="action_mark_paid" string="Marcar pago" type="object" states="ready"/>
+          <button name="action_set_ready" string="Marcar pronto" type="object"
+                  modifiers="{'invisible': ['not', ['state', '=', 'draft']]}"/>
+          <button name="action_mark_paid" string="Marcar pago" type="object"
+                  modifiers="{'invisible': ['not', ['state', '=', 'ready']]}"/>
           <field name="state" widget="statusbar" statusbar_visible="draft,ready,paid,cancel"/>
         </header>
         <sheet>
