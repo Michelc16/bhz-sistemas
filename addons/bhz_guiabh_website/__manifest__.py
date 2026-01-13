@@ -18,6 +18,7 @@
         'views/guiabh_event_views.xml',
         'views/guiabh_place_views.xml',
         'views/guiabh_taxonomy_views.xml',
+        'views/guiabh_ad_views.xml',
         'views/website_templates.xml',
         'views/website_pages.xml',
     ],
