@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-  <data>
 
   <!-- HOME -->
   <template id="page_dealer_home" name="Dealer Home" page="True">
@@ -265,5 +264,4 @@
     </t>
   </template>
 
-  </data>
 </odoo>
