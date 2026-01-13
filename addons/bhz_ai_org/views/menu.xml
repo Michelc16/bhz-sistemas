@@ -7,4 +7,6 @@
   <menuitem id="bhz_ai_roles_menu" name="Roles" parent="bhz_ai_root" action="bhz_ai_org.action_bhz_ai_role" sequence="30" groups="bhz_ai_org.group_bhz_ai_admin"/>
   <menuitem id="bhz_ai_tools_menu" name="Tools" parent="bhz_ai_root" action="bhz_ai_org.action_bhz_ai_tool" sequence="40" groups="bhz_ai_org.group_bhz_ai_admin"/>
   <menuitem id="bhz_ai_policies_menu" name="Policies" parent="bhz_ai_root" action="bhz_ai_org.action_bhz_ai_policy" sequence="50" groups="bhz_ai_org.group_bhz_ai_admin"/>
+  <menuitem id="bhz_ai_memory_menu" name="Memory" parent="bhz_ai_root" action="bhz_ai_org.action_bhz_ai_memory" sequence="60" groups="bhz_ai_org.group_bhz_ai_operator,bhz_ai_org.group_bhz_ai_admin"/>
+  <menuitem id="bhz_ai_audit_menu" name="Audit Logs" parent="bhz_ai_root" action="bhz_ai_org.action_bhz_ai_audit_log" sequence="70" groups="bhz_ai_org.group_bhz_ai_admin"/>
 </odoo>
