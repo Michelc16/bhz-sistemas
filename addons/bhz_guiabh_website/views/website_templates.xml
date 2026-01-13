@@ -62,7 +62,7 @@
               <div class="tab-pane fade show active" id="fav-events" role="tabpanel">
                 <div class="guiabh-grid">
                   <t t-if="events">
-                    <t t-foreach="events" t-as="event" t-key="event.id"><t t-call="bhz_guiabh_website.guiabh_event_card"/></t>
+                    <t t-foreach="events" t-as="event"><t t-call="bhz_guiabh_website.guiabh_event_card"/></t>
                   </t>
                   <t t-else=""><div class="guiabh-empty"><p>Nenhum evento salvo.</p></div></t>
                 </div>
@@ -70,7 +70,7 @@
               <div class="tab-pane fade" id="fav-places" role="tabpanel">
                 <div class="guiabh-grid">
                   <t t-if="places">
-                    <t t-foreach="places" t-as="place" t-key="place.id"><t t-call="bhz_guiabh_website.guiabh_place_card"/></t>
+                    <t t-foreach="places" t-as="place"><t t-call="bhz_guiabh_website.guiabh_place_card"/></t>
                   </t>
                   <t t-else=""><div class="guiabh-empty"><p>Nenhum lugar salvo.</p></div></t>
                 </div>
@@ -94,7 +94,7 @@
           <div class="col-md-4 col-12">
             <select name="categories" class="form-select">
               <option value="">Interesse em categoria</option>
-              <option t-foreach="request.env['guiabh.event.category'].search([('active','=',True)])" t-as="cat" t-key="cat.id" t-att-value="cat.id"><t t-esc="cat.name"/></option>
+              <option t-foreach="request.env['guiabh.event.category'].search([('active','=',True)])" t-as="cat" t-att-value="cat.id"><t t-esc="cat.name"/></option>
             </select>
           </div>
           <div class="col-12">
@@ -152,13 +152,13 @@
               <div class="col-md-4">
                 <select name="cat" class="form-select" aria-label="Categoria">
                   <option value="">Categoria</option>
-                  <option t-foreach="categories" t-as="cat" t-key="cat.id" t-att-value="cat.id" t-att-selected="str(current_filters.get('cat'))==str(cat.id)"><t t-esc="cat.name"/></option>
+                  <option t-foreach="categories" t-as="cat" t-att-value="cat.id" t-att-selected="str(current_filters.get('cat'))==str(cat.id)"><t t-esc="cat.name"/></option>
                 </select>
               </div>
               <div class="col-md-4">
                 <select name="reg" class="form-select" aria-label="Região">
                   <option value="">Região</option>
-                  <option t-foreach="regions" t-as="reg" t-key="reg.id" t-att-value="reg.id" t-att-selected="str(current_filters.get('reg'))==str(reg.id)"><t t-esc="reg.name"/></option>
+                  <option t-foreach="regions" t-as="reg" t-att-value="reg.id" t-att-selected="str(current_filters.get('reg'))==str(reg.id)"><t t-esc="reg.name"/></option>
                 </select>
               </div>
               <div class="col-md-4">
@@ -168,7 +168,7 @@
 
             <div class="guiabh-grid agenda-grid">
               <t t-if="day_blocks">
-                <t t-foreach="day_blocks" t-as="block" t-key="block">
+                <t t-foreach="day_blocks" t-as="block">
                   <t t-set="day" t-value="block[0]"/>
                   <t t-set="items" t-value="block[1]"/>
                   <div class="agenda-day-card" t-att-class="(day == today and 'is-today') or (day.weekday() in (5,6) and 'is-weekend')">
@@ -179,7 +179,7 @@
                       <span class="badge bg-secondary" t-if="day.weekday() in (5,6)">Fim de semana</span>
                     </div>
                     <div class="agenda-day-body">
-                      <t t-foreach="items" t-as="event" t-key="event.id">
+                      <t t-foreach="items" t-as="event">
                         <div class="agenda-item">
                           <div class="thumb">
                             <img t-att-src="event.cover_image and '/web/image/guiabh.event/%s/cover_image' % event.id or '/bhz_guiabh_website/static/src/img/placeholders/event_placeholder.svg'" loading="lazy" alt="Capa do evento"/>
@@ -228,13 +228,13 @@
               <div class="col-md-3">
                 <select name="cat" class="form-select">
                   <option value="">Categoria</option>
-                  <option t-foreach="categories" t-as="cat" t-key="cat.id" t-att-value="cat.id" t-att-selected="str(current_filters.get('cat'))==str(cat.id)"><t t-esc="cat.name"/></option>
+                  <option t-foreach="categories" t-as="cat" t-att-value="cat.id" t-att-selected="str(current_filters.get('cat'))==str(cat.id)"><t t-esc="cat.name"/></option>
                 </select>
               </div>
               <div class="col-md-3">
                 <select name="reg" class="form-select">
                   <option value="">Região/Bairro</option>
-                  <option t-foreach="regions" t-as="reg" t-key="reg.id" t-att-value="reg.id" t-att-selected="str(current_filters.get('reg'))==str(reg.id)"><t t-esc="reg.name"/></option>
+                  <option t-foreach="regions" t-as="reg" t-att-value="reg.id" t-att-selected="str(current_filters.get('reg'))==str(reg.id)"><t t-esc="reg.name"/></option>
                 </select>
               </div>
               <div class="col-md-6">
@@ -260,10 +260,10 @@
               <div class="tab-pane fade show active" id="tab-all" role="tabpanel">
                 <div class="guiabh-grid">
                   <t t-if="events">
-                    <t t-foreach="events" t-as="event" t-key="event.id"><t t-call="bhz_guiabh_website.guiabh_event_card"/></t>
+                    <t t-foreach="events" t-as="event"><t t-call="bhz_guiabh_website.guiabh_event_card"/></t>
                   </t>
                   <t t-if="places">
-                    <t t-foreach="places" t-as="place" t-key="place.id"><t t-call="bhz_guiabh_website.guiabh_place_card"/></t>
+                    <t t-foreach="places" t-as="place"><t t-call="bhz_guiabh_website.guiabh_place_card"/></t>
                   </t>
                   <t t-if="not events and not places">
                     <div class="guiabh-empty"><p>Nenhum resultado para esta busca.</p></div>
@@ -273,7 +273,7 @@
               <div class="tab-pane fade" id="tab-events" role="tabpanel">
                 <div class="guiabh-grid">
                   <t t-if="events">
-                    <t t-foreach="events" t-as="event" t-key="event.id"><t t-call="bhz_guiabh_website.guiabh_event_card"/></t>
+                    <t t-foreach="events" t-as="event"><t t-call="bhz_guiabh_website.guiabh_event_card"/></t>
                   </t>
                   <t t-else=""><div class="guiabh-empty"><p>Nenhum evento encontrado.</p></div></t>
                 </div>
@@ -281,7 +281,7 @@
               <div class="tab-pane fade" id="tab-places" role="tabpanel">
                 <div class="guiabh-grid">
                   <t t-if="places">
-                    <t t-foreach="places" t-as="place" t-key="place.id"><t t-call="bhz_guiabh_website.guiabh_place_card"/></t>
+                    <t t-foreach="places" t-as="place"><t t-call="bhz_guiabh_website.guiabh_place_card"/></t>
                   </t>
                   <t t-else=""><div class="guiabh-empty"><p>Nenhum lugar encontrado.</p></div></t>
                 </div>
@@ -342,7 +342,7 @@
         <div class="cover">
           <img t-att-src="img" t-att-alt="item.get('title')" loading="lazy"/>
           <t t-if="item.get('badges')">
-            <t t-foreach="item.get('badges')" t-as="badge" t-key="badge">
+            <t t-foreach="item.get('badges')" t-as="badge">
               <div class="badge"><t t-esc="badge"/></div>
             </t>
           </t>
@@ -355,7 +355,7 @@
           <h3><t t-esc="item.get('title')"/></h3>
           <div class="meta">
             <span class="text-chip" t-if="item.get('subtitle')"><t t-esc="item.get('subtitle')"/></span>
-            <t t-foreach="item.get('meta', [])" t-as="meta" t-key="meta">
+            <t t-foreach="item.get('meta', [])" t-as="meta">
               <span class="text-chip"><t t-esc="meta"/></span>
             </t>
           </div>
@@ -434,7 +434,7 @@
             </div>
             <div class="guiabh-carousel guiabh-carousel-highlight js-featured-carousel">
               <t t-if="featured_carousel">
-                <t t-foreach="featured_carousel" t-as="item" t-key="item.get('id') or loop.index">
+                <t t-foreach="featured_carousel" t-as="item">
                   <t t-call="bhz_guiabh_website.guiabh_content_card"/>
                 </t>
               </t>
@@ -452,7 +452,7 @@
           <div class="guia-container">
             <t t-if="ads_home_top">
               <div class="guiabh-grid mb-4">
-                <t t-foreach="ads_home_top" t-as="ad" t-key="ad.id">
+                <t t-foreach="ads_home_top" t-as="ad">
                   <div class="guiabh-card ad-card">
                     <div class="cover">
                       <img t-att-src="ad.image and '/web/image/guiabh.ad/%s/image' % ad.id or '/bhz_guiabh_website/static/src/img/placeholders/editorial_placeholder.svg'" alt="Anúncio" loading="lazy"/>
@@ -474,7 +474,7 @@
             </div>
             <div class="guiabh-carousel">
               <t t-if="featured_events">
-                <t t-foreach="featured_events" t-as="item" t-key="item.get('id') or loop.index">
+                <t t-foreach="featured_events" t-as="item">
                   <t t-call="bhz_guiabh_website.guiabh_content_card"/>
                 </t>
               </t>
@@ -499,7 +499,7 @@
             </div>
             <t t-if="ads_between">
               <div class="guiabh-grid mb-4">
-                <t t-foreach="ads_between" t-as="ad" t-key="ad.id">
+                <t t-foreach="ads_between" t-as="ad">
                   <div class="guiabh-card ad-card">
                     <div class="cover">
                       <img t-att-src="ad.image and '/web/image/guiabh.ad/%s/image' % ad.id or '/bhz_guiabh_website/static/src/img/placeholders/editorial_placeholder.svg'" alt="Anúncio" loading="lazy"/>
@@ -514,7 +514,7 @@
             </t>
             <div class="guiabh-grid">
               <t t-if="upcoming_events">
-                <t t-foreach="upcoming_events" t-as="item" t-key="item.get('id') or loop.index">
+                <t t-foreach="upcoming_events" t-as="item">
                   <t t-call="bhz_guiabh_website.guiabh_content_card"/>
                 </t>
               </t>
@@ -539,7 +539,7 @@
             </div>
             <div class="guiabh-grid">
               <t t-if="featured_places">
-                <t t-foreach="featured_places" t-as="item" t-key="item.get('id') or loop.index">
+                <t t-foreach="featured_places" t-as="item">
                   <t t-call="bhz_guiabh_website.guiabh_content_card"/>
                 </t>
               </t>
@@ -564,7 +564,7 @@
             </div>
             <div class="guiabh-carousel">
               <t t-if="now_playing_movies">
-                <t t-foreach="now_playing_movies" t-as="item" t-key="item.get('id') or loop.index">
+                <t t-foreach="now_playing_movies" t-as="item">
                   <t t-call="bhz_guiabh_website.guiabh_content_card"/>
                 </t>
               </t>
@@ -589,7 +589,7 @@
             </div>
             <div class="guiabh-grid">
               <t t-if="upcoming_matches">
-                <t t-foreach="upcoming_matches" t-as="item" t-key="item.get('id') or loop.index">
+                <t t-foreach="upcoming_matches" t-as="item">
                   <t t-call="bhz_guiabh_website.guiabh_content_card"/>
                 </t>
               </t>
@@ -613,8 +613,8 @@
             </div>
               <t t-if="pref_events or pref_places">
                 <div class="guiabh-grid">
-                  <t t-foreach="pref_events" t-as="event" t-key="event.id"><t t-call="bhz_guiabh_website.guiabh_event_card"/></t>
-                  <t t-foreach="pref_places" t-as="place" t-key="place.id"><t t-call="bhz_guiabh_website.guiabh_place_card"/></t>
+                  <t t-foreach="pref_events" t-as="event"><t t-call="bhz_guiabh_website.guiabh_event_card"/></t>
+                  <t t-foreach="pref_places" t-as="place"><t t-call="bhz_guiabh_website.guiabh_place_card"/></t>
                 </div>
               </t>
             <t t-else="">
@@ -624,12 +624,12 @@
                   <form class="row g-2" action="/preferencias/salvar" method="post">
                     <div class="col-md-4">
                       <select name="categories" class="form-select" multiple="multiple" size="4">
-                        <option t-foreach="request.env['guiabh.event.category'].search([('active','=',True)])" t-as="cat" t-key="cat.id" t-att-value="cat.id"><t t-esc="cat.name"/></option>
+                        <option t-foreach="request.env['guiabh.event.category'].search([('active','=',True)])" t-as="cat" t-att-value="cat.id"><t t-esc="cat.name"/></option>
                       </select>
                     </div>
                     <div class="col-md-4">
                       <select name="regions" class="form-select" multiple="multiple" size="4">
-                        <option t-foreach="request.env['guiabh.region'].search([('active','=',True)])" t-as="reg" t-key="reg.id" t-att-value="reg.id"><t t-esc="reg.name"/></option>
+                        <option t-foreach="request.env['guiabh.region'].search([('active','=',True)])" t-as="reg" t-att-value="reg.id"><t t-esc="reg.name"/></option>
                       </select>
                     </div>
                     <div class="col-md-4 d-grid">
@@ -723,13 +723,13 @@
                 <div class="col-md-2">
                   <select name="cat" class="form-select" aria-label="Categoria">
                     <option value="">Categoria</option>
-                    <option t-foreach="categories" t-as="cat" t-key="cat.id" t-att-value="cat.id" t-att-selected="str(current_filters.get('cat')) == str(cat.id)"><t t-esc="cat.name"/></option>
+                    <option t-foreach="categories" t-as="cat" t-att-value="cat.id" t-att-selected="str(current_filters.get('cat')) == str(cat.id)"><t t-esc="cat.name"/></option>
                   </select>
                 </div>
                 <div class="col-md-2">
                   <select name="reg" class="form-select" aria-label="Região">
                     <option value="">Região</option>
-                    <option t-foreach="regions" t-as="reg" t-key="reg.id" t-att-value="reg.id" t-att-selected="str(current_filters.get('reg')) == str(reg.id)"><t t-esc="reg.name"/></option>
+                    <option t-foreach="regions" t-as="reg" t-att-value="reg.id" t-att-selected="str(current_filters.get('reg')) == str(reg.id)"><t t-esc="reg.name"/></option>
                   </select>
                 </div>
                 <div class="col-md-2">
@@ -770,7 +770,7 @@
           <div class="guia-container">
             <t t-if="ads_sidebar">
                   <div class="guiabh-grid mb-3">
-                    <t t-foreach="ads_sidebar" t-as="ad" t-key="ad.id">
+                    <t t-foreach="ads_sidebar" t-as="ad">
                       <div class="guiabh-card ad-card">
                         <div class="cover">
                       <img t-att-src="ad.image and '/web/image/guiabh.ad/%s/image/800/600' % ad.id or '/bhz_guiabh_website/static/src/img/placeholders/editorial_placeholder.svg'" alt="Anúncio" loading="lazy"/>
@@ -785,7 +785,7 @@
             </t>
             <div class="guiabh-grid">
               <t t-if="events">
-                <t t-foreach="events" t-as="event" t-key="event.id"><t t-call="bhz_guiabh_website.guiabh_event_card"/></t>
+                <t t-foreach="events" t-as="event"><t t-call="bhz_guiabh_website.guiabh_event_card"/></t>
               </t>
               <t t-else=""><p>Nenhum evento encontrado com estes filtros.</p></t>
             </div>
@@ -865,7 +865,7 @@
             <div class="mt-5" t-if="related_events">
               <div class="guiabh-section-title"><h2>Eventos relacionados</h2></div>
               <div class="guiabh-grid">
-                <t t-foreach="related_events" t-as="event" t-key="event.id"><t t-call="bhz_guiabh_website.guiabh_event_card"/></t>
+                <t t-foreach="related_events" t-as="event"><t t-call="bhz_guiabh_website.guiabh_event_card"/></t>
               </div>
             </div>
           </div>
@@ -893,13 +893,13 @@
                 <div class="col-md-3">
                   <select name="tipo" class="form-select" aria-label="Tipo de lugar">
                     <option value="">Tipo</option>
-                    <option t-foreach="place_types" t-as="tipo" t-key="tipo.id" t-att-value="tipo.id" t-att-selected="str(current_filters.get('tipo')) == str(tipo.id)"><t t-esc="tipo.name"/></option>
+                    <option t-foreach="place_types" t-as="tipo" t-att-value="tipo.id" t-att-selected="str(current_filters.get('tipo')) == str(tipo.id)"><t t-esc="tipo.name"/></option>
                   </select>
                 </div>
                 <div class="col-md-3">
                   <select name="reg" class="form-select" aria-label="Região">
                     <option value="">Região</option>
-                    <option t-foreach="regions" t-as="reg" t-key="reg.id" t-att-value="reg.id" t-att-selected="str(current_filters.get('reg')) == str(reg.id)"><t t-esc="reg.name"/></option>
+                    <option t-foreach="regions" t-as="reg" t-att-value="reg.id" t-att-selected="str(current_filters.get('reg')) == str(reg.id)"><t t-esc="reg.name"/></option>
                   </select>
                 </div>
                 <div class="col-md-3">
@@ -918,7 +918,7 @@
           <div class="guia-container">
             <t t-if="ads_sidebar">
                   <div class="guiabh-grid mb-3">
-                    <t t-foreach="ads_sidebar" t-as="ad" t-key="ad.id">
+                    <t t-foreach="ads_sidebar" t-as="ad">
                       <div class="guiabh-card ad-card">
                         <div class="cover">
                       <img t-att-src="ad.image and '/web/image/guiabh.ad/%s/image/800/600' % ad.id or '/bhz_guiabh_website/static/src/img/placeholders/editorial_placeholder.svg'" alt="Anúncio" loading="lazy"/>
@@ -933,7 +933,7 @@
             </t>
             <div class="guiabh-grid">
               <t t-if="places">
-                <t t-foreach="places" t-as="place" t-key="place.id"><t t-call="bhz_guiabh_website.guiabh_place_card"/></t>
+                <t t-foreach="places" t-as="place"><t t-call="bhz_guiabh_website.guiabh_place_card"/></t>
               </t>
               <t t-else=""><p>Nenhum lugar encontrado com estes filtros.</p></t>
             </div>
@@ -974,7 +974,7 @@
                 <img class="img img-fluid rounded w-100" t-att-src="place.cover_image and '/web/image/guiabh.place/%s/cover_image/1200/700' % place.id or '/bhz_guiabh_website/static/src/img/placeholders/place_placeholder.svg'" t-att-alt="place.name" loading="lazy"/>
                 <div class="guiabh-gallery mt-3" t-if="place.gallery_image_ids">
                   <div class="guiabh-grid">
-                    <t t-foreach="place.gallery_image_ids" t-as="img" t-key="img.id">
+                    <t t-foreach="place.gallery_image_ids" t-as="img">
                       <img class="img img-fluid rounded" t-att-src="'/web/image/guiabh.place.image/%s/image' % img.id" loading="lazy" alt="Galeria do lugar"/>
                     </t>
                   </div>
@@ -988,7 +988,7 @@
                   <span class="guiabh-chip" t-if="place.region_id.name"><t t-esc="place.region_id.name"/></span>
                   <span class="guiabh-chip" t-if="place.price_range"><t t-esc="place.price_range"/></span>
                   <t t-if="place.tags_ids">
-                    <span class="guiabh-chip" t-foreach="place.tags_ids" t-as="tg" t-key="tg.id"><t t-esc="tg.name"/></span>
+                    <span class="guiabh-chip" t-foreach="place.tags_ids" t-as="tg"><t t-esc="tg.name"/></span>
                   </t>
                 </div>
                 <div class="mt-3">
@@ -1025,13 +1025,13 @@
             <div class="mt-5" t-if="place_events">
               <div class="guiabh-section-title"><h2>Eventos nesse local</h2></div>
               <div class="guiabh-grid">
-                <t t-foreach="place_events" t-as="event" t-key="event.id"><t t-call="bhz_guiabh_website.guiabh_event_card"/></t>
+                <t t-foreach="place_events" t-as="event"><t t-call="bhz_guiabh_website.guiabh_event_card"/></t>
               </div>
             </div>
             <div class="mt-5" t-if="related_places">
               <div class="guiabh-section-title"><h2>Outros lugares recomendados</h2></div>
               <div class="guiabh-grid">
-                <t t-foreach="related_places" t-as="place" t-key="place.id"><t t-call="bhz_guiabh_website.guiabh_place_card"/></t>
+                <t t-foreach="related_places" t-as="place"><t t-call="bhz_guiabh_website.guiabh_place_card"/></t>
               </div>
             </div>
           </div>
@@ -1058,7 +1058,7 @@
               <a href="/eventos?when=weekend">Ver todos</a>
             </div>
               <div class="guiabh-grid">
-                <t t-foreach="weekend_events" t-as="event" t-key="event.id"><t t-call="bhz_guiabh_website.guiabh_event_card"/></t>
+                <t t-foreach="weekend_events" t-as="event"><t t-call="bhz_guiabh_website.guiabh_event_card"/></t>
               </div>
             <div class="mt-5">
               <div class="guiabh-section-title"><h2>Checklist rápido</h2></div>
