@@ -79,4 +79,142 @@ odoo.define("bhz_dealer_website.dealer", function (require) {
       this.$target.trigger("snippet-car-reload");
     },
   });
+
+  publicWidget.registry.BhzDealerFilters = publicWidget.Widget.extend({
+    selector: ".bhz-filter-toggle",
+    events: {
+      "click": "_toggleFilters",
+    },
+    start() {
+      this.$filters = this.$el.next(".bhz-filters");
+      return this._super(...arguments);
+    },
+    _toggleFilters(ev) {
+      ev.preventDefault();
+      if (this.$filters && this.$filters.length) {
+        this.$filters.toggleClass("is-open");
+      }
+    },
+  });
+
+  publicWidget.registry.BhzDealerWhatsApp = publicWidget.Widget.extend({
+    selector: ".bhz-dealer",
+    start() {
+      this._injectButton();
+      return this._super(...arguments);
+    },
+    _injectButton() {
+      const $body = $("body");
+      const phone = $body.data("bhz-whatsapp") || this._guessPhone();
+      if (!phone) {
+        return;
+      }
+      const message = encodeURIComponent($body.data("bhz-whatsapp-msg") || "Olá, quero saber mais sobre os carros.");
+      const url = `https://wa.me/${phone}?text=${message}`;
+      const $btn = $(`
+        <a class="bhz-floating-whatsapp" target="_blank" rel="noopener" aria-label="WhatsApp" href="${url}">
+          <i class="fa fa-whatsapp"></i> Fale no WhatsApp
+        </a>
+      `);
+      $("body").append($btn);
+    },
+    _guessPhone() {
+      const meta = $('meta[name="whatsapp"]');
+      if (meta.length) {
+        return meta.attr("content");
+      }
+      return null;
+    },
+  });
+
+  publicWidget.registry.BhzDealerLeadModal = publicWidget.Widget.extend({
+    selector: "body",
+    events: {
+      "click .bhz-interest-btn": "_openModal",
+      "submit #bhz-lead-form": "_submitLead",
+    },
+    _openModal(ev) {
+      ev.preventDefault();
+      const $btn = $(ev.currentTarget);
+      const carId = $btn.data("car-id");
+      const carName = $btn.data("car-name");
+      let $modal = $("#bhz-lead-modal");
+      if (!$modal.length) {
+        $modal = $(`
+          <div class="modal fade" id="bhz-lead-modal" tabindex="-1">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Tenho interesse</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="bhz-lead-form">
+                  <div class="modal-body">
+                    <input type="hidden" name="car_id" />
+                    <div class="mb-2">
+                      <label class="form-label">Nome</label>
+                      <input type="text" name="name" class="form-control" required />
+                    </div>
+                    <div class="mb-2">
+                      <label class="form-label">Telefone</label>
+                      <input type="text" name="phone" class="form-control" />
+                    </div>
+                    <div class="mb-2">
+                      <label class="form-label">E-mail</label>
+                      <input type="email" name="email" class="form-control" />
+                    </div>
+                    <div class="mb-2">
+                      <label class="form-label">Mensagem</label>
+                      <textarea name="message" class="form-control" rows="3">Tenho interesse no carro.</textarea>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button type="submit" class="btn btn-primary">Enviar</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        `);
+        $("body").append($modal);
+      }
+      $modal.find("input[name='car_id']").val(carId || "");
+      $modal.find("textarea[name='message']").val(`Tenho interesse no carro: ${carName || ""}`);
+      if (window.bootstrap && window.bootstrap.Modal) {
+        const modal = bootstrap.Modal.getOrCreateInstance($modal[0]);
+        modal.show();
+      } else {
+        $modal.modal("show");
+      }
+    },
+    async _submitLead(ev) {
+      ev.preventDefault();
+      const $form = $(ev.currentTarget);
+      const data = {
+        car_id: $form.find("[name='car_id']").val(),
+        name: $form.find("[name='name']").val(),
+        phone: $form.find("[name='phone']").val(),
+        email: $form.find("[name='email']").val(),
+        message: $form.find("[name='message']").val(),
+      };
+      const $submit = $form.find("button[type='submit']");
+      $submit.prop("disabled", true).text("Enviando...");
+      try {
+        await ajax.jsonRpc("/carros/lead", "call", data);
+        $form[0].reset();
+        if (window.bootstrap && window.bootstrap.Modal) {
+          bootstrap.Modal.getInstance($("#bhz-lead-modal")[0]).hide();
+        } else {
+          $("#bhz-lead-modal").modal("hide");
+        }
+        alert("Recebemos seu interesse! Em breve entraremos em contato.");
+      } catch (err) {
+        console.error("Erro ao enviar lead", err);
+        alert("Não foi possível enviar agora. Tente novamente.");
+      } finally {
+        $submit.prop("disabled", false).text("Enviar");
+      }
+    },
+  });
 });

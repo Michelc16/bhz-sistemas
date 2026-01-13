@@ -5,7 +5,7 @@
     <field name="name">bhz.dealer.car.tree</field>
     <field name="model">bhz.dealer.car</field>
     <field name="arch" type="xml">
-      <list string="Carros">
+      <list string="Carros" create="1" edit="1">
         <field name="is_featured"/>
         <field name="name"/>
         <field name="brand"/>
@@ -25,6 +25,13 @@
     <field name="model">bhz.dealer.car</field>
     <field name="arch" type="xml">
       <form string="Carro">
+        <header>
+          <button name="action_view_on_website" type="object" class="oe_stat_button" icon="fa-external-link">
+            <div class="o_stat_info">
+              <span class="o_stat_text">Ver no Site</span>
+            </div>
+          </button>
+        </header>
         <sheet>
           <div class="oe_title">
             <h1><field name="name" placeholder="Ex: Corolla XEi 2022 Completo"/></h1>
@@ -92,14 +99,5 @@
       </form>
     </field>
   </record>
-
-  <record id="action_bhz_dealer_cars" model="ir.actions.act_window">
-    <field name="name">Carros</field>
-    <field name="res_model">bhz.dealer.car</field>
-    <field name="view_mode">list,form</field>
-  </record>
-
-  <menuitem id="menu_bhz_dealer_root" name="BHZ Dealer" sequence="80" action="action_bhz_dealer_cars" groups="base.group_user"/>
-  <menuitem id="menu_bhz_dealer_cars" name="Carros" parent="menu_bhz_dealer_root" action="action_bhz_dealer_cars" sequence="10" groups="base.group_user"/>
   </data>
 </odoo>

@@ -5,10 +5,12 @@
     "summary": "Site moderno para concessionárias: estoque, detalhe do carro, filtros e captação de leads.",
     "author": "BHZ Sistemas",
     "license": "LGPL-3",
-    "depends": ["website", "website_sale", "mail"],
+    "depends": ["website", "crm", "mail"],
     "data": [
         "security/security.xml",
         "security/ir.model.access.csv",
+        "views/dealer_menu.xml",
+        "views/config_views.xml",
         "data/demo.xml",
         "views/car_views.xml",
         "views/website_menus.xml",

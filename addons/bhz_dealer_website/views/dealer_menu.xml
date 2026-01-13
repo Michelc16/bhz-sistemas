@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <record id="action_bhz_dealer_cars" model="ir.actions.act_window">
+      <field name="name">Carros</field>
+      <field name="res_model">bhz.dealer.car</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_bhz_dealer_config" model="ir.actions.act_window">
+      <field name="name">Configurações</field>
+      <field name="res_model">bhz.dealer.website.config</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_bhz_dealer_root" name="BHZ Dealer" sequence="80" groups="base.group_user"/>
+    <menuitem id="menu_bhz_dealer_cars" name="Carros" parent="menu_bhz_dealer_root" action="action_bhz_dealer_cars" sequence="10" groups="base.group_user"/>
+    <menuitem id="menu_bhz_dealer_config" name="Configurações" parent="menu_bhz_dealer_root" action="action_bhz_dealer_config" sequence="90" groups="bhz_dealer_website.group_bhz_dealer_manager"/>
+  </data>
+</odoo>

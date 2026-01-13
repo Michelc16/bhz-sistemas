@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <record id="view_bhz_dealer_config_tree" model="ir.ui.view">
+      <field name="name">bhz.dealer.website.config.tree</field>
+      <field name="model">bhz.dealer.website.config</field>
+      <field name="arch" type="xml">
+        <tree string="Configurações do site">
+          <field name="website_id"/>
+          <field name="primary_color"/>
+          <field name="secondary_color"/>
+          <field name="hero_title"/>
+          <field name="whatsapp"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_bhz_dealer_config_form" model="ir.ui.view">
+      <field name="name">bhz.dealer.website.config.form</field>
+      <field name="model">bhz.dealer.website.config</field>
+      <field name="arch" type="xml">
+        <form string="Configuração do Website">
+          <sheet>
+            <group>
+              <field name="website_id"/>
+              <group>
+                <field name="primary_color" widget="color"/>
+                <field name="secondary_color" widget="color"/>
+              </group>
+            </group>
+            <notebook>
+              <page string="Hero">
+                <group>
+                  <field name="hero_title"/>
+                  <field name="hero_subtitle"/>
+                  <field name="hero_bg_image" widget="image"/>
+                </group>
+              </page>
+              <page string="Contato">
+                <group>
+                  <field name="phone"/>
+                  <field name="whatsapp"/>
+                  <field name="address"/>
+                  <field name="instagram_url"/>
+                </group>
+              </page>
+            </notebook>
+          </sheet>
+        </form>
+      </field>
+    </record>
+  </data>
+</odoo>

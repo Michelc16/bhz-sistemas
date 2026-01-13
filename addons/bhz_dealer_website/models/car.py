@@ -12,7 +12,13 @@ class BhzDealerCar(models.Model):
     active = fields.Boolean(default=True)
 
     company_id = fields.Many2one("res.company", default=lambda self: self.env.company, index=True)
-    website_id = fields.Many2one("website", string="Website", help="Se vazio, aparece em qualquer website.")
+    website_id = fields.Many2one(
+        "website.website",
+        string="Website",
+        index=True,
+        default=lambda self: self._get_fallback_website_id(),
+        help="Se vazio, aparece em qualquer website.",
+    )
 
     # Identificação
     brand = fields.Char("Marca", required=True, index=True)
@@ -72,6 +78,39 @@ class BhzDealerCar(models.Model):
         for rec in self:
             if rec.year and (rec.year < 1950 or rec.year > 2100):
                 raise ValidationError("Ano inválido.")
+
+    @api.model
+    def _get_fallback_website_id(self):
+        website = self.env["website"].get_current_website()
+        return website.id if website else False
+
+    @api.model
+    def create(self, vals):
+        vals = dict(vals)
+        if not vals.get("website_id"):
+            fallback = self._get_fallback_website_id()
+            if fallback:
+                vals["website_id"] = fallback
+        return super().create(vals)
+
+    def write(self, vals):
+        res = super().write(vals)
+        if not vals.get("website_id"):
+            fallback = self._get_fallback_website_id()
+            if fallback:
+                no_site = self.filtered(lambda rec: not rec.website_id)
+                if no_site:
+                    super(BhzDealerCar, no_site).write({"website_id": fallback})
+        return res
+
+    def action_view_on_website(self):
+        self.ensure_one()
+        url = f"/carros/{self.slug}" if self.slug else "/carros"
+        return {
+            "type": "ir.actions.act_url",
+            "url": url,
+            "target": "new",
+        }
 
 class BhzDealerCarImage(models.Model):
     _name = "bhz.dealer.car.image"

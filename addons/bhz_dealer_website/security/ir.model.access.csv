@@ -3,3 +3,4 @@ access_bhz_dealer_car_manager,bhz.dealer.car manager,model_bhz_dealer_car,bhz_de
 access_bhz_dealer_car_image_manager,bhz.dealer.car.image manager,model_bhz_dealer_car_image,bhz_dealer_website.group_bhz_dealer_manager,1,1,1,1
 access_bhz_dealer_car_user,bhz.dealer.car user,model_bhz_dealer_car,base.group_user,1,1,1,0
 access_bhz_dealer_car_image_user,bhz.dealer.car.image user,model_bhz_dealer_car_image,base.group_user,1,1,1,0
+access_bhz_dealer_config_manager,bhz.dealer.website.config manager,model_bhz_dealer_website_config,bhz_dealer_website.group_bhz_dealer_manager,1,1,1,1

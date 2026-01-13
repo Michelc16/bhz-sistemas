@@ -10,89 +10,91 @@
       <field name="arch" type="xml">
         <template id="page_dealer_home" name="Dealer Home" page="True">
           <t t-call="website.layout">
-            <div id="wrap" class="bhz-dealer">
-
-              <!-- HERO inspirado em Webmotors -->
-              <section class="bhz-hero s_title" data-snippet="s_title" data-name="Hero BHZ Dealer">
+            <t t-set="config" t-value="request.env['bhz.dealer.website.config'].sudo().get_for_website(request.website)"/>
+            <t t-set="primary" t-value="config.primary_color or '#0d6efd'"/>
+            <t t-set="secondary" t-value="config.secondary_color or '#6610f2'"/>
+            <t t-if="config and (config.whatsapp or config.phone)">
+              <script>
+                document.body.setAttribute('data-bhz-whatsapp', "<t t-esc=\"(config.whatsapp or config.phone or '').replace('\"','').replace(\"'\",'')\"/>");
+                document.body.setAttribute('data-bhz-whatsapp-msg', "Olá, quero saber mais sobre os carros.");
+              </script>
+            </t>
+            <div id="wrap" class="bhz-dealer" t-att-style="'--bhz-primary:%s;--bhz-secondary:%s;' % (primary, secondary)">
+              <section class="s_title py-5">
                 <div class="container">
-                  <div class="bhz-hero-inner">
-                    <div class="bhz-hero-copy">
-                      <p class="bhz-kicker text-uppercase">Sem burocracia • Revisados • Garantia</p>
-                      <h1 class="bhz-hero-title">Seu próximo carro está aqui.</h1>
-                      <p class="bhz-hero-subtitle">Pesquise por marca, modelo ou faixa de preço. Negocie online e feche com segurança.</p>
-
-                      <form action="/carros" method="get" class="bhz-hero-search">
-                        <input type="text" name="q" placeholder="Busque por marca, modelo ou versão…" class="form-control"/>
-                        <button class="btn btn-primary" type="submit">Buscar</button>
-                      </form>
-
-                      <div class="bhz-hero-chips">
-                        <a href="/carros?condition=new" class="bhz-chip">0 km</a>
-                        <a href="/carros?condition=seminovo" class="bhz-chip">Seminovos</a>
-                        <a href="/carros?fuel=electric" class="bhz-chip">Elétricos</a>
-                        <a href="/carros?q=SUV" class="bhz-chip">SUV</a>
-                        <a href="/carros?price_max=80000" class="bhz-chip">Até R$80k</a>
-                      </div>
+                  <div class="row align-items-center g-4">
+                    <div class="col-lg-7">
+                      <p class="text-uppercase text-muted mb-2">Sem burocracia • Revisados • Garantia</p>
+                      <h1 class="display-5 fw-bold"><t t-esc="config.hero_title or 'Encontre o próximo carro da sua garagem.'"/></h1>
+                      <p class="lead text-muted"><t t-esc="config.hero_subtitle or 'Busque por marca, ano ou faixa de preço e veja os destaques selecionados.'"/></p>
                     </div>
-                    <div class="bhz-hero-art">
-                      <div class="bhz-hero-glow"></div>
-                      <div class="bhz-hero-box">
-                        <div class="bhz-hero-box-title">Ofertas da semana</div>
-                        <div class="bhz-hero-box-sub">Seleção com revisão e garantia.</div>
-                        <a href="/carros?condition=seminovo" class="btn btn-outline-light w-100 mt-3">Ver ofertas</a>
-                      </div>
+                    <div class="col-lg-5">
+                      <t t-set="brand_list" t-value="request.env['bhz.dealer.car'].sudo().search_read([('active','=',True),('website_id','=',request.website.id)], ['brand'])"/>
+                      <t t-set="brands" t-value="sorted({b['brand'] for b in brand_list if b.get('brand')})"/>
+                      <form action="/carros" method="get" class="card shadow-sm p-3">
+                        <div class="mb-2">
+                          <label class="form-label">Marca</label>
+                          <select class="form-select" name="brand">
+                            <option value="">Todas</option>
+                            <t t-foreach="brands" t-as="b">
+                              <option t-att-value="b"><t t-esc="b"/></option>
+                            </t>
+                          </select>
+                        </div>
+                        <div class="row g-2 mb-2">
+                          <div class="col-6">
+                            <label class="form-label">Ano mín</label>
+                            <input class="form-control" type="number" name="year_min" placeholder="2015"/>
+                          </div>
+                          <div class="col-6">
+                            <label class="form-label">Ano máx</label>
+                            <input class="form-control" type="number" name="year_max" placeholder="2024"/>
+                          </div>
+                        </div>
+                        <div class="mb-3">
+                          <label class="form-label">Preço máximo</label>
+                          <input class="form-control" type="number" name="price_max" placeholder="100000"/>
+                        </div>
+                        <div class="d-grid">
+                          <button class="btn btn-primary btn-lg" type="submit">Buscar agora</button>
+                        </div>
+                      </form>
                     </div>
                   </div>
                 </div>
               </section>
 
-              <!-- DESTAQUES -->
-              <section class="bhz-section">
+              <section class="py-5 bg-light" t-att-style="config.hero_bg_image and ('background-image:url(/web/image/%s/hero_bg_image); background-size:cover; background-position:center;' % config.id) or ''">
                 <div class="container">
-                  <div class="bhz-section-head">
-                    <h2>Destaques</h2>
-                    <a href="/carros" class="bhz-link">Ver estoque completo →</a>
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="h3 mb-0">Destaques</h2>
+                    <a class="btn btn-link" href="/carros">Ver estoque →</a>
                   </div>
-
-                  <t t-set="featured" t-value="request.env['bhz.dealer.car'].sudo().search([('active','=',True),('is_featured','=',True),'|',('website_id','=',False),('website_id','=',request.website.id)], limit=8)"/>
-                  <div class="bhz-grid">
-                    <t t-foreach="featured" t-as="car">
-                      <t t-call="bhz_dealer_website.car_card"/>
+                  <t t-set="featured" t-value="request.env['bhz.dealer.car'].sudo().search([('active','=',True),('is_featured','=',True),('website_id','=',request.website.id)], limit=8)"/>
+                  <div class="row g-3">
+                    <t t-if="featured">
+                      <t t-foreach="featured" t-as="car">
+                        <div class="col-md-6 col-lg-4 col-xl-3">
+                          <t t-call="bhz_dealer_website.car_card"/>
+                        </div>
+                      </t>
+                    </t>
+                    <t t-else="">
+                      <div class="col-12">
+                        <div class="alert alert-info mb-0">Nenhum destaque disponível. Marque alguns carros como destaque para aparecer aqui.</div>
+                      </div>
                     </t>
                   </div>
                 </div>
               </section>
 
-              <!-- Blocos por categoria -->
-              <section class="bhz-section bhz-categories">
-                <div class="container">
-                  <div class="bhz-section-head">
-                    <h2>Encontre por categoria</h2>
-                  </div>
-                  <div class="bhz-grid bhz-cat-grid">
-                    <a href="/carros?condition=new" class="bhz-cat-card">Carros 0 km</a>
-                    <a href="/carros?condition=seminovo" class="bhz-cat-card">Seminovos</a>
-                    <a href="/carros?q=SUV" class="bhz-cat-card">SUVs</a>
-                    <a href="/carros?q=Sedan" class="bhz-cat-card">Sedans</a>
-                    <a href="/carros?fuel=electric" class="bhz-cat-card">Elétricos</a>
-                    <a href="/carros?price_max=80000" class="bhz-cat-card">Até R$ 80 mil</a>
-                  </div>
+              <section class="py-5">
+                <div class="container text-center">
+                  <h3 class="mb-3">Quer ver o estoque completo?</h3>
+                  <p class="text-muted mb-4">Acesse todos os carros disponíveis e filtre por marca, ano e preço.</p>
+                  <a class="btn btn-primary btn-lg" href="/carros">Ver estoque</a>
                 </div>
               </section>
-
-              <!-- CTA -->
-              <section class="bhz-cta s_text_block" data-snippet="s_text_block" data-name="CTA BHZ Dealer">
-                <div class="container">
-                  <div class="bhz-cta-inner">
-                    <div>
-                      <h3>Quer vender seu carro ou avaliar sua troca?</h3>
-                      <p>Envie os dados agora e receba uma proposta rápida.</p>
-                    </div>
-                    <a class="btn btn-primary btn-lg" href="/carros">Falar com a equipe</a>
-                  </div>
-                </div>
-              </section>
-
             </div>
           </t>
         </template>
@@ -276,6 +278,8 @@
                         <div class="bhz-muted mt-2">Resposta rápida • Atendimento humano</div>
                       </div>
 
+                      <button type="button" class="btn btn-primary mt-3 w-100 bhz-interest-btn" t-att-data-car-id="car.id" t-att-data-car-name="car.name">Tenho interesse</button>
+
                       <div class="bhz-desc mt-4">
                         <h3>Descrição</h3>
                         <div t-if="car.description" t-raw="car.description"/>
@@ -301,6 +305,267 @@
           </t>
         </template>
       </field>
+    </record>
+
+    <!-- Página simples: listagem de carros -->
+    <record id="view_page_car_list" model="ir.ui.view">
+      <field name="name">bhz.dealer.page.car.list</field>
+      <field name="type">qweb</field>
+      <field name="key">bhz_dealer_website.page_car_list</field>
+      <field name="arch" type="xml">
+        <template id="page_car_list" name="Carros" page="True">
+          <t t-call="website.layout">
+            <t t-set="config" t-value="request.env['bhz.dealer.website.config'].sudo().get_for_website(request.website)"/>
+            <t t-set="primary" t-value="config.primary_color or '#0d6efd'"/>
+            <t t-set="secondary" t-value="config.secondary_color or '#6610f2'"/>
+            <t t-if="config and (config.whatsapp or config.phone)">
+              <script>
+                document.body.setAttribute('data-bhz-whatsapp', "<t t-esc=\"(config.whatsapp or config.phone or '').replace('\"','').replace(\"'\",'')\"/>");
+                document.body.setAttribute('data-bhz-whatsapp-msg', "Olá, quero saber mais sobre os carros.");
+              </script>
+            </t>
+            <div id="wrap" class="container py-4 bhz-dealer" t-att-style="'--bhz-primary:%s;--bhz-secondary:%s;' % (primary, secondary)">
+              <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                <div>
+                  <h1 class="mb-0">Carros</h1>
+                  <div class="text-muted"><t t-esc="pager['total'] if pager else len(cars)"/> veículo(s)</div>
+                </div>
+                <div class="d-flex gap-2 align-items-center">
+                  <label class="text-muted small mb-0">Ordenar</label>
+                  <form method="get" action="/carros" class="d-flex gap-2">
+                    <input type="hidden" name="q" t-att-value="filters.get('q') or ''"/>
+                    <input type="hidden" name="brand" t-att-value="filters.get('brand') or ''"/>
+                    <input type="hidden" name="model" t-att-value="filters.get('model') or ''"/>
+                    <input type="hidden" name="fuel" t-att-value="filters.get('fuel') or ''"/>
+                    <input type="hidden" name="condition" t-att-value="filters.get('condition') or ''"/>
+                    <input type="hidden" name="transmission" t-att-value="filters.get('transmission') or ''"/>
+                    <input type="hidden" name="year_min" t-att-value="filters.get('year_min') or ''"/>
+                    <input type="hidden" name="year_max" t-att-value="filters.get('year_max') or ''"/>
+                    <input type="hidden" name="price_min" t-att-value="filters.get('price_min') or ''"/>
+                    <input type="hidden" name="price_max" t-att-value="filters.get('price_max') or ''"/>
+                    <select class="form-select form-select-sm" name="order" onchange="this.form.submit()">
+                      <option value="">Destaques e mais novos</option>
+                      <option value="price_asc" t-att-selected="1 if filters.get('order')=='price_asc' else None">Preço (menor → maior)</option>
+                      <option value="price_desc" t-att-selected="1 if filters.get('order')=='price_desc' else None">Preço (maior → menor)</option>
+                      <option value="year_desc" t-att-selected="1 if filters.get('order')=='year_desc' else None">Ano (mais novo)</option>
+                      <option value="year_asc" t-att-selected="1 if filters.get('order')=='year_asc' else None">Ano (mais antigo)</option>
+                      <option value="newest" t-att-selected="1 if filters.get('order')=='newest' else None">Mais recentes</option>
+                    </select>
+                  </form>
+                </div>
+              </div>
+
+              <div class="bhz-stock-layout">
+                <div class="bhz-filter-toggle btn btn-outline-secondary d-lg-none">Filtros</div>
+                <aside class="bhz-filters">
+                  <form action="/carros" method="get" class="bhz-filter-form">
+                    <label>Busca</label>
+                    <input class="form-control" type="text" name="q" t-att-value="filters.get('q') or ''"/>
+
+                    <label class="mt-2">Marca</label>
+                    <select class="form-select" name="brand">
+                      <option value="">Todas</option>
+                      <t t-foreach="brand_list" t-as="b">
+                        <option t-att-value="b" t-att-selected="1 if (filters.get('brand')==b) else None"><t t-esc="b"/></option>
+                      </t>
+                    </select>
+
+                    <label class="mt-2">Modelo</label>
+                    <input class="form-control" type="text" name="model" t-att-value="filters.get('model') or ''"/>
+
+                    <label class="mt-2">Condição</label>
+                    <select class="form-select" name="condition">
+                      <option value="">Todas</option>
+                      <option value="new" t-att-selected="1 if filters.get('condition')=='new' else None">Novo</option>
+                      <option value="seminovo" t-att-selected="1 if filters.get('condition')=='seminovo' else None">Seminovo</option>
+                      <option value="used" t-att-selected="1 if filters.get('condition')=='used' else None">Usado</option>
+                    </select>
+
+                    <label class="mt-2">Combustível</label>
+                    <select class="form-select" name="fuel">
+                      <option value="">Todos</option>
+                      <option value="flex" t-att-selected="1 if filters.get('fuel')=='flex' else None">Flex</option>
+                      <option value="gasoline" t-att-selected="1 if filters.get('fuel')=='gasoline' else None">Gasolina</option>
+                      <option value="ethanol" t-att-selected="1 if filters.get('fuel')=='ethanol' else None">Etanol</option>
+                      <option value="diesel" t-att-selected="1 if filters.get('fuel')=='diesel' else None">Diesel</option>
+                      <option value="hybrid" t-att-selected="1 if filters.get('fuel')=='hybrid' else None">Híbrido</option>
+                      <option value="electric" t-att-selected="1 if filters.get('fuel')=='electric' else None">Elétrico</option>
+                    </select>
+
+                    <label class="mt-2">Câmbio</label>
+                    <select class="form-select" name="transmission">
+                      <option value="">Todos</option>
+                      <option value="manual" t-att-selected="1 if filters.get('transmission')=='manual' else None">Manual</option>
+                      <option value="auto" t-att-selected="1 if filters.get('transmission')=='auto' else None">Automático</option>
+                      <option value="cvt" t-att-selected="1 if filters.get('transmission')=='cvt' else None">CVT</option>
+                    </select>
+
+                    <div class="row mt-2">
+                      <div class="col-6">
+                        <label>Ano mín</label>
+                        <input class="form-control" type="number" name="year_min" t-att-value="filters.get('year_min') or ''"/>
+                      </div>
+                      <div class="col-6">
+                        <label>Ano máx</label>
+                        <input class="form-control" type="number" name="year_max" t-att-value="filters.get('year_max') or ''"/>
+                      </div>
+                    </div>
+
+                    <div class="row mt-2">
+                      <div class="col-6">
+                        <label>Preço mín</label>
+                        <input class="form-control" type="number" step="0.01" name="price_min" t-att-value="filters.get('price_min') or ''"/>
+                      </div>
+                      <div class="col-6">
+                        <label>Preço máx</label>
+                        <input class="form-control" type="number" step="0.01" name="price_max" t-att-value="filters.get('price_max') or ''"/>
+                      </div>
+                    </div>
+
+                    <button class="btn btn-primary w-100 mt-3" type="submit">Aplicar filtros</button>
+                    <a class="btn btn-outline-secondary w-100 mt-2" href="/carros">Limpar</a>
+                  </form>
+                </aside>
+
+                <div class="bhz-stock-grid">
+                  <div class="bhz-grid">
+                    <t t-if="cars">
+                      <t t-foreach="cars" t-as="car">
+                        <t t-call="bhz_dealer_website.car_card"/>
+                      </t>
+                    </t>
+                    <t t-else="">
+                      <div class="alert alert-info">Nenhum carro encontrado com esses filtros.</div>
+                    </t>
+                  </div>
+
+                  <t t-if="pager and pager['page_count'] &gt; 1">
+                    <div class="mt-3">
+                      <t t-call="website.pager">
+                        <t t-set="page" t-value="pager['page']"/>
+                        <t t-set="page_count" t-value="pager['page_count']"/>
+                        <t t-set="step" t-value="pager['step']"/>
+                        <t t-set="url" t-value="pager['page_url']"/>
+                      </t>
+                    </div>
+                  </t>
+                </div>
+              </div>
+            </div>
+          </t>
+        </template>
+      </field>
+    </record>
+
+    <!-- Página simples: detalhe do carro -->
+    <record id="view_page_car_detail" model="ir.ui.view">
+      <field name="name">bhz.dealer.page.car.detail</field>
+      <field name="type">qweb</field>
+      <field name="key">bhz_dealer_website.page_car_detail</field>
+      <field name="arch" type="xml">
+        <template id="page_car_detail" name="Carro" page="True">
+          <t t-call="website.layout">
+            <t t-set="config" t-value="request.env['bhz.dealer.website.config'].sudo().get_for_website(request.website)"/>
+            <t t-set="primary" t-value="config.primary_color or '#0d6efd'"/>
+            <t t-set="secondary" t-value="config.secondary_color or '#6610f2'"/>
+            <t t-if="config and (config.whatsapp or config.phone)">
+              <script>
+                document.body.setAttribute('data-bhz-whatsapp', "<t t-esc=\"(config.whatsapp or config.phone or '').replace('\"','').replace(\"'\",'')\"/>");
+                document.body.setAttribute('data-bhz-whatsapp-msg', "Olá, quero saber mais sobre os carros.");
+              </script>
+            </t>
+            <div id="wrap" class="container py-4 bhz-dealer" t-att-style="'--bhz-primary:%s;--bhz-secondary:%s;' % (primary, secondary)">
+              <a href="/carros" class="text-muted small d-inline-block mb-2">← Voltar</a>
+              <h1 class="mb-2"><t t-esc="car.name"/></h1>
+              <div class="mb-3 text-muted">
+                <t t-if="car.year">Ano: <t t-esc="car.year"/> · </t>
+                <t t-if="car.brand"><t t-esc="car.brand"/> </t>
+                <t t-if="car.model"><t t-esc="car.model"/></t>
+              </div>
+              <div class="mb-3">
+                <t t-if="car.price">
+                  <strong>Preço:</strong>
+                  <span><t t-esc="car.currency_id.symbol"/> <t t-esc="'%.2f' % car.price"/></span>
+                </t>
+              </div>
+              <t t-if="car.description">
+                <div class="mb-3">
+                  <strong>Descrição:</strong>
+                  <div t-raw="car.description"/>
+                </div>
+              </t>
+              <t t-if="car.features">
+                <div class="mb-3">
+                  <strong>Opcionais:</strong>
+                  <pre class="mb-0"><t t-esc="car.features"/></pre>
+                </div>
+              </t>
+            </div>
+          </t>
+        </template>
+      </field>
+    </record>
+
+    <!-- Página Quem Somos -->
+    <record id="view_page_dealer_about" model="ir.ui.view">
+      <field name="name">bhz.dealer.page.about</field>
+      <field name="type">qweb</field>
+      <field name="key">bhz_dealer_website.page_about</field>
+      <field name="arch" type="xml">
+        <template id="page_about" name="Quem Somos" page="True">
+          <t t-call="website.layout">
+            <div id="wrap" class="container py-4">
+              <h1 class="mb-3">Quem Somos</h1>
+              <p>Edite este conteúdo para contar a história da sua concessionária, equipe e diferenciais.</p>
+              <p class="text-muted small">Página básica criada pelo módulo BHZ Dealer.</p>
+            </div>
+          </t>
+        </template>
+      </field>
+    </record>
+
+    <!-- Página Contato -->
+    <record id="view_page_dealer_contact" model="ir.ui.view">
+      <field name="name">bhz.dealer.page.contact</field>
+      <field name="type">qweb</field>
+      <field name="key">bhz_dealer_website.page_contact</field>
+      <field name="arch" type="xml">
+        <template id="page_contact" name="Contato" page="True">
+          <t t-call="website.layout">
+            <div id="wrap" class="container py-4">
+              <h1 class="mb-3">Contato</h1>
+              <p>Adicione aqui informações de contato ou um formulário do website builder.</p>
+              <p class="text-muted small">Página básica criada pelo módulo BHZ Dealer.</p>
+            </div>
+          </t>
+        </template>
+      </field>
+    </record>
+
+    <record id="page_about" model="website.page">
+      <field name="name">Quem Somos</field>
+      <field name="website_id" ref="website.default_website"/>
+      <field name="url">/quem-somos</field>
+      <field name="view_id" ref="view_page_dealer_about"/>
+    </record>
+
+    <record id="page_contact" model="website.page">
+      <field name="name">Contato</field>
+      <field name="website_id" ref="website.default_website"/>
+      <field name="url">/contato</field>
+      <field name="view_id" ref="view_page_dealer_contact"/>
+    </record>
+
+    <!-- Página home e vínculo como homepage -->
+    <record id="page_dealer_home_page" model="website.page">
+      <field name="name">Home</field>
+      <field name="website_id" ref="website.default_website"/>
+      <field name="url">/</field>
+      <field name="view_id" ref="view_page_dealer_home"/>
+    </record>
+
+    <record id="website.default_website" model="website">
+      <field name="homepage_id" ref="page_dealer_home_page"/>
     </record>
 
   </data>

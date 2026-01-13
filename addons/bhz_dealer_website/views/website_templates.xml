@@ -105,5 +105,26 @@
     </template>
 
     <!-- Snippet picker removido temporariamente para evitar XPaths frágeis por tema -->
+
+    <!-- Blocos mínimos para listagem/detalhe -->
+    <template id="car_simple_card">
+      <div class="bhz-simple-car py-2">
+        <div>
+          <a t-att-href="'/carros/%s' % car.id" class="fw-bold text-decoration-none">
+            <t t-esc="car.name"/>
+          </a>
+          <t t-if="car.year">
+            <span class="text-muted">(<t t-esc="car.year"/>)</span>
+          </t>
+        </div>
+        <div class="text-muted small">
+          <t t-if="car.price">
+            <t t-esc="car.currency_id.symbol"/> <t t-esc="'%.2f' % car.price"/>
+          </t>
+          <t t-if="car.brand"> · <t t-esc="car.brand"/></t>
+          <t t-if="car.model"> <t t-esc="car.model"/></t>
+        </div>
+      </div>
+    </template>
   </data>
 </odoo>
