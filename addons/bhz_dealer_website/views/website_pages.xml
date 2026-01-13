@@ -12,33 +12,34 @@
           <t t-call="website.layout">
             <div id="wrap" class="bhz-dealer">
 
-              <!-- HERO (editável no construtor) -->
+              <!-- HERO inspirado em Webmotors -->
               <section class="bhz-hero s_title" data-snippet="s_title" data-name="Hero BHZ Dealer">
                 <div class="container">
                   <div class="bhz-hero-inner">
                     <div class="bhz-hero-copy">
-                      <h1 class="bhz-hero-title">Encontre seu próximo carro hoje</h1>
-                      <p class="bhz-hero-subtitle">
-                        Estoque atualizado, atendimento rápido e as melhores condições.
-                      </p>
+                      <p class="bhz-kicker text-uppercase">Sem burocracia • Revisados • Garantia</p>
+                      <h1 class="bhz-hero-title">Seu próximo carro está aqui.</h1>
+                      <p class="bhz-hero-subtitle">Pesquise por marca, modelo ou faixa de preço. Negocie online e feche com segurança.</p>
 
                       <form action="/carros" method="get" class="bhz-hero-search">
                         <input type="text" name="q" placeholder="Busque por marca, modelo ou versão…" class="form-control"/>
-                        <button class="btn btn-primary" type="submit">Ver estoque</button>
+                        <button class="btn btn-primary" type="submit">Buscar</button>
                       </form>
 
-                      <div class="bhz-hero-trust">
-                        <div class="bhz-pill">Financiamento</div>
-                        <div class="bhz-pill">Troca com troco</div>
-                        <div class="bhz-pill">Garantia</div>
+                      <div class="bhz-hero-chips">
+                        <a href="/carros?condition=new" class="bhz-chip">0 km</a>
+                        <a href="/carros?condition=seminovo" class="bhz-chip">Seminovos</a>
+                        <a href="/carros?fuel=electric" class="bhz-chip">Elétricos</a>
+                        <a href="/carros?q=SUV" class="bhz-chip">SUV</a>
+                        <a href="/carros?price_max=80000" class="bhz-chip">Até R$80k</a>
                       </div>
                     </div>
                     <div class="bhz-hero-art">
                       <div class="bhz-hero-glow"></div>
                       <div class="bhz-hero-box">
-                        <div class="bhz-hero-box-title">Destaques da semana</div>
-                        <div class="bhz-hero-box-sub">Sem enrolação: clique e fale agora.</div>
-                        <a href="/carros" class="btn btn-outline-light w-100 mt-3">Ver ofertas</a>
+                        <div class="bhz-hero-box-title">Ofertas da semana</div>
+                        <div class="bhz-hero-box-sub">Seleção com revisão e garantia.</div>
+                        <a href="/carros?condition=seminovo" class="btn btn-outline-light w-100 mt-3">Ver ofertas</a>
                       </div>
                     </div>
                   </div>
@@ -49,8 +50,8 @@
               <section class="bhz-section">
                 <div class="container">
                   <div class="bhz-section-head">
-                    <h2>Carros em destaque</h2>
-                    <a href="/carros" class="bhz-link">Ver tudo →</a>
+                    <h2>Destaques</h2>
+                    <a href="/carros" class="bhz-link">Ver estoque completo →</a>
                   </div>
 
                   <t t-set="featured" t-value="request.env['bhz.dealer.car'].sudo().search([('active','=',True),('is_featured','=',True),'|',('website_id','=',False),('website_id','=',request.website.id)], limit=8)"/>
@@ -62,15 +63,32 @@
                 </div>
               </section>
 
+              <!-- Blocos por categoria -->
+              <section class="bhz-section bhz-categories">
+                <div class="container">
+                  <div class="bhz-section-head">
+                    <h2>Encontre por categoria</h2>
+                  </div>
+                  <div class="bhz-grid bhz-cat-grid">
+                    <a href="/carros?condition=new" class="bhz-cat-card">Carros 0 km</a>
+                    <a href="/carros?condition=seminovo" class="bhz-cat-card">Seminovos</a>
+                    <a href="/carros?q=SUV" class="bhz-cat-card">SUVs</a>
+                    <a href="/carros?q=Sedan" class="bhz-cat-card">Sedans</a>
+                    <a href="/carros?fuel=electric" class="bhz-cat-card">Elétricos</a>
+                    <a href="/carros?price_max=80000" class="bhz-cat-card">Até R$ 80 mil</a>
+                  </div>
+                </div>
+              </section>
+
               <!-- CTA -->
               <section class="bhz-cta s_text_block" data-snippet="s_text_block" data-name="CTA BHZ Dealer">
                 <div class="container">
                   <div class="bhz-cta-inner">
                     <div>
                       <h3>Quer vender seu carro ou avaliar sua troca?</h3>
-                      <p>Fale com a equipe e receba atendimento em minutos.</p>
+                      <p>Envie os dados agora e receba uma proposta rápida.</p>
                     </div>
-                    <a class="btn btn-primary btn-lg" href="/carros">Falar com a concessionária</a>
+                    <a class="btn btn-primary btn-lg" href="/carros">Falar com a equipe</a>
                   </div>
                 </div>
               </section>

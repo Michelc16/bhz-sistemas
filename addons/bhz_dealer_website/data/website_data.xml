@@ -27,5 +27,28 @@
       <field name="sequence">10</field>
       <field name="website_id" ref="website.default_website"/>
     </record>
+
+    <!-- Submenus rápidos inspirados na navegação de portais automotivos -->
+    <record id="menu_bhz_dealer_stock_novos" model="website.menu">
+      <field name="name">Novos</field>
+      <field name="url">/carros?condition=new</field>
+      <field name="parent_id" ref="menu_bhz_dealer_stock"/>
+      <field name="sequence">1</field>
+      <field name="website_id" ref="website.default_website"/>
+    </record>
+    <record id="menu_bhz_dealer_stock_seminovos" model="website.menu">
+      <field name="name">Seminovos</field>
+      <field name="url">/carros?condition=seminovo</field>
+      <field name="parent_id" ref="menu_bhz_dealer_stock"/>
+      <field name="sequence">2</field>
+      <field name="website_id" ref="website.default_website"/>
+    </record>
+    <record id="menu_bhz_dealer_stock_suv" model="website.menu">
+      <field name="name">SUVs</field>
+      <field name="url">/carros?q=SUV</field>
+      <field name="parent_id" ref="menu_bhz_dealer_stock"/>
+      <field name="sequence">3</field>
+      <field name="website_id" ref="website.default_website"/>
+    </record>
   </data>
 </odoo>
