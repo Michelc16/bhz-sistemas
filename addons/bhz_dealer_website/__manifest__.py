@@ -12,6 +12,7 @@
         "data/demo.xml",
         "views/car_views.xml",
         "views/website_menus.xml",
+        "views/website_views.xml",
         "views/website_templates.xml",
         "views/website_pages.xml",
     ],

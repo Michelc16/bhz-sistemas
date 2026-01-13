@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <!-- Espaço reservado para futuras definições de views/menus do website.
+         Snippet picker removido para evitar xpath frágil em temas. -->
+  </data>
+</odoo>

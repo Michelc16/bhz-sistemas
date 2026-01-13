@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<templates id="bhz_dealer_templates" xml:space="preserve">
+<templates id="template" xml:space="preserve">
   <!-- Card do carro (reutilizável) -->
   <template id="car_card">
     <a t-att-href="'/carros/%s-%s' % (car.id, car.slug or '')" class="bhz-car-card d-block text-decoration-none">
