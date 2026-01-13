@@ -13,7 +13,7 @@ class BhzDealerCar(models.Model):
 
     company_id = fields.Many2one("res.company", default=lambda self: self.env.company, index=True)
     website_id = fields.Many2one(
-        "website.website",
+        "website",
         string="Website",
         index=True,
         default=lambda self: self._get_fallback_website_id(),

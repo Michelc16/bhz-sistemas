@@ -11,7 +11,7 @@ class BhzDealerWebsiteConfig(models.Model):
     ]
 
     website_id = fields.Many2one(
-        "website.website",
+        "website",
         string="Website",
         required=True,
         default=lambda self: self._default_website(),
