@@ -5,13 +5,13 @@
       <field name="name">bhz.dealer.website.config.tree</field>
       <field name="model">bhz.dealer.website.config</field>
       <field name="arch" type="xml">
-        <tree string="Configurações do site">
+        <list string="Configurações do site">
           <field name="website_id"/>
           <field name="primary_color"/>
           <field name="secondary_color"/>
           <field name="hero_title"/>
           <field name="whatsapp"/>
-        </tree>
+        </list>
       </field>
     </record>
 
