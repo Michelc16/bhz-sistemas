@@ -1,5 +1,4 @@
 <odoo>
-  <data>
   <record id="view_bhz_marketplace_seller_tree" model="ir.ui.view">
     <field name="name">bhz.marketplace.seller.tree</field>
     <field name="model">bhz.marketplace.seller</field>
