@@ -1,16 +1,17 @@
 <odoo>
+  <data>
   <record id="view_bhz_marketplace_seller_tree" model="ir.ui.view">
     <field name="name">bhz.marketplace.seller.tree</field>
     <field name="model">bhz.marketplace.seller</field>
     <field name="arch" type="xml">
-      <tree>
+      <list>
         <field name="name"/>
         <field name="partner_id"/>
         <field name="user_id"/>
         <field name="state"/>
         <field name="shop_slug"/>
         <field name="commission_rate"/>
-      </tree>
+      </list>
     </field>
   </record>
 
@@ -20,10 +21,10 @@
     <field name="arch" type="xml">
       <form string="Seller">
         <header>
-          <button name="action_set_pending" string="Enviar para aprovação" type="object" states="draft,rejected" class="btn-primary"/>
-          <button name="action_approve" string="Aprovar" type="object" states="pending"/>
-          <button name="action_reject" string="Rejeitar" type="object" states="pending"/>
-          <button name="action_suspend" string="Suspender" type="object" states="approved"/>
+          <button name="action_set_pending" string="Enviar para aprovação" type="object" class="btn-primary"/>
+          <button name="action_approve" string="Aprovar" type="object"/>
+          <button name="action_reject" string="Rejeitar" type="object"/>
+          <button name="action_suspend" string="Suspender" type="object"/>
           <field name="state" widget="statusbar" statusbar_visible="draft,pending,approved,rejected,suspended"/>
         </header>
         <sheet>
@@ -55,11 +56,11 @@
           <notebook>
             <page string="Tokens API">
               <field name="api_token_ids">
-                <tree editable="bottom">
+                <list editable="bottom">
                   <field name="name"/>
                   <field name="token" readonly="1"/>
                   <field name="last_used_at"/>
-                </tree>
+                </list>
               </field>
             </page>
           </notebook>
@@ -71,6 +72,7 @@
   <record id="action_bhz_marketplace_seller" model="ir.actions.act_window">
     <field name="name">Sellers</field>
     <field name="res_model">bhz.marketplace.seller</field>
-    <field name="view_mode">tree,form</field>
+    <field name="view_mode">list,form</field>
   </record>
+  </data>
 </odoo>
