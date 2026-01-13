@@ -22,8 +22,8 @@
     <field name="model">sale.order.line</field>
     <field name="inherit_id" ref="sale.view_order_line_tree"/>
     <field name="arch" type="xml">
-      <xpath expr="//tree/field[@name='product_uom_qty']" position="before">
-        <field name="bhz_seller_id" groups="bhz_marketplace_core.group_marketplace_manager,bhz_marketplace_core.group_marketplace_seller"/>
+      <xpath expr="//tree/field[@name='product_id']" position="after">
+        <field name="bhz_seller_id" optional="show" groups="bhz_marketplace_core.group_marketplace_manager,bhz_marketplace_core.group_marketplace_seller"/>
       </xpath>
     </field>
   </record>
