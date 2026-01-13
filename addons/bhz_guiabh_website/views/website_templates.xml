@@ -30,7 +30,7 @@
             <span class="text-chip" t-if="event.price_type == 'paid'"><t t-esc="'A partir de %s%s' % (event.currency_id and event.currency_id.symbol or 'R$', event.min_price or '')"/></span>
             <a t-att-href="event.website_url or '/eventos/%s' % event.slug" class="btn btn-link">Ver detalhes</a>
             <t t-if="request.env.user.has_group('base.group_user')">
-              <a t-att-href="'/favoritos/toggle?model=guiabh.event&res_id=%s' % event.id" class="btn btn-link">Salvar</a>
+              <a t-att-href="'/favoritos/toggle?model=guiabh.event&amp;res_id=%s' % event.id" class="btn btn-link">Salvar</a>
             </t>
             <t t-else="">
               <a href="/web/login" class="btn btn-link">Faça login para salvar</a>
@@ -323,7 +323,7 @@
           <div class="footer">
             <a t-att-href="place.website_url or '/lugares/%s' % place.slug" class="btn btn-link">Saiba mais</a>
             <t t-if="request.env.user.has_group('base.group_user')">
-              <a t-att-href="'/favoritos/toggle?model=guiabh.place&res_id=%s' % place.id" class="btn btn-link">Salvar</a>
+              <a t-att-href="'/favoritos/toggle?model=guiabh.place&amp;res_id=%s' % place.id" class="btn btn-link">Salvar</a>
             </t>
             <t t-else="">
               <a href="/web/login" class="btn btn-link">Faça login para salvar</a>
@@ -730,7 +730,7 @@
                     <i class="fa fa-share-alt"></i> Compartilhar
                   </a>
                   <t t-if="request.env.user.has_group('base.group_user')">
-                    <a t-att-href="'/favoritos/toggle?model=guiabh.event&res_id=%s' % event.id" class="btn btn-outline-primary">Salvar</a>
+                    <a t-att-href="'/favoritos/toggle?model=guiabh.event&amp;res_id=%s' % event.id" class="btn btn-outline-primary">Salvar</a>
                   </t>
                   <t t-else="">
                     <a href="/web/login" class="btn btn-outline-primary">Faça login para salvar</a>
@@ -889,7 +889,7 @@
                   </t>
                   <div class="mt-2">
                     <t t-if="request.env.user.has_group('base.group_user')">
-                      <a t-att-href="'/favoritos/toggle?model=guiabh.place&res_id=%s' % place.id" class="btn btn-outline-secondary">Salvar</a>
+                      <a t-att-href="'/favoritos/toggle?model=guiabh.place&amp;res_id=%s' % place.id" class="btn btn-outline-secondary">Salvar</a>
                     </t>
                     <t t-else="">
                       <a href="/web/login" class="btn btn-outline-secondary">Faça login para salvar</a>
