@@ -1,22 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- Campos relacionados em res.config.settings -->
     <record id="view_res_config_settings_ifood_inherit" model="ir.ui.view">
         <field name="name">res.config.settings.view.form.inherit.bhz_ifood_connector</field>
         <field name="model">res.config.settings</field>
-        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <!-- Em Odoo 19, a view base de settings vem de base_setup -->
+        <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
         <field name="arch" type="xml">
-
-            <!-- Tenta encaixar no app Vendas; se não existir o bloco, continua funcionando -->
-            <xpath expr="//div[contains(@class,'settings')]" position="inside">
-                <div class="app_settings_block" data-string="iFood" string="iFood">
+            <xpath expr="//div[hasclass('o_settings_container')]" position="inside">
+                <div class="app_settings_block" string="iFood">
                     <h2>iFood</h2>
-
                     <div class="row mt16 o_settings_container">
                         <div class="col-12 col-lg-6 o_setting_box">
                             <div class="o_setting_left_pane"/>
                             <div class="o_setting_right_pane">
-                                <label string="Contas iFood"/>
+                                <div class="o_form_label">Contas iFood</div>
                                 <div class="text-muted">
                                     Gerencie credenciais, merchant_id, webhook e sincronização de pedidos.
                                 </div>
@@ -33,7 +31,7 @@
                         <div class="col-12 col-lg-6 o_setting_box">
                             <div class="o_setting_left_pane"/>
                             <div class="o_setting_right_pane">
-                                <label string="Pedidos iFood"/>
+                                <div class="o_form_label">Pedidos iFood</div>
                                 <div class="text-muted">
                                     Visualize os pedidos recebidos (webhook/polling) e importe para vendas.
                                 </div>
@@ -50,7 +48,7 @@
                         <div class="col-12 col-lg-6 o_setting_box">
                             <div class="o_setting_left_pane"/>
                             <div class="o_setting_right_pane">
-                                <label string="Mapa de Produtos"/>
+                                <div class="o_form_label">Mapa de Produtos</div>
                                 <div class="text-muted">
                                     Faça o vínculo SKU iFood → Produto Odoo para importar itens corretamente.
                                 </div>
@@ -63,11 +61,9 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </xpath>
-
         </field>
     </record>
 
