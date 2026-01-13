@@ -875,14 +875,14 @@
                   <div t-if="place.website_link"><i class="fa fa-globe"/> <a t-att-href="place.website_link" target="_blank" rel="noopener">Site oficial</a></div>
                   <t t-if="place.latitude and place.longitude">
                     <div class="mt-2">
-                      <a class="btn btn-outline-primary" t-att-href="'https://www.google.com/maps/search/?api=1&query=%s,%s' % (place.latitude, place.longitude)" target="_blank" rel="noopener">
+                      <a class="btn btn-outline-primary" t-att-href="'https://www.google.com/maps/search/?api=1&amp;query=%s,%s' % (place.latitude, place.longitude)" target="_blank" rel="noopener">
                         <i class="fa fa-map-marker"></i> Como chegar
                       </a>
                     </div>
                   </t>
                   <t t-elif="place.address_text">
                     <div class="mt-2">
-                      <a class="btn btn-outline-primary" t-att-href="'https://www.google.com/maps/search/?api=1&query=%s' % place.address_text" target="_blank" rel="noopener">
+                      <a class="btn btn-outline-primary" t-att-href="'https://www.google.com/maps/search/?api=1&amp;query=%s' % place.address_text" target="_blank" rel="noopener">
                         <i class="fa fa-map-marker"></i> Como chegar
                       </a>
                     </div>
