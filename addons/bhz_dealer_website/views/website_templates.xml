@@ -1,108 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
-<templates id="bhz_dealer_templates" xml:space="preserve">
-  <!-- Card do carro (reutilizável) -->
-  <template id="car_card">
-    <a t-att-href="'/carros/%s-%s' % (car.id, car.slug or '')" class="bhz-car-card d-block text-decoration-none">
-      <div class="bhz-car-thumb">
-        <t t-if="car.main_image">
-          <img t-att-src="'/web/image/bhz.dealer.car/%s/main_image' % car.id" alt="" loading="lazy"/>
-        </t>
-        <t t-else="">
-          <div class="bhz-car-thumb--placeholder">Sem foto</div>
-        </t>
-        <t t-if="car.is_featured">
-          <span class="bhz-badge">Destaque</span>
-        </t>
-      </div>
-      <div class="bhz-car-body">
-        <div class="bhz-car-title"><t t-esc="car.name"/></div>
-        <div class="bhz-car-meta">
-          <span><t t-esc="car.year"/></span>
-          <span>•</span>
-          <span><t t-esc="car.mileage_km"/> km</span>
-          <span>•</span>
-          <span><t t-esc="dict(car._fields['fuel'].selection).get(car.fuel)"/></span>
+<odoo>
+  <data>
+    <!-- Card do carro (reutilizável) -->
+    <template id="car_card">
+      <a t-att-href="'/carros/%s-%s' % (car.id, car.slug or '')" class="bhz-car-card d-block text-decoration-none">
+        <div class="bhz-car-thumb">
+          <t t-if="car.main_image">
+            <img t-att-src="'/web/image/bhz.dealer.car/%s/main_image' % car.id" alt="" loading="lazy"/>
+          </t>
+          <t t-else="">
+            <div class="bhz-car-thumb--placeholder">Sem foto</div>
+          </t>
+          <t t-if="car.is_featured">
+            <span class="bhz-badge">Destaque</span>
+          </t>
         </div>
-        <div class="bhz-car-price">
-          <t t-esc="car.currency_id.symbol"/> <t t-esc="('%.2f' % car.price).replace('.', ',')"/>
+        <div class="bhz-car-body">
+          <div class="bhz-car-title"><t t-esc="car.name"/></div>
+          <div class="bhz-car-meta">
+            <span><t t-esc="car.year"/></span>
+            <span>•</span>
+            <span><t t-esc="car.mileage_km"/> km</span>
+            <span>•</span>
+            <span><t t-esc="dict(car._fields['fuel'].selection).get(car.fuel)"/></span>
+          </div>
+          <div class="bhz-car-price">
+            <t t-esc="car.currency_id.symbol"/> <t t-esc="('%.2f' % car.price).replace('.', ',')"/>
+          </div>
         </div>
-      </div>
-    </a>
-  </template>
+      </a>
+    </template>
 
-  <!-- fragmento reutilizável para o snippet -->
-  <template id="snippet_car_showcase_cards">
-    <t t-if="cars">
-      <t t-foreach="cars" t-as="car">
-        <t t-call="bhz_dealer_website.car_card"/>
+    <!-- fragmento reutilizável para o snippet -->
+    <template id="snippet_car_showcase_cards">
+      <t t-if="cars">
+        <t t-foreach="cars" t-as="car">
+          <t t-call="bhz_dealer_website.car_card"/>
+        </t>
       </t>
-    </t>
-    <t t-else="">
-      <div class="alert alert-info">Nenhum carro encontrado para esta seleção.</div>
-    </t>
-  </template>
+      <t t-else="">
+        <div class="alert alert-info">Nenhum carro encontrado para esta seleção.</div>
+      </t>
+    </template>
 
-  <!-- Snippet: Vitrine de carros -->
-  <template id="snippet_car_showcase" name="Vitrine de carros">
-    <section class="s_car_showcase o_snippet_body" data-snippet="s_car_showcase" data-name="Vitrine de carros" data-mode="featured" data-limit="6" data-brand="">
-      <div class="container">
-        <div class="bhz-section-head">
-          <h2 contenteditable="true">Vitrine de carros</h2>
-          <div class="bhz-muted" contenteditable="true">Destaques da loja</div>
-        </div>
-        <div class="bhz-grid bhz-showcase-grid">
-          <div class="bhz-muted">Carregando ofertas...</div>
-        </div>
-      </div>
-    </section>
-  </template>
-
-  <!-- Snippet: Banner CTA -->
-  <template id="snippet_dealer_banner" name="Banner com CTA">
-    <section class="s_dealer_banner o_snippet_body" data-snippet="s_dealer_banner" data-name="Banner CTA Concessionária">
-      <div class="container">
-        <div class="bhz-banner">
-          <div>
-            <h2 contenteditable="true">Pronto para fazer um test drive?</h2>
-            <p class="bhz-muted" contenteditable="true">Agende agora e dirija o modelo que você quer.</p>
+    <!-- Snippet: Vitrine de carros -->
+    <template id="snippet_car_showcase" name="Vitrine de carros">
+      <section class="s_car_showcase o_snippet_body" data-snippet="s_car_showcase" data-name="Vitrine de carros" data-mode="featured" data-limit="6" data-brand="">
+        <div class="container">
+          <div class="bhz-section-head">
+            <h2 contenteditable="true">Vitrine de carros</h2>
+            <div class="bhz-muted" contenteditable="true">Destaques da loja</div>
           </div>
-          <a class="btn btn-light btn-lg" href="/contactus">Agendar</a>
+          <div class="bhz-grid bhz-showcase-grid">
+            <div class="bhz-muted">Carregando ofertas...</div>
+          </div>
         </div>
-      </div>
-    </section>
-  </template>
+      </section>
+    </template>
 
-  <!-- Snippet: Faixa de confiança -->
-  <template id="snippet_trust_strip" name="Faixa de confiança">
-    <section class="s_trust_strip o_snippet_body" data-snippet="s_trust_strip" data-name="Faixa de confiança">
-      <div class="container">
-        <div class="bhz-trust">
-          <div class="bhz-trust-item">
-            <i class="fa fa-shield"></i>
+    <!-- Snippet: Banner CTA -->
+    <template id="snippet_dealer_banner" name="Banner com CTA">
+      <section class="s_dealer_banner o_snippet_body" data-snippet="s_dealer_banner" data-name="Banner CTA Concessionária">
+        <div class="container">
+          <div class="bhz-banner">
             <div>
-              <div class="bhz-trust-title" contenteditable="true">Garantia</div>
-              <div class="bhz-muted" contenteditable="true">Veículos revisados</div>
+              <h2 contenteditable="true">Pronto para fazer um test drive?</h2>
+              <p class="bhz-muted" contenteditable="true">Agende agora e dirija o modelo que você quer.</p>
+            </div>
+            <a class="btn btn-light btn-lg" href="/contactus">Agendar</a>
+          </div>
+        </div>
+      </section>
+    </template>
+
+    <!-- Snippet: Faixa de confiança -->
+    <template id="snippet_trust_strip" name="Faixa de confiança">
+      <section class="s_trust_strip o_snippet_body" data-snippet="s_trust_strip" data-name="Faixa de confiança">
+        <div class="container">
+          <div class="bhz-trust">
+            <div class="bhz-trust-item">
+              <i class="fa fa-shield"></i>
+              <div>
+                <div class="bhz-trust-title" contenteditable="true">Garantia</div>
+                <div class="bhz-muted" contenteditable="true">Veículos revisados</div>
+              </div>
+            </div>
+            <div class="bhz-trust-item">
+              <i class="fa fa-money"></i>
+              <div>
+                <div class="bhz-trust-title" contenteditable="true">Financiamento</div>
+                <div class="bhz-muted" contenteditable="true">Planos flexíveis</div>
+              </div>
+            </div>
+            <div class="bhz-trust-item">
+              <i class="fa fa-comments"></i>
+              <div>
+                <div class="bhz-trust-title" contenteditable="true">Atendimento</div>
+                <div class="bhz-muted" contenteditable="true">Resposta rápida</div>
+              </div>
             </div>
           </div>
-          <div class="bhz-trust-item">
-            <i class="fa fa-money"></i>
-            <div>
-              <div class="bhz-trust-title" contenteditable="true">Financiamento</div>
-              <div class="bhz-muted" contenteditable="true">Planos flexíveis</div>
-            </div>
-          </div>
-          <div class="bhz-trust-item">
-            <i class="fa fa-comments"></i>
-            <div>
-              <div class="bhz-trust-title" contenteditable="true">Atendimento</div>
-              <div class="bhz-muted" contenteditable="true">Resposta rápida</div>
-            </div>
-          </div>
         </div>
-      </div>
-    </section>
-  </template>
+      </section>
+    </template>
 
-  <!-- Snippet palette entries -->
-  <!-- Picker removido para evitar xpath frágil em temas; snippets continuam utilizáveis via edição direta/duplicação. -->
-</templates>
+    <!-- Snippet picker removido temporariamente para evitar XPaths frágeis por tema -->
+  </data>
+</odoo>
