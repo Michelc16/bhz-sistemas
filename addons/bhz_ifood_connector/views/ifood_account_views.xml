@@ -63,7 +63,7 @@
                                     <field name="token_expires_at" readonly="1"/>
                                 </group>
                             </group>
-                            <label string="Dica: em produção, prefira armazenar Client Secret via variáveis/secret (Odoo.sh) e restringir acesso ao grupo iFood Manager."/>
+                            <div class="o_form_label">Dica: em produção, prefira armazenar Client Secret via variáveis/secret (Odoo.sh) e restringir acesso ao grupo iFood Manager.</div>
                         </page>
 
                         <page string="Webhook">
@@ -73,7 +73,7 @@
                                            placeholder="Use como token na URL do webhook e na validação da assinatura"/>
                                 </group>
                                 <group>
-                                    <label string="URL do Webhook (coloque no Portal iFood):"/>
+                                    <div class="o_form_label">URL do Webhook (coloque no Portal iFood):</div>
                                     <div>
                                         <span>/ifood/webhook/</span>
                                         <field name="webhook_secret" readonly="1"/>
