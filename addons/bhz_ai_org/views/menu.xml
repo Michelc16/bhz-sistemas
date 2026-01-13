@@ -1,6 +1,6 @@
 <odoo>
   <!-- Menu raiz de aplicativo visível a todos os usuários internos -->
-  <menuitem id="bhz_ai_root" name="BHZ AI" sequence="10" groups="base.group_user"/>
+  <menuitem id="bhz_ai_root" name="BHZ AI" sequence="10" groups="base.group_user" action="bhz_ai_org.action_bhz_ai_task"/>
 
   <menuitem id="bhz_ai_tasks_menu" name="Tasks" parent="bhz_ai_root" action="bhz_ai_org.action_bhz_ai_task" sequence="10"/>
   <menuitem id="bhz_ai_agents_menu" name="Agents" parent="bhz_ai_root" action="bhz_ai_org.action_bhz_ai_agent" sequence="20"/>
