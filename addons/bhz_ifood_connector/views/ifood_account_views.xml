@@ -113,10 +113,8 @@
                 <field name="company_id"/>
                 <filter string="Ativas" name="active" domain="[('active','=',True)]"/>
                 <filter string="Webhook" name="webhook" domain="[('webhook_enabled','=',True)]"/>
-                <group expand="0" string="Agrupar por">
-                    <filter string="Empresa" name="group_company" context="{'group_by':'company_id'}"/>
-                    <filter string="Ambiente" name="group_env" context="{'group_by':'environment'}"/>
-                </group>
+                <filter string="Agrupar por Empresa" name="gb_company" context="{'group_by':'company_id'}"/>
+                <filter string="Agrupar por Ambiente" name="gb_env" context="{'group_by':'environment'}"/>
             </search>
         </field>
     </record>
