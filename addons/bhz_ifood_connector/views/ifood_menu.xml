@@ -1,7 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-  <menuitem id="menu_ifood_root" name="iFood" sequence="10"/>
+  <data>
+    <menuitem id="menu_ifood_root" name="iFood" sequence="10"/>
 
-  <menuitem id="menu_ifood_accounts" name="Contas" parent="menu_ifood_root" action="%(bhz_ifood_connector.action_ifood_accounts)d"/>
-  <menuitem id="menu_ifood_orders" name="Pedidos" parent="menu_ifood_root" action="%(bhz_ifood_connector.action_ifood_orders)d"/>
-  <menuitem id="menu_ifood_product_map" name="Mapa de Produtos" parent="menu_ifood_root" action="%(bhz_ifood_connector.action_ifood_product_maps)d"/>
+    <menuitem id="menu_ifood_accounts" name="Contas" parent="menu_ifood_root" action="%(bhz_ifood_connector.action_ifood_accounts)d"/>
+    <menuitem id="menu_ifood_orders" name="Pedidos" parent="menu_ifood_root" action="%(bhz_ifood_connector.action_ifood_orders)d"/>
+    <menuitem id="menu_ifood_product_map" name="Mapa de Produtos" parent="menu_ifood_root" action="%(bhz_ifood_connector.action_ifood_product_maps)d"/>
+  </data>
 </odoo>

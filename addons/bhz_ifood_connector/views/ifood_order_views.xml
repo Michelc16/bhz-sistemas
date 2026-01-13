@@ -1,4 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
+  <data>
 
     <!-- LIST -->
     <record id="view_bhz_ifood_order_tree" model="ir.ui.view">
@@ -110,4 +112,5 @@
         </field>
     </record>
 
+  </data>
 </odoo>
