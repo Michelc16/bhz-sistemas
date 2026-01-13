@@ -86,7 +86,7 @@ class BhzDealerCar(models.Model):
 
     @api.model
     def create(self, vals):
-        vals = dict(vals)
+        vals = dict(vals or {})
         if not vals.get("website_id"):
             fallback = self._get_fallback_website_id()
             if fallback:
