@@ -9,10 +9,10 @@
     "data": [
         "security/security.xml",
         "security/ir.model.access.csv",
-        "views/menu.xml",
         "views/reputation_views.xml",
         "views/product_ads_views.xml",
         "views/product_views.xml",
+        "views/menu.xml",
     ],
     "installable": True,
 }

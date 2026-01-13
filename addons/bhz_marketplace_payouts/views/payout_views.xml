@@ -3,13 +3,13 @@
     <field name="name">bhz.seller.payout.tree</field>
     <field name="model">bhz.seller.payout</field>
     <field name="arch" type="xml">
-      <tree>
+      <list>
         <field name="seller_id"/>
         <field name="date_from"/>
         <field name="date_to"/>
         <field name="amount"/>
         <field name="state"/>
-      </tree>
+      </list>
     </field>
   </record>
 
@@ -39,6 +39,6 @@
   <record id="action_bhz_seller_payout" model="ir.actions.act_window">
     <field name="name">Repasses</field>
     <field name="res_model">bhz.seller.payout</field>
-    <field name="view_mode">tree,form</field>
+    <field name="view_mode">list,form</field>
   </record>
 </odoo>

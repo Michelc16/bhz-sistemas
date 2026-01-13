@@ -1,6 +1,6 @@
 <odoo>
   <!-- Form de pergunta no produto -->
-  <template id="product_qa_block" inherit_id="website_sale.product" name="Q&A block">
+  <template id="product_qa_block" inherit_id="website_sale.product" name="Q&amp;A block">
     <xpath expr="//div[@id='product_details']" position="after">
       <div class="mt-4" id="bhz_qa">
         <h3>Perguntas sobre o produto</h3>
