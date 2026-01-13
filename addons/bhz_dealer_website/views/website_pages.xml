@@ -1,267 +1,289 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+  <data>
 
-  <!-- HOME -->
-  <template id="page_dealer_home" name="Dealer Home" page="True">
-    <t t-call="website.layout">
-      <div id="wrap" class="bhz-dealer">
+    <!-- Página Home -->
+    <record id="view_page_dealer_home" model="ir.ui.view">
+      <field name="name">bhz.dealer.page.dealer.home</field>
+      <field name="type">qweb</field>
+      <field name="key">bhz_dealer_website.page_dealer_home</field>
+      <field name="arch" type="xml">
+        <template id="page_dealer_home" name="Dealer Home" page="True">
+          <t t-call="website.layout">
+            <div id="wrap" class="bhz-dealer">
 
-        <!-- HERO (editável no construtor) -->
-        <section class="bhz-hero s_title" data-snippet="s_title" data-name="Hero BHZ Dealer">
-          <div class="container">
-            <div class="bhz-hero-inner">
-              <div class="bhz-hero-copy">
-                <h1 class="bhz-hero-title">Encontre seu próximo carro hoje</h1>
-                <p class="bhz-hero-subtitle">
-                  Estoque atualizado, atendimento rápido e as melhores condições.
-                </p>
+              <!-- HERO (editável no construtor) -->
+              <section class="bhz-hero s_title" data-snippet="s_title" data-name="Hero BHZ Dealer">
+                <div class="container">
+                  <div class="bhz-hero-inner">
+                    <div class="bhz-hero-copy">
+                      <h1 class="bhz-hero-title">Encontre seu próximo carro hoje</h1>
+                      <p class="bhz-hero-subtitle">
+                        Estoque atualizado, atendimento rápido e as melhores condições.
+                      </p>
 
-                <form action="/carros" method="get" class="bhz-hero-search">
-                  <input type="text" name="q" placeholder="Busque por marca, modelo ou versão…" class="form-control"/>
-                  <button class="btn btn-primary" type="submit">Ver estoque</button>
-                </form>
+                      <form action="/carros" method="get" class="bhz-hero-search">
+                        <input type="text" name="q" placeholder="Busque por marca, modelo ou versão…" class="form-control"/>
+                        <button class="btn btn-primary" type="submit">Ver estoque</button>
+                      </form>
 
-                <div class="bhz-hero-trust">
-                  <div class="bhz-pill">Financiamento</div>
-                  <div class="bhz-pill">Troca com troco</div>
-                  <div class="bhz-pill">Garantia</div>
-                </div>
-              </div>
-              <div class="bhz-hero-art">
-                <div class="bhz-hero-glow"></div>
-                <div class="bhz-hero-box">
-                  <div class="bhz-hero-box-title">Destaques da semana</div>
-                  <div class="bhz-hero-box-sub">Sem enrolação: clique e fale agora.</div>
-                  <a href="/carros" class="btn btn-outline-light w-100 mt-3">Ver ofertas</a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- DESTAQUES -->
-        <section class="bhz-section">
-          <div class="container">
-            <div class="bhz-section-head">
-              <h2>Carros em destaque</h2>
-              <a href="/carros" class="bhz-link">Ver tudo →</a>
-            </div>
-
-            <t t-set="featured" t-value="request.env['bhz.dealer.car'].sudo().search([('active','=',True),('is_featured','=',True),'|',('website_id','=',False),('website_id','=',request.website.id)], limit=8)"/>
-            <div class="bhz-grid">
-              <t t-foreach="featured" t-as="car">
-                <t t-call="bhz_dealer_website.car_card"/>
-              </t>
-            </div>
-          </div>
-        </section>
-
-        <!-- CTA -->
-        <section class="bhz-cta s_text_block" data-snippet="s_text_block" data-name="CTA BHZ Dealer">
-          <div class="container">
-            <div class="bhz-cta-inner">
-              <div>
-                <h3>Quer vender seu carro ou avaliar sua troca?</h3>
-                <p>Fale com a equipe e receba atendimento em minutos.</p>
-              </div>
-              <a class="btn btn-primary btn-lg" href="/carros">Falar com a concessionária</a>
-            </div>
-          </div>
-        </section>
-
-      </div>
-    </t>
-  </template>
-
-  <!-- LISTAGEM -->
-  <template id="page_cars_listing" name="Cars Listing" page="True">
-    <t t-call="website.layout">
-      <div id="wrap" class="bhz-dealer">
-        <section class="bhz-section bhz-stock">
-          <div class="container">
-            <div class="bhz-section-head">
-              <h1>Estoque</h1>
-              <div class="bhz-muted"><t t-esc="len(cars)"/> resultado(s)</div>
-            </div>
-
-            <div class="bhz-stock-layout">
-              <!-- Filtros -->
-              <aside class="bhz-filters">
-                <form action="/carros" method="get" class="bhz-filter-form">
-                  <label>Busca</label>
-                  <input class="form-control" type="text" name="q" t-att-value="filters.get('q') or ''"/>
-
-                  <label class="mt-2">Ordenar por</label>
-                  <select class="form-select" name="sort">
-                    <option value="">Relevância</option>
-                    <option value="price_asc" t-att-selected="1 if filters.get('sort')=='price_asc' else None">Preço (menor → maior)</option>
-                    <option value="price_desc" t-att-selected="1 if filters.get('sort')=='price_desc' else None">Preço (maior → menor)</option>
-                    <option value="year_desc" t-att-selected="1 if filters.get('sort')=='year_desc' else None">Ano (mais novo)</option>
-                    <option value="year_asc" t-att-selected="1 if filters.get('sort')=='year_asc' else None">Ano (mais antigo)</option>
-                  </select>
-
-                  <label class="mt-2">Marca</label>
-                  <select class="form-select" name="brand">
-                    <option value="">Todas</option>
-                    <t t-foreach="brand_list" t-as="b">
-                      <option t-att-value="b" t-att-selected="1 if (filters.get('brand')==b) else None"><t t-esc="b"/></option>
-                    </t>
-                  </select>
-
-                  <label class="mt-2">Condição</label>
-                  <select class="form-select" name="condition">
-                    <option value="">Todas</option>
-                    <option value="new" t-att-selected="1 if filters.get('condition')=='new' else None">Novo</option>
-                    <option value="seminovo" t-att-selected="1 if filters.get('condition')=='seminovo' else None">Seminovo</option>
-                    <option value="used" t-att-selected="1 if filters.get('condition')=='used' else None">Usado</option>
-                  </select>
-
-                  <label class="mt-2">Combustível</label>
-                  <select class="form-select" name="fuel">
-                    <option value="">Todos</option>
-                    <option value="flex" t-att-selected="1 if filters.get('fuel')=='flex' else None">Flex</option>
-                    <option value="gasoline" t-att-selected="1 if filters.get('fuel')=='gasoline' else None">Gasolina</option>
-                    <option value="ethanol" t-att-selected="1 if filters.get('fuel')=='ethanol' else None">Etanol</option>
-                    <option value="diesel" t-att-selected="1 if filters.get('fuel')=='diesel' else None">Diesel</option>
-                    <option value="hybrid" t-att-selected="1 if filters.get('fuel')=='hybrid' else None">Híbrido</option>
-                    <option value="electric" t-att-selected="1 if filters.get('fuel')=='electric' else None">Elétrico</option>
-                  </select>
-
-                  <label class="mt-2">Câmbio</label>
-                  <select class="form-select" name="transmission">
-                    <option value="">Todos</option>
-                    <option value="manual" t-att-selected="1 if filters.get('transmission')=='manual' else None">Manual</option>
-                    <option value="auto" t-att-selected="1 if filters.get('transmission')=='auto' else None">Automático</option>
-                    <option value="cvt" t-att-selected="1 if filters.get('transmission')=='cvt' else None">CVT</option>
-                  </select>
-
-                  <div class="row mt-2">
-                    <div class="col-6">
-                      <label>Ano mín</label>
-                      <input class="form-control" type="number" name="year_min" t-att-value="filters.get('year_min') or ''"/>
+                      <div class="bhz-hero-trust">
+                        <div class="bhz-pill">Financiamento</div>
+                        <div class="bhz-pill">Troca com troco</div>
+                        <div class="bhz-pill">Garantia</div>
+                      </div>
                     </div>
-                    <div class="col-6">
-                      <label>Ano máx</label>
-                      <input class="form-control" type="number" name="year_max" t-att-value="filters.get('year_max') or ''"/>
+                    <div class="bhz-hero-art">
+                      <div class="bhz-hero-glow"></div>
+                      <div class="bhz-hero-box">
+                        <div class="bhz-hero-box-title">Destaques da semana</div>
+                        <div class="bhz-hero-box-sub">Sem enrolação: clique e fale agora.</div>
+                        <a href="/carros" class="btn btn-outline-light w-100 mt-3">Ver ofertas</a>
+                      </div>
                     </div>
                   </div>
+                </div>
+              </section>
 
-                  <div class="row mt-2">
-                    <div class="col-6">
-                      <label>Preço mín</label>
-                      <input class="form-control" type="number" step="0.01" name="price_min" t-att-value="filters.get('price_min') or ''"/>
-                    </div>
-                    <div class="col-6">
-                      <label>Preço máx</label>
-                      <input class="form-control" type="number" step="0.01" name="price_max" t-att-value="filters.get('price_max') or ''"/>
-                    </div>
+              <!-- DESTAQUES -->
+              <section class="bhz-section">
+                <div class="container">
+                  <div class="bhz-section-head">
+                    <h2>Carros em destaque</h2>
+                    <a href="/carros" class="bhz-link">Ver tudo →</a>
                   </div>
 
-                  <button class="btn btn-primary w-100 mt-3" type="submit">Aplicar filtros</button>
-                  <a class="btn btn-outline-secondary w-100 mt-2" href="/carros">Limpar</a>
-                </form>
-              </aside>
-
-              <!-- Grid -->
-              <div class="bhz-stock-grid">
-                <div class="bhz-grid">
-                  <t t-foreach="cars" t-as="car">
-                    <t t-call="bhz_dealer_website.car_card"/>
-                  </t>
-                </div>
-
-                <t t-if="not cars">
-                  <div class="alert alert-info mt-3">Nenhum carro encontrado com esses filtros.</div>
-                </t>
-              </div>
-            </div>
-          </div>
-        </section>
-      </div>
-    </t>
-  </template>
-
-  <!-- DETALHE -->
-  <template id="page_car_detail" name="Car Detail" page="True">
-    <t t-call="website.layout">
-      <div id="wrap" class="bhz-dealer">
-        <section class="bhz-section">
-          <div class="container">
-            <div class="bhz-breadcrumb">
-              <a href="/carros">← Voltar ao estoque</a>
-            </div>
-
-            <div class="bhz-detail">
-              <div class="bhz-detail-media">
-                <div class="bhz-detail-main">
-                  <t t-if="car.main_image">
-                    <img t-att-src="'/web/image/bhz.dealer.car/%s/main_image' % car.id" alt="" />
-                  </t>
-                  <t t-else="">
-                    <div class="bhz-car-thumb--placeholder">Sem foto</div>
-                  </t>
-                </div>
-
-                <t t-if="car.image_ids">
-                  <div class="bhz-detail-gallery">
-                    <t t-foreach="car.image_ids" t-as="img">
-                      <img t-att-src="'/web/image/bhz.dealer.car.image/%s/image' % img.id" alt="" loading="lazy"/>
+                  <t t-set="featured" t-value="request.env['bhz.dealer.car'].sudo().search([('active','=',True),('is_featured','=',True),'|',('website_id','=',False),('website_id','=',request.website.id)], limit=8)"/>
+                  <div class="bhz-grid">
+                    <t t-foreach="featured" t-as="car">
+                      <t t-call="bhz_dealer_website.car_card"/>
                     </t>
                   </div>
-                </t>
-              </div>
-
-              <div class="bhz-detail-info">
-                <h1 class="mb-1"><t t-esc="car.name"/></h1>
-                <div class="bhz-detail-sub">
-                  <span><t t-esc="car.brand"/></span> • <span><t t-esc="car.model"/></span> • <span><t t-esc="car.year"/></span>
                 </div>
+              </section>
 
-                <div class="bhz-detail-price">
-                  <t t-esc="car.currency_id.symbol"/> <t t-esc="('%.2f' % car.price).replace('.', ',')"/>
+              <!-- CTA -->
+              <section class="bhz-cta s_text_block" data-snippet="s_text_block" data-name="CTA BHZ Dealer">
+                <div class="container">
+                  <div class="bhz-cta-inner">
+                    <div>
+                      <h3>Quer vender seu carro ou avaliar sua troca?</h3>
+                      <p>Fale com a equipe e receba atendimento em minutos.</p>
+                    </div>
+                    <a class="btn btn-primary btn-lg" href="/carros">Falar com a concessionária</a>
+                  </div>
                 </div>
+              </section>
 
-                <div class="bhz-specs">
-                  <div><strong>KM:</strong> <t t-esc="car.mileage_km"/></div>
-                  <div><strong>Combustível:</strong> <t t-esc="dict(car._fields['fuel'].selection).get(car.fuel)"/></div>
-                  <div><strong>Câmbio:</strong> <t t-esc="dict(car._fields['transmission'].selection).get(car.transmission)"/></div>
-                  <div><strong>Condição:</strong> <t t-esc="dict(car._fields['condition'].selection).get(car.condition)"/></div>
-                </div>
+            </div>
+          </t>
+        </template>
+      </field>
+    </record>
 
-                <div class="bhz-actions">
-                  <t t-set="wa" t-value="car.whatsapp or (car.company_id.phone or '').replace('+','').replace(' ','')"/>
-                  <a t-if="wa" class="btn btn-success btn-lg w-100"
-                     t-att-href="'https://wa.me/%s?text=%s' % (wa, ('Tenho interesse no carro: %s' % car.name))">
-                    Falar no WhatsApp
-                  </a>
-                  <a t-if="not wa" class="btn btn-primary btn-lg w-100" href="/contactus">Quero atendimento</a>
+    <!-- Página de listagem -->
+    <record id="view_page_cars_listing" model="ir.ui.view">
+      <field name="name">bhz.dealer.page.cars.listing</field>
+      <field name="type">qweb</field>
+      <field name="key">bhz_dealer_website.page_cars_listing</field>
+      <field name="arch" type="xml">
+        <template id="page_cars_listing" name="Cars Listing" page="True">
+          <t t-call="website.layout">
+            <div id="wrap" class="bhz-dealer">
+              <section class="bhz-section bhz-stock">
+                <div class="container">
+                  <div class="bhz-section-head">
+                    <h1>Estoque</h1>
+                    <div class="bhz-muted"><t t-esc="len(cars)"/> resultado(s)</div>
+                  </div>
 
-                  <div class="bhz-muted mt-2">Resposta rápida • Atendimento humano</div>
-                </div>
+                  <div class="bhz-stock-layout">
+                    <!-- Filtros -->
+                    <aside class="bhz-filters">
+                      <form action="/carros" method="get" class="bhz-filter-form">
+                        <label>Busca</label>
+                        <input class="form-control" type="text" name="q" t-att-value="filters.get('q') or ''"/>
 
-                <div class="bhz-desc mt-4">
-                  <h3>Descrição</h3>
-                  <div t-if="car.description" t-raw="car.description"/>
-                  <div t-if="not car.description" class="bhz-muted">Consulte condições e detalhes com a concessionária.</div>
+                        <label class="mt-2">Ordenar por</label>
+                        <select class="form-select" name="sort">
+                          <option value="">Relevância</option>
+                          <option value="price_asc" t-att-selected="1 if filters.get('sort')=='price_asc' else None">Preço (menor → maior)</option>
+                          <option value="price_desc" t-att-selected="1 if filters.get('sort')=='price_desc' else None">Preço (maior → menor)</option>
+                          <option value="year_desc" t-att-selected="1 if filters.get('sort')=='year_desc' else None">Ano (mais novo)</option>
+                          <option value="year_asc" t-att-selected="1 if filters.get('sort')=='year_asc' else None">Ano (mais antigo)</option>
+                        </select>
 
-                  <t t-if="car.features">
-                    <h3 class="mt-4">Opcionais</h3>
-                    <ul class="bhz-features">
-                      <t t-foreach="car.features.splitlines()" t-as="f">
-                        <t t-if="f.strip()">
-                          <li><t t-esc="f"/></li>
+                        <label class="mt-2">Marca</label>
+                        <select class="form-select" name="brand">
+                          <option value="">Todas</option>
+                          <t t-foreach="brand_list" t-as="b">
+                            <option t-att-value="b" t-att-selected="1 if (filters.get('brand')==b) else None"><t t-esc="b"/></option>
+                          </t>
+                        </select>
+
+                        <label class="mt-2">Condição</label>
+                        <select class="form-select" name="condition">
+                          <option value="">Todas</option>
+                          <option value="new" t-att-selected="1 if filters.get('condition')=='new' else None">Novo</option>
+                          <option value="seminovo" t-att-selected="1 if filters.get('condition')=='seminovo' else None">Seminovo</option>
+                          <option value="used" t-att-selected="1 if filters.get('condition')=='used' else None">Usado</option>
+                        </select>
+
+                        <label class="mt-2">Combustível</label>
+                        <select class="form-select" name="fuel">
+                          <option value="">Todos</option>
+                          <option value="flex" t-att-selected="1 if filters.get('fuel')=='flex' else None">Flex</option>
+                          <option value="gasoline" t-att-selected="1 if filters.get('fuel')=='gasoline' else None">Gasolina</option>
+                          <option value="ethanol" t-att-selected="1 if filters.get('fuel')=='ethanol' else None">Etanol</option>
+                          <option value="diesel" t-att-selected="1 if filters.get('fuel')=='diesel' else None">Diesel</option>
+                          <option value="hybrid" t-att-selected="1 if filters.get('fuel')=='hybrid' else None">Híbrido</option>
+                          <option value="electric" t-att-selected="1 if filters.get('fuel')=='electric' else None">Elétrico</option>
+                        </select>
+
+                        <label class="mt-2">Câmbio</label>
+                        <select class="form-select" name="transmission">
+                          <option value="">Todos</option>
+                          <option value="manual" t-att-selected="1 if filters.get('transmission')=='manual' else None">Manual</option>
+                          <option value="auto" t-att-selected="1 if filters.get('transmission')=='auto' else None">Automático</option>
+                          <option value="cvt" t-att-selected="1 if filters.get('transmission')=='cvt' else None">CVT</option>
+                        </select>
+
+                        <div class="row mt-2">
+                          <div class="col-6">
+                            <label>Ano mín</label>
+                            <input class="form-control" type="number" name="year_min" t-att-value="filters.get('year_min') or ''"/>
+                          </div>
+                          <div class="col-6">
+                            <label>Ano máx</label>
+                            <input class="form-control" type="number" name="year_max" t-att-value="filters.get('year_max') or ''"/>
+                          </div>
+                        </div>
+
+                        <div class="row mt-2">
+                          <div class="col-6">
+                            <label>Preço mín</label>
+                            <input class="form-control" type="number" step="0.01" name="price_min" t-att-value="filters.get('price_min') or ''"/>
+                          </div>
+                          <div class="col-6">
+                            <label>Preço máx</label>
+                            <input class="form-control" type="number" step="0.01" name="price_max" t-att-value="filters.get('price_max') or ''"/>
+                          </div>
+                        </div>
+
+                        <button class="btn btn-primary w-100 mt-3" type="submit">Aplicar filtros</button>
+                        <a class="btn btn-outline-secondary w-100 mt-2" href="/carros">Limpar</a>
+                      </form>
+                    </aside>
+
+                    <!-- Grid -->
+                    <div class="bhz-stock-grid">
+                      <div class="bhz-grid">
+                        <t t-foreach="cars" t-as="car">
+                          <t t-call="bhz_dealer_website.car_card"/>
                         </t>
+                      </div>
+
+                      <t t-if="not cars">
+                        <div class="alert alert-info mt-3">Nenhum carro encontrado com esses filtros.</div>
                       </t>
-                    </ul>
-                  </t>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              </section>
             </div>
+          </t>
+        </template>
+      </field>
+    </record>
 
-          </div>
-        </section>
-      </div>
-    </t>
-  </template>
+    <!-- Página de detalhe -->
+    <record id="view_page_car_detail" model="ir.ui.view">
+      <field name="name">bhz.dealer.page.car.detail</field>
+      <field name="type">qweb</field>
+      <field name="key">bhz_dealer_website.page_car_detail</field>
+      <field name="arch" type="xml">
+        <template id="page_car_detail" name="Car Detail" page="True">
+          <t t-call="website.layout">
+            <div id="wrap" class="bhz-dealer">
+              <section class="bhz-section">
+                <div class="container">
+                  <div class="bhz-breadcrumb">
+                    <a href="/carros">← Voltar ao estoque</a>
+                  </div>
 
+                  <div class="bhz-detail">
+                    <div class="bhz-detail-media">
+                      <div class="bhz-detail-main">
+                        <t t-if="car.main_image">
+                          <img t-att-src="'/web/image/bhz.dealer.car/%s/main_image' % car.id" alt="" />
+                        </t>
+                        <t t-else="">
+                          <div class="bhz-car-thumb--placeholder">Sem foto</div>
+                        </t>
+                      </div>
+
+                      <div class="bhz-gallery mt-3">
+                        <t t-foreach="car.image_ids" t-as="img">
+                          <div class="bhz-gallery-thumb" t-att-data-img="'/web/image/%s/image' % img.id">
+                            <img t-att-src="'/web/image/%s/image' % img.id" alt=""/>
+                          </div>
+                        </t>
+                      </div>
+                    </div>
+
+                    <div class="bhz-detail-body">
+                      <div class="bhz-detail-head">
+                        <h1><t t-esc="car.name"/></h1>
+                        <div class="bhz-detail-price">
+                          <t t-esc="car.currency_id.symbol"/> <t t-esc="('%.2f' % car.price).replace('.', ',')"/>
+                        </div>
+                      </div>
+
+                      <div class="bhz-detail-meta">
+                        <span><t t-esc="car.year"/></span>
+                        <span>•</span>
+                        <span><t t-esc="car.mileage_km"/> km</span>
+                        <span>•</span>
+                        <span><t t-esc="dict(car._fields['fuel'].selection).get(car.fuel)"/></span>
+                      </div>
+
+                      <div class="bhz-actions">
+                        <t t-set="wa" t-value="car.whatsapp or (car.company_id.phone or '').replace('+','').replace(' ','')"/>
+                        <a t-if="wa" class="btn btn-success btn-lg w-100"
+                           t-att-href="'https://wa.me/%s?text=%s' % (wa, ('Tenho interesse no carro: %s' % car.name))">
+                          Falar no WhatsApp
+                        </a>
+                        <a t-if="not wa" class="btn btn-primary btn-lg w-100" href="/contactus">Quero atendimento</a>
+
+                        <div class="bhz-muted mt-2">Resposta rápida • Atendimento humano</div>
+                      </div>
+
+                      <div class="bhz-desc mt-4">
+                        <h3>Descrição</h3>
+                        <div t-if="car.description" t-raw="car.description"/>
+                        <div t-if="not car.description" class="bhz-muted">Consulte condições e detalhes com a concessionária.</div>
+
+                        <t t-if="car.features">
+                          <h3 class="mt-4">Opcionais</h3>
+                          <ul class="bhz-features">
+                            <t t-foreach="car.features.splitlines()" t-as="f">
+                              <t t-if="f.strip()">
+                                <li><t t-esc="f"/></li>
+                              </t>
+                            </t>
+                          </ul>
+                        </t>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </section>
+            </div>
+          </t>
+        </template>
+      </field>
+    </record>
+
+  </data>
 </odoo>
