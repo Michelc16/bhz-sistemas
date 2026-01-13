@@ -49,10 +49,8 @@
                 <field name="product_id"/>
                 <field name="company_id"/>
                 <field name="account_id"/>
-                <group expand="0" string="Agrupar por">
-                    <filter string="Empresa" name="group_company" context="{'group_by':'company_id'}"/>
-                    <filter string="Conta" name="group_account" context="{'group_by':'account_id'}"/>
-                </group>
+                <filter string="Agrupar por Empresa" name="group_company" context="{'group_by':'company_id'}"/>
+                <filter string="Agrupar por Conta" name="group_account" context="{'group_by':'account_id'}"/>
             </search>
         </field>
     </record>
