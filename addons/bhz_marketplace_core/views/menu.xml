@@ -1,9 +1,7 @@
 <odoo>
-  <data>
-    <menuitem id="menu_bhz_marketplace_root" name="Marketplace" sequence="30"
-              groups="bhz_marketplace_core.group_marketplace_manager"
-              web_icon="base,static/description/icon.png" app="True"/>
-    <menuitem id="menu_bhz_marketplace_sellers" name="Vendedores" parent="menu_bhz_marketplace_root" action="bhz_marketplace_core.action_bhz_marketplace_seller" sequence="10"/>
-    <menuitem id="menu_bhz_marketplace_tokens" name="Tokens API" parent="menu_bhz_marketplace_root" action="bhz_marketplace_core.action_bhz_marketplace_api_token" sequence="20"/>
-  </data>
+  <menuitem id="menu_bhz_marketplace_root" name="Marketplace" sequence="30"
+            groups="bhz_marketplace_core.group_marketplace_manager"
+            web_icon="base,static/description/icon.png" app="True"/>
+  <menuitem id="menu_bhz_marketplace_sellers" name="Vendedores" parent="menu_bhz_marketplace_root" action="bhz_marketplace_core.action_bhz_marketplace_seller" sequence="10"/>
+  <menuitem id="menu_bhz_marketplace_tokens" name="Tokens API" parent="menu_bhz_marketplace_root" action="bhz_marketplace_core.action_bhz_marketplace_api_token" sequence="20"/>
 </odoo>
