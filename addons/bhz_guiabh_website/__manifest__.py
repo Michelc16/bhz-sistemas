@@ -7,7 +7,7 @@
     'license': 'LGPL-3',
     'category': 'Website',
     'version': '1.0.0',
-    'depends': ['base', 'web', 'website'],
+    'depends': ['base', 'web', 'website', 'bhz_event_promo', 'bhz_cineart', 'bhz_football_agenda', 'bhz_city_places'],
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',

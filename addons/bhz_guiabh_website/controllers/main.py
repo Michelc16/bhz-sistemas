@@ -60,6 +60,14 @@ class GuiaBHWebsite(http.Controller):
         ]
         return request.env['guiabh.ad'].sudo().search(domain, order='sequence, start_date desc', limit=limit)
 
+    def _domain_with_website(self, model_obj, base_domain=None):
+        """Helper to inject website filter when model has website_id."""
+        domain = list(base_domain or [])
+        website = self._website()
+        if 'website_id' in model_obj._fields:
+            domain = ['|', ('website_id', '=', False), ('website_id', '=', website.id)] + domain
+        return domain
+
     def _get_preferences(self):
         if request.env.user._is_public():
             return None
@@ -207,6 +215,54 @@ class GuiaBHWebsite(http.Controller):
         pref_events = Event.search(pref_event_domain, order='start_datetime asc', limit=6) if pref_event_domain else Event.browse()
         pref_places = Place.search(pref_place_domain, order='name asc', limit=6) if pref_place_domain else Place.browse()
 
+        # Conteúdo externo (eventos, filmes, jogos, locais)
+        promo_event_obj = request.env['event.event'].sudo()
+        promo_domain = self._domain_with_website(
+            promo_event_obj,
+            [('show_on_public_agenda', '=', True), ('website_published', '=', True)]
+        )
+        promo_events = promo_event_obj.search(promo_domain, order='is_featured desc, date_begin asc', limit=8)
+
+        cine_movies = request.env['guiabh.cineart.movie'].sudo().guiabh_get_movies(categories=['now', 'premiere'], limit=8)
+        football_matches = request.env['bhz.football.match'].sudo().guiabh_get_upcoming_matches(limit=6, order_mode="recent")
+
+        city_place_obj = request.env['bhz.place'].sudo()
+        city_places = city_place_obj.search(
+            self._domain_with_website(city_place_obj, [('website_published', '=', True), ('active', '=', True)]),
+            order='sequence asc, name asc',
+            limit=8,
+        )
+
+        banner_items = []
+        for ev in promo_events.filtered(lambda e: e.promo_cover_image):
+            banner_items.append({
+                'key': f"promo-{ev.id}",
+                'title': ev.name,
+                'subtitle': ev.promo_short_description or (ev.date_begin and fields.Datetime.to_string(ev.date_begin)) or '',
+                'image': f"/web/image/event.event/{ev.id}/promo_cover_image/1200/600",
+                'url': ev.website_url or f"/event/{ev.id}",
+                'tag': 'Evento',
+            })
+        for mov in cine_movies.filtered(lambda m: m.poster_image or m.poster_url):
+            banner_items.append({
+                'key': f"movie-{mov.id}",
+                'title': mov.name,
+                'subtitle': mov.release_date or (mov.category and dict(mov._fields['category']._description_selection(mov)).get(mov.category)) or mov.genre or '',
+                'image': mov.poster_image and f"/web/image/guiabh.cineart.movie/{mov.id}/poster_image/1200/600" or mov.poster_url,
+                'url': mov.cineart_url or '#',
+                'tag': 'Cinema',
+            })
+        for match in football_matches:
+            banner_items.append({
+                'key': f"match-{match.id}",
+                'title': f"{match.home_team_id.name} x {match.away_team_id.name}",
+                'subtitle': fields.Datetime.to_string(match.match_datetime) if match.match_datetime else '',
+                'image': '/bhz_guiabh_website/static/src/img/placeholders/event_placeholder.svg',
+                'url': match.ticket_url or '#',
+                'tag': 'Futebol',
+            })
+        banner_items = banner_items[:8]
+
         values = {
             'featured_events': featured_events,
             'upcoming_events': upcoming_events,
@@ -216,6 +272,11 @@ class GuiaBHWebsite(http.Controller):
             'pref_events': pref_events,
             'pref_places': pref_places,
             'preferences': prefs,
+            'promo_events': promo_events,
+            'cine_movies': cine_movies,
+            'football_matches': football_matches,
+            'city_places': city_places,
+            'banner_items': banner_items,
         }
         return self._render_cache('bhz_guiabh_website.guiabh_home', values)
 

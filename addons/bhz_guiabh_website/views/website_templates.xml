@@ -378,6 +378,83 @@
           </div>
         </section>
 
+        <!-- Destaques automáticos (carrossel) -->
+        <section class="py-4 bg-soft" t-if="banner_items" aria-label="Destaques automáticos">
+          <div class="guia-container">
+            <div class="guiabh-section-title">
+              <div>
+                <p class="eyebrow">Agora</p>
+                <h2>Guias e destaques</h2>
+              </div>
+            </div>
+            <div id="guiabh-banner-carousel" class="carousel slide" data-bs-ride="carousel">
+              <div class="carousel-inner">
+                <t t-foreach="banner_items" t-as="item" t-key="item['key']">
+                  <div class="carousel-item" t-att-class="loop.first and 'carousel-item active' or 'carousel-item'">
+                    <div class="row g-3 align-items-center">
+                      <div class="col-lg-7">
+                        <img t-att-src="item.get('image') or '/bhz_guiabh_website/static/src/img/placeholders/editorial_placeholder.svg'" class="d-block w-100 rounded-3" alt="Destaque" loading="lazy"/>
+                      </div>
+                      <div class="col-lg-5">
+                        <span class="badge bg-primary mb-2"><t t-esc="item.get('tag') or 'Destaque'"/></span>
+                        <h3 class="mb-2"><t t-esc="item.get('title')"/></h3>
+                        <p class="text-muted mb-3"><t t-esc="item.get('subtitle')"/></p>
+                        <a t-att-href="item.get('url') or '#'" class="btn btn-primary btn-guiabh">Ver mais</a>
+                      </div>
+                    </div>
+                  </div>
+                </t>
+              </div>
+              <button class="carousel-control-prev" type="button" data-bs-target="#guiabh-banner-carousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Anterior</span>
+              </button>
+              <button class="carousel-control-next" type="button" data-bs-target="#guiabh-banner-carousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Próximo</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Eventos anunciados (bhz_event_promo) -->
+        <section class="py-5" t-if="promo_events" aria-label="Eventos anunciados">
+          <div class="guia-container">
+            <div class="guiabh-section-title">
+              <div>
+                <p class="eyebrow">Agenda integrada</p>
+                <h2>Eventos anunciados</h2>
+              </div>
+              <a href="/eventos" class="link-more">Ver agenda</a>
+            </div>
+            <div class="guiabh-grid">
+              <t t-foreach="promo_events" t-as="ev" t-key="ev.id">
+                <div class="guiabh-card">
+                  <div class="cover">
+                    <img t-att-src="ev.promo_cover_image and '/web/image/event.event/%s/promo_cover_image/800/450' % ev.id or '/bhz_guiabh_website/static/src/img/placeholders/event_placeholder.svg'" loading="lazy" t-att-alt="ev.name"/>
+                    <div class="badge" t-if="getattr(ev, 'is_featured', False)">Destaque</div>
+                  </div>
+                  <div class="content">
+                    <h3><t t-esc="ev.name"/></h3>
+                    <p class="text-muted"><t t-esc="ev.promo_short_description or (hasattr(ev, 'subtitle') and ev.subtitle) or ''"/></p>
+                    <div class="guiabh-meta">
+                      <t t-if="ev.date_begin">
+                        <i class="fa fa-calendar" aria-hidden="true"></i>
+                        <time t-field="ev.date_begin" t-options="{'widget': 'datetime'}"/>
+                      </t>
+                      <t t-if="ev.neighborhood"> · <t t-esc="ev.neighborhood"/></t>
+                    </div>
+                    <div class="footer">
+                      <a t-att-href="ev.website_url or '/event/%s' % ev.id" class="btn btn-link">Ver detalhes</a>
+                      <span class="text-chip" t-if="ev.promo_category_id.name"><t t-esc="ev.promo_category_id.name"/></span>
+                    </div>
+                  </div>
+                </div>
+              </t>
+            </div>
+          </div>
+        </section>
+
         <!-- Em alta -->
         <section class="py-5" aria-label="Eventos em destaque">
           <div class="guia-container">
@@ -456,6 +533,68 @@
           </div>
         </section>
 
+        <!-- Filmes em cartaz (bhz_cineart) -->
+        <section class="py-5" t-if="cine_movies" aria-label="Filmes em cartaz">
+          <div class="guia-container">
+            <div class="guiabh-section-title">
+              <div>
+                <p class="eyebrow">Cinema</p>
+                <h2>Filmes em destaque</h2>
+              </div>
+              <a href="/cineart" class="link-more">Ver todos</a>
+            </div>
+            <div class="guiabh-grid">
+              <t t-foreach="cine_movies" t-as="movie" t-key="movie.id">
+                <div class="guiabh-card">
+                  <div class="cover">
+                    <img t-att-src="movie.poster_image and '/web/image/guiabh.cineart.movie/%s/poster_image/600/800' % movie.id or movie.poster_url or '/bhz_guiabh_website/static/src/img/placeholders/event_placeholder.svg'" loading="lazy" t-att-alt="movie.name"/>
+                    <div class="badge" t-if="movie.category"><t t-esc="movie.category"/></div>
+                  </div>
+                  <div class="content">
+                    <h3><t t-esc="movie.name"/></h3>
+                    <p class="text-muted"><t t-esc="movie.genre or movie.release_date"/></p>
+                    <div class="footer">
+                      <a t-att-href="movie.cineart_url or '#'" class="btn btn-link" target="_blank" rel="noopener">Ver detalhes</a>
+                    </div>
+                  </div>
+                </div>
+              </t>
+            </div>
+          </div>
+        </section>
+
+        <!-- Agenda de jogos (bhz_football_agenda) -->
+        <section class="py-5 bg-soft" t-if="football_matches" aria-label="Agenda de jogos">
+          <div class="guia-container">
+            <div class="guiabh-section-title">
+              <div>
+                <p class="eyebrow">Esportes</p>
+                <h2>Jogos em breve</h2>
+              </div>
+            </div>
+            <div class="row g-3">
+              <t t-foreach="football_matches" t-as="match" t-key="match.id">
+                <div class="col-md-6">
+                  <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                      <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="badge bg-primary"><t t-esc="match.competition or 'Jogo'"/></span>
+                        <small class="text-muted" t-if="match.match_datetime"><time t-field="match.match_datetime" t-options="{'widget': 'datetime'}"/></small>
+                      </div>
+                      <h3 class="h5 mb-1"><t t-esc="match.home_team_id.name"/> x <t t-esc="match.away_team_id.name"/></h3>
+                      <p class="text-muted mb-2"><t t-esc="match.stadium or match.city"/></p>
+                      <div class="d-flex gap-2">
+                        <a t-if="match.ticket_url" t-att-href="match.ticket_url" class="btn btn-sm btn-primary" target="_blank" rel="noopener">Ingressos</a>
+                        <span class="text-muted" t-if="match.broadcast">Transmissão: <t t-esc="match.broadcast"/></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </t>
+            </div>
+          </div>
+        </section>
+
         <!-- Lugares -->
         <section class="py-5" aria-label="Lugares em BH">
           <div class="guia-container">
@@ -473,6 +612,38 @@
               <t t-else="">
                 <div class="guiabh-empty">
                   <p>Cadastre lugares para montar um guia incrível.</p>
+                </div>
+              </t>
+            </div>
+          </div>
+        </section>
+
+        <!-- Locais automatizados (bhz_city_places) -->
+        <section class="py-5 bg-soft" t-if="city_places" aria-label="Locais verificados">
+          <div class="guia-container">
+            <div class="guiabh-section-title">
+              <div>
+                <p class="eyebrow">Mapa vivo</p>
+                <h2>Locais atualizados automaticamente</h2>
+              </div>
+            </div>
+            <div class="guiabh-grid">
+              <t t-foreach="city_places" t-as="loc" t-key="loc.id">
+                <div class="guiabh-card">
+                  <div class="cover">
+                    <img t-att-src="loc.image_1920 and '/web/image/bhz.place/%s/image_1920/800/600' % loc.id or '/bhz_guiabh_website/static/src/img/placeholders/place_placeholder.svg'" loading="lazy" t-att-alt="loc.name"/>
+                  </div>
+                  <div class="content">
+                    <h3><t t-esc="loc.name"/></h3>
+                    <p class="text-muted"><t t-raw="loc.short_description or ''"/></p>
+                    <div class="guiabh-meta">
+                      <t t-if="loc.neighborhood"><i class="fa fa-map-marker" aria-hidden="true"></i> <t t-esc="loc.neighborhood"/></t>
+                      <t t-if="loc.price_range"> · <t t-esc="loc.price_range"/></t>
+                    </div>
+                    <div class="footer">
+                      <a t-att-href="loc.maps_url or loc.website or '#'" class="btn btn-link" target="_blank" rel="noopener">Como chegar</a>
+                    </div>
+                  </div>
                 </div>
               </t>
             </div>
