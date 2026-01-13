@@ -96,7 +96,7 @@
   <record id="action_bhz_dealer_cars" model="ir.actions.act_window">
     <field name="name">Carros</field>
     <field name="res_model">bhz.dealer.car</field>
-    <field name="view_mode">tree,form</field>
+    <field name="view_mode">list,form</field>
   </record>
 
   <menuitem id="menu_bhz_dealer_root" name="BHZ Dealer" sequence="80"/>
