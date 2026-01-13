@@ -13,13 +13,10 @@
             <t t-set="config" t-value="request.env['bhz.dealer.website.config'].sudo().get_for_website(request.website)"/>
             <t t-set="primary" t-value="config.primary_color or '#0d6efd'"/>
             <t t-set="secondary" t-value="config.secondary_color or '#6610f2'"/>
-            <t t-if="config and (config.whatsapp or config.phone)">
-              <script>
-                document.body.setAttribute('data-bhz-whatsapp', "<t t-esc=\"(config.whatsapp or config.phone or '').replace('\\\"','').replace(\"'\",'')\"/>");
-                document.body.setAttribute('data-bhz-whatsapp-msg', "Olá, quero saber mais sobre os carros.");
-              </script>
-            </t>
-            <div id="wrap" class="bhz-dealer" t-att-style="'--bhz-primary:%s;--bhz-secondary:%s;' % (primary, secondary)">
+            <div id="wrap" class="bhz-dealer"
+                 t-att-style="'--bhz-primary:%s;--bhz-secondary:%s;' % (primary, secondary)"
+                 t-att-data-bhz-whatsapp="(config.whatsapp or config.phone) and (config.whatsapp or config.phone) or ''"
+                 t-att-data-bhz-whatsapp-msg="'Olá, quero saber mais sobre os carros.'">
               <section class="s_title py-5">
                 <div class="container">
                   <div class="row align-items-center g-4">
