@@ -8,3 +8,4 @@ access_bhz_ai_task_action,bhz.ai.task.action,model_bhz_ai_task_action,bhz_ai_org
 access_bhz_ai_memory_operator,bhz.ai.memory,model_bhz_ai_memory,bhz_ai_org.group_bhz_ai_operator,1,1,1,0
 access_bhz_ai_memory_admin,bhz.ai.memory,model_bhz_ai_memory,bhz_ai_org.group_bhz_ai_admin,1,1,1,1
 access_bhz_ai_audit_log_admin,bhz.ai.audit.log,model_bhz_ai_audit_log,bhz_ai_org.group_bhz_ai_admin,1,1,1,0
+access_bhz_ai_task_user,bhz.ai.task user,model_bhz_ai_task,base.group_user,1,0,0,0
