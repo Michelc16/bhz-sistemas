@@ -28,7 +28,7 @@
           <tbody>
             <t t-foreach="products" t-as="prod">
               <tr>
-                <td><a t-att-href="'/web#id=%s&model=product.template&view_type=form' % prod.id"><t t-esc="prod.name"/></a></td>
+                <td><a t-att-href="'/web#id=%s&amp;model=product.template&amp;view_type=form' % prod.id"><t t-esc="prod.name"/></a></td>
                 <td><t t-esc="prod.bhz_marketplace_state"/></td>
                 <td><t t-esc="prod.list_price"/></td>
               </tr>
