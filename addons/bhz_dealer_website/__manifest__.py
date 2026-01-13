@@ -15,6 +15,7 @@
         "views/website_views.xml",
         "views/website_templates.xml",
         "views/website_pages.xml",
+        "data/website_data.xml",
     ],
     "assets": {
         "web.assets_frontend": [
