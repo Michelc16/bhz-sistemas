@@ -1,5 +1,5 @@
 {
-    "name": "GuiaBH - Cineart (Página exclusiva + sincronização de filmes)",
+    "name": "BHZ-Cinema (Cineart)",
     "version": "1.0.0",
     "category": "Website",
     "summary": "Página /cineart com Em Cartaz, Em Breve e Estreias da Semana (sincroniza do site do Cineart).",

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <!-- Menu raiz -->
+    <menuitem id="menu_guiabh_root" name="GuiaBH" sequence="5"/>
+
+    <!-- Ação e menu de eventos -->
+    <record id="action_guiabh_event" model="ir.actions.act_window">
+        <field name="name">Eventos</field>
+        <field name="res_model">guiabh.event</field>
+        <field name="view_mode">kanban,list,form</field>
+    </record>
+
+    <menuitem id="menu_guiabh_events" name="Eventos" parent="menu_guiabh_root" action="action_guiabh_event" sequence="10"/>
+
+    <!-- List view -->
+    <record id="view_guiabh_event_tree" model="ir.ui.view">
+        <field name="name">guiabh.event.tree</field>
+        <field name="model">guiabh.event</field>
+        <field name="arch" type="xml">
+            <list string="Eventos">
+                <field name="name"/>
+                <field name="start_datetime"/>
+                <field name="end_datetime"/>
+                <field name="category_id"/>
+                <field name="region_id"/>
+                <field name="price_type"/>
+                <field name="min_price"/>
+                <field name="is_featured"/>
+                <field name="website_published"/>
+                <field name="website_id"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Kanban view -->
+    <record id="view_guiabh_event_kanban" model="ir.ui.view">
+        <field name="name">guiabh.event.kanban</field>
+        <field name="model">guiabh.event</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="category_id" class="o_kanban_mobile" create="1">
+                <field name="cover_image"/>
+                <field name="name"/>
+                <field name="start_datetime"/>
+                <field name="category_id"/>
+                <field name="region_id"/>
+                <field name="is_featured"/>
+                <field name="website_published"/>
+                <templates>
+                    <t t-name="card">
+                        <div t-attf-class="oe_kanban_global_click o_kanban_card">
+                            <div class="o_kanban_image">
+                                <t t-if="record.id and record.id.raw_value and record.cover_image">
+                                    <img t-att-src="'/web/image/guiabh.event/%s/cover_image' % record.id.raw_value" class="img img-fluid" alt="Evento"/>
+                                </t>
+                                <div t-else="" class="o_kanban_image_placeholder">Evento</div>
+                                <div class="badge badge-primary" t-if="record.is_featured and record.is_featured.raw_value">Destaque</div>
+                                <div class="badge badge-success" t-if="record.website_published and record.website_published.raw_value">Publicado</div>
+                            </div>
+                            <div class="o_kanban_details">
+                                <strong><field name="name"/></strong>
+                                <div class="text-muted">
+                                    <field name="start_datetime"/>
+                                </div>
+                                <div>
+                                    <span class="badge badge-light" t-if="record.category_id and record.category_id.raw_value"><field name="category_id"/></span>
+                                    <span class="badge" t-if="record.region_id and record.region_id.raw_value"><field name="region_id"/></span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Form view -->
+    <record id="view_guiabh_event_form" model="ir.ui.view">
+        <field name="name">guiabh.event.form</field>
+        <field name="model">guiabh.event</field>
+        <field name="arch" type="xml">
+            <form string="Evento">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object" name="action_publish" icon="fa-globe">
+                            <field name="website_published" widget="boolean_button" options="{'terminology': 'website'}"/>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_unpublish" icon="fa-eye-slash" string="Despublicar"/>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="slug"/>
+                            <field name="active"/>
+                            <field name="published"/>
+                            <field name="is_featured"/>
+                            <field name="website_id"/>
+                        </group>
+                        <group>
+                            <field name="start_datetime"/>
+                            <field name="end_datetime"/>
+                            <field name="price_type"/>
+                            <field name="currency_id" groups="base.group_multi_currency"/>
+                            <field name="min_price" modifiers="{'invisible': [['price_type','!=','paid']]}"/>
+                            <field name="ticket_url"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="venue_name"/>
+                            <field name="address_text"/>
+                            <field name="region_id"/>
+                            <field name="category_id"/>
+                            <field name="tags_ids" widget="many2many_tags"/>
+                        </group>
+                        <group>
+                            <field name="short_description"/>
+                            <field name="cover_image" widget="image" class="oe_avatar" options="{'preview_image': 'cover_image'}"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Descrição">
+                            <field name="description_html" widget="html" class="oe_inline"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+  </data>
+</odoo>
