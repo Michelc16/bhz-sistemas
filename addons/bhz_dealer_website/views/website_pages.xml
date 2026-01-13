@@ -15,7 +15,7 @@
             <t t-set="secondary" t-value="config.secondary_color or '#6610f2'"/>
             <t t-if="config and (config.whatsapp or config.phone)">
               <script>
-                document.body.setAttribute('data-bhz-whatsapp', "<t t-esc=\"(config.whatsapp or config.phone or '').replace('\"','').replace(\"'\",'')\"/>");
+                document.body.setAttribute('data-bhz-whatsapp', "<t t-esc=\"(config.whatsapp or config.phone or '').replace('\\\"','').replace(\"'\",'')\"/>");
                 document.body.setAttribute('data-bhz-whatsapp-msg', "Olá, quero saber mais sobre os carros.");
               </script>
             </t>
