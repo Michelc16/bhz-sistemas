@@ -1,5 +1,4 @@
 <odoo>
-  <data>
   <record id="view_bhz_marketplace_api_token_tree" model="ir.ui.view">
     <field name="name">bhz.marketplace.api.token.tree</field>
     <field name="model">bhz.marketplace.api.token</field>
@@ -38,5 +37,4 @@
     <field name="res_model">bhz.marketplace.api.token</field>
     <field name="view_mode">list,form</field>
   </record>
-  </data>
 </odoo>
