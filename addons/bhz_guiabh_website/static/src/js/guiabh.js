@@ -174,3 +174,23 @@ options.registry.GuiabhPlacesOptions = options.Class.extend({
         this.$target.find('.js-guiabh-dynamic').trigger('reload');
     },
 });
+
+publicWidget.registry.GuiabhCarouselNav = publicWidget.Widget.extend({
+    selector: '.js-carousel-nav',
+    start() {
+        this.$target.on('click', '[data-dir]', this._onClick.bind(this));
+        return this._super(...arguments);
+    },
+    _onClick(ev) {
+        ev.preventDefault();
+        const dir = $(ev.currentTarget).data('dir');
+        const targetSelector = this.$target.data('target');
+        const $container = targetSelector ? this.$el.closest('section').find(targetSelector) : this.$el.prev('.guiabh-carousel');
+        if (!$container.length) {
+            return;
+        }
+        const node = $container[0];
+        const delta = node.clientWidth * 0.8;
+        node.scrollBy({ left: dir === 'next' ? delta : -delta, behavior: 'smooth' });
+    },
+});

@@ -254,6 +254,38 @@ body.guia-bh {
   }
 }
 
+.guiabh-card-generic .badge {
+  background: rgba(31, 111, 235, 0.85);
+  color: #fff;
+  padding: 6px 10px;
+}
+
+.badge-soft {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #e8f1ff;
+  color: var(--guiabh-primary);
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.match-logos {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0;
+  img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: contain;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+  }
+}
+
 .guiabh-carousel {
   display: grid;
   grid-auto-flow: column;
@@ -261,6 +293,31 @@ body.guia-bh {
   gap: 16px;
   overflow-x: auto;
   padding-bottom: 6px;
+  scroll-snap-type: x mandatory;
+}
+
+.guiabh-carousel > * {
+  scroll-snap-align: start;
+}
+
+.guiabh-carousel-highlight {
+  background: linear-gradient(90deg, rgba(31, 111, 235, 0.06), transparent 40%, rgba(90, 209, 232, 0.06));
+  padding: 10px;
+  border-radius: 18px;
+}
+
+.carousel-nav {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.icon-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+  font-weight: 800;
 }
 
 // Chips

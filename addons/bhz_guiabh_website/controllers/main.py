@@ -186,11 +186,22 @@ class GuiaBHWebsite(http.Controller):
 
     @http.route(['/'], type='http', auth='public', website=True, sitemap=True)
     def home(self, **kwargs):
+        website = self._website()
+        bridge = request.env['bhz.guiabh.content.bridge'].sudo()
         Event = request.env['guiabh.event']
         Place = request.env['guiabh.place']
-        featured_events = Event.search(self._event_domain() + [('is_featured', '=', True)], order='start_datetime asc', limit=6)
-        upcoming_events = Event.search(self._event_domain(), order='start_datetime asc', limit=6)
-        featured_places = Place.search(self._place_domain() + [('is_featured', '=', True)], order='name asc', limit=6)
+        featured_events = bridge.get_featured_events(limit=6, website=website)
+        upcoming_events = bridge.get_upcoming_events(limit=6, date_window=30, website=website)
+        featured_places = bridge.get_featured_places(limit=6, website=website)
+        now_playing_movies = bridge.get_now_playing_movies(limit=6, website=website)
+        upcoming_matches = bridge.get_upcoming_matches(limit=6, date_window=45, website=website)
+        featured_carousel = bridge.build_featured_carousel(
+            events=featured_events,
+            movies=now_playing_movies,
+            matches=upcoming_matches,
+            places=featured_places,
+            limit=10,
+        )
         prefs = self._get_preferences()
         pref_event_domain = self._event_domain()
         pref_place_domain = self._place_domain()
@@ -211,6 +222,9 @@ class GuiaBHWebsite(http.Controller):
             'featured_events': featured_events,
             'upcoming_events': upcoming_events,
             'featured_places': featured_places,
+            'now_playing_movies': now_playing_movies,
+            'upcoming_matches': upcoming_matches,
+            'featured_carousel': featured_carousel,
             'ads_home_top': self._get_ads('home_top', limit=2),
             'ads_between': self._get_ads('between_sections', limit=2),
             'pref_events': pref_events,

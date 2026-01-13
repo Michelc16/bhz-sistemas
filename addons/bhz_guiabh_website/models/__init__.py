@@ -5,3 +5,4 @@ from . import guiabh_favorite
 from . import guiabh_lead
 from . import guiabh_ad
 from . import guiabh_preference
+from . import content_bridge
