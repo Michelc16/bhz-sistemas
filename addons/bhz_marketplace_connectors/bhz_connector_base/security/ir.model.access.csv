@@ -1,3 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_connector_account,bhz.connector.account.manager,model_bhz_connector_account,bhz_marketplace_connectors.group_marketplace_integrations,1,1,1,1
-access_connector_job,bhz.connector.job.manager,model_bhz_connector_job,bhz_marketplace_connectors.group_marketplace_integrations,1,1,1,1
+access_connector_account,bhz.connector.account.manager,model_bhz_connector_account,bhz_connector_base.group_marketplace_integrations,1,1,1,1
+access_connector_job,bhz.connector.job.manager,model_bhz_connector_job,bhz_connector_base.group_marketplace_integrations,1,1,1,1
