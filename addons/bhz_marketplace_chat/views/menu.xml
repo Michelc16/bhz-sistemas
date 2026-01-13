@@ -1,4 +1,4 @@
 <odoo>
   <menuitem id="menu_bhz_marketplace_support" name="Atendimento" parent="bhz_marketplace_core.menu_bhz_marketplace_root" sequence="60" groups="bhz_marketplace_chat.group_marketplace_support"/>
-  <menuitem id="menu_bhz_marketplace_questions" name="Perguntas" parent="menu_bhz_marketplace_support" action="action_bhz_product_question" sequence="10"/>
+  <menuitem id="menu_bhz_marketplace_questions" name="Perguntas" parent="menu_bhz_marketplace_support" action="bhz_marketplace_chat.action_bhz_product_question" sequence="10"/>
 </odoo>

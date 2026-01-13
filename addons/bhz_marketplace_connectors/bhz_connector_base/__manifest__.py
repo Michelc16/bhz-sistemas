@@ -9,9 +9,9 @@
     "data": [
         "security/security.xml",
         "security/ir.model.access.csv",
-        "views/menu.xml",
         "views/connector_account_views.xml",
         "views/connector_job_views.xml",
+        "views/menu.xml",
     ],
     "installable": True,
 }

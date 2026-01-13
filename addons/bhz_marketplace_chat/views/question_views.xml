@@ -3,14 +3,14 @@
     <field name="name">bhz.product.question.tree</field>
     <field name="model">bhz.product.question</field>
     <field name="arch" type="xml">
-      <tree>
+      <list>
         <field name="product_tmpl_id"/>
         <field name="seller_id"/>
         <field name="author_partner_id"/>
         <field name="state"/>
         <field name="question"/>
         <field name="answer"/>
-      </tree>
+      </list>
     </field>
   </record>
 
@@ -20,8 +20,8 @@
     <field name="arch" type="xml">
       <form string="Pergunta de produto">
         <header>
-          <button name="action_answered" string="Marcar respondida" type="object" states="pending"/>
-          <button name="action_hide" string="Ocultar" type="object" states="pending,answered"/>
+          <button name="action_answered" string="Marcar respondida" type="object"/>
+          <button name="action_hide" string="Ocultar" type="object"/>
           <field name="state" widget="statusbar" statusbar_visible="pending,answered,hidden"/>
         </header>
         <sheet>
@@ -43,6 +43,6 @@
   <record id="action_bhz_product_question" model="ir.actions.act_window">
     <field name="name">Perguntas</field>
     <field name="res_model">bhz.product.question</field>
-    <field name="view_mode">tree,form</field>
+    <field name="view_mode">list,form</field>
   </record>
 </odoo>

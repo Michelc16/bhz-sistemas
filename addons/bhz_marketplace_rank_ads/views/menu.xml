@@ -1,5 +1,5 @@
 <odoo>
   <menuitem id="menu_bhz_marketplace_growth" name="Growth" parent="bhz_marketplace_core.menu_bhz_marketplace_root" sequence="80" groups="bhz_marketplace_rank_ads.group_marketplace_growth"/>
-  <menuitem id="menu_bhz_marketplace_reputation" name="Reputação" parent="menu_bhz_marketplace_growth" action="action_bhz_seller_reputation" sequence="10"/>
-  <menuitem id="menu_bhz_marketplace_ads" name="Ads" parent="menu_bhz_marketplace_growth" action="action_bhz_product_ads" sequence="20"/>
+  <menuitem id="menu_bhz_marketplace_reputation" name="Reputação" parent="menu_bhz_marketplace_growth" action="bhz_marketplace_rank_ads.action_bhz_seller_reputation" sequence="10"/>
+  <menuitem id="menu_bhz_marketplace_ads" name="Ads" parent="menu_bhz_marketplace_growth" action="bhz_marketplace_rank_ads.action_bhz_product_ads" sequence="20"/>
 </odoo>

@@ -3,7 +3,7 @@
     <field name="name">bhz.seller.ledger.move.tree</field>
     <field name="model">bhz.seller.ledger.move</field>
     <field name="arch" type="xml">
-      <tree>
+      <list>
         <field name="date"/>
         <field name="seller_id"/>
         <field name="move_type"/>
@@ -11,7 +11,7 @@
         <field name="sale_order_id"/>
         <field name="sale_order_line_id"/>
         <field name="ref"/>
-      </tree>
+      </list>
     </field>
   </record>
 
@@ -41,6 +41,6 @@
   <record id="action_bhz_seller_ledger_move" model="ir.actions.act_window">
     <field name="name">Ledger</field>
     <field name="res_model">bhz.seller.ledger.move</field>
-    <field name="view_mode">tree,form</field>
+    <field name="view_mode">list,form</field>
   </record>
 </odoo>

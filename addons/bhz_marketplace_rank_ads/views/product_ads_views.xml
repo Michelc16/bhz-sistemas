@@ -3,14 +3,14 @@
     <field name="name">bhz.product.ads.tree</field>
     <field name="model">bhz.product.ads</field>
     <field name="arch" type="xml">
-      <tree>
+      <list>
         <field name="product_tmpl_id"/>
         <field name="seller_id"/>
         <field name="active"/>
         <field name="budget"/>
         <field name="spent"/>
         <field name="boost"/>
-      </tree>
+      </list>
     </field>
   </record>
 
@@ -36,6 +36,6 @@
   <record id="action_bhz_product_ads" model="ir.actions.act_window">
     <field name="name">Ads</field>
     <field name="res_model">bhz.product.ads</field>
-    <field name="view_mode">tree,form</field>
+    <field name="view_mode">list,form</field>
   </record>
 </odoo>
