@@ -86,11 +86,19 @@ class BhzDealerCar(models.Model):
 
     @api.model
     def create(self, vals):
-        vals = dict(vals or {})
-        if not vals.get("website_id"):
-            fallback = self._get_fallback_website_id()
-            if fallback:
-                vals["website_id"] = fallback
+        fallback = self._get_fallback_website_id()
+
+        def _inject(valdict):
+            data = dict(valdict or {})
+            if not data.get("website_id") and fallback:
+                data["website_id"] = fallback
+            return data
+
+        if isinstance(vals, list):
+            prepared = [_inject(v) for v in vals]
+            return super().create(prepared)
+
+        vals = _inject(vals)
         return super().create(vals)
 
     def write(self, vals):
