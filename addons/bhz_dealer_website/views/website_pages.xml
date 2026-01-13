@@ -553,10 +553,7 @@
       <field name="website_id" ref="website.default_website"/>
       <field name="url">/</field>
       <field name="view_id" ref="view_page_dealer_home"/>
-    </record>
-
-    <record id="website.default_website" model="website">
-      <field name="homepage_id" ref="page_dealer_home_page"/>
+      <field name="is_published">True</field>
     </record>
 
   </data>
