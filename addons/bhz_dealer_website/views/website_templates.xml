@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<templates id="bhz_dealer_website_templates" xml:space="preserve">
+<odoo>
+  <data>
   <!-- Componentes reutilizáveis -->
-  <t t-name="bhz_dealer_website.car_card">
+  <template id="car_card" name="Car Card">
     <a t-att-href="'/carros/%s-%s' % (car.id, car.slug or '')" class="bhz-car-card d-block text-decoration-none">
       <div class="bhz-car-thumb">
         <t t-if="car.main_image">
@@ -33,9 +34,9 @@
         </div>
       </div>
     </a>
-  </t>
+  </template>
 
-  <t t-name="bhz_dealer_website.snippet_car_showcase_cards">
+  <template id="snippet_car_showcase_cards" name="Snippet Car Cards">
     <t t-if="cars">
       <t t-foreach="cars" t-as="car">
         <t t-call="bhz_dealer_website.car_card"/>
@@ -44,7 +45,7 @@
     <t t-else="">
       <div class="alert alert-info">Nenhum carro encontrado para esta seleção.</div>
     </t>
-  </t>
+  </template>
 
   <!-- Snippets -->
   <template id="snippet_car_showcase" name="Vitrine de carros">
@@ -708,4 +709,5 @@
       </div>
     </t>
   </template>
-</templates>
+  </data>
+</odoo>
