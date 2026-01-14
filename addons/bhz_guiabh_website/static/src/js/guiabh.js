@@ -111,12 +111,18 @@ publicWidget.registry.GuiabhDynamicSnippet = publicWidget.Widget.extend({
         return params;
     },
     _load() {
+        if (!this.el || !this.el.isConnected) {
+            return;
+        }
         const type = this.$el.data('type');
         const layout = this.$el.data('layout') || 'grid';
         const params = this._params();
         const route = type === 'places' ? '/guiabh/snippet/places' : '/guiabh/snippet/events';
         const showPrice = params.show_price !== false;
         ajax.jsonRpc(route, 'call', params).then((data) => {
+            if (!this.el || !this.el.isConnected) {
+                return;
+            }
             this.$el.empty();
             const items = data && data.items ? data.items : [];
             if (!items.length) {
