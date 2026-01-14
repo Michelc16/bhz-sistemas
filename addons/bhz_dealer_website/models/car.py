@@ -5,7 +5,7 @@ from odoo.exceptions import ValidationError
 class BhzDealerCar(models.Model):
     _name = "bhz.dealer.car"
     _description = "Carro - Concessionária"
-    _inherit = ["mail.thread", "mail.activity.mixin"]
+    _inherit = ["mail.thread", "mail.activity.mixin", "website.published.mixin"]
     _order = "is_featured desc, create_date desc"
 
     name = fields.Char(string="Título do anúncio", required=True, tracking=True)
@@ -47,7 +47,6 @@ class BhzDealerCar(models.Model):
     ], string="Câmbio", default="auto", index=True)
 
     doors = fields.Integer("Portas", default=4)
-    owners = fields.Integer("Nº de donos", default=1)
     condition = fields.Selection([
         ("new", "Novo"),
         ("used", "Usado"),
@@ -57,10 +56,12 @@ class BhzDealerCar(models.Model):
     # Conteúdo
     description = fields.Html("Descrição")
     features = fields.Text("Opcionais (1 por linha)")
+    optional_lines = fields.Text("Itens opcionais", related="features", readonly=False)
     main_image = fields.Image("Imagem principal", max_width=1920, max_height=1080)
     image_ids = fields.One2many("bhz.dealer.car.image", "car_id", string="Galeria")
 
     is_featured = fields.Boolean("Destaque", default=False, index=True)
+    owners_count = fields.Integer("Nº de donos", default=1)
     slug = fields.Char("Slug (URL)", compute="_compute_slug", store=True, index=True)
 
     # Contato / CTA

@@ -4,6 +4,7 @@
   <record id="view_bhz_dealer_car_tree" model="ir.ui.view">
     <field name="name">bhz.dealer.car.list</field>
     <field name="model">bhz.dealer.car</field>
+    <field name="type">list</field>
     <field name="arch" type="xml">
       <list string="Carros" create="1" edit="1">
         <field name="is_featured"/>
@@ -12,9 +13,10 @@
         <field name="model"/>
         <field name="year"/>
         <field name="price"/>
-        <field name="condition"/>
         <field name="fuel"/>
         <field name="transmission"/>
+        <field name="website_id"/>
+        <field name="website_published"/>
         <field name="active"/>
       </list>
     </field>
@@ -26,6 +28,7 @@
     <field name="arch" type="xml">
       <form string="Carro">
         <header>
+          <field name="website_published" widget="website_publish_button"/>
           <button name="action_view_on_website" type="object" class="oe_stat_button" icon="fa-external-link">
             <div class="o_stat_info">
               <span class="o_stat_text">Ver no Site</span>
@@ -42,6 +45,7 @@
               <field name="website_id"/>
               <field name="is_featured"/>
               <field name="active"/>
+              <field name="website_published"/>
             </group>
             <group>
               <field name="price"/>
@@ -59,19 +63,20 @@
                   <field name="model"/>
                   <field name="trim"/>
                   <field name="year"/>
+                  <field name="doors"/>
                 </group>
                 <group>
                   <field name="fuel"/>
                   <field name="transmission"/>
-                  <field name="doors"/>
-                  <field name="owners"/>
+                  <field name="owners_count"/>
+                  <field name="plate_final"/>
                 </group>
               </group>
               <group>
                 <field name="description" widget="html"/>
               </group>
               <group>
-                <field name="features" placeholder="Ar-condicionado&#10;Airbag&#10;Multimídia"/>
+                <field name="optional_lines" placeholder="Ar-condicionado&#10;Airbag&#10;Multimídia"/>
               </group>
             </page>
 
@@ -94,9 +99,39 @@
                 <field name="lead_email_to"/>
               </group>
             </page>
+
+            <page string="Publicação">
+              <group>
+                <field name="website_id"/>
+                <field name="website_published"/>
+                <field name="is_featured"/>
+                <field name="active"/>
+                <field name="slug" readonly="1"/>
+              </group>
+            </page>
           </notebook>
         </sheet>
       </form>
+    </field>
+  </record>
+
+  <record id="view_bhz_dealer_car_search" model="ir.ui.view">
+    <field name="name">bhz.dealer.car.search</field>
+    <field name="model">bhz.dealer.car</field>
+    <field name="type">search</field>
+    <field name="arch" type="xml">
+      <search string="Buscar carros">
+        <field name="name"/>
+        <field name="brand"/>
+        <field name="model"/>
+        <field name="website_id"/>
+        <filter name="active" string="Ativos" domain="[('active','=',True)]"/>
+        <filter name="featured" string="Destaque" domain="[('is_featured','=',True)]"/>
+        <filter name="published" string="Publicado no site" domain="[('website_published','=',True)]"/>
+        <filter name="group_by_website" string="Website" context="{'group_by':'website_id'}"/>
+        <filter name="group_by_brand" string="Marca" context="{'group_by':'brand'}"/>
+        <filter name="group_by_year" string="Ano" context="{'group_by':'year'}"/>
+      </search>
     </field>
   </record>
   </data>

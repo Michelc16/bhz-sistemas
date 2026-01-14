@@ -3,6 +3,7 @@
   <data>
     <record id="view_bhz_dealer_config_tree" model="ir.ui.view">
       <field name="name">bhz.dealer.website.config.tree</field>
+      <field name="type">list</field>
       <field name="model">bhz.dealer.website.config</field>
       <field name="arch" type="xml">
         <list string="Configurações do site">
