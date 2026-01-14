@@ -536,6 +536,34 @@
                   <t t-esc="config.cta_label or 'Tenho interesse'"/>
                 </button>
 
+                <div class="card shadow-sm mt-3">
+                  <div class="card-body">
+                    <h5 class="card-title mb-3">Tenho interesse</h5>
+                    <form class="bhz-lead-form">
+                      <input type="hidden" name="car_id" t-att-value="car.id"/>
+                      <input type="hidden" name="lead_type" value="interest"/>
+                      <input type="text" name="hp_field" class="d-none" aria-hidden="true"/>
+                      <div class="mb-2">
+                        <label class="form-label">Nome</label>
+                        <input class="form-control" type="text" name="name" required="1"/>
+                      </div>
+                      <div class="mb-2">
+                        <label class="form-label">Telefone</label>
+                        <input class="form-control" type="text" name="phone" required="1"/>
+                      </div>
+                      <div class="mb-2">
+                        <label class="form-label">E-mail</label>
+                        <input class="form-control" type="email" name="email"/>
+                      </div>
+                      <div class="mb-2">
+                        <label class="form-label">Mensagem</label>
+                        <textarea class="form-control" name="message" rows="3">Tenho interesse no carro.</textarea>
+                      </div>
+                      <button class="btn btn-primary w-100" type="submit">Enviar</button>
+                    </form>
+                  </div>
+                </div>
+
                 <div class="bhz-desc mt-4">
                   <h3>Descrição</h3>
                   <div t-if="car.description" t-raw="car.description"/>
@@ -583,7 +611,59 @@
         <h1 class="mb-3">Venda seu carro</h1>
         <p class="lead">Avaliação justa, pagamento rápido e sem burocracia.</p>
         <p>Envie os dados do veículo e entraremos em contato para uma proposta.</p>
-        <a class="btn btn-primary btn-lg" href="/contato">Enviar proposta</a>
+        <div class="row g-4 mt-3">
+          <div class="col-lg-6">
+            <form class="bhz-lead-form">
+              <input type="hidden" name="lead_type" value="sell_car"/>
+              <input type="text" name="hp_field" class="d-none" aria-hidden="true"/>
+              <div class="mb-2">
+                <label class="form-label">Seu nome</label>
+                <input class="form-control" type="text" name="name" required="1"/>
+              </div>
+              <div class="mb-2">
+                <label class="form-label">Telefone</label>
+                <input class="form-control" type="text" name="phone" required="1"/>
+              </div>
+              <div class="mb-2">
+                <label class="form-label">E-mail</label>
+                <input class="form-control" type="email" name="email"/>
+              </div>
+              <div class="mb-2">
+                <label class="form-label">Marca</label>
+                <input class="form-control" type="text" name="car_brand"/>
+              </div>
+              <div class="mb-2">
+                <label class="form-label">Modelo</label>
+                <input class="form-control" type="text" name="car_model"/>
+              </div>
+              <div class="row g-2">
+                <div class="col-6">
+                  <label class="form-label">Ano</label>
+                  <input class="form-control" type="number" name="car_year"/>
+                </div>
+                <div class="col-6">
+                  <label class="form-label">KM</label>
+                  <input class="form-control" type="number" name="car_km" data-km-mask="1"/>
+                </div>
+              </div>
+              <div class="mb-3 mt-2">
+                <label class="form-label">Mensagem</label>
+                <textarea class="form-control" name="message" rows="3">Quero vender meu carro.</textarea>
+              </div>
+              <button class="btn btn-primary" type="submit">Enviar proposta</button>
+            </form>
+          </div>
+          <div class="col-lg-6">
+            <div class="p-4 bg-light rounded h-100">
+              <h5 class="fw-bold">Como funciona?</h5>
+              <ul class="mt-2">
+                <li>Avaliamos o veículo rapidamente.</li>
+                <li>Envie fotos e histórico básico.</li>
+                <li>Pagamento seguro e sem burocracia.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
     </t>
   </template>
@@ -595,8 +675,9 @@
         <p class="lead">Fale com a equipe para tirar dúvidas ou agendar uma visita.</p>
         <div class="row g-4">
           <div class="col-md-6">
-            <form class="o_website_form" action="/website_form/" method="post" data-model_name="crm.lead">
-              <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+            <form class="bhz-lead-form">
+              <input type="hidden" name="lead_type" value="contact"/>
+              <input type="text" name="hp_field" class="d-none" aria-hidden="true"/>
               <div class="mb-2">
                 <label class="form-label">Nome</label>
                 <input class="form-control" type="text" name="name" required="1"/>
@@ -607,11 +688,11 @@
               </div>
               <div class="mb-2">
                 <label class="form-label">E-mail</label>
-                <input class="form-control" type="email" name="email_from"/>
+                <input class="form-control" type="email" name="email"/>
               </div>
               <div class="mb-3">
                 <label class="form-label">Mensagem</label>
-                <textarea class="form-control" name="description" rows="4"></textarea>
+                <textarea class="form-control" name="message" rows="4"></textarea>
               </div>
               <button class="btn btn-primary" type="submit">Enviar</button>
             </form>

@@ -131,13 +131,34 @@ class BhzDealerWebsite(http.Controller):
         return request.render("bhz_dealer_website.template_dealer_car_detail", {"car": car, "website": website, "config": config})
 
     @http.route("/carros/lead", type="jsonrpc", auth="public", website=True, methods=["POST"])
-    def car_lead(self, car_id=None, name=None, phone=None, email=None, message=None, **kw):
+    def car_lead(self, car_id=None, name=None, phone=None, email=None, message=None, lead_type=None, car_brand=None, car_model=None, car_year=None, car_km=None, **kw):
+        if kw.get("hp_field"):
+            return {"error": "spam"}
+
         Car = request.env["bhz.dealer.car"].sudo()
-        Lead = request.env["crm.lead"].sudo()
+        LeadModel = request.env.get("crm.lead")
+        if not LeadModel:
+            return {"error": "crm_unavailable"}
+        Lead = LeadModel.sudo()
 
         car = Car.browse(int(car_id)).exists() if car_id else Car.browse()
-        if car and (not car.active or car.website_id.id != request.website.id):
+        if car and (not car.active or not car.website_published or car.website_id.id != request.website.id):
             return {"error": "not_found"}
+
+        source = Lead._dealer_source() if hasattr(Lead, "_dealer_source") else False
+        details = (message or "").strip()
+        extra_lines = []
+        if lead_type == "sell_car":
+            if car_brand:
+                extra_lines.append(f"Marca: {car_brand}")
+            if car_model:
+                extra_lines.append(f"Modelo: {car_model}")
+            if car_year:
+                extra_lines.append(f"Ano: {car_year}")
+            if car_km:
+                extra_lines.append(f"KM: {car_km}")
+        if extra_lines:
+            details = (details + "\n" if details else "") + "\n".join(extra_lines)
 
         vals = {
             "type": "opportunity",
@@ -145,14 +166,26 @@ class BhzDealerWebsite(http.Controller):
             "contact_name": name,
             "phone": phone,
             "email_from": email,
-            "description": (message or "").strip(),
+            "description": details,
+            "website_id": request.website.id,
         }
         if car:
-            vals["description"] = (vals["description"] or "") + f"\n\nCarro: {car.name} (ID {car.id})"
+            car_url = f"/carros/{car.id}-{car.slug or ''}"
+            vals["description"] = (vals["description"] or "") + f"\n\nCarro: {car.name} (ID {car.id})\nURL: {car_url}"
             tag = request.env.ref("crm.tag_website_lead", raise_if_not_found=False)
             if tag:
                 vals["tag_ids"] = [(4, tag.id)]
+            if Lead._fields.get("dealer_car_id"):
+                vals["dealer_car_id"] = car.id
+        if source and Lead._fields.get("source_id"):
+            vals["source_id"] = source.id
+
         lead = Lead.create(vals)
+
+        group = request.env.ref("bhz_dealer_website.group_bhz_dealer_manager", raise_if_not_found=False)
+        if group and group.users:
+            lead.message_subscribe(partner_ids=group.users.partner_id.ids)
+            lead.message_post(body="Novo lead do site Dealer.", subtype_xmlid="mail.mt_note")
 
         return {"lead_id": lead.id}
 

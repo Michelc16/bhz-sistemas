@@ -154,6 +154,7 @@ odoo.define("bhz_dealer_website.dealer", function (require) {
     events: {
       "click .bhz-interest-btn": "_openModal",
       "submit #bhz-lead-form": "_submitLead",
+      "submit .bhz-lead-form": "_submitInline",
     },
     _openModal(ev) {
       ev.preventDefault();
@@ -173,6 +174,7 @@ odoo.define("bhz_dealer_website.dealer", function (require) {
                 <form id="bhz-lead-form">
                   <div class="modal-body">
                     <input type="hidden" name="car_id" />
+                    <input type="text" name="hp_field" class="d-none" aria-hidden="true" />
                     <div class="mb-2">
                       <label class="form-label">Nome</label>
                       <input type="text" name="name" class="form-control" required />
@@ -210,25 +212,49 @@ odoo.define("bhz_dealer_website.dealer", function (require) {
         $modal.modal("show");
       }
     },
+    async _submitInline(ev) {
+      ev.preventDefault();
+      const $form = $(ev.currentTarget);
+      const data = this._collectData($form);
+      if (!data.name) {
+        alert("Informe seu nome.");
+        return;
+      }
+      await this._sendLead($form, data);
+    },
     async _submitLead(ev) {
       ev.preventDefault();
       const $form = $(ev.currentTarget);
-      const data = {
+      const data = this._collectData($form);
+      await this._sendLead($form, data, true);
+    },
+    _collectData($form) {
+      return {
         car_id: $form.find("[name='car_id']").val(),
         name: $form.find("[name='name']").val(),
         phone: $form.find("[name='phone']").val(),
         email: $form.find("[name='email']").val(),
         message: $form.find("[name='message']").val(),
+        hp_field: $form.find("[name='hp_field']").val(),
+        lead_type: $form.find("[name='lead_type']").val(),
+        car_brand: $form.find("[name='car_brand']").val(),
+        car_model: $form.find("[name='car_model']").val(),
+        car_year: $form.find("[name='car_year']").val(),
+        car_km: $form.find("[name='car_km']").val(),
       };
+    },
+    async _sendLead($form, data, closeModal = false) {
       const $submit = $form.find("button[type='submit']");
       $submit.prop("disabled", true).text("Enviando...");
       try {
         await ajax.jsonRpc("/carros/lead", "call", data);
         $form[0].reset();
-        if (window.bootstrap && window.bootstrap.Modal) {
-          bootstrap.Modal.getInstance($("#bhz-lead-modal")[0]).hide();
-        } else {
-          $("#bhz-lead-modal").modal("hide");
+        if (closeModal) {
+          if (window.bootstrap && window.bootstrap.Modal) {
+            bootstrap.Modal.getInstance($("#bhz-lead-modal")[0]).hide();
+          } else {
+            $("#bhz-lead-modal").modal("hide");
+          }
         }
         alert("Recebemos seu interesse! Em breve entraremos em contato.");
       } catch (err) {
