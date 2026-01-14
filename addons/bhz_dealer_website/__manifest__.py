@@ -13,6 +13,7 @@
         "views/car_views.xml",
         "views/config_views.xml",
         "views/dealer_menu.xml",
+        "views/website_templates.xml",
         "views/website_views.xml",
     ],
     "assets": {
