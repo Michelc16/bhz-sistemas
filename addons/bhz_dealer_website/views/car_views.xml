@@ -5,7 +5,7 @@
     <field name="name">bhz.dealer.car.tree</field>
     <field name="model">bhz.dealer.car</field>
     <field name="arch" type="xml">
-      <list string="Carros" create="1" edit="1">
+      <tree string="Carros" create="1" edit="1">
         <field name="is_featured"/>
         <field name="name"/>
         <field name="brand"/>
@@ -16,7 +16,7 @@
         <field name="fuel"/>
         <field name="transmission"/>
         <field name="active"/>
-      </list>
+      </tree>
     </field>
   </record>
 
@@ -80,11 +80,11 @@
                 <field name="main_image" widget="image"/>
               </group>
               <field name="image_ids">
-                <list editable="bottom">
+                <tree editable="bottom">
                   <field name="sequence"/>
                   <field name="name"/>
                   <field name="image" widget="image"/>
-                </list>
+                </tree>
               </field>
             </page>
 

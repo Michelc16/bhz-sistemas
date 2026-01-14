@@ -9,14 +9,14 @@
     "data": [
         "security/security.xml",
         "security/ir.model.access.csv",
-        "views/dealer_menu.xml",
-        "views/config_views.xml",
-        "data/demo.xml",
         "views/car_views.xml",
+        "views/config_views.xml",
+        "views/dealer_menu.xml",
         "views/website_menus.xml",
         "views/website_views.xml",
         "views/website_templates.xml",
         "views/website_pages.xml",
+        "data/demo.xml",
         "data/website_data.xml",
     ],
     "assets": {

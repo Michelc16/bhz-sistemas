@@ -5,6 +5,7 @@
       <field name="name">Carros</field>
       <field name="res_model">bhz.dealer.car</field>
       <field name="view_mode">tree,form</field>
+      <field name="view_id" ref="view_bhz_dealer_car_tree"/>
     </record>
 
     <record id="action_bhz_dealer_config" model="ir.actions.act_window">
