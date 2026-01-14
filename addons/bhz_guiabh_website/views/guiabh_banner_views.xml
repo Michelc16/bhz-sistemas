@@ -56,7 +56,7 @@
               name="Banners GuiaBH"
               parent="website.menu_website_configuration"
               action="action_guiabh_banner"
-              groups="base.group_website_publisher"
+              groups="website.group_website_designer"
               sequence="120"/>
   </data>
 </odoo>
