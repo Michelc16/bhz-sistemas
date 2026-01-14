@@ -28,6 +28,14 @@
     ],
     'application': False,
     'installable': True,
-    'assets': {},
+    'assets': {
+        'web.assets_frontend': [
+            'bhz_guiabh_website/static/src/scss/guiabh.scss',
+            'bhz_guiabh_website/static/src/js/guiabh.js',
+        ],
+        'website.assets_wysiwyg': [
+            'bhz_guiabh_website/static/src/js/guiabh.js',
+        ],
+    },
     'images': ['static/description/icon.png'],
 }
