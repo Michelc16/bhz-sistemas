@@ -9,4 +9,4 @@ access_guiabh_favorite_user,guiabh.favorite user,model_guiabh_favorite,base.grou
 access_guiabh_lead_user,guiabh.lead user,model_guiabh_lead,base.group_user,1,1,1,0
 access_guiabh_ad_user,guiabh.ad user,model_guiabh_ad,base.group_user,1,1,1,1
 access_guiabh_pref_user,guiabh.preference user,model_guiabh_preference,base.group_user,1,1,1,1
-access_guiabh_banner_user,guiabh.banner user,model_guiabh_banner,base.group_website_publisher,1,1,1,1
+access_guiabh_banner_user,guiabh.banner user,model_guiabh_banner,website.group_website_publisher,1,1,1,1
