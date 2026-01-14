@@ -20,7 +20,7 @@
             "bhz_dealer_website/static/src/scss/dealer.scss",
             "bhz_dealer_website/static/src/js/dealer.js",
         ],
-        "web.assets_qweb": [
+        "website.assets_frontend": [
             "bhz_dealer_website/views/website_templates.xml",
         ],
         "website.assets_editor": [
