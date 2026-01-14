@@ -3,6 +3,7 @@
     "version": "19.0.1.0.0",
     "category": "Website",
     "summary": "Site moderno para concessionárias: estoque, detalhe do carro, filtros e captação de leads.",
+    "description": "Aplicativo BHZ Dealer para publicar estoque de carros, páginas de detalhe e captação de leads no site.",
     "author": "BHZ Sistemas",
     "license": "LGPL-3",
     "depends": ["website", "crm", "mail"],

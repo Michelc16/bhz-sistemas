@@ -115,7 +115,7 @@ class BhzDealerWebsite(http.Controller):
 
         return request.render("bhz_dealer_website.page_car_detail", {"car": car, "website": website})
 
-    @http.route("/carros/lead", type="json", auth="public", website=True, methods=["POST"])
+    @http.route("/carros/lead", type="jsonrpc", auth="public", website=True, methods=["POST"])
     def car_lead(self, car_id=None, name=None, phone=None, email=None, message=None, **kw):
         Car = request.env["bhz.dealer.car"].sudo()
         Lead = request.env["crm.lead"].sudo()
@@ -141,7 +141,7 @@ class BhzDealerWebsite(http.Controller):
 
         return {"lead_id": lead.id}
 
-    @http.route("/bhz_dealer/snippet/cars", type="json", auth="public", website=True)
+    @http.route("/bhz_dealer/snippet/cars", type="jsonrpc", auth="public", website=True)
     def snippet_cars(self, mode="featured", brand=None, limit=6, **kw):
         website = request.website
         domain = [("active", "=", True), "|", ("website_id", "=", False), ("website_id", "=", website.id)]
