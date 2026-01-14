@@ -96,44 +96,37 @@
 
     <!-- Theme pages -->
     <record id="theme_page_guiabh_home" model="theme.website.page">
-      <field name="name">GuiaBH Home</field>
       <field name="url">/</field>
       <field name="view_id" ref="theme_view_guiabh_home"/>
       <field name="is_published" eval="True"/>
       <field name="is_new_page_template" eval="True"/>
     </record>
     <record id="theme_page_guiabh_events" model="theme.website.page">
-      <field name="name">GuiaBH Eventos</field>
       <field name="url">/eventos</field>
       <field name="view_id" ref="theme_view_guiabh_events"/>
       <field name="is_published" eval="True"/>
     </record>
     <record id="theme_page_guiabh_places" model="theme.website.page">
-      <field name="name">GuiaBH Lugares</field>
       <field name="url">/lugares</field>
       <field name="view_id" ref="theme_view_guiabh_places"/>
       <field name="is_published" eval="True"/>
     </record>
     <record id="theme_page_guiabh_agenda" model="theme.website.page">
-      <field name="name">GuiaBH Agenda</field>
       <field name="url">/agenda</field>
       <field name="view_id" ref="theme_view_guiabh_agenda"/>
       <field name="is_published" eval="True"/>
     </record>
     <record id="theme_page_guiabh_search" model="theme.website.page">
-      <field name="name">GuiaBH Buscar</field>
       <field name="url">/buscar</field>
       <field name="view_id" ref="theme_view_guiabh_search"/>
       <field name="is_published" eval="True"/>
     </record>
     <record id="theme_page_guiabh_favorites" model="theme.website.page">
-      <field name="name">GuiaBH Favoritos</field>
       <field name="url">/favoritos</field>
       <field name="view_id" ref="theme_view_guiabh_favorites"/>
       <field name="is_published" eval="True"/>
     </record>
     <record id="theme_page_guiabh_thanks" model="theme.website.page">
-      <field name="name">GuiaBH Obrigado</field>
       <field name="url">/obrigado</field>
       <field name="view_id" ref="theme_view_guiabh_thanks"/>
       <field name="is_published" eval="True"/>
