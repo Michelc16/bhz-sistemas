@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models
 from odoo.exceptions import ValidationError
-
 class BhzDealerCar(models.Model):
     _name = "bhz.dealer.car"
     _description = "Carro - Concessionária"
@@ -63,6 +62,7 @@ class BhzDealerCar(models.Model):
     is_featured = fields.Boolean("Destaque", default=False, index=True)
     owners_count = fields.Integer("Nº de donos", default=1)
     slug = fields.Char("Slug (URL)", compute="_compute_slug", store=True, index=True)
+    website_url = fields.Char("Website URL", compute="_compute_website_url", help="URL pública deste carro.")
 
     # Contato / CTA
     whatsapp = fields.Char("WhatsApp do anúncio", help="Ex: 5531999999999 (sem + e sem espaços)")
@@ -79,6 +79,12 @@ class BhzDealerCar(models.Model):
         for rec in self:
             if rec.year and (rec.year < 1950 or rec.year > 2100):
                 raise ValidationError("Ano inválido.")
+
+    def _compute_website_url(self):
+        super()._compute_website_url()
+        for rec in self:
+            slug = rec.slug or (rec.name or "").replace(" ", "-")
+            rec.website_url = f"/carros/{rec.id}-{slug}"
 
     @api.model
     def _get_fallback_website_id(self):
@@ -114,7 +120,9 @@ class BhzDealerCar(models.Model):
 
     def action_view_on_website(self):
         self.ensure_one()
-        url = f"/carros/{self.slug}" if self.slug else "/carros"
+        website = self.website_id or self.env["website"].get_current_website()
+        base = website.get_base_url() if website else self.env["ir.config_parameter"].sudo().get_param("web.base.url", "")
+        url = f"{base}{self.website_url or '/carros'}"
         return {
             "type": "ir.actions.act_url",
             "url": url,
