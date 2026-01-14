@@ -40,6 +40,8 @@ class BhzDealerWebsite(http.Controller):
         year_max = _intval(kw.get("year_max"))
         price_min = _floatval(kw.get("price_min"))
         price_max = _floatval(kw.get("price_max"))
+        km_min = _intval(kw.get("km_min"))
+        km_max = _intval(kw.get("km_max"))
         order_key = (kw.get("order") or "").strip()
 
         if q:
@@ -62,6 +64,10 @@ class BhzDealerWebsite(http.Controller):
             domain.append(("price", ">=", price_min))
         if price_max:
             domain.append(("price", "<=", price_max))
+        if km_min:
+            domain.append(("mileage_km", ">=", km_min))
+        if km_max:
+            domain.append(("mileage_km", "<=", km_max))
 
         order_map = {
             "price_asc": "is_featured desc, price asc, year desc, create_date desc",
@@ -102,6 +108,8 @@ class BhzDealerWebsite(http.Controller):
                 "year_max": year_max or "",
                 "price_min": price_min or "",
                 "price_max": price_max or "",
+                "km_min": km_min or "",
+                "km_max": km_max or "",
                 "order": order_key,
             },
             "brand_list": brand_list,

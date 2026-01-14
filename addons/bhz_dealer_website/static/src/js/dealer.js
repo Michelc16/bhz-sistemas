@@ -97,6 +97,28 @@ odoo.define("bhz_dealer_website.dealer", function (require) {
     },
   });
 
+  publicWidget.registry.BhzDealerFilterForm = publicWidget.Widget.extend({
+    selector: ".bhz-filter-form",
+    events: {
+      "input [data-price-mask]": "_sanitizeNumber",
+      "input [data-km-mask]": "_sanitizeNumber",
+      "submit": "_cleanNumbers",
+    },
+    _sanitizeNumber(ev) {
+      const $input = $(ev.currentTarget);
+      const digits = ($input.val() || "").toString().replace(/\D/g, "");
+      $input.val(digits);
+    },
+    _cleanNumbers(ev) {
+      const $form = $(ev.currentTarget);
+      $form.find("[data-price-mask],[data-km-mask]").each((_, el) => {
+        const $el = $(el);
+        const digits = ($el.val() || "").toString().replace(/\D/g, "");
+        $el.val(digits);
+      });
+    },
+  });
+
   publicWidget.registry.BhzDealerWhatsApp = publicWidget.Widget.extend({
     selector: ".bhz-dealer",
     start() {

@@ -10,21 +10,26 @@
         <t t-else="">
           <div class="bhz-car-thumb--placeholder">Sem foto</div>
         </t>
+        <div class="bhz-thumb-gradient"></div>
         <t t-if="car.is_featured">
           <span class="bhz-badge">Destaque</span>
         </t>
       </div>
       <div class="bhz-car-body">
-        <div class="bhz-car-title"><t t-esc="car.name"/></div>
-        <div class="bhz-car-meta">
-          <span><t t-esc="car.year"/></span>
-          <span>•</span>
-          <span><t t-esc="car.mileage_km"/> km</span>
-          <span>•</span>
-          <span><t t-esc="dict(car._fields['fuel'].selection).get(car.fuel)"/></span>
+        <div class="d-flex justify-content-between align-items-start gap-2">
+          <div class="bhz-car-title"><t t-esc="car.name"/></div>
+          <div class="bhz-car-price">
+            <t t-esc="car.currency_id.symbol"/> <t t-esc="('%.2f' % car.price).replace('.', ',')"/>
+          </div>
         </div>
-        <div class="bhz-car-price">
-          <t t-esc="car.currency_id.symbol"/> <t t-esc="('%.2f' % car.price).replace('.', ',')"/>
+        <div class="bhz-chip-row">
+          <span class="bhz-chip"><i class="fa fa-calendar"></i> <t t-esc="car.year"/></span>
+          <span class="bhz-chip"><i class="fa fa-tachometer"></i> <t t-esc="car.mileage_km"/> km</span>
+          <span class="bhz-chip"><i class="fa fa-bolt"></i> <t t-esc="dict(car._fields['fuel'].selection).get(car.fuel)"/></span>
+        </div>
+        <div class="bhz-chip-row">
+          <span class="bhz-chip"><i class="fa fa-cog"></i> <t t-esc="dict(car._fields['transmission'].selection).get(car.transmission)"/></span>
+          <span class="bhz-chip"><i class="fa fa-car"></i> <t t-esc="car.brand"/></span>
         </div>
       </div>
     </a>
@@ -100,6 +105,86 @@
     </section>
   </template>
 
+  <template id="snippet_dealer_highlights" name="Destaques da semana">
+    <section class="s_car_showcase o_snippet_body" data-snippet="s_dealer_highlights" data-name="Destaques da semana" data-mode="featured" data-limit="6" data-brand="">
+      <div class="container">
+        <div class="bhz-section-head">
+          <h2 contenteditable="true">Destaques da semana</h2>
+          <div class="bhz-muted" contenteditable="true">Seleção especial para você</div>
+        </div>
+        <div class="bhz-grid bhz-showcase-grid">
+          <div class="bhz-muted">Carregando ofertas...</div>
+        </div>
+      </div>
+    </section>
+  </template>
+
+  <template id="snippet_dealer_quick_search" name="Busca rápida">
+    <section class="o_snippet_body" data-snippet="s_dealer_quick_search" data-name="Busca rápida">
+      <div class="container">
+        <div class="bhz-card-glass">
+          <h3 contenteditable="true" class="fw-bold mb-2">Encontre seu carro</h3>
+          <form action="/carros" method="get" class="row g-2 bhz-filter-form">
+            <div class="col-md-3 col-6">
+              <label class="form-label">Marca</label>
+              <input class="form-control" type="text" name="brand" placeholder="Toyota"/>
+            </div>
+            <div class="col-md-3 col-6">
+              <label class="form-label">Modelo</label>
+              <input class="form-control" type="text" name="model" placeholder="Corolla"/>
+            </div>
+            <div class="col-md-3 col-6">
+              <label class="form-label">Ano mín</label>
+              <input class="form-control" type="number" name="year_min" placeholder="2018"/>
+            </div>
+            <div class="col-md-3 col-6">
+              <label class="form-label">Preço máx</label>
+              <input class="form-control" type="number" name="price_max" placeholder="120000" data-price-mask="1"/>
+            </div>
+            <div class="col-12 d-grid d-md-flex gap-2 mt-2">
+              <button class="btn btn-primary" type="submit">Buscar</button>
+              <a class="btn btn-outline-secondary" href="/carros">Ver estoque completo</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </template>
+
+  <template id="snippet_dealer_benefits" name="Benefícios / Garantia">
+    <section class="o_snippet_body" data-snippet="s_dealer_benefits" data-name="Benefícios / Garantia">
+      <div class="container">
+        <div class="bhz-section-head">
+          <h2 contenteditable="true">Por que comprar aqui?</h2>
+          <div class="bhz-muted" contenteditable="true">Transparência e confiança</div>
+        </div>
+        <div class="bhz-trust mt-3">
+          <div class="bhz-trust-item">
+            <i class="fa fa-certificate"></i>
+            <div>
+              <div class="bhz-trust-title" contenteditable="true">Garantia</div>
+              <div class="bhz-muted" contenteditable="true">Revisão completa e laudo</div>
+            </div>
+          </div>
+          <div class="bhz-trust-item">
+            <i class="fa fa-handshake-o"></i>
+            <div>
+              <div class="bhz-trust-title" contenteditable="true">Atendimento</div>
+              <div class="bhz-muted" contenteditable="true">Consultores dedicados</div>
+            </div>
+          </div>
+          <div class="bhz-trust-item">
+            <i class="fa fa-money"></i>
+            <div>
+              <div class="bhz-trust-title" contenteditable="true">Financiamento</div>
+              <div class="bhz-muted" contenteditable="true">Planos flexíveis</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </template>
+
   <template id="car_simple_card">
     <div class="bhz-simple-car py-2">
       <div>
@@ -127,52 +212,60 @@
       <t t-set="primary" t-value="config.dealer_primary_color or config.primary_color or '#0d6efd'"/>
       <t t-set="secondary" t-value="config.dealer_secondary_color or config.secondary_color or '#6610f2'"/>
       <div id="wrap" class="bhz-dealer"
-           t-att-style="'--bhz-primary:%s;--bhz-secondary:%s;' % (primary, secondary)"
+           t-att-style="'--bhz-primary:%s;--bhz-secondary:%s;--dealer-primary:%s;--dealer-secondary:%s;' % (primary, secondary, primary, secondary)"
            t-att-data-bhz-whatsapp="(config.whatsapp_number or config.whatsapp or config.phone) or ''"
            t-att-data-bhz-whatsapp-msg="'Olá, quero saber mais sobre os carros.'">
-        <section class="s_title py-5">
+        <section class="bhz-hero">
           <div class="container">
-            <div class="row align-items-center g-4">
-              <div class="col-lg-7">
+            <div class="bhz-hero-inner">
+              <div>
                 <p class="text-uppercase text-muted mb-2">Sem burocracia • Revisados • Garantia</p>
-                <h1 class="display-5 fw-bold"><t t-esc="config.hero_title or 'Encontre o próximo carro da sua garagem.'"/></h1>
-                <p class="lead text-muted"><t t-esc="config.hero_subtitle or 'Busque por marca, ano ou faixa de preço e veja os destaques selecionados.'"/></p>
+                <h1 class="bhz-hero-title"><t t-esc="config.hero_title or 'Encontre o próximo carro da sua garagem.'"/></h1>
+                <p class="bhz-hero-subtitle"><t t-esc="config.hero_subtitle or 'Busque por marca, ano ou faixa de preço e veja os destaques selecionados.'"/></p>
                 <div class="d-flex gap-2 flex-wrap mt-3">
                   <a class="btn btn-primary btn-lg" href="/carros">Ver estoque</a>
                   <a class="btn btn-outline-secondary btn-lg" href="/financiamento">Simular financiamento</a>
                 </div>
+                <div class="bhz-chip-row mt-3">
+                  <span class="bhz-chip"><i class="fa fa-shield"></i> Garantia</span>
+                  <span class="bhz-chip"><i class="fa fa-clock-o"></i> Resposta rápida</span>
+                  <span class="bhz-chip"><i class="fa fa-credit-card"></i> Financiamento fácil</span>
+                </div>
               </div>
-              <div class="col-lg-5">
+              <div>
                 <t t-set="brand_list" t-value="request.env['bhz.dealer.car'].sudo().search_read([('active','=',True),('website_id','=',request.website.id),('website_published','=',True)], ['brand'])"/>
                 <t t-set="brands" t-value="sorted({b['brand'] for b in brand_list if b.get('brand')})"/>
-                <form action="/carros" method="get" class="card shadow-sm p-3">
-                  <div class="mb-2">
-                    <label class="form-label">Marca</label>
-                    <select class="form-select" name="brand">
-                      <option value="">Todas</option>
-                      <t t-foreach="brands" t-as="b">
-                        <option t-att-value="b"><t t-esc="b"/></option>
-                      </t>
-                    </select>
-                  </div>
-                  <div class="row g-2 mb-2">
-                    <div class="col-6">
-                      <label class="form-label">Ano mín</label>
-                      <input class="form-control" type="number" name="year_min" placeholder="2015"/>
+                <div class="bhz-card-glass">
+                  <h5 class="fw-bold mb-3">Busca rápida</h5>
+                  <form action="/carros" method="get" class="bhz-hero-search">
+                    <div class="row g-2">
+                      <div class="col-12">
+                        <label class="form-label">Marca</label>
+                        <select class="form-select" name="brand">
+                          <option value="">Todas</option>
+                          <t t-foreach="brands" t-as="b">
+                            <option t-att-value="b"><t t-esc="b"/></option>
+                          </t>
+                        </select>
+                      </div>
+                      <div class="col-6">
+                        <label class="form-label">Ano mín</label>
+                        <input class="form-control" type="number" name="year_min" placeholder="2015"/>
+                      </div>
+                      <div class="col-6">
+                        <label class="form-label">Ano máx</label>
+                        <input class="form-control" type="number" name="year_max" placeholder="2024"/>
+                      </div>
+                      <div class="col-12">
+                        <label class="form-label">Preço máximo</label>
+                        <input class="form-control" type="number" name="price_max" placeholder="100000" data-price-mask="1"/>
+                      </div>
                     </div>
-                    <div class="col-6">
-                      <label class="form-label">Ano máx</label>
-                      <input class="form-control" type="number" name="year_max" placeholder="2024"/>
+                    <div class="d-grid mt-3">
+                      <button class="btn btn-primary btn-lg" type="submit">Buscar agora</button>
                     </div>
-                  </div>
-                  <div class="mb-3">
-                    <label class="form-label">Preço máximo</label>
-                    <input class="form-control" type="number" name="price_max" placeholder="100000"/>
-                  </div>
-                  <div class="d-grid">
-                    <button class="btn btn-primary btn-lg" type="submit">Buscar agora</button>
-                  </div>
-                </form>
+                  </form>
+                </div>
               </div>
             </div>
           </div>
@@ -235,7 +328,7 @@
       <t t-set="primary" t-value="config.dealer_primary_color or config.primary_color or '#0d6efd'"/>
       <t t-set="secondary" t-value="config.dealer_secondary_color or config.secondary_color or '#6610f2'"/>
       <div id="wrap" class="container py-4 bhz-dealer"
-           t-att-style="'--bhz-primary:%s;--bhz-secondary:%s;' % (primary, secondary)">
+           t-att-style="'--bhz-primary:%s;--bhz-secondary:%s;--dealer-primary:%s;--dealer-secondary:%s;' % (primary, secondary, primary, secondary)">
         <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
           <div>
             <h1 class="mb-0">Carros</h1>
@@ -254,6 +347,8 @@
               <input type="hidden" name="year_max" t-att-value="filters.get('year_max') or ''"/>
               <input type="hidden" name="price_min" t-att-value="filters.get('price_min') or ''"/>
               <input type="hidden" name="price_max" t-att-value="filters.get('price_max') or ''"/>
+              <input type="hidden" name="km_min" t-att-value="filters.get('km_min') or ''"/>
+              <input type="hidden" name="km_max" t-att-value="filters.get('km_max') or ''"/>
               <select class="form-select form-select-sm" name="order" onchange="this.form.submit()">
                 <option value="">Destaques e mais novos</option>
                 <option value="price_asc" t-att-selected="1 if filters.get('order')=='price_asc' else None">Preço (menor → maior)</option>
@@ -324,12 +419,23 @@
 
               <div class="row mt-2">
                 <div class="col-6">
+                  <label>KM mín</label>
+                  <input class="form-control" type="number" name="km_min" t-att-value="filters.get('km_min') or ''" data-km-mask="1"/>
+                </div>
+                <div class="col-6">
+                  <label>KM máx</label>
+                  <input class="form-control" type="number" name="km_max" t-att-value="filters.get('km_max') or ''" data-km-mask="1"/>
+                </div>
+              </div>
+
+              <div class="row mt-2">
+                <div class="col-6">
                   <label>Preço mín</label>
-                  <input class="form-control" type="number" step="0.01" name="price_min" t-att-value="filters.get('price_min') or ''"/>
+                  <input class="form-control" type="number" step="0.01" name="price_min" t-att-value="filters.get('price_min') or ''" data-price-mask="1"/>
                 </div>
                 <div class="col-6">
                   <label>Preço máx</label>
-                  <input class="form-control" type="number" step="0.01" name="price_max" t-att-value="filters.get('price_max') or ''"/>
+                  <input class="form-control" type="number" step="0.01" name="price_max" t-att-value="filters.get('price_max') or ''" data-price-mask="1"/>
                 </div>
               </div>
 
@@ -451,6 +557,11 @@
 
           </div>
         </section>
+        <div class="bhz-sticky-cta d-lg-none">
+          <t t-set="wa" t-value="car.whatsapp or config.whatsapp_number or (car.company_id.phone or '').replace('+','').replace(' ','')"/>
+          <a t-if="wa" class="btn btn-success w-100" t-att-href="'https://wa.me/%s?text=%s' % (wa, ('Tenho interesse no carro: %s' % car.name))">Chamar no WhatsApp</a>
+          <a t-if="not wa" class="btn btn-primary w-100" href="/contactus">Tenho interesse</a>
+        </div>
       </div>
     </t>
   </template>
