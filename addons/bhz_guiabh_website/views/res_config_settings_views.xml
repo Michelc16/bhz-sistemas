@@ -34,27 +34,27 @@
               <h3 class="mb8">Home GuiaBH</h3>
               <div class="row">
                 <div class="col-6">
-                  <label>Eventos em destaque</label>
+                  <label class="o_form_label" for="guiabh_home_limit_featured_events">Eventos em destaque</label>
                   <field name="guiabh_home_limit_featured_events"/>
                 </div>
                 <div class="col-6">
-                  <label>Próximos eventos</label>
+                  <label class="o_form_label" for="guiabh_home_limit_upcoming_events">Próximos eventos</label>
                   <field name="guiabh_home_limit_upcoming_events"/>
                 </div>
                 <div class="col-6">
-                  <label>Filmes</label>
+                  <label class="o_form_label" for="guiabh_home_limit_movies">Filmes</label>
                   <field name="guiabh_home_limit_movies"/>
                 </div>
                 <div class="col-6">
-                  <label>Jogos</label>
+                  <label class="o_form_label" for="guiabh_home_limit_matches">Jogos</label>
                   <field name="guiabh_home_limit_matches"/>
                 </div>
                 <div class="col-6">
-                  <label>Lugares</label>
+                  <label class="o_form_label" for="guiabh_home_limit_places">Lugares</label>
                   <field name="guiabh_home_limit_places"/>
                 </div>
                 <div class="col-6">
-                  <label>Banners</label>
+                  <label class="o_form_label" for="guiabh_home_limit_banners">Banners</label>
                   <field name="guiabh_home_limit_banners"/>
                 </div>
               </div>
