@@ -96,11 +96,13 @@ class GuiaBHWebsite(http.Controller):
             resp.headers["Cache-Control"] = f"public, max-age={max_age}"
         return resp
 
-    @http.route(['/manifest.webmanifest'], type='http', auth='public', website=True, sitemap=False)
+    @http.route(['/manifest.webmanifest', '/web/manifest.webmanifest'], type='http', auth='public', website=True, sitemap=False)
     def manifest(self, **kwargs):
-        """Serve a manifest to avoid 404 in builder/preview when theme is active."""
+        """Serve a manifest to avoid 404 in builder/preview/browser."""
         if not self._theme_active():
-            return request.not_found()
+            # still serve a minimal manifest to avoid console noise
+            content = '{"name": "GuiaBH","short_name": "GuiaBH","start_url": "/","display": "standalone"}'
+            return request.make_response(content, headers=[('Content-Type', 'application/manifest+json')])
         with tools.file_open('bhz_guiabh_website/static/src/manifest.webmanifest', 'r') as f:
             content = f.read()
         return request.make_response(content, headers=[('Content-Type', 'application/manifest+json')])

@@ -387,81 +387,82 @@
         <t t-set="twitter_description">Agenda viva de eventos, cinema, jogos e lugares em BH.</t>
         <t t-set="twitter_image" t-value="'/bhz_guiabh_website/static/src/img/placeholders/editorial_placeholder.svg'"/>
 
-        <!-- HERO -->
-        <section class="guiabh-hero" aria-label="Busca de eventos e lugares">
-          <div class="guia-container hero-grid">
-            <div class="hero-copy">
-              <div class="eyebrow">BH agora, sem perder tempo</div>
-              <h1>Descubra o que fazer em BH hoje</h1>
-              <p class="lead">Eventos imperdíveis, roteiros prontos e lugares incríveis — tudo em uma home só.</p>
-              <div class="search-box">
-                <form action="/eventos" method="get" class="hero-search">
-                  <input type="search" name="q" placeholder="Buscar eventos, artistas ou lugares" aria-label="Buscar"/>
-                  <button type="submit" class="btn btn-primary btn-guiabh">Buscar</button>
-                </form>
-                <div class="hero-chips js-guiabh-chip-filter" data-base-url="/eventos">
-                  <a class="hero-chip js-chip" data-param="when" data-value="today">Hoje</a>
-                  <a class="hero-chip js-chip" data-param="when" data-value="tomorrow">Amanhã</a>
-                  <a class="hero-chip js-chip" data-param="when" data-value="weekend">Fim de semana</a>
-                  <a class="hero-chip js-chip" data-param="free" data-value="1">Gratuitos</a>
+        <div id="wrap" class="oe_structure guiabh-home">
+          <!-- HERO -->
+          <section class="guiabh-hero" aria-label="Busca de eventos e lugares">
+            <div class="guia-container hero-grid">
+              <div class="hero-copy">
+                <div class="eyebrow">BH agora, sem perder tempo</div>
+                <h1>Descubra o que fazer em BH hoje</h1>
+                <p class="lead">Eventos imperdíveis, roteiros prontos e lugares incríveis — tudo em uma home só.</p>
+                <div class="search-box">
+                  <form action="/eventos" method="get" class="hero-search">
+                    <input type="search" name="q" placeholder="Buscar eventos, artistas ou lugares" aria-label="Buscar"/>
+                    <button type="submit" class="btn btn-primary btn-guiabh">Buscar</button>
+                  </form>
+                  <div class="hero-chips js-guiabh-chip-filter" data-base-url="/eventos">
+                    <a class="hero-chip js-chip" data-param="when" data-value="today">Hoje</a>
+                    <a class="hero-chip js-chip" data-param="when" data-value="tomorrow">Amanhã</a>
+                    <a class="hero-chip js-chip" data-param="when" data-value="weekend">Fim de semana</a>
+                    <a class="hero-chip js-chip" data-param="free" data-value="1">Gratuitos</a>
+                  </div>
+                </div>
+              </div>
+              <div class="hero-visual">
+                <img src="/bhz_guiabh_website/static/src/img/placeholders/editorial_placeholder.svg" alt="BH inspiradora" class="img img-fluid" loading="lazy" decoding="async"/>
+                <div class="hero-stats">
+                  <div>
+                    <strong><t t-esc="len(featured_events)"/></strong>
+                    <span>Eventos em alta</span>
+                  </div>
+                  <div>
+                    <strong><t t-esc="len(featured_places)"/></strong>
+                    <span>Lugares recomendados</span>
+                  </div>
                 </div>
               </div>
             </div>
-            <div class="hero-visual">
-              <img src="/bhz_guiabh_website/static/src/img/placeholders/editorial_placeholder.svg" alt="BH inspiradora" class="img img-fluid" loading="lazy" decoding="async"/>
-              <div class="hero-stats">
-                <div>
-                  <strong><t t-esc="len(featured_events)"/></strong>
-                  <span>Eventos em alta</span>
-                </div>
-                <div>
-                  <strong><t t-esc="len(featured_places)"/></strong>
-                  <span>Lugares recomendados</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+          </section>
 
-        <!-- Banner Destaque -->
-        <section class="py-4 guiabh-banner-section" aria-label="Banners em destaque">
-          <div class="guia-container">
-            <t t-if="banners">
-              <t t-set="carousel_id" t-value="'guiabhBannerCarousel'"/>
-              <div id="guiabhBannerCarousel" class="carousel slide" data-bs-ride="carousel">
-                <div class="carousel-inner">
-                  <t t-foreach="banners" t-as="banner">
-                    <div t-attf-class="carousel-item #{'active' if loop.first else ''}">
-                      <div class="guiabh-banner-card">
-                        <div class="ratio ratio-21x9">
-                          <img t-att-src="banner.get('image_url')" class="d-block w-100 rounded" t-att-alt="banner.get('title') or 'Banner GuiaBH'" loading="lazy" decoding="async"/>
-                        </div>
-                        <div class="guiabh-banner-caption">
-                          <h3><t t-esc="banner.get('title')"/></h3>
-                          <p class="text-muted"><t t-esc="banner.get('subtitle')"/></p>
-                          <a t-att-href="banner.get('link_url') or '#'" class="btn btn-primary btn-guiabh">Saiba mais</a>
+          <!-- Banner Destaque -->
+          <section class="py-4 guiabh-banner-section" aria-label="Banners em destaque">
+            <div class="guia-container">
+              <t t-if="banners">
+                <t t-set="carousel_id" t-value="'guiabhBannerCarousel'"/>
+                <div id="guiabhBannerCarousel" class="carousel slide" data-bs-ride="carousel">
+                  <div class="carousel-inner">
+                    <t t-foreach="banners" t-as="banner">
+                      <div t-attf-class="carousel-item #{'active' if loop.first else ''}">
+                        <div class="guiabh-banner-card">
+                          <div class="ratio ratio-21x9">
+                            <img t-att-src="banner.get('image_url')" class="d-block w-100 rounded" t-att-alt="banner.get('title') or 'Banner GuiaBH'" loading="lazy" decoding="async"/>
+                          </div>
+                          <div class="guiabh-banner-caption">
+                            <h3><t t-esc="banner.get('title')"/></h3>
+                            <p class="text-muted"><t t-esc="banner.get('subtitle')"/></p>
+                            <a t-att-href="banner.get('link_url') or '#'" class="btn btn-primary btn-guiabh">Saiba mais</a>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </t>
+                    </t>
+                  </div>
+                  <button class="carousel-control-prev" type="button" t-att-data-bs-target="'#'+carousel_id" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Anterior</span>
+                  </button>
+                  <button class="carousel-control-next" type="button" t-att-data-bs-target="'#'+carousel_id" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Próximo</span>
+                  </button>
                 </div>
-                <button class="carousel-control-prev" type="button" t-att-data-bs-target="'#'+carousel_id" data-bs-slide="prev">
-                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                  <span class="visually-hidden">Anterior</span>
-                </button>
-                <button class="carousel-control-next" type="button" t-att-data-bs-target="'#'+carousel_id" data-bs-slide="next">
-                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                  <span class="visually-hidden">Próximo</span>
-                </button>
-              </div>
-            </t>
-            <t t-else="">
-              <div class="guiabh-empty text-center">
-                <p>Cadastre banners para destaques rápidos.</p>
-              </div>
-            </t>
-          </div>
-        </section>
+              </t>
+              <t t-else="">
+                <div class="guiabh-empty text-center">
+                  <p>Cadastre banners para destaques rápidos.</p>
+                </div>
+              </t>
+            </div>
+          </section>
 
         <!-- Carrossel Destaques -->
         <section class="py-4 bg-soft" aria-label="Destaques do GuiaBH">
