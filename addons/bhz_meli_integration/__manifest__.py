@@ -1,7 +1,7 @@
 {
     "name": "BHZ - Integração Mercado Livre",
     "summary": "Integra contas do Mercado Livre com o Odoo usando app única da BHZ.",
-    "version": "19.0.1.0.0",
+    "version": "19.0.1.1.0",
     "author": "BHZ Sistemas",
     "website": "https://www.bhzsistemas.com.br",
     "license": "LGPL-3",
