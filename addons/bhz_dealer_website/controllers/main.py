@@ -7,8 +7,11 @@ class BhzDealerWebsite(http.Controller):
     @http.route(["/carros"], type="http", auth="public", website=True, sitemap=True)
     def cars_listing(self, page=1, **kw):
         website = request.website
+        config = request.env["bhz.dealer.website.config"].sudo().get_for_website(website)
+        if not config or not config.dealer_enabled:
+            return request.not_found()
         Car = request.env["bhz.dealer.car"].sudo()
-        domain = [("active", "=", True), ("website_id", "=", website.id)]
+        domain = [("active", "=", True), ("website_published", "=", True), ("website_id", "=", website.id)]
 
         def _intval(val):
             try:
@@ -81,7 +84,7 @@ class BhzDealerWebsite(http.Controller):
 
         cars = Car.search(domain, order=order_by, limit=step, offset=pager["offset"])
 
-        brands = Car.search_read([("active", "=", True), ("website_id", "=", website.id)], ["brand"])
+        brands = Car.search_read([("active", "=", True), ("website_published", "=", True), ("website_id", "=", website.id)], ["brand"])
         brand_list = sorted({b["brand"] for b in brands if b.get("brand")})
 
         values = {
@@ -102,18 +105,22 @@ class BhzDealerWebsite(http.Controller):
                 "order": order_key,
             },
             "brand_list": brand_list,
+            "config": config,
         }
-        return request.render("bhz_dealer_website.page_car_list", values)
+        return request.render("bhz_dealer_website.template_dealer_car_list", values)
 
     @http.route(["/carros/<int:car_id>", "/carros/<int:car_id>-<string:slug>"], type="http", auth="public", website=True, sitemap=True)
     def car_detail(self, car_id, slug=None, **kw):
+        config = request.env["bhz.dealer.website.config"].sudo().get_for_website(request.website)
+        if not config or not config.dealer_enabled:
+            return request.not_found()
         car = request.env["bhz.dealer.car"].sudo().browse(car_id).exists()
 
         website = request.website
-        if not car or not car.active or car.website_id.id != website.id:
+        if not car or not car.active or not car.website_published or car.website_id.id != website.id:
             return request.not_found()
 
-        return request.render("bhz_dealer_website.page_car_detail", {"car": car, "website": website})
+        return request.render("bhz_dealer_website.template_dealer_car_detail", {"car": car, "website": website, "config": config})
 
     @http.route("/carros/lead", type="jsonrpc", auth="public", website=True, methods=["POST"])
     def car_lead(self, car_id=None, name=None, phone=None, email=None, message=None, **kw):
@@ -144,7 +151,10 @@ class BhzDealerWebsite(http.Controller):
     @http.route("/bhz_dealer/snippet/cars", type="jsonrpc", auth="public", website=True)
     def snippet_cars(self, mode="featured", brand=None, limit=6, **kw):
         website = request.website
-        domain = [("active", "=", True), "|", ("website_id", "=", False), ("website_id", "=", website.id)]
+        config = request.env["bhz.dealer.website.config"].sudo().get_for_website(website)
+        if not config or not config.dealer_enabled:
+            return {"html": ""}
+        domain = [("active", "=", True), ("website_published", "=", True), ("website_id", "=", website.id)]
 
         try:
             limit = int(limit)

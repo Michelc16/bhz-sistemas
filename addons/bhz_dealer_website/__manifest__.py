@@ -13,12 +13,9 @@
         "views/car_views.xml",
         "views/config_views.xml",
         "views/dealer_menu.xml",
-        "views/website_menus.xml",
-        "views/website_views.xml",
         "views/website_templates.xml",
-        "views/website_pages.xml",
+        "views/website_views.xml",
         "data/demo.xml",
-        "data/website_data.xml",
     ],
     "assets": {
         "web.assets_frontend": [

@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
   <data>
-    <!-- Espaço reservado para futuras definições de views/menus do website.
-         Snippet picker removido para evitar xpath frágil em temas. -->
+    <menuitem id="menu_bhz_dealer_config_website"
+              name="Dealer"
+              parent="website.menu_website_configuration"
+              action="bhz_dealer_website.action_bhz_dealer_config"
+              sequence="50"
+              groups="bhz_dealer_website.group_bhz_dealer_manager"/>
   </data>
 </odoo>

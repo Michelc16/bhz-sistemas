@@ -8,10 +8,10 @@
       <field name="arch" type="xml">
         <list string="Configurações do site">
           <field name="website_id"/>
-          <field name="primary_color"/>
-          <field name="secondary_color"/>
-          <field name="hero_title"/>
-          <field name="whatsapp"/>
+          <field name="dealer_enabled"/>
+          <field name="dealer_primary_color"/>
+          <field name="dealer_secondary_color"/>
+          <field name="whatsapp_number"/>
         </list>
       </field>
     </record>
@@ -25,8 +25,12 @@
             <group>
               <field name="website_id"/>
               <group>
-                <field name="primary_color" widget="color"/>
-                <field name="secondary_color" widget="color"/>
+                <field name="dealer_enabled"/>
+                <field name="reveal_phone"/>
+              </group>
+              <group>
+                <field name="dealer_primary_color" widget="color"/>
+                <field name="dealer_secondary_color" widget="color"/>
               </group>
             </group>
             <notebook>
@@ -40,7 +44,8 @@
               <page string="Contato">
                 <group>
                   <field name="phone"/>
-                  <field name="whatsapp"/>
+                  <field name="whatsapp_number"/>
+                  <field name="cta_label"/>
                   <field name="address"/>
                   <field name="instagram_url"/>
                 </group>
