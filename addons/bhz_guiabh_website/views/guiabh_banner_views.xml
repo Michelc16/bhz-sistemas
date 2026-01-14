@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
   <data>
-    <record id="view_guiabh_banner_tree" model="ir.ui.view">
-      <field name="name">guiabh.banner.tree</field>
+    <record id="view_guiabh_banner_list" model="ir.ui.view">
+      <field name="name">guiabh.banner.list</field>
       <field name="model">guiabh.banner</field>
       <field name="arch" type="xml">
-        <tree string="Banners">
+        <list string="Banners">
           <field name="sequence" widget="handle"/>
           <field name="name"/>
           <field name="subtitle"/>
@@ -13,7 +13,7 @@
           <field name="date_start"/>
           <field name="date_end"/>
           <field name="active"/>
-        </tree>
+        </list>
       </field>
     </record>
 
