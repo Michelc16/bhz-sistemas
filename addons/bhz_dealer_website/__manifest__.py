@@ -13,13 +13,18 @@
         "views/car_views.xml",
         "views/config_views.xml",
         "views/dealer_menu.xml",
-        "views/website_templates.xml",
         "views/website_views.xml",
     ],
     "assets": {
         "web.assets_frontend": [
             "bhz_dealer_website/static/src/scss/dealer.scss",
             "bhz_dealer_website/static/src/js/dealer.js",
+        ],
+        "web.assets_qweb": [
+            "bhz_dealer_website/views/website_templates.xml",
+        ],
+        "website.assets_editor": [
+            "bhz_dealer_website/views/website_templates.xml",
         ],
     },
     "demo": [
