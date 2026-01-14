@@ -15,7 +15,6 @@
         "views/dealer_menu.xml",
         "views/website_templates.xml",
         "views/website_views.xml",
-        "data/demo.xml",
     ],
     "assets": {
         "web.assets_frontend": [
@@ -23,6 +22,9 @@
             "bhz_dealer_website/static/src/js/dealer.js",
         ],
     },
+    "demo": [
+        "data/demo.xml",
+    ],
     "application": True,
     "installable": True,
 }

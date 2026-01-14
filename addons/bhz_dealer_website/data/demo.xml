@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo noupdate="1">
   <data>
+    <!-- Config demo: habilita dealer e cores para website padrão (demo only) -->
+    <record id="bhz_dealer_config_demo" model="bhz.dealer.website.config">
+      <field name="website_id" ref="website.default_website"/>
+      <field name="dealer_enabled">True</field>
+      <field name="dealer_primary_color">#e60023</field>
+      <field name="dealer_secondary_color">#0d6efd</field>
+      <field name="whatsapp_number">5531999999999</field>
+      <field name="cta_label">Quero atendimento</field>
+      <field name="hero_title">Encontre o carro certo para você.</field>
+      <field name="hero_subtitle">Sem burocracia, revisados e com garantia estendida.</field>
+    </record>
+
+    <!-- Carros demo -->
     <record id="car_demo_1" model="bhz.dealer.car">
       <field name="name">Honda Civic Touring 2021</field>
       <field name="brand">Honda</field>
@@ -13,6 +26,8 @@
       <field name="transmission">auto</field>
       <field name="condition">seminovo</field>
       <field name="is_featured">True</field>
+      <field name="website_published">True</field>
+      <field name="website_id" ref="website.default_website"/>
       <field name="features">Teto solar
 Bancos em couro
 Multimídia</field>
@@ -30,9 +45,213 @@ Multimídia</field>
       <field name="transmission">auto</field>
       <field name="condition">seminovo</field>
       <field name="is_featured">True</field>
+      <field name="website_published">True</field>
+      <field name="website_id" ref="website.default_website"/>
       <field name="features">Piloto automático
 Câmera de ré
 Sensores</field>
     </record>
+
+    <record id="car_demo_3" model="bhz.dealer.car">
+      <field name="name">Jeep Compass Limited 2023</field>
+      <field name="brand">Jeep</field>
+      <field name="model">Compass</field>
+      <field name="trim">Limited T270</field>
+      <field name="year">2023</field>
+      <field name="price">179900</field>
+      <field name="mileage_km">12000</field>
+      <field name="fuel">flex</field>
+      <field name="transmission">auto</field>
+      <field name="condition">seminovo</field>
+      <field name="is_featured">True</field>
+      <field name="website_published">True</field>
+      <field name="website_id" ref="website.default_website"/>
+    </record>
+
+    <record id="car_demo_4" model="bhz.dealer.car">
+      <field name="name">Chevrolet Onix LT 1.0 2020</field>
+      <field name="brand">Chevrolet</field>
+      <field name="model">Onix</field>
+      <field name="trim">LT</field>
+      <field name="year">2020</field>
+      <field name="price">69900</field>
+      <field name="mileage_km">52000</field>
+      <field name="fuel">flex</field>
+      <field name="transmission">manual</field>
+      <field name="condition">used</field>
+      <field name="website_published">True</field>
+      <field name="website_id" ref="website.default_website"/>
+    </record>
+
+    <record id="car_demo_5" model="bhz.dealer.car">
+      <field name="name">Volkswagen T-Cross Highline 2022</field>
+      <field name="brand">Volkswagen</field>
+      <field name="model">T-Cross</field>
+      <field name="trim">Highline 250 TSI</field>
+      <field name="year">2022</field>
+      <field name="price">154900</field>
+      <field name="mileage_km">18000</field>
+      <field name="fuel">flex</field>
+      <field name="transmission">auto</field>
+      <field name="condition">seminovo</field>
+      <field name="is_featured">True</field>
+      <field name="website_published">True</field>
+      <field name="website_id" ref="website.default_website"/>
+    </record>
+
+    <record id="car_demo_6" model="bhz.dealer.car">
+      <field name="name">Fiat Pulse Audace 2023</field>
+      <field name="brand">Fiat</field>
+      <field name="model">Pulse</field>
+      <field name="trim">Audace</field>
+      <field name="year">2023</field>
+      <field name="price">99900</field>
+      <field name="mileage_km">8000</field>
+      <field name="fuel">flex</field>
+      <field name="transmission">cvt</field>
+      <field name="condition">seminovo</field>
+      <field name="website_published">True</field>
+      <field name="website_id" ref="website.default_website"/>
+    </record>
+
+    <record id="car_demo_7" model="bhz.dealer.car">
+      <field name="name">Renault Kwid Zen 2021</field>
+      <field name="brand">Renault</field>
+      <field name="model">Kwid</field>
+      <field name="trim">Zen</field>
+      <field name="year">2021</field>
+      <field name="price">47900</field>
+      <field name="mileage_km">35000</field>
+      <field name="fuel">flex</field>
+      <field name="transmission">manual</field>
+      <field name="condition">used</field>
+      <field name="website_published">True</field>
+      <field name="website_id" ref="website.default_website"/>
+    </record>
+
+    <record id="car_demo_8" model="bhz.dealer.car">
+      <field name="name">Hyundai HB20S Platinum 2024</field>
+      <field name="brand">Hyundai</field>
+      <field name="model">HB20S</field>
+      <field name="trim">Platinum</field>
+      <field name="year">2024</field>
+      <field name="price">114900</field>
+      <field name="mileage_km">5000</field>
+      <field name="fuel">flex</field>
+      <field name="transmission">auto</field>
+      <field name="condition">new</field>
+      <field name="is_featured">True</field>
+      <field name="website_published">True</field>
+      <field name="website_id" ref="website.default_website"/>
+    </record>
+
+    <record id="car_demo_9" model="bhz.dealer.car">
+      <field name="name">Nissan Kicks SV 2023</field>
+      <field name="brand">Nissan</field>
+      <field name="model">Kicks</field>
+      <field name="trim">SV</field>
+      <field name="year">2023</field>
+      <field name="price">119900</field>
+      <field name="mileage_km">15000</field>
+      <field name="fuel">flex</field>
+      <field name="transmission">cvt</field>
+      <field name="condition">seminovo</field>
+      <field name="website_published">True</field>
+      <field name="website_id" ref="website.default_website"/>
+    </record>
+
+    <record id="car_demo_10" model="bhz.dealer.car">
+      <field name="name">BMW 320i GP 2020</field>
+      <field name="brand">BMW</field>
+      <field name="model">320i</field>
+      <field name="trim">GP</field>
+      <field name="year">2020</field>
+      <field name="price">219900</field>
+      <field name="mileage_km">39000</field>
+      <field name="fuel">gasoline</field>
+      <field name="transmission">auto</field>
+      <field name="condition">seminovo</field>
+      <field name="is_featured">True</field>
+      <field name="website_published">True</field>
+      <field name="website_id" ref="website.default_website"/>
+    </record>
+
+    <!-- Páginas institucionais demo (ligadas ao website padrão) -->
+    <record id="view_demo_guarantee" model="ir.ui.view">
+      <field name="name">bhz.dealer.demo.guarantee</field>
+      <field name="type">qweb</field>
+      <field name="arch" type="xml">
+        <template name="Garantia Dealer" page="True">
+          <t t-call="website.layout">
+            <div id="wrap" class="container py-5">
+              <h1 class="mb-3">Garantia Estendida</h1>
+              <p class="lead">Nosso estoque passa por inspeção e entrega com garantia.</p>
+              <ul>
+                <li>Laudo cautelar aprovado.</li>
+                <li>Garantia de motor e câmbio.</li>
+                <li>Assistência para transferência.</li>
+              </ul>
+            </div>
+          </t>
+        </template>
+      </field>
+    </record>
+
+    <record id="page_demo_guarantee" model="website.page">
+      <field name="name">Garantia</field>
+      <field name="website_id" ref="website.default_website"/>
+      <field name="url">/garantia</field>
+      <field name="view_id" ref="view_demo_guarantee"/>
+      <field name="is_published">True</field>
+    </record>
+
+    <record id="view_demo_financing" model="ir.ui.view">
+      <field name="name">bhz.dealer.demo.financing</field>
+      <field name="type">qweb</field>
+      <field name="arch" type="xml">
+        <template name="Financiamento Dealer" page="True">
+          <t t-call="website.layout">
+            <div id="wrap" class="container py-5">
+              <h1 class="mb-3">Financiamento fácil</h1>
+              <p class="lead">Simule e aprove com nossos parceiros.</p>
+              <p>Taxas competitivas, aprovação online e análise rápida.</p>
+            </div>
+          </t>
+        </template>
+      </field>
+    </record>
+
+    <record id="page_demo_financing" model="website.page">
+      <field name="name">Financiamento</field>
+      <field name="website_id" ref="website.default_website"/>
+      <field name="url">/financiamento-demo</field>
+      <field name="view_id" ref="view_demo_financing"/>
+      <field name="is_published">True</field>
+    </record>
+
+    <record id="view_demo_about" model="ir.ui.view">
+      <field name="name">bhz.dealer.demo.about</field>
+      <field name="type">qweb</field>
+      <field name="arch" type="xml">
+        <template name="Sobre a Concessionária" page="True">
+          <t t-call="website.layout">
+            <div id="wrap" class="container py-5">
+              <h1 class="mb-3">Sobre a Concessionária Demo</h1>
+              <p>Time especializado, estoque revisado e atendimento humanizado.</p>
+              <p class="text-muted">Exemplo para ambientes de demonstração.</p>
+            </div>
+          </t>
+        </template>
+      </field>
+    </record>
+
+    <record id="page_demo_about" model="website.page">
+      <field name="name">Sobre</field>
+      <field name="website_id" ref="website.default_website"/>
+      <field name="url">/sobre-demo</field>
+      <field name="view_id" ref="view_demo_about"/>
+      <field name="is_published">True</field>
+    </record>
+
   </data>
 </odoo>
