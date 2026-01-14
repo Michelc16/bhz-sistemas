@@ -1,7 +1,7 @@
 {
     "name": "BHZ Dealer Website",
     "version": "19.0.1.0.1",
-    "category": "Website",
+    "category": "Theme",
     "summary": "Site moderno para concessionárias: estoque, detalhe do carro, filtros e captação de leads.",
     "description": "Aplicativo BHZ Dealer para publicar estoque de carros, páginas de detalhe e captação de leads no site.",
     "author": "BHZ Sistemas",
@@ -13,7 +13,6 @@
         "views/car_views.xml",
         "views/config_views.xml",
         "views/dealer_menu.xml",
-        "views/website_templates.xml",
         "views/website_views.xml",
     ],
     "assets": {
@@ -25,6 +24,6 @@
     "demo": [
         "data/demo.xml",
     ],
-    "application": True,
+    "application": False,
     "installable": True,
 }
