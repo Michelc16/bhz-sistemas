@@ -430,7 +430,7 @@
               <t t-set="carousel_id" t-value="'guiabhBannerCarousel'"/>
               <div id="guiabhBannerCarousel" class="carousel slide" data-bs-ride="carousel">
                 <div class="carousel-inner">
-                  <t t-foreach="banners" t-as="banner" t-key="banner_index">
+                  <t t-foreach="banners" t-as="banner">
                     <div t-attf-class="carousel-item #{'active' if loop.first else ''}">
                       <div class="guiabh-banner-card">
                         <div class="ratio ratio-21x9">

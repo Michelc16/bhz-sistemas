@@ -93,12 +93,8 @@ publicWidget.registry.GuiabhDynamicSnippet = publicWidget.Widget.extend({
         reload: '_load',
     },
     start() {
-        // Run after iframe is ready; if not, defer.
-        if (this.el.isConnected) {
-            this._load();
-        } else {
-            setTimeout(() => this._load(), 0);
-        }
+        // Run after iframe is ready; if not, defer to next tick.
+        setTimeout(() => this._load(), 0);
         return this._super(...arguments);
     },
     _params() {

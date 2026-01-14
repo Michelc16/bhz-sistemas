@@ -215,7 +215,9 @@ class GuiaBHContentBridge(models.AbstractModel):
         website = website or self.env["website"].get_current_website()
         Banner = self._get_model("guiabh.banner")
         if not Banner:
-            return []
+            # fallback: build banners from featured content
+            return self._build_featured_banners(limit=limit, website=website)
+
         now = fields.Datetime.now()
         domain = [
             ("active", "=", True),
@@ -233,7 +235,35 @@ class GuiaBHContentBridge(models.AbstractModel):
                 "image_url": img,
                 "link_url": bn.link_url or "#",
             })
+
+        # If no explicit banners, auto-build from featured content without copying records.
+        if not data:
+            data = self._build_featured_banners(limit=limit, website=website)
         return data
+
+    def _build_featured_banners(self, limit=8, website=None):
+        """Build banners from featured content across sources (no duplication)."""
+        website = website or self.env["website"].get_current_website()
+        items = []
+
+        def _add(entries, kind_label):
+            for entry in entries or []:
+                items.append({
+                    "title": entry.get("title"),
+                    "subtitle": ", ".join(entry.get("tags") or []) or kind_label,
+                    "image_url": entry.get("image_url") or entry.get("cover") or self._placeholder("event"),
+                    "link_url": entry.get("url") or "#",
+                    "priority": entry.get("editorial_priority") or 50,
+                })
+
+        _add(self.get_featured_events(limit=limit, website=website), "Evento")
+        _add(self.get_featured_places(limit=limit, website=website), "Lugar")
+        _add(self.get_now_playing_movies(limit=limit, website=website), "Cinema")
+        _add(self.get_upcoming_matches(limit=limit, website=website), "Jogo")
+
+        # sort by priority and date-like info if available
+        items = sorted(items, key=lambda i: i.get("priority", 50))
+        return items[:limit]
 
     # Fallbacks -----------------------------------------------------------
     def _fallback_events(self, featured=False, limit=6, date_window=30, website=None):

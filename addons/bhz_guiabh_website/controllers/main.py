@@ -89,8 +89,10 @@ class GuiaBHWebsite(http.Controller):
         return placeholder or ""
 
     def _render_cache(self, template, values, max_age=300):
+        # Avoid caching when editing to ensure builder gets fresh DOM.
+        is_edit = request.params.get('edit') or request.params.get('enable_editor')
         resp = request.render(template, values)
-        if hasattr(resp, "headers"):
+        if hasattr(resp, "headers") and not is_edit:
             resp.headers["Cache-Control"] = f"public, max-age={max_age}"
         return resp
 
