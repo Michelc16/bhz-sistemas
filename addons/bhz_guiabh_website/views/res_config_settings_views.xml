@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <record id="view_website_config_settings_guiabh" model="ir.ui.view">
+      <field name="name">website.config.settings.guiabh</field>
+      <field name="model">res.config.settings</field>
+      <field name="inherit_id" ref="website.res_config_settings_view_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//div[@id='website_features']" position="inside">
+          <div class="row mt16">
+            <div class="col-12 col-lg-6">
+              <h3 class="mb8">GuiaBH</h3>
+              <div class="mb4">
+                <label for="guiabh_create_site">Criar site GuiaBH</label>
+              </div>
+              <div class="o_form_label o_form_label_help">
+                <field name="guiabh_create_site"/>
+                <span class="text-muted">Cria um novo website dedicado ao GuiaBH (não altera sites existentes).</span>
+              </div>
+              <div class="o_form_label o_form_label_help">
+                <label for="guiabh_site_name">Nome do site</label>
+                <field name="guiabh_site_name"/>
+                <span class="text-muted">Nome para o novo site (opcional).</span>
+              </div>
+              <div class="o_form_label o_form_label_help">
+                <field name="guiabh_apply_theme"/>
+                <span class="text-muted">Aplica o tema GuiaBH somente no novo site criado.</span>
+              </div>
+              <div class="alert alert-info mt8">
+                <p class="mb0">As alterações acima só executam ao salvar as configurações. Nada é aplicado automaticamente na instalação.</p>
+              </div>
+            </div>
+            <div class="col-12 col-lg-6">
+              <h3 class="mb8">Home GuiaBH</h3>
+              <div class="row">
+                <div class="col-6">
+                  <label>Eventos em destaque</label>
+                  <field name="guiabh_home_limit_featured_events"/>
+                </div>
+                <div class="col-6">
+                  <label>Próximos eventos</label>
+                  <field name="guiabh_home_limit_upcoming_events"/>
+                </div>
+                <div class="col-6">
+                  <label>Filmes</label>
+                  <field name="guiabh_home_limit_movies"/>
+                </div>
+                <div class="col-6">
+                  <label>Jogos</label>
+                  <field name="guiabh_home_limit_matches"/>
+                </div>
+                <div class="col-6">
+                  <label>Lugares</label>
+                  <field name="guiabh_home_limit_places"/>
+                </div>
+                <div class="col-6">
+                  <label>Banners</label>
+                  <field name="guiabh_home_limit_banners"/>
+                </div>
+              </div>
+            </div>
+          </div>
+        </xpath>
+      </field>
+    </record>
+  </data>
+</odoo>

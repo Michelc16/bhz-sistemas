@@ -174,6 +174,67 @@ class GuiaBHContentBridge(models.AbstractModel):
                         break
         return items[:limit]
 
+    # Provider API (normalized cards) ------------------------------------
+    @api.model
+    def provider_events(self, limit=6, website=None):
+        """Normalized events from bhz_event_promo or fallback."""
+        events = self.get_featured_events(limit=limit, website=website)
+        if len(events) < limit:
+            events += self.get_upcoming_events(limit=limit - len(events), date_window=45, website=website)
+        return [self._normalize_card(ev) for ev in events][:limit]
+
+    @api.model
+    def provider_movies(self, limit=6, website=None):
+        movies = self.get_now_playing_movies(limit=limit, website=website)
+        return [self._normalize_card(mv) for mv in movies][:limit]
+
+    @api.model
+    def provider_matches(self, limit=6, website=None):
+        matches = self.get_upcoming_matches(limit=limit, date_window=45, website=website)
+        return [self._normalize_card(mt) for mt in matches][:limit]
+
+    @api.model
+    def provider_places(self, limit=6, website=None):
+        places = self.get_featured_places(limit=limit, website=website)
+        return [self._normalize_card(pl) for pl in places][:limit]
+
+    @api.model
+    def provider_feed(self, limit=20, website=None):
+        """Aggregate feed combining events, movies, matches, places."""
+        website = website or self.env["website"].get_current_website()
+        per_kind = max(1, int(limit / 4))
+        feed = []
+        feed += self.provider_events(limit=per_kind, website=website)
+        feed += self.provider_movies(limit=per_kind, website=website)
+        feed += self.provider_matches(limit=per_kind, website=website)
+        feed += self.provider_places(limit=per_kind, website=website)
+        return feed[:limit]
+
+    @api.model
+    def get_banners(self, limit=8, website=None):
+        website = website or self.env["website"].get_current_website()
+        Banner = self._get_model("guiabh.banner")
+        if not Banner:
+            return []
+        now = fields.Datetime.now()
+        domain = [
+            ("active", "=", True),
+            "|", ("date_start", "=", False), ("date_start", "<=", now),
+            "|", ("date_end", "=", False), ("date_end", ">=", now),
+        ]
+        domain += self._website_domain(Banner, website)
+        banners = Banner.search(domain, order="sequence asc, id asc", limit=limit)
+        data = []
+        for bn in banners:
+            img = self._image_url(bn, "image", width=1920, height=800, placeholder=self._placeholder("event"))
+            data.append({
+                "title": bn.name,
+                "subtitle": bn.subtitle or "",
+                "image_url": img,
+                "link_url": bn.link_url or "#",
+            })
+        return data
+
     # Fallbacks -----------------------------------------------------------
     def _fallback_events(self, featured=False, limit=6, date_window=30, website=None):
         Event = self._get_model("guiabh.event")
@@ -340,4 +401,16 @@ class GuiaBHContentBridge(models.AbstractModel):
             "cta_label": "Detalhes",
             "home_logo": home_logo,
             "away_logo": away_logo,
+        }
+
+    def _normalize_card(self, item):
+        """Return a normalized structure shared across providers."""
+        return {
+            "kind": item.get("kind"),
+            "title": item.get("title"),
+            "cover": item.get("image_url"),
+            "date": item.get("date_label") or "",
+            "url": item.get("url"),
+            "tags": item.get("meta") or [],
+            "is_featured": "Destaque" in (item.get("badges") or []),
         }

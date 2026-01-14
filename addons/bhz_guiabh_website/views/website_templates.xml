@@ -382,6 +382,10 @@
         <t t-set="website_meta_description">Encontre eventos, shows, teatros, bares e passeios em BH com uma experiência moderna.</t>
         <t t-set="canonical_url" t-value="request.httprequest.url"/>
         <t t-set="og_image" t-value="'/bhz_guiabh_website/static/src/img/placeholders/editorial_placeholder.svg'"/>
+        <t t-set="twitter_card">summary_large_image</t>
+        <t t-set="twitter_title">GuiaBH - Eventos e Lugares em Belo Horizonte</t>
+        <t t-set="twitter_description">Agenda viva de eventos, cinema, jogos e lugares em BH.</t>
+        <t t-set="twitter_image" t-value="'/bhz_guiabh_website/static/src/img/placeholders/editorial_placeholder.svg'"/>
 
         <!-- HERO -->
         <section class="guiabh-hero" aria-label="Busca de eventos e lugares">
@@ -404,7 +408,7 @@
               </div>
             </div>
             <div class="hero-visual">
-              <img src="/bhz_guiabh_website/static/src/img/placeholders/editorial_placeholder.svg" alt="BH inspiradora" class="img img-fluid" loading="lazy"/>
+              <img src="/bhz_guiabh_website/static/src/img/placeholders/editorial_placeholder.svg" alt="BH inspiradora" class="img img-fluid" loading="lazy" decoding="async"/>
               <div class="hero-stats">
                 <div>
                   <strong><t t-esc="len(featured_events)"/></strong>
@@ -416,6 +420,46 @@
                 </div>
               </div>
             </div>
+          </div>
+        </section>
+
+        <!-- Banner Destaque -->
+        <section class="py-4 guiabh-banner-section" aria-label="Banners em destaque">
+          <div class="guia-container">
+            <t t-if="banners">
+              <t t-set="carousel_id" t-value="'guiabhBannerCarousel'"/>
+              <div id="guiabhBannerCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                  <t t-foreach="banners" t-as="banner" t-key="banner_index">
+                    <div t-attf-class="carousel-item #{'active' if loop.first else ''}">
+                      <div class="guiabh-banner-card">
+                        <div class="ratio ratio-21x9">
+                          <img t-att-src="banner.get('image_url')" class="d-block w-100 rounded" t-att-alt="banner.get('title') or 'Banner GuiaBH'" loading="lazy" decoding="async"/>
+                        </div>
+                        <div class="guiabh-banner-caption">
+                          <h3><t t-esc="banner.get('title')"/></h3>
+                          <p class="text-muted"><t t-esc="banner.get('subtitle')"/></p>
+                          <a t-att-href="banner.get('link_url') or '#'" class="btn btn-primary btn-guiabh">Saiba mais</a>
+                        </div>
+                      </div>
+                    </div>
+                  </t>
+                </div>
+                <button class="carousel-control-prev" type="button" t-att-data-bs-target="'#'+carousel_id" data-bs-slide="prev">
+                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Anterior</span>
+                </button>
+                <button class="carousel-control-next" type="button" t-att-data-bs-target="'#'+carousel_id" data-bs-slide="next">
+                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Próximo</span>
+                </button>
+              </div>
+            </t>
+            <t t-else="">
+              <div class="guiabh-empty text-center">
+                <p>Cadastre banners para destaques rápidos.</p>
+              </div>
+            </t>
           </div>
         </section>
 
@@ -804,6 +848,10 @@
         <t t-set="og_title" t-value="event.name"/>
         <t t-set="og_description" t-value="(event.short_description or event.name)[:160]"/>
         <t t-set="og_image" t-value="event.cover_image and '/web/image/guiabh.event/%s/cover_image' % event.id or '/bhz_guiabh_website/static/src/img/placeholders/event_placeholder.svg'"/>
+        <t t-set="twitter_card">summary_large_image</t>
+        <t t-set="twitter_title" t-value="event.name"/>
+        <t t-set="twitter_description" t-value="(event.short_description or event.name)[:160]"/>
+        <t t-set="twitter_image" t-value="event.cover_image and '/web/image/guiabh.event/%s/cover_image' % event.id or '/bhz_guiabh_website/static/src/img/placeholders/event_placeholder.svg'"/>
         <t t-set="canonical_url" t-value="request.httprequest.url"/>
         <t t-set="json_ld">
           <script type="application/ld+json">
@@ -825,7 +873,7 @@
           <div class="guia-container">
             <div class="row g-4 align-items-start">
               <div class="col-lg-7">
-                <img class="img img-fluid rounded w-100" t-att-src="event.cover_image and '/web/image/guiabh.event/%s/cover_image/1200/700' % event.id or '/bhz_guiabh_website/static/src/img/placeholders/event_placeholder.svg'" t-att-alt="event.name" loading="lazy"/>
+                <img class="img img-fluid rounded w-100" t-att-src="event.cover_image and '/web/image/guiabh.event/%s/cover_image/1200/700' % event.id or '/bhz_guiabh_website/static/src/img/placeholders/event_placeholder.svg'" t-att-alt="event.name" loading="lazy" decoding="async"/>
               </div>
               <div class="col-lg-5">
                 <t t-if="event.start_datetime">
@@ -952,6 +1000,10 @@
         <t t-set="og_title" t-value="place.name"/>
         <t t-set="og_description" t-value="(place.short_description or place.name)[:160]"/>
         <t t-set="og_image" t-value="place.cover_image and '/web/image/guiabh.place/%s/cover_image' % place.id or '/bhz_guiabh_website/static/src/img/placeholders/place_placeholder.svg'"/>
+        <t t-set="twitter_card">summary_large_image</t>
+        <t t-set="twitter_title" t-value="place.name"/>
+        <t t-set="twitter_description" t-value="(place.short_description or place.name)[:160]"/>
+        <t t-set="twitter_image" t-value="place.cover_image and '/web/image/guiabh.place/%s/cover_image' % place.id or '/bhz_guiabh_website/static/src/img/placeholders/place_placeholder.svg'"/>
         <t t-set="canonical_url" t-value="request.httprequest.url"/>
         <t t-set="json_ld">
           <script type="application/ld+json">
@@ -971,7 +1023,7 @@
           <div class="guia-container">
             <div class="row g-4 align-items-start">
               <div class="col-lg-7">
-                <img class="img img-fluid rounded w-100" t-att-src="place.cover_image and '/web/image/guiabh.place/%s/cover_image/1200/700' % place.id or '/bhz_guiabh_website/static/src/img/placeholders/place_placeholder.svg'" t-att-alt="place.name" loading="lazy"/>
+                <img class="img img-fluid rounded w-100" t-att-src="place.cover_image and '/web/image/guiabh.place/%s/cover_image/1200/700' % place.id or '/bhz_guiabh_website/static/src/img/placeholders/place_placeholder.svg'" t-att-alt="place.name" loading="lazy" decoding="async"/>
                 <div class="guiabh-gallery mt-3" t-if="place.gallery_image_ids">
                   <div class="guiabh-grid">
                     <t t-foreach="place.gallery_image_ids" t-as="img">

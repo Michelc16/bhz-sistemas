@@ -6,3 +6,5 @@ from . import guiabh_lead
 from . import guiabh_ad
 from . import guiabh_preference
 from . import content_bridge
+from . import res_config_settings
+from . import guiabh_banner

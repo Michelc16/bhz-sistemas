@@ -2,13 +2,23 @@
 from datetime import datetime, timedelta
 import json
 
-from odoo import fields, http
+from odoo import fields, http, tools
 from odoo.http import request
 
 
 class GuiaBHWebsite(http.Controller):
+    THEME_NAME = 'bhz_guiabh_website'
+
     def _website(self):
         return request.website
+
+    def _theme_active(self):
+        return self._website().theme_id and self._website().theme_id.name == self.THEME_NAME
+
+    def _ensure_theme_or_404(self):
+        if not self._theme_active():
+            return request.not_found()
+        return None
 
     def _event_domain(self):
         website = self._website()
@@ -84,8 +94,29 @@ class GuiaBHWebsite(http.Controller):
             resp.headers["Cache-Control"] = f"public, max-age={max_age}"
         return resp
 
+    @http.route(['/manifest.webmanifest'], type='http', auth='public', website=True, sitemap=False)
+    def manifest(self, **kwargs):
+        """Serve a manifest to avoid 404 in builder/preview when theme is active."""
+        if not self._theme_active():
+            return request.not_found()
+        with tools.file_open('bhz_guiabh_website/static/src/manifest.webmanifest', 'r') as f:
+            content = f.read()
+        return request.make_response(content, headers=[('Content-Type', 'application/manifest+json')])
+
+    @http.route('/guiabh/provider/feed', type='json', auth='public', website=True)
+    def provider_feed(self, limit=20):
+        ensure = self._ensure_theme_or_404()
+        if ensure:
+            return False
+        bridge = request.env['bhz.guiabh.content.bridge'].sudo()
+        feed = bridge.provider_feed(limit=limit, website=request.website)
+        return {'items': feed}
+
     @http.route(['/sitemap_guia.xml'], type='http', auth='public', website=True, sitemap=False)
     def sitemap_guia(self, **kwargs):
+        ensure = self._ensure_theme_or_404()
+        if ensure:
+            return ensure
         website = self._website()
         urls = [
             {'loc': self._abs_url('/')},
@@ -112,6 +143,9 @@ class GuiaBHWebsite(http.Controller):
 
     @http.route(['/buscar'], type='http', auth='public', website=True, sitemap=True)
     def search(self, page=1, **kwargs):
+        ensure = self._ensure_theme_or_404()
+        if ensure:
+            return ensure
         Event = request.env['guiabh.event'].sudo()
         Place = request.env['guiabh.place'].sudo()
         website = self._website()
@@ -186,15 +220,28 @@ class GuiaBHWebsite(http.Controller):
 
     @http.route(['/'], type='http', auth='public', website=True, sitemap=True)
     def home(self, **kwargs):
+        # If the theme is not active on this website, render the default homepage to avoid takeover.
+        if not self._theme_active():
+            return request.render('website.homepage')
+
         website = self._website()
         bridge = request.env['bhz.guiabh.content.bridge'].sudo()
         Event = request.env['guiabh.event']
         Place = request.env['guiabh.place']
-        featured_events = bridge.get_featured_events(limit=6, website=website)
-        upcoming_events = bridge.get_upcoming_events(limit=6, date_window=30, website=website)
-        featured_places = bridge.get_featured_places(limit=6, website=website)
-        now_playing_movies = bridge.get_now_playing_movies(limit=6, website=website)
-        upcoming_matches = bridge.get_upcoming_matches(limit=6, date_window=45, website=website)
+        ICP = request.env['ir.config_parameter'].sudo()
+        limit_featured = int(ICP.get_param('bhz_guiabh_website.home_limit_featured_events', default=8))
+        limit_upcoming = int(ICP.get_param('bhz_guiabh_website.home_limit_upcoming_events', default=8))
+        limit_movies = int(ICP.get_param('bhz_guiabh_website.home_limit_movies', default=8))
+        limit_matches = int(ICP.get_param('bhz_guiabh_website.home_limit_matches', default=6))
+        limit_places = int(ICP.get_param('bhz_guiabh_website.home_limit_places', default=8))
+        limit_banners = int(ICP.get_param('bhz_guiabh_website.home_limit_banners', default=5))
+
+        featured_events = bridge.get_featured_events(limit=limit_featured, website=website)
+        upcoming_events = bridge.get_upcoming_events(limit=limit_upcoming, date_window=30, website=website)
+        featured_places = bridge.get_featured_places(limit=limit_places, website=website)
+        now_playing_movies = bridge.get_now_playing_movies(limit=limit_movies, website=website)
+        upcoming_matches = bridge.get_upcoming_matches(limit=limit_matches, date_window=45, website=website)
+        banners = bridge.get_banners(limit=limit_banners, website=website)
         featured_carousel = bridge.build_featured_carousel(
             events=featured_events,
             movies=now_playing_movies,
@@ -230,11 +277,15 @@ class GuiaBHWebsite(http.Controller):
             'pref_events': pref_events,
             'pref_places': pref_places,
             'preferences': prefs,
+            'banners': banners,
         }
         return self._render_cache('bhz_guiabh_website.guiabh_home', values)
 
     @http.route(['/eventos'], type='http', auth='public', website=True, sitemap=True)
     def events(self, page=1, **kwargs):
+        ensure = self._ensure_theme_or_404()
+        if ensure:
+            return ensure
         Event = request.env['guiabh.event']
         page = int(page) if str(page).isdigit() else 1
         domain = list(self._event_domain())
@@ -291,6 +342,9 @@ class GuiaBHWebsite(http.Controller):
 
     @http.route(['/eventos/<string:slug>', '/evento/<string:slug>'], type='http', auth='public', website=True, sitemap=True)
     def event_detail(self, slug, **kwargs):
+        ensure = self._ensure_theme_or_404()
+        if ensure:
+            return ensure
         website = self._website()
         domain = ['|', ('website_id', '=', False), ('website_id', '=', website.id), ('slug', '=', slug)]
         if not request.env.user.has_group('website.group_website_publisher'):
@@ -310,6 +364,9 @@ class GuiaBHWebsite(http.Controller):
 
     @http.route(['/lugares'], type='http', auth='public', website=True, sitemap=True)
     def places(self, page=1, **kwargs):
+        ensure = self._ensure_theme_or_404()
+        if ensure:
+            return ensure
         Place = request.env['guiabh.place']
         page = int(page) if str(page).isdigit() else 1
         domain = list(self._place_domain())
@@ -359,6 +416,9 @@ class GuiaBHWebsite(http.Controller):
 
     @http.route(['/agenda'], type='http', auth='public', website=True, sitemap=True)
     def agenda(self, view='week', cat=None, reg=None, **kwargs):
+        ensure = self._ensure_theme_or_404()
+        if ensure:
+            return ensure
         Event = request.env['guiabh.event']
         today = fields.Date.context_today(request.env.user)
 
@@ -423,6 +483,9 @@ class GuiaBHWebsite(http.Controller):
 
     @http.route(['/lugares/<string:slug>'], type='http', auth='public', website=True, sitemap=True)
     def place_detail(self, slug, **kwargs):
+        ensure = self._ensure_theme_or_404()
+        if ensure:
+            return ensure
         website = self._website()
         domain = ['|', ('website_id', '=', False), ('website_id', '=', website.id), ('slug', '=', slug)]
         if not request.env.user.has_group('website.group_website_publisher'):
@@ -444,6 +507,9 @@ class GuiaBHWebsite(http.Controller):
 
     @http.route('/guiabh/snippet/events', type='json', auth='public', website=True)
     def snippet_events_data(self, limit=6, category_id=None, region_id=None, free=None):
+        ensure = self._ensure_theme_or_404()
+        if ensure:
+            return False
         limit = int(limit) if str(limit).isdigit() else 6
         domain = self._event_domain()
         if category_id:
@@ -474,6 +540,9 @@ class GuiaBHWebsite(http.Controller):
 
     @http.route('/guiabh/snippet/places', type='json', auth='public', website=True)
     def snippet_places_data(self, limit=6, place_type_id=None, region_id=None, tags=None):
+        ensure = self._ensure_theme_or_404()
+        if ensure:
+            return False
         limit = int(limit) if str(limit).isdigit() else 6
         domain = self._place_domain()
         if place_type_id:
@@ -506,6 +575,9 @@ class GuiaBHWebsite(http.Controller):
 
     @http.route(['/guias/fim-de-semana'], type='http', auth='public', website=True, sitemap=True)
     def weekend_guide(self, **kwargs):
+        ensure = self._ensure_theme_or_404()
+        if ensure:
+            return ensure
         start, end = self._get_time_bounds('weekend')
         domain = self._event_domain()
         if start and end:
@@ -518,6 +590,9 @@ class GuiaBHWebsite(http.Controller):
 
     @http.route(['/favoritos/toggle'], type='http', auth='user', website=True)
     def favorite_toggle(self, model=None, res_id=None, redirect=None, **kwargs):
+        ensure = self._ensure_theme_or_404()
+        if ensure:
+            return ensure
         allowed_models = {"guiabh.event", "guiabh.place"}
         if model not in allowed_models or not res_id:
             return request.redirect(redirect or '/minha-lista')
@@ -554,6 +629,9 @@ class GuiaBHWebsite(http.Controller):
 
     @http.route(['/minha-lista'], type='http', auth='user', website=True, sitemap=False)
     def favorites(self, **kwargs):
+        ensure = self._ensure_theme_or_404()
+        if ensure:
+            return ensure
         website = self._website()
         Fav = request.env['guiabh.favorite'].sudo()
         favs = Fav.search([('user_id', '=', request.env.user.id), ('website_id', '=', website.id)])
@@ -569,6 +647,9 @@ class GuiaBHWebsite(http.Controller):
 
     @http.route(['/preferencias/salvar'], type='http', auth='user', website=True, methods=['POST'])
     def preferences_save(self, **kwargs):
+        ensure = self._ensure_theme_or_404()
+        if ensure:
+            return ensure
         prefs = self._get_preferences()
         category_ids = kwargs.getlist('categories') if hasattr(kwargs, 'getlist') else kwargs.get('categories', [])
         region_ids = kwargs.getlist('regions') if hasattr(kwargs, 'getlist') else kwargs.get('regions', [])
@@ -595,6 +676,9 @@ class GuiaBHWebsite(http.Controller):
 
     @http.route(['/lead/guiabh'], type='http', auth='public', website=True, methods=['POST'])
     def lead_submit(self, **kwargs):
+        ensure = self._ensure_theme_or_404()
+        if ensure:
+            return ensure
         name = (kwargs.get('name') or '').strip()
         email = (kwargs.get('email') or '').strip()
         categories = kwargs.getlist('categories') if hasattr(kwargs, 'getlist') else kwargs.get('categories', [])
@@ -621,4 +705,7 @@ class GuiaBHWebsite(http.Controller):
 
     @http.route(['/obrigado'], type='http', auth='public', website=True, sitemap=True)
     def thank_you(self, **kwargs):
+        ensure = self._ensure_theme_or_404()
+        if ensure:
+            return ensure
         return request.render('bhz_guiabh_website.guiabh_thanks', {'error': kwargs.get('error')})

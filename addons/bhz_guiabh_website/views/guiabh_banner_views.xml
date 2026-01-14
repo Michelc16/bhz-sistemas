@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <record id="view_guiabh_banner_tree" model="ir.ui.view">
+      <field name="name">guiabh.banner.tree</field>
+      <field name="model">guiabh.banner</field>
+      <field name="arch" type="xml">
+        <tree string="Banners">
+          <field name="sequence" widget="handle"/>
+          <field name="name"/>
+          <field name="subtitle"/>
+          <field name="website_id"/>
+          <field name="date_start"/>
+          <field name="date_end"/>
+          <field name="active"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_guiabh_banner_form" model="ir.ui.view">
+      <field name="name">guiabh.banner.form</field>
+      <field name="model">guiabh.banner</field>
+      <field name="arch" type="xml">
+        <form string="Banner">
+          <sheet>
+            <group>
+              <group>
+                <field name="name"/>
+                <field name="subtitle"/>
+                <field name="link_url"/>
+                <field name="sequence"/>
+                <field name="website_id"/>
+              </group>
+              <group>
+                <field name="image" widget="image" class="oe_avatar"/>
+              </group>
+            </group>
+            <group>
+              <field name="active"/>
+              <field name="date_start"/>
+              <field name="date_end"/>
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record id="action_guiabh_banner" model="ir.actions.act_window">
+      <field name="name">Banners GuiaBH</field>
+      <field name="res_model">guiabh.banner</field>
+      <field name="view_mode">tree,form</field>
+      <field name="context">{'default_website_id': website_id}</field>
+    </record>
+
+    <menuitem id="menu_guiabh_banner"
+              name="Banners GuiaBH"
+              parent="website.menu_website_configuration"
+              action="action_guiabh_banner"
+              groups="base.group_website_publisher"
+              sequence="120"/>
+  </data>
+</odoo>

@@ -23,3 +23,12 @@ class GuiaBHAd(models.Model):
         ("sidebar", "Listagens - Sidebar"),
         ("between_sections", "Entre seções"),
     ], required=True, default="home_top")
+    editorial_state = fields.Selection([
+        ('pending', 'Pendente'),
+        ('approved', 'Aprovado'),
+        ('rejected', 'Rejeitado'),
+    ], string="Status editorial", default='pending', tracking=True)
+    editorial_priority = fields.Integer('Prioridade editorial', default=50, help="Quanto menor, maior prioridade.")
+    editorial_notes = fields.Text('Notas editoriais')
+    editorial_reviewer_id = fields.Many2one('res.users', string='Revisor')
+    editorial_date = fields.Datetime('Data de revisão')

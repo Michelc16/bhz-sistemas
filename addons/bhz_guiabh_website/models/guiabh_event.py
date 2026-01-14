@@ -32,6 +32,15 @@ class GuiaBHEvent(models.Model):
     is_featured = fields.Boolean('Em destaque', default=False)
     published = fields.Boolean('Publicado internamente', default=True)
     website_id = fields.Many2one('website', string='Website', ondelete='set null', default=lambda self: self.env['website'].get_current_website())
+    editorial_state = fields.Selection([
+        ('pending', 'Pendente'),
+        ('approved', 'Aprovado'),
+        ('rejected', 'Rejeitado'),
+    ], string="Status editorial", default='pending', tracking=True)
+    editorial_priority = fields.Integer('Prioridade editorial', default=50, help="Quanto menor, maior prioridade.")
+    editorial_notes = fields.Text('Notas editoriais')
+    editorial_reviewer_id = fields.Many2one('res.users', string='Revisor')
+    editorial_date = fields.Datetime('Data de revisão')
 
     _sql_constraints = [
         ('slug_website_unique', 'unique(slug, website_id)', 'O slug deve ser único por website.'),
