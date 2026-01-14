@@ -3,7 +3,7 @@
   <data>
   <!-- Componentes reutilizáveis -->
   <template id="car_card" name="Car Card">
-    <a t-att-href="'/carros/%s-%s' % (car.id, car.slug or '')" class="bhz-car-card d-block text-decoration-none">
+    <a t-att-href="'/carros/%s-%s' % (car.id, slug(car))" class="bhz-car-card d-block text-decoration-none">
       <div class="bhz-car-thumb">
         <t t-if="car.main_image">
           <img t-att-src="'/web/image/bhz.dealer.car/%s/main_image' % car.id" alt="" loading="lazy"/>
@@ -38,9 +38,9 @@
 
   <template id="snippet_car_showcase_cards" name="Snippet Car Cards">
     <t t-if="cars">
-      <t t-foreach="cars" t-as="car">
-        <t t-call="bhz_dealer_website.car_card"/>
-      </t>
+                  <t t-foreach="cars" t-as="car">
+                    <t t-call="bhz_dealer_website.car_card"/>
+                  </t>
     </t>
     <t t-else="">
       <div class="alert alert-info">Nenhum carro encontrado para esta seleção.</div>

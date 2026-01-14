@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from odoo import http
 from odoo.http import request
+from odoo.addons.http_routing.models.ir_http import slug
+from werkzeug.exceptions import NotFound
 
 class BhzDealerWebsite(http.Controller):
 
@@ -124,26 +126,33 @@ class BhzDealerWebsite(http.Controller):
         return request.render("bhz_dealer_website.template_dealer_car_list", values)
 
     @http.route(
-        ["/carros/<model(\"bhz.dealer.car\"):car>", "/carros/<slug(car)>"],
+        [
+            "/carros/<int:car_id>",
+            "/carros/<int:car_id>-<string:car_slug>",
+        ],
         type="http",
         auth="public",
         website=True,
         sitemap=True,
     )
-    def car_detail(self, car, **kw):
+    def car_detail(self, car_id, car_slug=None, **kw):
         config = request.env["bhz.dealer.website.config"].sudo().get_for_website(request.website)
         if not config or not config.dealer_enabled:
             return request.not_found()
 
         website = request.website
+        car = request.env["bhz.dealer.car"].sudo().browse(int(car_id)).exists()
         if (
             not car
-            or not car.exists()
             or not car.active
             or not car.website_published
             or (car.website_id and car.website_id.id != website.id)
         ):
-            return request.not_found()
+            raise NotFound()
+
+        canonical = f"/carros/{car.id}-{slug(car)}"
+        if car_slug and car_slug != slug(car):
+            return request.redirect(canonical, code=301)
 
         return request.render("bhz_dealer_website.template_dealer_car_detail", {"car": car, "website": website, "config": config})
 
@@ -187,7 +196,7 @@ class BhzDealerWebsite(http.Controller):
             "website_id": request.website.id,
         }
         if car:
-            car_url = f"/carros/{car.id}-{car.slug or ''}"
+            car_url = f"/carros/{car.id}-{slug(car)}"
             vals["description"] = (vals["description"] or "") + f"\n\nCarro: {car.name} (ID {car.id})\nURL: {car_url}"
             tag = request.env.ref("crm.tag_website_lead", raise_if_not_found=False)
             if tag:
