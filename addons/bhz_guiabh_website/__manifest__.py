@@ -26,11 +26,10 @@
         'data/ir_cron.xml',
         'security/guiabh_cinema_security.xml',
         'security/guiabh_football_security.xml',
-    ],
-    'qweb': [],
-    'demo': [
         'data/demo.xml',
     ],
+    'qweb': [],
+    'demo': [],
     'application': False,
     'installable': True,
     'assets': {

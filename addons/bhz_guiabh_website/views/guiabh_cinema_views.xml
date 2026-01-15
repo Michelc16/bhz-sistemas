@@ -5,7 +5,7 @@
       <field name="name">guiabh.cinema.movie.tree</field>
       <field name="model">guiabh.cinema.movie</field>
       <field name="arch" type="xml">
-        <tree string="Filmes" create="true">
+        <list string="Filmes" create="true">
           <field name="name"/>
           <field name="category"/>
           <field name="genre"/>
@@ -13,7 +13,7 @@
           <field name="release_date"/>
           <field name="is_featured"/>
           <field name="website_published"/>
-        </tree>
+        </list>
       </field>
     </record>
 

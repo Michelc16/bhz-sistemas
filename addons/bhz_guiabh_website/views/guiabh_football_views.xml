@@ -5,10 +5,10 @@
       <field name="name">guiabh.football.team.tree</field>
       <field name="model">guiabh.football.team</field>
       <field name="arch" type="xml">
-        <tree string="Times">
+        <list string="Times">
           <field name="name"/>
           <field name="active"/>
-        </tree>
+        </list>
       </field>
     </record>
 
@@ -36,14 +36,14 @@
       <field name="name">guiabh.football.match.tree</field>
       <field name="model">guiabh.football.match</field>
       <field name="arch" type="xml">
-        <tree string="Jogos">
+        <list string="Jogos">
           <field name="home_team_id"/>
           <field name="away_team_id"/>
           <field name="competition"/>
           <field name="match_datetime"/>
           <field name="city"/>
           <field name="website_published"/>
-        </tree>
+        </list>
       </field>
     </record>
 
