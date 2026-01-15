@@ -13,7 +13,7 @@ patch(WebsiteBuilderClientAction.prototype, {
 const _originalResolveIframeLoaded = WebsiteBuilderClientAction.prototype.resolveIframeLoaded;
 WebsiteBuilderClientAction.prototype.resolveIframeLoaded = function (...args) {
     try {
-        return _originalResolveIframeLoaded.apply(this, args);
+        return _originalResolveIframeLoaded ? _originalResolveIframeLoaded.apply(this, args) : undefined;
     } catch (err) {
         // Prevent editor crash when core tries to replaceChildren/removeChild on missing nodes.
         return;

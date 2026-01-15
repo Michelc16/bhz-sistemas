@@ -76,9 +76,6 @@ class GuiaBHEvent(models.Model):
         return super().create(vals_list)
 
     def write(self, vals):
-        if 'website_published' not in vals and vals.get('active', True):
-            vals = dict(vals)
-            vals['website_published'] = True
         return super().write(vals)
 
     def _compute_website_url(self):
