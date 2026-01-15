@@ -12,7 +12,7 @@
     <!-- Menu entry reusing Cineart movie action -->
     <menuitem id="menu_guiabh_cineart_root_proxy"
               name="Cinema"
-              parent="guiabh_event.menu_guiabh_root"
+              parent="bhz_guiabh_website.menu_guiabh_root"
               sequence="50"/>
     <menuitem id="menu_guiabh_cineart_movies_proxy"
               name="Filmes (Cineart)"
