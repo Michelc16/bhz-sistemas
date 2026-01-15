@@ -9,3 +9,5 @@ from . import content_bridge
 from . import res_config_settings
 from . import guiabh_banner
 from . import cron
+from . import guiabh_cinema
+from . import guiabh_football

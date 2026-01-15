@@ -10,3 +10,6 @@ access_guiabh_lead_user,guiabh.lead user,model_guiabh_lead,base.group_user,1,1,1
 access_guiabh_ad_user,guiabh.ad user,model_guiabh_ad,base.group_user,1,1,1,1
 access_guiabh_pref_user,guiabh.preference user,model_guiabh_preference,base.group_user,1,1,1,1
 access_guiabh_banner_user,guiabh.banner user,model_guiabh_banner,website.group_website_designer,1,1,1,1
+access_guiabh_cinema_movie_user,guiabh.cinema.movie user,model_guiabh_cinema_movie,base.group_user,1,1,1,1
+access_guiabh_football_team_user,guiabh.football.team user,model_guiabh_football_team,base.group_user,1,1,1,1
+access_guiabh_football_match_user,guiabh.football.match user,model_guiabh_football_match,base.group_user,1,1,1,1

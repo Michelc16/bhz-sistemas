@@ -10,7 +10,7 @@ class GuiaBHContentBridge(models.AbstractModel):
 
     # Helpers -------------------------------------------------------------
     def _get_model(self, model_name):
-        """Restricted getter that only allows models owned by this module/theme."""
+        """Restricted getter for models available in this database."""
         try:
             return self.env[model_name].sudo()
         except KeyError:
@@ -119,27 +119,36 @@ class GuiaBHContentBridge(models.AbstractModel):
     @api.model
     def get_now_playing_movies(self, limit=6, website=None):
         website = website or self.env["website"].get_current_website()
-        Movie = self._get_model("guiabh.cineart.movie")
-        if Movie and hasattr(Movie, "guiabh_get_movies"):
-            movies = Movie.with_context(self._company_ctx(website)).guiabh_get_movies(
-                categories=["now", "premiere"],
-                limit=limit,
-                order_mode="popular",
-                company_id=website.company_id.id if website and website.company_id else None,
-            )
+        Movie = self._get_model("guiabh.cinema.movie") or self._get_model("guiabh.cineart.movie")
+        if Movie:
+            domain = [
+                ("active", "=", True),
+                ("website_published", "=", True),
+            ]
+            if "category" in Movie._fields:
+                domain.append(("category", "in", ["now", "premiere"]))
+            if "website_id" in Movie._fields and website:
+                domain += ["|", ("website_id", "=", False), ("website_id", "=", website.id)]
+            movies = Movie.search(domain, order="is_featured desc, id desc", limit=limit)
             return [self._serialize_movie(mv) for mv in movies]
         return []
 
     @api.model
     def get_upcoming_matches(self, limit=6, date_window=30, website=None):
         website = website or self.env["website"].get_current_website()
-        Match = self._get_model("bhz.football.match")
-        if Match and hasattr(Match, "guiabh_get_upcoming_matches"):
-            matches = Match.with_context(self._company_ctx(website)).guiabh_get_upcoming_matches(
-                limit=limit,
-                order_mode="popular",
-                company_id=website.company_id.id if website and website.company_id else None,
-            )
+        Match = self._get_model("guiabh.football.match")
+        if Match:
+            now = fields.Datetime.now()
+            end = now + timedelta(days=date_window or 30)
+            domain = [
+                ("website_published", "=", True),
+                ("active", "=", True),
+                ("match_datetime", ">=", now),
+                ("match_datetime", "<=", end),
+            ]
+            if "website_id" in Match._fields and website:
+                domain += ["|", ("website_id", "=", False), ("website_id", "=", website.id)]
+            matches = Match.search(domain, order="match_datetime asc, id asc", limit=limit)
             return [self._serialize_match(mt) for mt in matches]
         return []
 

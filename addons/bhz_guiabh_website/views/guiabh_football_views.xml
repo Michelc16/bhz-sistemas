@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <record id="view_guiabh_football_team_tree" model="ir.ui.view">
+      <field name="name">guiabh.football.team.tree</field>
+      <field name="model">guiabh.football.team</field>
+      <field name="arch" type="xml">
+        <tree string="Times">
+          <field name="name"/>
+          <field name="active"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_guiabh_football_team_form" model="ir.ui.view">
+      <field name="name">guiabh.football.team.form</field>
+      <field name="model">guiabh.football.team</field>
+      <field name="arch" type="xml">
+        <form string="Time">
+          <sheet>
+            <group>
+              <group>
+                <field name="name"/>
+                <field name="active"/>
+              </group>
+              <group>
+                <field name="logo" widget="image" class="oe_avatar"/>
+              </group>
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_guiabh_football_match_tree" model="ir.ui.view">
+      <field name="name">guiabh.football.match.tree</field>
+      <field name="model">guiabh.football.match</field>
+      <field name="arch" type="xml">
+        <tree string="Jogos">
+          <field name="home_team_id"/>
+          <field name="away_team_id"/>
+          <field name="competition"/>
+          <field name="match_datetime"/>
+          <field name="city"/>
+          <field name="website_published"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_guiabh_football_match_form" model="ir.ui.view">
+      <field name="name">guiabh.football.match.form</field>
+      <field name="model">guiabh.football.match</field>
+      <field name="arch" type="xml">
+        <form string="Jogo">
+          <sheet>
+            <group>
+              <group>
+                <field name="home_team_id"/>
+                <field name="away_team_id"/>
+                <field name="competition"/>
+                <field name="round_name"/>
+                <field name="match_datetime"/>
+                <field name="stadium"/>
+                <field name="city"/>
+                <field name="broadcast"/>
+                <field name="ticket_url"/>
+              </group>
+              <group>
+                <field name="website_published"/>
+                <field name="website_id"/>
+                <field name="notes" widget="text"/>
+              </group>
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record id="action_guiabh_football_team" model="ir.actions.act_window">
+      <field name="name">Times</field>
+      <field name="res_model">guiabh.football.team</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_guiabh_football_match" model="ir.actions.act_window">
+      <field name="name">Jogos</field>
+      <field name="res_model">guiabh.football.match</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_guiabh_football_root"
+              name="Futebol"
+              parent="bhz_guiabh_website.menu_guiabh_root"
+              sequence="50"/>
+    <menuitem id="menu_guiabh_football_matches"
+              name="Jogos"
+              parent="menu_guiabh_football_root"
+              action="action_guiabh_football_match"
+              sequence="10"/>
+    <menuitem id="menu_guiabh_football_teams"
+              name="Times"
+              parent="menu_guiabh_football_root"
+              action="action_guiabh_football_team"
+              sequence="20"/>
+  </data>
+</odoo>
