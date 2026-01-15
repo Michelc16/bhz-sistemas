@@ -19,7 +19,7 @@ patch(WebsiteBuilderClientAction.prototype, {
     },
 });
 
-// Extra defensive fallback in case the patch above is not applied early enough.
+// Extra defensive fallbacks in case the patch above is not applied early enough.
 if (WebsiteBuilderClientAction && WebsiteBuilderClientAction.prototype) {
     const originalAddWelcome = WebsiteBuilderClientAction.prototype.addWelcomeMessage;
     WebsiteBuilderClientAction.prototype.addWelcomeMessage = async function () {
@@ -27,6 +27,16 @@ if (WebsiteBuilderClientAction && WebsiteBuilderClientAction.prototype) {
             return await originalAddWelcome.call(this);
         } catch (err) {
             // Swallow errors caused by missing wrap to keep the builder usable.
+            return;
+        }
+    };
+
+    const originalResolveIframeLoaded = WebsiteBuilderClientAction.prototype.resolveIframeLoaded;
+    WebsiteBuilderClientAction.prototype.resolveIframeLoaded = function () {
+        try {
+            return originalResolveIframeLoaded.call(this);
+        } catch (err) {
+            // If any DOM hook fails (e.g., replaceChildren on null), ignore to keep builder alive.
             return;
         }
     };
