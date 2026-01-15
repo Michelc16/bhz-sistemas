@@ -3,7 +3,7 @@ import { patch } from "@web/core/utils/patch";
 import { WebsiteBuilderClientAction } from "@website/client_actions/website_preview/website_builder_action";
 
 // Guard against missing homepage wrap element to avoid replaceChildren errors in builder.
-patch(WebsiteBuilderClientAction.prototype, "bhz_guiabh_website.safe_welcome", {
+patch(WebsiteBuilderClientAction.prototype, {
     async addWelcomeMessage() {
         if (this.websiteService.isRestrictedEditor && !this.state.isEditing) {
             const doc = this.websiteContent?.el?.contentDocument;
