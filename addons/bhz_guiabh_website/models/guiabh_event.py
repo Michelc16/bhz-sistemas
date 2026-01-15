@@ -66,6 +66,21 @@ class GuiaBHEvent(models.Model):
         value = re.sub(r'-+', '-', value).strip('-')
         return value
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if 'website_published' not in vals:
+                vals['website_published'] = True
+            if not vals.get('website_id'):
+                vals['website_id'] = self.env['website'].get_current_website().id
+        return super().create(vals_list)
+
+    def write(self, vals):
+        if 'website_published' not in vals and vals.get('active', True):
+            vals = dict(vals)
+            vals['website_published'] = True
+        return super().write(vals)
+
     def _compute_website_url(self):
         super()._compute_website_url()
         for record in self:
