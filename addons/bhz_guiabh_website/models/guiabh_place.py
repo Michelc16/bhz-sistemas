@@ -41,7 +41,7 @@ class GuiaBHPlace(models.Model):
         ('pending', 'Pendente'),
         ('approved', 'Aprovado'),
         ('rejected', 'Rejeitado'),
-    ], string="Status editorial", default='pending', tracking=True)
+    ], string="Status editorial", default='pending')
     editorial_priority = fields.Integer('Prioridade editorial', default=50, help="Quanto menor, maior prioridade.")
     editorial_notes = fields.Text('Notas editoriais')
     editorial_reviewer_id = fields.Many2one('res.users', string='Revisor')

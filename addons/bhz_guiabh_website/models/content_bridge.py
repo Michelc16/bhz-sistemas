@@ -71,7 +71,7 @@ class GuiaBHContentBridge(models.AbstractModel):
     def get_featured_events(self, limit=6, website=None):
         website = website or self.env["website"].get_current_website()
         Event = self._get_model("event.event")
-        if not Event or not self._module_installed("bhz_event_promo"):
+        if not Event:
             return self._fallback_events(featured=True, limit=limit, website=website)
 
         domain = (
@@ -89,7 +89,7 @@ class GuiaBHContentBridge(models.AbstractModel):
     def get_upcoming_events(self, limit=6, date_window=30, website=None):
         website = website or self.env["website"].get_current_website()
         Event = self._get_model("event.event")
-        if not Event or not self._module_installed("bhz_event_promo"):
+        if not Event:
             return self._fallback_events(limit=limit, date_window=date_window, website=website)
 
         now = fields.Datetime.now()
@@ -109,7 +109,7 @@ class GuiaBHContentBridge(models.AbstractModel):
     def get_featured_places(self, limit=6, website=None):
         website = website or self.env["website"].get_current_website()
         Place = self._get_model("bhz.place")
-        if not Place or not self._module_installed("bhz_city_places"):
+        if not Place:
             return self._fallback_places(limit=limit, website=website)
 
         domain = (
@@ -125,7 +125,7 @@ class GuiaBHContentBridge(models.AbstractModel):
     def get_now_playing_movies(self, limit=6, website=None):
         website = website or self.env["website"].get_current_website()
         Movie = self._get_model("guiabh.cineart.movie")
-        if not Movie or not self._module_installed("bhz_cineart"):
+        if not Movie:
             return []
 
         domain = [("category", "in", ["now", "premiere"]), ("active", "=", True)]
@@ -137,7 +137,7 @@ class GuiaBHContentBridge(models.AbstractModel):
     def get_upcoming_matches(self, limit=6, date_window=30, website=None):
         website = website or self.env["website"].get_current_website()
         Match = self._get_model("bhz.football.match")
-        if not Match or not self._module_installed("bhz_football_agenda"):
+        if not Match:
             return []
 
         now = fields.Datetime.now()
