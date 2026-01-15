@@ -15,6 +15,15 @@ class GuiaBHContentBridge(models.AbstractModel):
         except KeyError:
             return None
 
+    def _company_ctx(self, website):
+        """Return context to constrain by website company without breaking multi-company."""
+        company = website.company_id if website else self.env.company
+        company_ids = [cid for cid in {company.id if company else self.env.company.id, self.env.company.id}]
+        return {
+            "allowed_company_ids": company_ids,
+            "force_company": company.id if company else False,
+        }
+
     def _module_installed(self, module_name):
         module = (
             self.env["ir.module.module"]
@@ -71,86 +80,89 @@ class GuiaBHContentBridge(models.AbstractModel):
     def get_featured_events(self, limit=6, website=None):
         website = website or self.env["website"].get_current_website()
         Event = self._get_model("event.event")
-        if not Event:
-            return self._fallback_events(featured=True, limit=limit, website=website)
-
-        domain = (
-            self._published_domain(Event)
-            + self._website_domain(Event, website)
-            + [("is_featured", "=", True)]
-        )
-        start_field = "date_begin" if "date_begin" in Event._fields else "start_datetime"
-        if start_field:
-            domain.append((start_field, ">=", fields.Datetime.now()))
-        events = Event.search(domain, order="bhz_website_visit_count desc, date_begin asc, id desc", limit=limit)
-        return [self._serialize_event(ev, website) for ev in events]
+        if Event and hasattr(Event, "guiabh_get_featured_events"):
+            events = (
+                Event.with_context(self._company_ctx(website))
+                .guiabh_get_featured_events(limit=limit)
+            )
+            return [self._serialize_event(ev, website) for ev in events]
+        if Event:
+            domain = (
+                self._published_domain(Event)
+                + self._website_domain(Event, website)
+                + [("is_featured", "=", True)]
+            )
+            start_field = "date_begin" if "date_begin" in Event._fields else "start_datetime"
+            if start_field:
+                domain.append((start_field, ">=", fields.Datetime.now()))
+            events = Event.search(domain, order="bhz_website_visit_count desc, date_begin asc, id desc", limit=limit)
+            return [self._serialize_event(ev, website) for ev in events]
+        return self._fallback_events(featured=True, limit=limit, website=website)
 
     @api.model
     def get_upcoming_events(self, limit=6, date_window=30, website=None):
         website = website or self.env["website"].get_current_website()
         Event = self._get_model("event.event")
-        if not Event:
-            return self._fallback_events(limit=limit, date_window=date_window, website=website)
-
-        now = fields.Datetime.now()
-        end = now + timedelta(days=date_window or 30)
-        domain = (
-            self._published_domain(Event)
-            + self._website_domain(Event, website)
-            + [("is_featured", "in", [False, True])]
-        )
-        start_field = "date_begin" if "date_begin" in Event._fields else "start_datetime"
-        if start_field:
-            domain += [(start_field, ">=", now), (start_field, "<=", end)]
-        events = Event.search(domain, order="date_begin asc, id desc", limit=limit)
-        return [self._serialize_event(ev, website) for ev in events]
+        if Event and hasattr(Event, "guiabh_get_announced_events"):
+            events = (
+                Event.with_context(self._company_ctx(website))
+                .guiabh_get_announced_events(limit=limit, order_mode="recent")
+            )
+            return [self._serialize_event(ev, website) for ev in events]
+        if Event:
+            now = fields.Datetime.now()
+            end = now + timedelta(days=date_window or 30)
+            domain = (
+                self._published_domain(Event)
+                + self._website_domain(Event, website)
+                + [("is_featured", "in", [False, True])]
+            )
+            start_field = "date_begin" if "date_begin" in Event._fields else "start_datetime"
+            if start_field:
+                domain += [(start_field, ">=", now), (start_field, "<=", end)]
+            events = Event.search(domain, order="date_begin asc, id desc", limit=limit)
+            return [self._serialize_event(ev, website) for ev in events]
+        return self._fallback_events(limit=limit, date_window=date_window, website=website)
 
     @api.model
     def get_featured_places(self, limit=6, website=None):
         website = website or self.env["website"].get_current_website()
         Place = self._get_model("bhz.place")
-        if not Place:
-            return self._fallback_places(limit=limit, website=website)
-
-        domain = (
-            self._published_domain(Place)
-            + self._website_domain(Place, website)
-            + self._company_domain(Place, website)
-            + [("is_featured", "=", True)]
-        )
-        places = Place.search(domain, order="sequence asc, name asc", limit=limit)
-        return [self._serialize_place(pl, website) for pl in places]
+        if Place:
+            domain = [
+                ("active", "=", True),
+                ("website_published", "=", True),
+            ] + self._website_domain(Place, website) + self._company_domain(Place, website)
+            places = Place.with_context(self._company_ctx(website)).search(domain, order="sequence asc, name asc", limit=limit)
+            return [self._serialize_place(pl, website) for pl in places]
+        return self._fallback_places(limit=limit, website=website)
 
     @api.model
     def get_now_playing_movies(self, limit=6, website=None):
         website = website or self.env["website"].get_current_website()
         Movie = self._get_model("guiabh.cineart.movie")
-        if not Movie:
-            return []
-
-        domain = [("category", "in", ["now", "premiere"]), ("active", "=", True)]
-        domain += self._company_domain(Movie, website)
-        movies = Movie.search(domain, order="website_visit_count desc, category asc, name asc", limit=limit)
-        return [self._serialize_movie(mv) for mv in movies]
+        if Movie and hasattr(Movie, "guiabh_get_movies"):
+            movies = Movie.with_context(self._company_ctx(website)).guiabh_get_movies(
+                categories=["now", "premiere"],
+                limit=limit,
+                order_mode="popular",
+                company_id=website.company_id.id if website and website.company_id else None,
+            )
+            return [self._serialize_movie(mv) for mv in movies]
+        return []
 
     @api.model
     def get_upcoming_matches(self, limit=6, date_window=30, website=None):
         website = website or self.env["website"].get_current_website()
         Match = self._get_model("bhz.football.match")
-        if not Match:
-            return []
-
-        now = fields.Datetime.now()
-        end = now + timedelta(days=date_window or 30)
-        domain = [
-            ("website_published", "=", True),
-            ("active", "=", True),
-            ("match_datetime", ">=", now),
-            ("match_datetime", "<=", end),
-        ]
-        domain += self._company_domain(Match, website)
-        matches = Match.search(domain, order="website_visit_count desc, match_datetime asc, id asc", limit=limit)
-        return [self._serialize_match(mt) for mt in matches]
+        if Match and hasattr(Match, "guiabh_get_upcoming_matches"):
+            matches = Match.with_context(self._company_ctx(website)).guiabh_get_upcoming_matches(
+                limit=limit,
+                order_mode="popular",
+                company_id=website.company_id.id if website and website.company_id else None,
+            )
+            return [self._serialize_match(mt) for mt in matches]
+        return []
 
     @api.model
     def build_featured_carousel(self, events=None, movies=None, matches=None, places=None, limit=10):
