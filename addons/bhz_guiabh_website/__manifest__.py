@@ -7,7 +7,7 @@
     'license': 'LGPL-3',
     'category': 'Theme',
     'version': '1.0.0',
-    'depends': ['website'],
+    'depends': ['website', 'bhz_cineart'],
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
@@ -17,6 +17,7 @@
         'views/guiabh_taxonomy_views.xml',
         'views/guiabh_ad_views.xml',
         'views/guiabh_banner_views.xml',
+        'views/guiabh_cineart_views.xml',
         'views/website_templates.xml',
         'views/res_config_settings_views.xml',
         'data/theme_data.xml',
