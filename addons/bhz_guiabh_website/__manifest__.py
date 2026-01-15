@@ -36,6 +36,9 @@
         'website.assets_wysiwyg': [
             'bhz_guiabh_website/static/src/js/guiabh.js',
         ],
+        'web.assets_backend': [
+            'bhz_guiabh_website/static/src/js/builder_patch.js',
+        ],
     },
     'images': ['static/description/icon.png'],
 }
