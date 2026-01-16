@@ -19,12 +19,12 @@
         "views/bhz_event_import_views.xml",
     ],
     "assets": {
-        "web.assets_frontend": [
+        "website.assets_frontend": [
             "bhz_event_promo/static/src/scss/guiabh_event.scss",
             "bhz_event_promo/static/src/js/guiabh_announced_events.js",
             "bhz_event_promo/static/src/js/guiabh_featured_carousel.js",
         ],
-        "website.website_builder_assets": [
+        "website.assets_editor": [
             "bhz_event_promo/static/src/website_builder/**/*",
         ],
     },
