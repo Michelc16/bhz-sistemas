@@ -60,8 +60,10 @@ class CineartMovie(models.Model):
     )
 
     _table_args = (
-        models.UniqueConstraint(
-            "cineart_url", name="cineart_movie_url_unique"
+        models.Constraint(
+            "cineart_movie_url_unique",
+            type="unique",
+            fields=["cineart_url"],
         ),
     )
 

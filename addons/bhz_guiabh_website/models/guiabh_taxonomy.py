@@ -42,7 +42,9 @@ class GuiaBHTag(models.Model):
     website_id = fields.Many2one('website', string='Website', ondelete='set null')
 
     _table_args = (
-        models.UniqueConstraint(
-            "name", "website_id", name="guiabh_tag_name_website_unique"
+        models.Constraint(
+            "guiabh_tag_name_website_unique",
+            type="unique",
+            fields=["name", "website_id"],
         ),
     )

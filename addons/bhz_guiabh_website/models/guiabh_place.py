@@ -48,8 +48,10 @@ class GuiaBHPlace(models.Model):
     editorial_date = fields.Datetime('Data de revisão')
 
     _table_args = (
-        models.UniqueConstraint(
-            "slug", "website_id", name="guiabh_place_slug_website_unique"
+        models.Constraint(
+            "guiabh_place_slug_website_unique",
+            type="unique",
+            fields=["slug", "website_id"],
         ),
     )
 

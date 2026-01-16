@@ -113,10 +113,10 @@ class EventEvent(models.Model):
     external_last_sync = fields.Datetime(string="Última sincronização externa")
 
     _table_args = (
-        models.UniqueConstraint(
-            "external_source",
-            "external_id",
-            name="bhz_event_external_unique",
+        models.Constraint(
+            "bhz_event_external_unique",
+            type="unique",
+            fields=["external_source", "external_id"],
         ),
     )
     auto_remove_after_event = fields.Selection(

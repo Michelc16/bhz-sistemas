@@ -19,8 +19,10 @@ class GuiabhCineartCategory(models.Model):
     )
 
     _table_args = (
-        models.UniqueConstraint(
-            "code", name="cineart_category_code_unique"
+        models.Constraint(
+            "cineart_category_code_unique",
+            type="unique",
+            fields=["code"],
         ),
     )
 

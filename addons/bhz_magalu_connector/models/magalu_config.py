@@ -39,8 +39,10 @@ class BhzMagaluConfig(models.Model):
     _check_company_auto = True
     _order = "id desc"
     _table_args = (
-        models.UniqueConstraint(
-            "company_id", name="bhz_magalu_config_unique_company"
+        models.Constraint(
+            "bhz_magalu_config_unique_company",
+            type="unique",
+            fields=["company_id"],
         ),
     )
 

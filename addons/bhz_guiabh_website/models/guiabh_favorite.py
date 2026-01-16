@@ -8,8 +8,10 @@ class GuiaBHFav(models.Model):
     _description = "GuiaBH Favorite"
     _order = "create_date desc"
     _table_args = (
-        models.UniqueConstraint(
-            "user_id", "website_id", "res_model", "res_id", name="guiabh_favorite_unique"
+        models.Constraint(
+            "guiabh_favorite_unique",
+            type="unique",
+            fields=["user_id", "website_id", "res_model", "res_id"],
         ),
     )
 

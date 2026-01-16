@@ -7,11 +7,10 @@ class BhzWaConversation(models.Model):
     _description = "Conversa WhatsApp"
     _order = "is_pinned desc, last_message_date desc, id desc"
     _table_args = (
-        models.UniqueConstraint(
-            "partner_id",
-            "session_id",
-            "account_id",
-            name="bhz_wa_conversation_partner_session_account_unique",
+        models.Constraint(
+            "bhz_wa_conversation_partner_session_account_unique",
+            type="unique",
+            fields=["partner_id", "session_id", "account_id"],
         ),
     )
 

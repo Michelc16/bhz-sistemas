@@ -7,8 +7,10 @@ class GuiaBHPreference(models.Model):
     _description = "Preferências do usuário GuiaBH"
     _order = "id desc"
     _table_args = (
-        models.UniqueConstraint(
-            "user_id", "website_id", name="guiabh_preference_user_website_unique"
+        models.Constraint(
+            "guiabh_preference_user_website_unique",
+            type="unique",
+            fields=["user_id", "website_id"],
         ),
     )
 
