@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import http
 from odoo.http import request
-from odoo.addons.http_routing.models.ir_http import _slugify as slug
+from odoo.addons.http_routing.models.ir_http import slugify as slug
 from werkzeug.exceptions import NotFound
 
 class BhzDealerWebsite(http.Controller):
