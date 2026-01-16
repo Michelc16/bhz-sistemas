@@ -1,39 +1,78 @@
 /** @odoo-module **/
+odoo.define("bhz_event_promo.guiabh_announced_events_option", function (require) {
+    "use strict";
 
-import { SNIPPET_SPECIFIC } from "@html_builder/utils/option_sequence";
-import { BaseOptionComponent } from "@html_builder/core/utils";
-import { Plugin } from "@html_editor/plugin";
-import { withSequence } from "@html_editor/utils/resource";
-import { registry } from "@web/core/registry";
+    let BaseOptionComponent, Plugin, SNIPPET_SPECIFIC, withSequence, registry;
+    try {
+        BaseOptionComponent = require("@html_builder/core/utils").BaseOptionComponent;
+        Plugin = require("@html_editor/plugin").Plugin;
+        SNIPPET_SPECIFIC = require("@html_builder/utils/option_sequence").SNIPPET_SPECIFIC;
+        withSequence = require("@html_editor/utils/resource").withSequence;
+        registry = require("@web/core/registry");
+    } catch (err) {
+        // If builder libs aren't available (public/minimal assets), skip safely.
+        return;
+    }
 
-export class GuiabhAnnouncedEventsOption extends BaseOptionComponent {
-    static template = "bhz_event_promo.GuiabhAnnouncedEventsOption";
-    static selector = ".s_guiabh_announced_events";
-}
+    class GuiabhAnnouncedEventsOption extends BaseOptionComponent {
+        static selector = ".s_guiabh_announced_events";
+        static template = "bhz_event_promo.GuiabhAnnouncedEventsOption";
 
-class GuiabhAnnouncedEventsOptionPlugin extends Plugin {
-    static id = "guiabhAnnouncedEventsOption";
-    resources = {
-        builder_options: [withSequence(SNIPPET_SPECIFIC, GuiabhAnnouncedEventsOption)],
-        on_snippet_dropped_handlers: (params) => this.onSnippetDropped(params),
-    };
-
-    onSnippetDropped({ snippetEl }) {
-        if (!snippetEl.matches(GuiabhAnnouncedEventsOption.selector)) {
-            return;
+        setup() {
+            super.setup(...arguments);
+            this.limit = this._readLimit();
         }
-        if (!snippetEl.dataset.limit) {
-            snippetEl.dataset.limit = "12";
+
+        _readLimit() {
+            const section = this.el || document.createElement("div");
+            const raw = section.dataset?.limit || "12";
+            const parsed = parseInt(raw, 10);
+            if (Number.isNaN(parsed)) {
+                return 12;
+            }
+            return Math.min(Math.max(parsed, 1), 24);
         }
-        if (!snippetEl.dataset.categoryIds) {
-            snippetEl.dataset.categoryIds = "[]";
+
+        onLimitInput(ev) {
+            const value = this._sanitize(ev.target.value);
+            ev.target.value = value;
         }
-        if (!snippetEl.dataset.orderMode) {
-            snippetEl.dataset.orderMode = "recent";
+
+        onLimitChange(ev) {
+            const value = this._sanitize(ev.target.value);
+            ev.target.value = value;
+            this._applyLimit(value);
+        }
+
+        _sanitize(value) {
+            const parsed = parseInt(value || "0", 10) || 0;
+            return Math.min(Math.max(parsed, 1), 24);
+        }
+
+        _applyLimit(value) {
+            const section = this.el;
+            if (!section) {
+                return;
+            }
+            const valStr = String(value);
+            section.dataset.limit = valStr;
+            section.dispatchEvent(
+                new CustomEvent("change", {
+                    bubbles: true,
+                })
+            );
+            this.requestSave();
         }
     }
-}
 
-registry
-    .category("website-plugins")
-    .add(GuiabhAnnouncedEventsOptionPlugin.id, GuiabhAnnouncedEventsOptionPlugin);
+    class GuiabhAnnouncedEventsOptionPlugin extends Plugin {
+        static id = "guiabhAnnouncedEventsOption";
+        resources = {
+            builder_options: [withSequence(SNIPPET_SPECIFIC, GuiabhAnnouncedEventsOption)],
+        };
+    }
+
+    registry
+        .category("website-plugins")
+        .add(GuiabhAnnouncedEventsOptionPlugin.id, GuiabhAnnouncedEventsOptionPlugin);
+});
