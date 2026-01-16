@@ -257,9 +257,13 @@ class EventEvent(models.Model):
 
     @api.model
     def guiabh_get_featured_events(self, limit=12):
-        """Return events flagged as featured for website snippets."""
+        """Return events for destaque snippets; fallback to any published with image."""
         domain = self._prepare_public_events_domain(require_featured=True)
-        return self.sudo().search(domain, limit=limit, order="date_begin asc, id desc")
+        events = self.sudo().search(domain, limit=limit, order="date_begin asc, id desc")
+        if not events:
+            domain = self._prepare_public_events_domain(require_featured=False, require_image=True)
+            events = self.sudo().search(domain, limit=limit, order="date_begin asc, id desc")
+        return events
 
     @api.model
     def guiabh_get_announced_events(self, limit=12, category_ids=None, order_mode="recent"):
