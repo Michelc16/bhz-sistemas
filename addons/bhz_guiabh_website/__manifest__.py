@@ -35,8 +35,6 @@
     'assets': {
         'web.assets_frontend': [
             'bhz_guiabh_website/static/src/scss/guiabh.scss',
-        ],
-        'website.assets_editor': [
             'bhz_guiabh_website/static/src/js/guiabh.js',
         ],
         'web.assets_backend': [
