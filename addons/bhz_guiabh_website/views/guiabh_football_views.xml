@@ -79,13 +79,13 @@
     <record id="action_guiabh_football_team" model="ir.actions.act_window">
       <field name="name">Times</field>
       <field name="res_model">guiabh.football.team</field>
-      <field name="view_mode">tree,form</field>
+      <field name="view_mode">list,form</field>
     </record>
 
     <record id="action_guiabh_football_match" model="ir.actions.act_window">
       <field name="name">Jogos</field>
       <field name="res_model">guiabh.football.match</field>
-      <field name="view_mode">tree,form</field>
+      <field name="view_mode">list,form</field>
     </record>
 
     <menuitem id="menu_guiabh_football_root"

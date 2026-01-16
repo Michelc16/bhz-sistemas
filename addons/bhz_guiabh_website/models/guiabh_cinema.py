@@ -26,12 +26,6 @@ class GuiaBHCinemaMovie(models.Model):
     poster_image = fields.Image(string="Cartaz", max_width=1024, max_height=1024)
     active = fields.Boolean(default=True)
     website_published = fields.Boolean(default=True)
-    website_id = fields.Many2one(
-        "website",
-        string="Website",
-        default=lambda self: self.env["website"].get_current_website(),
-        ondelete="set null",
-    )
     is_featured = fields.Boolean(string="Destaque", default=False)
 
     def action_open_external(self):

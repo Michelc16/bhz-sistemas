@@ -25,10 +25,8 @@ class GuiaBHContentBridge(models.AbstractModel):
         return bool(module)
 
     def _website_domain(self, Model, website):
-        domain = []
-        if website and "website_id" in Model._fields:
-            domain = ["|", ("website_id", "=", False), ("website_id", "=", website.id)]
-        return domain
+        # Show only records from this module regardless of website context.
+        return []
 
     def _company_domain(self, Model, website):
         domain = []
@@ -79,9 +77,6 @@ class GuiaBHContentBridge(models.AbstractModel):
             ("active", "=", True),
             ("is_featured", "=", True),
         ] + self._website_domain(Event, website)
-        start_field = "start_datetime" if "start_datetime" in Event._fields else False
-        if start_field:
-            domain.append((start_field, ">=", fields.Datetime.now()))
         events = Event.search(domain, order="is_featured desc, start_datetime asc, id desc", limit=limit)
         return [self._serialize_event(ev, website) for ev in events]
 
@@ -100,6 +95,12 @@ class GuiaBHContentBridge(models.AbstractModel):
         if "start_datetime" in Event._fields:
             domain += [("start_datetime", ">=", now), ("start_datetime", "<=", end)]
         events = Event.search(domain, order="start_datetime asc, id desc", limit=limit)
+        if not events:
+            events = Event.search(
+                [("website_published", "=", True), ("active", "=", True)],
+                order="start_datetime desc, id desc",
+                limit=limit,
+            )
         return [self._serialize_event(ev, website) for ev in events]
 
     @api.model
@@ -119,19 +120,17 @@ class GuiaBHContentBridge(models.AbstractModel):
     @api.model
     def get_now_playing_movies(self, limit=6, website=None):
         website = website or self.env["website"].get_current_website()
-        Movie = self._get_model("guiabh.cinema.movie") or self._get_model("guiabh.cineart.movie")
-        if Movie:
-            domain = [
-                ("active", "=", True),
-                ("website_published", "=", True),
-            ]
-            if "category" in Movie._fields:
-                domain.append(("category", "in", ["now", "premiere"]))
-            if "website_id" in Movie._fields and website:
-                domain += ["|", ("website_id", "=", False), ("website_id", "=", website.id)]
-            movies = Movie.search(domain, order="is_featured desc, id desc", limit=limit)
-            return [self._serialize_movie(mv) for mv in movies]
-        return []
+        Movie = self._get_model("guiabh.cinema.movie")
+        if not Movie:
+            return []
+        domain = [
+            ("active", "=", True),
+            ("website_published", "=", True),
+        ]
+        if "category" in Movie._fields:
+            domain.append(("category", "in", ["now", "premiere"]))
+        movies = Movie.search(domain, order="is_featured desc, id desc", limit=limit)
+        return [self._serialize_movie(mv) for mv in movies]
 
     @api.model
     def get_upcoming_matches(self, limit=6, date_window=30, website=None):
@@ -146,8 +145,6 @@ class GuiaBHContentBridge(models.AbstractModel):
                 ("match_datetime", ">=", now),
                 ("match_datetime", "<=", end),
             ]
-            if "website_id" in Match._fields and website:
-                domain += ["|", ("website_id", "=", False), ("website_id", "=", website.id)]
             matches = Match.search(domain, order="match_datetime asc, id asc", limit=limit)
             return [self._serialize_match(mt) for mt in matches]
         return []

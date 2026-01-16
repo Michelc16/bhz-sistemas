@@ -32,7 +32,6 @@
                 <field name="release_date"/>
                 <field name="is_featured"/>
                 <field name="website_published"/>
-                <field name="website_id"/>
               </group>
               <group>
                 <field name="poster_image" widget="image" class="oe_avatar"/>
@@ -47,7 +46,7 @@
     <record id="action_guiabh_cinema_movie" model="ir.actions.act_window">
       <field name="name">Filmes (Cinema)</field>
       <field name="res_model">guiabh.cinema.movie</field>
-      <field name="view_mode">tree,form</field>
+      <field name="view_mode">list,form</field>
     </record>
 
     <menuitem id="menu_guiabh_cinema_root"
