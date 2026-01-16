@@ -75,7 +75,6 @@ class GuiaBHContentBridge(models.AbstractModel):
         domain = [
             ("website_published", "=", True),
             ("active", "=", True),
-            ("is_featured", "=", True),
         ] + self._website_domain(Event, website)
         events = Event.search(domain, order="is_featured desc, start_datetime asc, id desc", limit=limit)
         return [self._serialize_event(ev, website) for ev in events]
