@@ -9,6 +9,7 @@
         "base",
         "product",
     ],
+    "license": "LGPL-3",
     "data": [],
     "installable": True,
     "application": False,

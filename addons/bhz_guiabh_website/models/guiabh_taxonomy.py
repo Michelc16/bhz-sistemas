@@ -41,6 +41,8 @@ class GuiaBHTag(models.Model):
     active = fields.Boolean(default=True)
     website_id = fields.Many2one('website', string='Website', ondelete='set null')
 
-    _sql_constraints = [
-        ('name_website_unique', 'unique(name, website_id)', 'Já existe uma tag com este nome neste site.'),
-    ]
+    _table_args = (
+        models.UniqueConstraint(
+            "name", "website_id", name="guiabh_tag_name_website_unique"
+        ),
+    )

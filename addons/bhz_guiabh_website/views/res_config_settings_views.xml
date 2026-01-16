@@ -26,7 +26,7 @@
                 <field name="guiabh_apply_theme"/>
                 <span class="text-muted">Aplica o tema GuiaBH somente no novo site criado.</span>
               </div>
-              <div class="alert alert-info mt8">
+              <div class="alert alert-info mt8" role="status">
                 <p class="mb0">As alterações acima só executam ao salvar as configurações. Nada é aplicado automaticamente na instalação.</p>
               </div>
             </div>

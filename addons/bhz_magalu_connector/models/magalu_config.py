@@ -38,9 +38,11 @@ class BhzMagaluConfig(models.Model):
     _rec_name = "name"
     _check_company_auto = True
     _order = "id desc"
-    _sql_constraints = [
-        ("unique_company", "unique(company_id)", "Cada empresa só pode ter uma configuração Magalu."),
-    ]
+    _table_args = (
+        models.UniqueConstraint(
+            "company_id", name="bhz_magalu_config_unique_company"
+        ),
+    )
 
     name = fields.Char(default="Configuração Magalu", readonly=True)
     environment = fields.Selection(

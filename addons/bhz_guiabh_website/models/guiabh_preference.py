@@ -6,9 +6,11 @@ class GuiaBHPreference(models.Model):
     _name = "guiabh.preference"
     _description = "Preferências do usuário GuiaBH"
     _order = "id desc"
-    _sql_constraints = [
-        ("user_website_unique", "unique(user_id, website_id)", "Preferências já cadastradas para este usuário e site."),
-    ]
+    _table_args = (
+        models.UniqueConstraint(
+            "user_id", "website_id", name="guiabh_preference_user_website_unique"
+        ),
+    )
 
     user_id = fields.Many2one("res.users", required=True, ondelete="cascade")
     website_id = fields.Many2one(

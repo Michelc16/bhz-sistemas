@@ -47,9 +47,11 @@ class GuiaBHPlace(models.Model):
     editorial_reviewer_id = fields.Many2one('res.users', string='Revisor')
     editorial_date = fields.Datetime('Data de revisão')
 
-    _sql_constraints = [
-        ('place_slug_website_unique', 'unique(slug, website_id)', 'O slug deve ser único por website.'),
-    ]
+    _table_args = (
+        models.UniqueConstraint(
+            "slug", "website_id", name="guiabh_place_slug_website_unique"
+        ),
+    )
 
     @api.depends('name', 'website_id')
     def _compute_slug(self):

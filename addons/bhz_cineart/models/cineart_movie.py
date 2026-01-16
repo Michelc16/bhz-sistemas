@@ -59,9 +59,11 @@ class CineartMovie(models.Model):
         help="Controle opcional de popularidade para ordenar os destaques.",
     )
 
-    _sql_constraints = [
-        ("cineart_url_unique", "unique(cineart_url)", "Já existe um filme com este link do Cineart."),
-    ]
+    _table_args = (
+        models.UniqueConstraint(
+            "cineart_url", name="cineart_movie_url_unique"
+        ),
+    )
 
     def action_open_cineart(self):
         self.ensure_one()

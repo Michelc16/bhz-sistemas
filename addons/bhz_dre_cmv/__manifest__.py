@@ -3,6 +3,7 @@
     "version": "19.0.1.0.0",
     "category": "Accounting/Reporting",
     "summary": "Gere relatórios simples da Demonstração do Resultado",
+    "author": "BHZ Sistemas",
     "depends": ["account"],
     "data": [
         "security/security.xml",

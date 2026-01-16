@@ -7,9 +7,11 @@ class GuiaBHFav(models.Model):
     _name = "guiabh.favorite"
     _description = "GuiaBH Favorite"
     _order = "create_date desc"
-    _sql_constraints = [
-        ("favorite_unique", "unique(user_id, website_id, res_model, res_id)", "Já está na sua lista."),
-    ]
+    _table_args = (
+        models.UniqueConstraint(
+            "user_id", "website_id", "res_model", "res_id", name="guiabh_favorite_unique"
+        ),
+    )
 
     user_id = fields.Many2one("res.users", required=True, ondelete="cascade")
     website_id = fields.Many2one(
