@@ -10,8 +10,7 @@ class GuiaBHFav(models.Model):
     _table_args = (
         models.Constraint(
             "guiabh_favorite_unique",
-            type="unique",
-            fields=["user_id", "website_id", "res_model", "res_id"],
+            "unique(user_id, website_id, res_model, res_id)",
         ),
     )
 

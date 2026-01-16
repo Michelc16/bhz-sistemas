@@ -45,8 +45,7 @@ class GuiaBHEvent(models.Model):
     _table_args = (
         models.Constraint(
             "guiabh_event_slug_website_unique",
-            type="unique",
-            fields=["slug", "website_id"],
+            "unique(slug, website_id)",
         ),
     )
 

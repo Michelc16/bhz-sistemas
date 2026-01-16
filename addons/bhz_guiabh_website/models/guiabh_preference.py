@@ -9,8 +9,7 @@ class GuiaBHPreference(models.Model):
     _table_args = (
         models.Constraint(
             "guiabh_preference_user_website_unique",
-            type="unique",
-            fields=["user_id", "website_id"],
+            "unique(user_id, website_id)",
         ),
     )
 

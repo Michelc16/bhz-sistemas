@@ -115,8 +115,7 @@ class EventEvent(models.Model):
     _table_args = (
         models.Constraint(
             "bhz_event_external_unique",
-            type="unique",
-            fields=["external_source", "external_id"],
+            "unique(external_source, external_id)",
         ),
     )
     auto_remove_after_event = fields.Selection(

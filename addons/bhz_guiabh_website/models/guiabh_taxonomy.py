@@ -44,7 +44,6 @@ class GuiaBHTag(models.Model):
     _table_args = (
         models.Constraint(
             "guiabh_tag_name_website_unique",
-            type="unique",
-            fields=["name", "website_id"],
+            "unique(name, website_id)",
         ),
     )
