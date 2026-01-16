@@ -19,3 +19,19 @@ WebsiteBuilderClientAction.prototype.resolveIframeLoaded = function (...args) {
         return;
     }
 };
+
+// Swallow DOM removeChild errors globally in builder context to avoid OwlError loops.
+if (typeof window !== "undefined") {
+    const originalOnError = window.onerror;
+    window.onerror = function (message, source, lineno, colno, error) {
+        const msg = (message || "").toString();
+        const isRemoveChild = msg.includes("removeChild") && msg.includes("not a child");
+        if (isRemoveChild) {
+            return true; // mark as handled
+        }
+        if (originalOnError) {
+            return originalOnError.apply(this, arguments);
+        }
+        return false;
+    };
+}
