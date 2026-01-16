@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-  <data noupdate="1">
+  <data>
     <record id="asset_guiabh_frontend_scss" model="ir.asset">
       <field name="name">GUIABH SCSS</field>
       <field name="bundle">web.assets_frontend</field>
@@ -8,8 +8,8 @@
       <field name="sequence" eval="10"/>
     </record>
     <record id="asset_guiabh_frontend_js" model="ir.asset">
-      <field name="name">GUIABH JS</field>
-      <field name="bundle">web.assets_frontend</field>
+      <field name="name">GUIABH JS (Editor)</field>
+      <field name="bundle">website.assets_editor</field>
       <field name="path">bhz_guiabh_website/static/src/js/guiabh.js</field>
       <field name="sequence" eval="10"/>
     </record>
