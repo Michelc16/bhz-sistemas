@@ -2,15 +2,14 @@
 odoo.define('bhz_guiabh_website.guiabh', function (require) {
     'use strict';
 
-    const registry = (window.odoo && odoo.__modules) || {};
-    if (!registry['web.public.widget'] || !registry['web.ajax']) {
+    let publicWidget, ajax, options;
+    try {
+        publicWidget = require('web.public.widget');
+        ajax = require('web.ajax');
+    } catch (err) {
         // Minimal bundle loaded (no website widgets); skip to avoid noisy errors.
         return;
     }
-
-    let publicWidget = require('web.public.widget');
-    let ajax = require('web.ajax');
-    let options;
     try {
         options = require('website.snippets.options');
     } catch (err) {
