@@ -161,8 +161,8 @@
         <field name="name">Sunset no Parque</field>
         <field name="short_description">Line-up com DJs locais e food trucks.</field>
         <field name="website_id" ref="website.default_website"/>
-        <field name="start_datetime">2025-02-15 17:00:00</field>
-        <field name="end_datetime">2025-02-15 22:00:00</field>
+        <field name="start_datetime">2030-02-15 17:00:00</field>
+        <field name="end_datetime">2030-02-15 22:00:00</field>
         <field name="venue_name">Parque da Lua</field>
         <field name="address_text">Lagoa da Pampulha</field>
         <field name="region_id" ref="region_pampulha"/>
@@ -180,8 +180,8 @@
         <field name="name">Peça Noite em BH</field>
         <field name="short_description">Comédia inteligente com elenco local.</field>
         <field name="website_id" ref="website.default_website"/>
-        <field name="start_datetime">2025-03-05 20:00:00</field>
-        <field name="end_datetime">2025-03-05 22:00:00</field>
+        <field name="start_datetime">2030-03-05 20:00:00</field>
+        <field name="end_datetime">2030-03-05 22:00:00</field>
         <field name="venue_name">Teatro Municipal</field>
         <field name="address_text">Praça da Liberdade</field>
         <field name="region_id" ref="region_centro"/>
@@ -197,8 +197,8 @@
         <field name="name">Manhã no Museu</field>
         <field name="short_description">Atividades infantis e oficinas criativas.</field>
         <field name="website_id" ref="website.default_website"/>
-        <field name="start_datetime">2025-02-22 10:00:00</field>
-        <field name="end_datetime">2025-02-22 13:00:00</field>
+        <field name="start_datetime">2030-02-22 10:00:00</field>
+        <field name="end_datetime">2030-02-22 13:00:00</field>
         <field name="venue_name">Museu Memórias de BH</field>
         <field name="address_text">Praça da Cultura, 12 - Centro</field>
         <field name="region_id" ref="region_centro"/>
@@ -214,8 +214,8 @@
         <field name="name">Festival de Sabores Mineiros</field>
         <field name="short_description">Chefs locais com menus especiais e música ao vivo.</field>
         <field name="website_id" ref="website.default_website"/>
-        <field name="start_datetime">2025-03-20 18:00:00</field>
-        <field name="end_datetime">2025-03-20 23:00:00</field>
+        <field name="start_datetime">2030-03-20 18:00:00</field>
+        <field name="end_datetime">2030-03-20 23:00:00</field>
         <field name="venue_name">Jardim Gastronômico</field>
         <field name="address_text">Alameda Sabores, 45 - Lourdes</field>
         <field name="region_id" ref="region_lourdes"/>
@@ -231,8 +231,8 @@
         <field name="name">Corrida da Lagoa</field>
         <field name="short_description">Percurso de 7km com largada ao nascer do sol.</field>
         <field name="website_id" ref="website.default_website"/>
-        <field name="start_datetime">2025-02-28 06:00:00</field>
-        <field name="end_datetime">2025-02-28 09:00:00</field>
+        <field name="start_datetime">2030-02-28 06:00:00</field>
+        <field name="end_datetime">2030-02-28 09:00:00</field>
         <field name="venue_name">Orla da Pampulha</field>
         <field name="address_text">Pampulha</field>
         <field name="region_id" ref="region_pampulha"/>
@@ -248,8 +248,8 @@
         <field name="name">Roda Cultural na Praça</field>
         <field name="short_description">Performances gratuitas e feira criativa.</field>
         <field name="website_id" ref="website.default_website"/>
-        <field name="start_datetime">2025-02-18 16:00:00</field>
-        <field name="end_datetime">2025-02-18 20:00:00</field>
+        <field name="start_datetime">2030-02-18 16:00:00</field>
+        <field name="end_datetime">2030-02-18 20:00:00</field>
         <field name="venue_name">Praça Sete</field>
         <field name="address_text">Centro</field>
         <field name="region_id" ref="region_centro"/>
@@ -258,6 +258,50 @@
         <field name="price_type">free</field>
         <field name="website_published" eval="True"/>
         <field name="cover_image" type="base64" file="bhz_guiabh_website/static/src/img/placeholders/event_placeholder.svg"/>
+    </record>
+
+    <!-- Cinema demo -->
+    <record id="cinema_movie_avatar" model="guiabh.cinema.movie">
+      <field name="name">Avatar: Fogo e Cinzas</field>
+      <field name="category">now</field>
+      <field name="genre">Ação</field>
+      <field name="age_rating">14</field>
+      <field name="release_date">Jan 2030</field>
+      <field name="website_published" eval="True"/>
+      <field name="website_id" ref="website.default_website"/>
+      <field name="is_featured" eval="True"/>
+      <field name="poster_image" type="base64" file="bhz_guiabh_website/static/src/img/placeholders/event_placeholder.svg"/>
+      <field name="cineart_url">https://guiabh.com/cinema/avatar</field>
+    </record>
+    <record id="cinema_movie_empregada" model="guiabh.cinema.movie">
+      <field name="name">A Empregada</field>
+      <field name="category">premiere</field>
+      <field name="genre">Suspense</field>
+      <field name="age_rating">16</field>
+      <field name="release_date">Feb 2030</field>
+      <field name="website_published" eval="True"/>
+      <field name="website_id" ref="website.default_website"/>
+      <field name="poster_image" type="base64" file="bhz_guiabh_website/static/src/img/placeholders/event_placeholder.svg"/>
+      <field name="cineart_url">https://guiabh.com/cinema/a-empregada</field>
+    </record>
+
+    <!-- Futebol demo -->
+    <record id="football_team_mandante" model="guiabh.football.team">
+      <field name="name">Atlético BH</field>
+    </record>
+    <record id="football_team_visitante" model="guiabh.football.team">
+      <field name="name">Cruzeiro BH</field>
+    </record>
+    <record id="football_match_classico" model="guiabh.football.match">
+      <field name="home_team_id" ref="football_team_mandante"/>
+      <field name="away_team_id" ref="football_team_visitante"/>
+      <field name="competition">Mineiro</field>
+      <field name="match_datetime">2030-02-25 16:00:00</field>
+      <field name="stadium">Arena BH</field>
+      <field name="city">Belo Horizonte</field>
+      <field name="website_published" eval="True"/>
+      <field name="website_id" ref="website.default_website"/>
+      <field name="ticket_url">https://guiabh.com/ingressos/classico</field>
     </record>
   </data>
 </odoo>
