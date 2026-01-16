@@ -1,5 +1,5 @@
 /** @odoo-module **/
-odoo.define("bhz_event_promo.guiabh_featured_carousel_option", function (require) {
+odoo.define("bhz_event_promo.guiabh_featured_carousel_option", [], function (require) {
     "use strict";
 
     let BaseOptionComponent, Plugin, SNIPPET_SPECIFIC, withSequence, registry;
