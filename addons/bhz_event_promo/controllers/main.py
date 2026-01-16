@@ -231,23 +231,21 @@ class GuiaBHAgendaController(http.Controller):
     )
     def snippet_featured_events(self, limit=12, carousel_id=None):
         limit = self._sanitize_limit(limit)
+        carousel_target = "#%s" % carousel_id if carousel_id else ""
+        events = request.env["event.event"].sudo().browse()
         try:
-            events = (
-                request.env["event.event"]
-                .sudo()
-                .guiabh_get_featured_events(limit=limit)
+            events = request.env["event.event"].sudo().guiabh_get_featured_events(limit=limit)
+            slides = request.env["ir.ui.view"]._render_template(
+                "bhz_event_promo.guiabh_featured_carousel_slides",
+                {"events": events, "carousel_target": carousel_target},
+            )
+            indicators = request.env["ir.ui.view"]._render_template(
+                "bhz_event_promo.guiabh_featured_carousel_indicators",
+                {"events": events, "carousel_target": carousel_target},
             )
         except Exception:
-            events = request.env["event.event"].sudo().browse()
-        carousel_target = "#%s" % carousel_id if carousel_id else ""
-        slides = request.env["ir.ui.view"]._render_template(
-            "bhz_event_promo.guiabh_featured_carousel_slides",
-            {"events": events, "carousel_target": carousel_target},
-        )
-        indicators = request.env["ir.ui.view"]._render_template(
-            "bhz_event_promo.guiabh_featured_carousel_indicators",
-            {"events": events, "carousel_target": carousel_target},
-        )
+            slides = ""
+            indicators = ""
         return {
             "slides": slides,
             "indicators": indicators,

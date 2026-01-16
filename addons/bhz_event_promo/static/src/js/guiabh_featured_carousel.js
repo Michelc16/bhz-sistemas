@@ -42,6 +42,12 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
             this._applyPayload(payload);
         } catch (err) {
             console.error("Failed to load featured events", err);
+            this._applyPayload({
+                slides: "",
+                indicators: "",
+                has_events: false,
+                has_multiple: false,
+            });
         }
     },
 
