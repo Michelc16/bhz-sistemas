@@ -472,8 +472,11 @@ class EventEvent(models.Model):
     # ---------------------------------------------------------- Datetime helper
     def _get_display_timezone(self):
         website = getattr(request, "website", False)
-        if website and website.tz:
+        # Odoo 19 website does not expose tz; fall back safely.
+        if website and hasattr(website, "tz") and website.tz:
             return website.tz
+        if website and hasattr(website, "timezone") and website.timezone:
+            return website.timezone
         return self.env.context.get("tz") or self.env.user.tz or "UTC"
 
     def _localize_datetime(self, dt):
