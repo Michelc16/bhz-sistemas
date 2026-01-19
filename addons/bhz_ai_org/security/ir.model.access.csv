@@ -4,6 +4,7 @@ access_bhz_ai_role_user,bhz.ai.role user,model_bhz_ai_role,base.group_user,1,1,1
 access_bhz_ai_agent,bhz.ai.agent,model_bhz_ai_agent,bhz_ai_org.group_bhz_ai_operator,1,1,1,0
 access_bhz_ai_agent_user,bhz.ai.agent user,model_bhz_ai_agent,base.group_user,1,1,1,0
 access_bhz_ai_tool,bhz.ai.tool,model_bhz_ai_tool,bhz_ai_org.group_bhz_ai_admin,1,1,1,1
+access_bhz_ai_tool_admin,bhz.ai.tool admin,model_bhz_ai_tool,base.group_system,1,1,1,1
 access_bhz_ai_policy,bhz.ai.policy,model_bhz_ai_policy,bhz_ai_org.group_bhz_ai_admin,1,1,1,1
 access_bhz_ai_policy_user,bhz.ai.policy user,model_bhz_ai_policy,base.group_user,1,1,1,0
 access_bhz_ai_task,bhz.ai.task,model_bhz_ai_task,bhz_ai_org.group_bhz_ai_operator,1,1,1,0
