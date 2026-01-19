@@ -13,5 +13,11 @@
       <field name="path">bhz_guiabh_website/static/src/js/guiabh.js</field>
       <field name="sequence" eval="10"/>
     </record>
+    <record id="asset_guiabh_frontend_guard_js" model="ir.asset">
+      <field name="name">GUIABH Frontend Guard</field>
+      <field name="bundle">web.assets_frontend</field>
+      <field name="path">bhz_guiabh_website/static/src/js/frontend_guard.js</field>
+      <field name="sequence" eval="5"/>
+    </record>
   </data>
 </odoo>

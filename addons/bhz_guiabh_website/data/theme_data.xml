@@ -14,6 +14,12 @@
       <field name="path">bhz_guiabh_website/static/src/js/guiabh.js</field>
       <field name="sequence" eval="10"/>
     </record>
+    <record id="theme_asset_guiabh_frontend_guard_js" model="theme.ir.asset">
+      <field name="name">GUIABH Frontend Guard (Theme)</field>
+      <field name="bundle">web.assets_frontend</field>
+      <field name="path">bhz_guiabh_website/static/src/js/frontend_guard.js</field>
+      <field name="sequence" eval="5"/>
+    </record>
     <!-- Ensure assets are also loaded in builder/iframe -->
     <record id="theme_asset_guiabh_wysiwyg_js" model="theme.ir.asset">
       <field name="name">GUIABH JS (Builder)</field>
