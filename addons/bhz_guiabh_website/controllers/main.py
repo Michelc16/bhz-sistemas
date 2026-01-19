@@ -511,9 +511,6 @@ class GuiaBHWebsite(http.Controller):
 
     @http.route('/guiabh/snippet/events', type='json', auth='public', website=True)
     def snippet_events_data(self, limit=6, category_id=None, region_id=None, free=None):
-        ensure = self._ensure_theme_or_404()
-        if ensure:
-            return False
         limit = int(limit) if str(limit).isdigit() else 6
         domain = self._event_domain()
         if category_id:
@@ -544,9 +541,6 @@ class GuiaBHWebsite(http.Controller):
 
     @http.route('/guiabh/snippet/places', type='json', auth='public', website=True)
     def snippet_places_data(self, limit=6, place_type_id=None, region_id=None, tags=None):
-        ensure = self._ensure_theme_or_404()
-        if ensure:
-            return False
         limit = int(limit) if str(limit).isdigit() else 6
         domain = self._place_domain()
         if place_type_id:
