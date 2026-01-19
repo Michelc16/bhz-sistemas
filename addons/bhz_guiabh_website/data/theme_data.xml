@@ -20,6 +20,18 @@
       <field name="path">bhz_guiabh_website/static/src/js/frontend_guard.js</field>
       <field name="sequence" eval="5"/>
     </record>
+    <record id="theme_asset_guiabh_editor_guard_js" model="theme.ir.asset">
+      <field name="name">GUIABH Editor Guard (Theme)</field>
+      <field name="bundle">website.assets_editor</field>
+      <field name="path">bhz_guiabh_website/static/src/js/frontend_guard.js</field>
+      <field name="sequence" eval="5"/>
+    </record>
+    <record id="theme_asset_guiabh_wysiwyg_guard_js" model="theme.ir.asset">
+      <field name="name">GUIABH Wysiwyg Guard (Theme)</field>
+      <field name="bundle">website.assets_wysiwyg</field>
+      <field name="path">bhz_guiabh_website/static/src/js/frontend_guard.js</field>
+      <field name="sequence" eval="5"/>
+    </record>
     <!-- Ensure assets are also loaded in builder/iframe -->
     <record id="theme_asset_guiabh_wysiwyg_js" model="theme.ir.asset">
       <field name="name">GUIABH JS (Builder)</field>

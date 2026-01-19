@@ -19,5 +19,17 @@
       <field name="path">bhz_guiabh_website/static/src/js/frontend_guard.js</field>
       <field name="sequence" eval="5"/>
     </record>
+    <record id="asset_guiabh_editor_guard_js" model="ir.asset">
+      <field name="name">GUIABH Editor Guard</field>
+      <field name="bundle">website.assets_editor</field>
+      <field name="path">bhz_guiabh_website/static/src/js/frontend_guard.js</field>
+      <field name="sequence" eval="5"/>
+    </record>
+    <record id="asset_guiabh_wysiwyg_guard_js" model="ir.asset">
+      <field name="name">GUIABH Wysiwyg Guard</field>
+      <field name="bundle">website.assets_wysiwyg</field>
+      <field name="path">bhz_guiabh_website/static/src/js/frontend_guard.js</field>
+      <field name="sequence" eval="5"/>
+    </record>
   </data>
 </odoo>
