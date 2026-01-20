@@ -10,6 +10,7 @@
         "security/security.xml",
         "security/ir.model.access.csv",
         "security/record_rules.xml",
+        "views/actions.xml",
         "views/menu.xml",
         "views/return_views.xml",
         "views/portal_templates.xml",

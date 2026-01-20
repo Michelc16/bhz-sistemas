@@ -1,0 +1,10 @@
+<odoo>
+  <record id="action_bhz_marketplace_return" model="ir.actions.act_window">
+    <field name="name">Devoluções/Disputas</field>
+    <field name="res_model">bhz.marketplace.return</field>
+    <field name="view_mode">tree,form</field>
+    <field name="help" type="html">
+      <p class="o_view_nocontent_smiling_face">Crie sua primeira devolução/disputa.</p>
+    </field>
+  </record>
+</odoo>
