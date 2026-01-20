@@ -10,7 +10,7 @@
     </record>
     <record id="theme_asset_guiabh_frontend_js" model="theme.ir.asset">
       <field name="name">GUIABH JS (Theme)</field>
-      <field name="bundle">website.assets_frontend_lazy</field>
+      <field name="bundle">web.assets_frontend</field>
       <field name="path">bhz_guiabh_website/static/src/js/guiabh.js</field>
       <field name="sequence" eval="10"/>
     </record>

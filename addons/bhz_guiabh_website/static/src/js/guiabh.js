@@ -1,20 +1,14 @@
 /** @odoo-module **/
-odoo.define('bhz_guiabh_website.guiabh', function (require) {
+odoo.define('bhz_guiabh_website.guiabh', [
+    'web.public.widget',
+    'web.ajax',
+    'website.snippets.options',
+], function (require) {
     'use strict';
 
-    let publicWidget, ajax, options;
-    try {
-        publicWidget = require('web.public.widget');
-        ajax = require('web.ajax');
-    } catch (err) {
-        // Minimal bundle loaded (no website widgets); skip to avoid noisy errors.
-        return;
-    }
-    try {
-        options = require('website.snippets.options');
-    } catch (err) {
-        options = { Class: publicWidget.Widget.extend({}) };
-    }
+    const publicWidget = require('web.public.widget');
+    const ajax = require('web.ajax');
+    const options = require('website.snippets.options');
 
     const GuiabhUtils = {
         formatDate(dateStr) {
