@@ -20,10 +20,10 @@
     <field name="arch" type="xml">
       <form string="Devolução/Disputa">
         <header>
-          <button name="action_set_state" args="('seller_response',)" string="Aguardando vendedor" type="object" states="opened"/>
-          <button name="action_set_state" args="('mediation',)" string="Mediação" type="object" states="seller_response"/>
-          <button name="action_approve_refund" string="Aprovar reembolso" type="object" states="seller_response,mediation"/>
-          <button name="action_set_state" args="('rejected',)" string="Rejeitar" type="object" states="seller_response,mediation"/>
+          <button name="action_set_state" args="('seller_response',)" string="Aguardando vendedor" type="object" invisible="state != 'opened'"/>
+          <button name="action_set_state" args="('mediation',)" string="Mediação" type="object" invisible="state != 'seller_response'"/>
+          <button name="action_approve_refund" string="Aprovar reembolso" type="object" invisible="state not in ('seller_response', 'mediation')"/>
+          <button name="action_set_state" args="('rejected',)" string="Rejeitar" type="object" invisible="state not in ('seller_response', 'mediation')"/>
           <field name="state" widget="statusbar" statusbar_visible="opened,seller_response,mediation,approved_refund,rejected,closed"/>
         </header>
         <sheet>
