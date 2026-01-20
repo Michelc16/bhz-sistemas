@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <template id="marketplace_home" name="BHZ Marketplace - Home">
+    <t t-call="website.layout">
+      <div class="bhz-marketplace-hero py-5">
+        <div class="container">
+          <div class="row align-items-center">
+            <div class="col-12 col-lg-7 mb-4 mb-lg-0">
+              <h1 class="display-5 fw-bold">BHZ Marketplace</h1>
+              <p class="lead text-muted">Apps, sellers, pedidos e repasses em um só lugar.</p>
+              <div class="d-flex flex-wrap gap-2">
+                <a class="btn btn-primary" href="/web#menu_id=menu_bhz_marketplace_root&amp;action=">Abrir Console</a>
+                <a class="btn btn-outline-primary" href="/marketplace/shops">Explorar Lojas</a>
+              </div>
+            </div>
+            <div class="col-12 col-lg-5">
+              <div class="p-4 bg-white rounded-4 bhz-marketplace-card">
+                <h4 class="mb-3">Produtos em destaque</h4>
+                <div class="row g-3">
+                  <t t-foreach="products" t-as="prod">
+                    <div class="col-6">
+                      <a t-att-href="'/marketplace/product/%s' % prod.id" class="text-decoration-none text-reset">
+                        <div class="card h-100 shadow-sm border-0">
+                          <div class="ratio ratio-4x3 bg-light">
+                            <img t-if="prod.image_512" t-att-src="'/web/image/product.template/%s/image_512' % prod.id" class="rounded-top" style="object-fit: cover;"/>
+                            <div class="d-flex align-items-center justify-content-center text-muted" t-if="not prod.image_512">Sem imagem</div>
+                          </div>
+                          <div class="card-body">
+                            <div class="fw-semibold small" t-esc="prod.name"/>
+                            <div class="text-primary fw-bold" t-esc="prod.list_price"/>
+                          </div>
+                        </div>
+                      </a>
+                    </div>
+                  </t>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="container py-5">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h3 class="mb-0">Lojas em destaque</h3>
+          <a class="text-decoration-none" href="/marketplace/shops">Ver todas</a>
+        </div>
+        <div class="row g-3">
+          <t t-foreach="sellers" t-as="seller">
+            <div class="col-12 col-md-4 col-lg-3">
+              <div class="p-3 bg-white h-100 rounded-4 bhz-marketplace-card">
+                <div class="d-flex align-items-center gap-3">
+                  <img t-if="seller.shop_logo" t-att-src="'/web/image/bhz.marketplace.seller/%s/shop_logo' % seller.id" class="rounded-circle" style="width:48px; height:48px; object-fit:cover;"/>
+                  <div class="bg-light rounded-circle d-flex align-items-center justify-content-center text-muted" style="width:48px; height:48px;" t-if="not seller.shop_logo">BHZ</div>
+                  <div>
+                    <div class="fw-semibold" t-esc="seller.shop_title or seller.name"/>
+                    <div class="text-muted small" t-esc="seller.shop_slug"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </t>
+        </div>
+      </div>
+    </t>
+  </template>
+
+  <template id="marketplace_shops" name="BHZ Marketplace - Lojas">
+    <t t-call="website.layout">
+      <div class="container py-5">
+        <h1 class="mb-4">Lojas</h1>
+        <div class="row g-3">
+          <t t-foreach="sellers" t-as="seller">
+            <div class="col-12 col-md-6 col-lg-4">
+              <div class="p-4 bg-white h-100 rounded-4 bhz-marketplace-card">
+                <div class="d-flex gap-3 align-items-center mb-2">
+                  <img t-if="seller.shop_logo" t-att-src="'/web/image/bhz.marketplace.seller/%s/shop_logo' % seller.id" class="rounded-circle" style="width:52px; height:52px; object-fit:cover;"/>
+                  <div class="bg-light rounded-circle d-flex align-items-center justify-content-center text-muted" style="width:52px; height:52px;" t-if="not seller.shop_logo">BHZ</div>
+                  <div>
+                    <div class="fw-semibold" t-esc="seller.shop_title or seller.name"/>
+                    <div class="text-muted small" t-esc="seller.shop_slug"/>
+                  </div>
+                </div>
+                <p class="text-muted mb-0" t-esc="seller.shop_description or 'Loja parceira do BHZ Marketplace.'"/>
+              </div>
+            </div>
+          </t>
+        </div>
+      </div>
+    </t>
+  </template>
+
+  <template id="marketplace_category" name="BHZ Marketplace - Categoria">
+    <t t-call="website.layout">
+      <div class="container py-5">
+        <h1 class="mb-3"><t t-esc="category.name if category else 'Categoria'"/></h1>
+        <div class="row g-3">
+          <t t-foreach="products" t-as="prod">
+            <div class="col-6 col-md-3">
+              <a t-att-href="'/marketplace/product/%s' % prod.id" class="text-decoration-none text-reset">
+                <div class="card h-100 shadow-sm border-0">
+                  <div class="ratio ratio-4x3 bg-light">
+                    <img t-if="prod.image_512" t-att-src="'/web/image/product.template/%s/image_512' % prod.id" class="rounded-top" style="object-fit: cover;"/>
+                    <div class="d-flex align-items-center justify-content-center text-muted" t-if="not prod.image_512">Sem imagem</div>
+                  </div>
+                  <div class="card-body">
+                    <div class="fw-semibold small" t-esc="prod.name"/>
+                    <div class="text-primary fw-bold" t-esc="prod.list_price"/>
+                  </div>
+                </div>
+              </a>
+            </div>
+          </t>
+        </div>
+      </div>
+    </t>
+  </template>
+
+  <template id="marketplace_product" name="BHZ Marketplace - Produto">
+    <t t-call="website.layout">
+      <div class="container py-5">
+        <div class="row g-4">
+          <div class="col-12 col-md-5">
+            <div class="ratio ratio-4x3 bg-light rounded-4">
+              <img t-if="product.image_512" t-att-src="'/web/image/product.template/%s/image_512' % product.id" class="rounded-4" style="object-fit: cover;"/>
+              <div class="d-flex align-items-center justify-content-center text-muted" t-if="not product.image_512">Sem imagem</div>
+            </div>
+          </div>
+          <div class="col-12 col-md-7">
+            <h1 class="h3 mb-3" t-esc="product.name"/>
+            <p class="text-primary fw-bold fs-4" t-esc="product.list_price"/>
+            <p class="text-muted" t-esc="product.website_description or product.description_sale"/>
+            <div class="d-flex gap-2">
+              <a class="btn btn-primary" t-att-href="'/shop/product/%s' % product.id" t-if="request.env['ir.module.module'].sudo().search_count([('name','=','website_sale'), ('state','=','installed')])">Adicionar ao carrinho</a>
+              <a class="btn btn-outline-primary" href="/marketplace">Voltar</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </t>
+  </template>
+</odoo>

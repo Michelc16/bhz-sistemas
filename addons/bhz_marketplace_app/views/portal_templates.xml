@@ -1,0 +1,92 @@
+<odoo>
+  <template id="portal_my_marketplace_home" name="Portal BHZ Marketplace">
+    <t t-call="portal.portal_layout">
+      <t t-set="breadcrumbs" t-value="[(portal_url('/my'), 'Home'), ('Marketplace', False)]"/>
+      <div class="o_portal_wrap">
+        <h2>Marketplace do Vendedor</h2>
+        <div class="row g-3">
+          <div class="col-6 col-md-3">
+            <a class="btn btn-outline-primary w-100" href="/my/marketplace/products">Produtos</a>
+          </div>
+          <div class="col-6 col-md-3">
+            <a class="btn btn-outline-primary w-100" href="/my/marketplace/orders">Pedidos</a>
+          </div>
+          <div class="col-6 col-md-3">
+            <a class="btn btn-outline-primary w-100" href="/my/marketplace/returns">Devoluções/Disputas</a>
+          </div>
+        </div>
+      </div>
+    </t>
+  </template>
+
+  <template id="portal_my_marketplace_products" name="Portal BHZ Marketplace - Produtos">
+    <t t-call="portal.portal_layout">
+      <t t-set="breadcrumbs" t-value="[(portal_url('/my'), 'Home'), (portal_url('/my/marketplace'), 'Marketplace'), ('Produtos', False)]"/>
+      <div class="o_portal_wrap">
+        <h2>Meus produtos</h2>
+        <table class="table table-striped">
+          <thead>
+            <tr><th>Nome</th><th>Estado</th><th>Preço</th></tr>
+          </thead>
+          <tbody>
+            <t t-foreach="products" t-as="prod">
+              <tr>
+                <td><a t-att-href="'/web#id=%s&amp;model=product.template&amp;view_type=form' % prod.id"><t t-esc="prod.name"/></a></td>
+                <td><t t-esc="prod.bhz_marketplace_state"/></td>
+                <td><t t-esc="prod.list_price"/></td>
+              </tr>
+            </t>
+          </tbody>
+        </table>
+      </div>
+    </t>
+  </template>
+
+  <template id="portal_my_marketplace_orders" name="Portal BHZ Marketplace - Pedidos">
+    <t t-call="portal.portal_layout">
+      <t t-set="breadcrumbs" t-value="[(portal_url('/my'), 'Home'), (portal_url('/my/marketplace'), 'Marketplace'), ('Pedidos', False)]"/>
+      <div class="o_portal_wrap">
+        <h2>Pedidos com meus produtos</h2>
+        <table class="table table-striped">
+          <thead>
+            <tr><th>Pedido</th><th>Cliente</th><th>Total</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <t t-foreach="orders" t-as="so">
+              <tr>
+                <td><a t-att-href="'/my/orders/%s' % so.id"><t t-esc="so.name"/></a></td>
+                <td><t t-esc="so.partner_id.name"/></td>
+                <td><t t-esc="so.amount_total"/></td>
+                <td><t t-esc="so.state"/></td>
+              </tr>
+            </t>
+          </tbody>
+        </table>
+      </div>
+    </t>
+  </template>
+
+  <template id="portal_my_marketplace_returns" name="Portal BHZ Marketplace - Devoluções">
+    <t t-call="portal.portal_layout">
+      <t t-set="breadcrumbs" t-value="[(portal_url('/my'), 'Home'), (portal_url('/my/marketplace'), 'Marketplace'), ('Devoluções/Disputas', False)]"/>
+      <div class="o_portal_wrap">
+        <h2>Devoluções e disputas</h2>
+        <table class="table table-striped">
+          <thead>
+            <tr><th>Pedido</th><th>Motivo</th><th>Valor</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <t t-foreach="returns" t-as="ret">
+              <tr>
+                <td><t t-esc="ret.sale_order_id.name or '-'"/></td>
+                <td><t t-esc="ret.reason or '-'"/></td>
+                <td><t t-esc="ret.refund_amount"/></td>
+                <td><t t-esc="ret.state"/></td>
+              </tr>
+            </t>
+          </tbody>
+        </table>
+      </div>
+    </t>
+  </template>
+</odoo>

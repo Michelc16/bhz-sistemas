@@ -1,0 +1,34 @@
+{
+    "name": "BHZ Marketplace",
+    "summary": "App completo do marketplace (admin, portal do vendedor e website demo).",
+    "version": "19.0.1.0.0",
+    "category": "Sales",
+    "author": "BHZ Sistemas",
+    "website": "https://bhzsistemas.com.br",
+    "license": "LGPL-3",
+    "application": True,
+    "depends": [
+        "bhz_marketplace_core",
+        "bhz_marketplace_shipping",
+        "bhz_marketplace_returns_disputes",
+        "bhz_marketplace_payouts",
+        "bhz_marketplace_rank_ads",
+        "bhz_marketplace_chat",
+        "bhz_connector_base",
+        "website",
+        "portal",
+    ],
+    "data": [
+        "security/security.xml",
+        "views/actions.xml",
+        "views/menu.xml",
+        "views/portal_templates.xml",
+        "views/website_templates.xml",
+    ],
+    "assets": {
+        "web.assets_frontend": [
+            "bhz_marketplace_app/static/src/css/marketplace_website.css",
+        ],
+    },
+    "installable": True,
+}

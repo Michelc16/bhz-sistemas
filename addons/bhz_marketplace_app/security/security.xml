@@ -1,0 +1,9 @@
+<odoo>
+  <!-- Regra básica multi-empresa para sellers do marketplace -->
+  <record id="rule_bhz_marketplace_seller_company" model="ir.rule">
+    <field name="name">Sellers por empresa</field>
+    <field name="model_id" ref="bhz_marketplace_core.model_bhz_marketplace_seller"/>
+    <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    <field name="groups" eval="[(4, ref('bhz_marketplace_core.group_marketplace_manager'))]"/>
+  </record>
+</odoo>

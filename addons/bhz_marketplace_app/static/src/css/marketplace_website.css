@@ -1,0 +1,15 @@
+:root {
+  --bhz-marketplace-primary: #0d6efd;
+  --bhz-marketplace-light: #f6f7fb;
+}
+
+.bhz-marketplace-hero {
+  background: radial-gradient(circle at 20% 20%, rgba(13, 110, 253, 0.1), transparent 40%),
+              radial-gradient(circle at 80% 0%, rgba(13, 110, 253, 0.12), transparent 35%),
+              linear-gradient(120deg, #ffffff 0%, #f3f6ff 100%);
+}
+
+.bhz-marketplace-card {
+  border: 1px solid #e9ecf5;
+  box-shadow: 0 10px 40px rgba(13, 110, 253, 0.08);
+}
