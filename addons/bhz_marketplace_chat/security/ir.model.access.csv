@@ -1,3 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_product_question_manager,bhz.product.question.manager,model_bhz_product_question,bhz_marketplace_chat.group_marketplace_support,1,1,1,1
+access_product_question_manager_root,bhz.product.question.manager.root,model_bhz_product_question,bhz_marketplace_core.group_marketplace_manager,1,1,1,1
 access_product_question_seller,bhz.product.question.seller,model_bhz_product_question,bhz_marketplace_core.group_marketplace_seller,1,1,1,0

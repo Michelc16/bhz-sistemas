@@ -2,7 +2,7 @@
   <menuitem id="menu_bhz_marketplace_app_root"
             name="BHZ Marketplace"
             sequence="15"
-            groups="base.group_user"
+            groups="bhz_marketplace_core.group_marketplace_manager"
             web_icon="bhz_marketplace_app,static/description/icon.png"
             action="bhz_marketplace_app.action_bhz_marketplace_home"/>
 

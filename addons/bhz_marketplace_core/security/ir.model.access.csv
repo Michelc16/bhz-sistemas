@@ -1,5 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_bhz_marketplace_seller_manager,bhz.marketplace.seller.manager,model_bhz_marketplace_seller,bhz_marketplace_core.group_marketplace_manager,1,1,1,1
-access_bhz_marketplace_seller_user,bhz.marketplace.seller.user,model_bhz_marketplace_seller,bhz_marketplace_core.group_marketplace_seller,1,1,0,0
+access_bhz_marketplace_seller_user,bhz.marketplace.seller.user,model_bhz_marketplace_seller,bhz_marketplace_core.group_marketplace_seller,1,1,1,0
 access_bhz_marketplace_api_token_manager,bhz.marketplace.api.token.manager,model_bhz_marketplace_api_token,bhz_marketplace_core.group_marketplace_manager,1,1,1,1
 access_bhz_marketplace_api_token_seller,bhz.marketplace.api.token.seller,model_bhz_marketplace_api_token,bhz_marketplace_core.group_marketplace_seller,1,1,1,0

@@ -1,3 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_seller_reputation,bhz.seller.reputation.manager,model_bhz_seller_reputation,bhz_marketplace_rank_ads.group_marketplace_growth,1,1,1,1
 access_product_ads,bhz.product.ads.manager,model_bhz_product_ads,bhz_marketplace_rank_ads.group_marketplace_growth,1,1,1,1
+access_seller_reputation_root,bhz.seller.reputation.manager.root,model_bhz_seller_reputation,bhz_marketplace_core.group_marketplace_manager,1,1,1,1
+access_product_ads_root,bhz.product.ads.manager.root,model_bhz_product_ads,bhz_marketplace_core.group_marketplace_manager,1,1,1,1
