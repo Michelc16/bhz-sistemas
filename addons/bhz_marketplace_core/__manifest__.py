@@ -10,7 +10,6 @@
         "security/security.xml",
         "security/ir.model.access.csv",
         "security/record_rules.xml",
-        "data/admin_groups.xml",
         "views/seller_views.xml",
         "views/api_token_views.xml",
         "views/product_views.xml",
@@ -19,6 +18,7 @@
         "views/portal_templates.xml",
         "views/website_templates.xml",
     ],
+    "post_init_hook": "post_init_hook",
     "application": True,
     "installable": True,
 }
