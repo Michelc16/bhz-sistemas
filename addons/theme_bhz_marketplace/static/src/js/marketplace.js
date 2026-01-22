@@ -4,8 +4,6 @@
  */
 odoo.define('theme_bhz_marketplace.marketplace', function (require) {
   'use strict';
-  const { loadCSS } = require('web.asset_utils');
-
   const body = document.body;
   const html = document.documentElement;
 
@@ -19,6 +17,6 @@ odoo.define('theme_bhz_marketplace.marketplace', function (require) {
     return;
   }
 
-  // Garantir carregamento do CSS (caso precise lazy load em certos builds)
-  loadCSS('/theme_bhz_marketplace/static/src/css/marketplace.css');
+  // Nenhuma manipulação de DOM para evitar conflitos com Owl/backend.
+  // O CSS já é carregado via assets, então o JS permanece intencionalmente leve.
 });

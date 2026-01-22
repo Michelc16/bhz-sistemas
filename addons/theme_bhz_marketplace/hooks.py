@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-from odoo import api
+from odoo import api, SUPERUSER_ID
 
 
-def post_init_hook(env):
+def post_init_hook(cr, registry):
     """Apply the theme and create basic pages/menus for the marketplace website only."""
-    env = env.su()
+    env = api.Environment(cr, SUPERUSER_ID, {})
     Website = env["website"]
 
     # Isolated website lookup/creation
