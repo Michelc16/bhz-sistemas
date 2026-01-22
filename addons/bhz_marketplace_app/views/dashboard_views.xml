@@ -1,11 +1,11 @@
 <odoo>
-  <record id="view_bhz_marketplace_dashboard_tree" model="ir.ui.view">
-    <field name="name">bhz.marketplace.dashboard.tree</field>
+  <record id="view_bhz_marketplace_dashboard_list" model="ir.ui.view">
+    <field name="name">bhz.marketplace.dashboard.list</field>
     <field name="model">bhz.marketplace.dashboard</field>
     <field name="arch" type="xml">
-      <tree>
+      <list>
         <field name="name"/>
-      </tree>
+      </list>
     </field>
   </record>
 
@@ -50,7 +50,7 @@
   <record id="action_bhz_marketplace_dashboard_helper" model="ir.actions.act_window">
     <field name="name">Dashboard</field>
     <field name="res_model">bhz.marketplace.dashboard</field>
-    <field name="view_mode">kanban,tree,form</field>
+    <field name="view_mode">kanban,list,form</field>
     <field name="target">current</field>
   </record>
 </odoo>
