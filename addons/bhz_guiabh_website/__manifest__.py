@@ -10,7 +10,7 @@
     "depends": [
         "base",
         "website",
-        "web_editor",
+        "web",
     ],
     "data": [
         "security/ir.model.access.csv",
