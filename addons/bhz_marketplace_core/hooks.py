@@ -4,20 +4,18 @@ from odoo import SUPERUSER_ID
 
 def post_init_hook(env):
     admin = env.ref("base.user_admin", raise_if_not_found=False)
-    superuser = env.ref("base.user_root", raise_if_not_found=False) or env["res.users"].browse(SUPERUSER_ID)
+    user_root = env["res.users"].browse(SUPERUSER_ID)
+
+    targets = user_root
+    if admin:
+        targets |= admin
+
     group_manager = env.ref("bhz_marketplace_core.group_marketplace_manager", raise_if_not_found=False)
     group_seller = env.ref("bhz_marketplace_core.group_marketplace_seller", raise_if_not_found=False)
 
-    users = env["res.users"]
-    if admin:
-        users |= admin
-    users |= superuser
-
-    groups = env["res.groups"]
-    if group_manager:
-        groups |= group_manager
-    if group_seller:
-        groups |= group_seller
-
-    if users and groups:
-        users.write({"groups_id": [(4, g.id) for g in groups]})
+    for group in (group_manager, group_seller):
+        if not group:
+            continue
+        for user in targets:
+            if user not in group.users:
+                group.write({"users": [(4, user.id)]})
