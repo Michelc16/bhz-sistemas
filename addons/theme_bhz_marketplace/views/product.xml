@@ -1,0 +1,34 @@
+<odoo>
+  <template id="page_product" name="Marketplace Product">
+    <t t-call="website.layout">
+      <t t-set="product" t-value="request.env['product.template'].sudo().browse(int(request.params.get('product_id', 0)))"/>
+      <t t-if="not product or not product.exists()">
+        <div class="container py-5">
+          <div class="alert alert-warning">Produto não encontrado.</div>
+        </div>
+      </t>
+      <t t-if="product and product.exists()">
+        <div class="container py-5">
+          <div class="row g-4">
+            <div class="col-md-5">
+              <div class="ratio ratio-1x1 bg-light rounded-4">
+                <img t-if="product.image_512" t-att-src="'/web/image/product.template/%s/image_512' % product.id" class="rounded-4" style="object-fit:cover;" alt=""/>
+                <div class="d-flex align-items-center justify-content-center text-muted" t-if="not product.image_512">Sem imagem</div>
+              </div>
+            </div>
+            <div class="col-md-7">
+              <h1 class="h3" t-esc="product.name"/>
+              <div class="h4 text-primary fw-bold mb-3" t-esc="product.list_price"/>
+              <p class="text-muted" t-esc="product.website_description or product.description_sale"/>
+              <div class="d-flex gap-2 my-3">
+                <span class="badge bg-success">Frete rápido</span>
+                <span class="badge bg-secondary" t-esc="product.bhz_seller_id.name or 'Loja'"/>
+              </div>
+              <a t-att-href="'/shop/product/%s' % product.id" class="btn btn-primary btn-lg">Comprar</a>
+            </div>
+          </div>
+        </div>
+      </t>
+    </t>
+  </template>
+</odoo>

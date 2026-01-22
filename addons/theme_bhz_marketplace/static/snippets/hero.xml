@@ -1,0 +1,13 @@
+<odoo>
+  <template id="s_bhz_hero" name="BHZ Hero" inherit_id="website.s_cover_default">
+    <xpath expr="//section" position="attributes">
+      <attribute name="class">s_cover s_parallax bg-200 o_colored_level o_cc o_cc3</attribute>
+    </xpath>
+    <xpath expr="//h1" position="replace">
+      <h1>Compre e venda rápido no BHZ Marketplace</h1>
+    </xpath>
+    <xpath expr="//p" position="replace">
+      <p class="lead">Frete ágil, ofertas diárias e lojas verificadas.</p>
+    </xpath>
+  </template>
+</odoo>

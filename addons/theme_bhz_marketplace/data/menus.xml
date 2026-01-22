@@ -1,0 +1,3 @@
+<odoo>
+  <!-- Menus são criados dinamicamente no post_init_hook para não afetar outros sites. -->
+</odoo>

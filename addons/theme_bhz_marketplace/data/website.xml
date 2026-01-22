@@ -1,0 +1,3 @@
+<odoo>
+  <!-- Nenhum website é criado por dados; criação ocorre no post_init_hook para isolar a aplicação do tema. -->
+</odoo>

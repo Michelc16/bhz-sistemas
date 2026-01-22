@@ -1,0 +1,7 @@
+<odoo>
+  <template id="layout_bhz_marketplace" name="Layout BHZ Marketplace" inherit_id="website.layout">
+    <xpath expr="//head" position="inside">
+      <t t-set="theme_marketplace" t-value="True"/>
+    </xpath>
+  </template>
+</odoo>

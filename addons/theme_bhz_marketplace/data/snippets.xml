@@ -1,0 +1,4 @@
+<odoo>
+  <!-- Registro das views de snippets (definidas em static/snippets/*.xml) via inherit_id é desnecessário porque são templates de snippet.
+       Mantemos o arquivo para cumprir a estrutura solicitada. -->
+</odoo>
