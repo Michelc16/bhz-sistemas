@@ -67,17 +67,18 @@
     <field name="view_mode">tree,form</field>
   </record>
 
-  <record id="action_bhz_marketplace_home" model="ir.actions.act_window">
-    <field name="name">BHZ Marketplace</field>
-    <field name="res_model">bhz.marketplace.seller</field>
-    <field name="view_mode">tree,form</field>
-  </record>
-
   <record id="action_bhz_app_settings" model="ir.actions.act_window">
     <field name="name">Configuração do Marketplace</field>
     <field name="res_model">res.config.settings</field>
     <field name="view_mode">tree,form</field>
     <field name="target">new</field>
     <field name="context">{'module_bhz_marketplace_core': True}</field>
+  </record>
+
+  <record id="action_bhz_marketplace_dashboard" model="ir.actions.act_window">
+    <field name="name">BHZ Marketplace</field>
+    <field name="res_model">bhz.marketplace.dashboard</field>
+    <field name="view_mode">kanban,tree,form</field>
+    <field name="target">current</field>
   </record>
 </odoo>

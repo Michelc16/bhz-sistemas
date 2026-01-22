@@ -1,0 +1,56 @@
+<odoo>
+  <record id="view_bhz_marketplace_dashboard_tree" model="ir.ui.view">
+    <field name="name">bhz.marketplace.dashboard.tree</field>
+    <field name="model">bhz.marketplace.dashboard</field>
+    <field name="arch" type="xml">
+      <tree>
+        <field name="name"/>
+      </tree>
+    </field>
+  </record>
+
+  <record id="view_bhz_marketplace_dashboard_form" model="ir.ui.view">
+    <field name="name">bhz.marketplace.dashboard.form</field>
+    <field name="model">bhz.marketplace.dashboard</field>
+    <field name="arch" type="xml">
+      <form string="BHZ Marketplace">
+        <group>
+          <field name="name" readonly="1"/>
+        </group>
+      </form>
+    </field>
+  </record>
+
+  <record id="view_bhz_marketplace_dashboard_kanban" model="ir.ui.view">
+    <field name="name">bhz.marketplace.dashboard.kanban</field>
+    <field name="model">bhz.marketplace.dashboard</field>
+    <field name="arch" type="xml">
+      <kanban>
+        <templates>
+          <t t-name="kanban-box">
+            <div class="o_kanban_record">
+              <div class="o_kanban_primary_left">
+                <strong>BHZ Marketplace</strong>
+              </div>
+              <div class="o_kanban_primary_right">
+                <span class="badge bg-primary">Dashboard</span>
+              </div>
+              <div class="mt-2">
+                <a type="action" name="bhz_marketplace_app.action_bhz_app_sellers" class="btn btn-secondary btn-sm me-2">Vendedores</a>
+                <a type="action" name="bhz_marketplace_app.action_bhz_app_products" class="btn btn-secondary btn-sm me-2">Produtos</a>
+                <a type="action" name="bhz_marketplace_app.action_bhz_app_orders" class="btn btn-secondary btn-sm">Pedidos</a>
+              </div>
+            </div>
+          </t>
+        </templates>
+      </kanban>
+    </field>
+  </record>
+
+  <record id="action_bhz_marketplace_dashboard_helper" model="ir.actions.act_window">
+    <field name="name">Dashboard</field>
+    <field name="res_model">bhz.marketplace.dashboard</field>
+    <field name="view_mode">kanban,tree,form</field>
+    <field name="target">current</field>
+  </record>
+</odoo>

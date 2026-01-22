@@ -21,6 +21,7 @@
     "data": [
         "security/security.xml",
         "views/actions.xml",
+        "views/dashboard_views.xml",
         "views/menu.xml",
         "views/portal_templates.xml",
         "views/website_templates.xml",
