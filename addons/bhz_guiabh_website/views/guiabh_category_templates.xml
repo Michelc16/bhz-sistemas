@@ -65,7 +65,7 @@
                             <t t-elif="category.description">
                                 <t t-esc="category.description"/>
                             </t>
-                            <t t-else>Seleção curada do GuiaBH.</t>
+                            <t t-else="">Seleção curada do GuiaBH.</t>
                         </p>
                         <form class="guiabh-search" action="/website/search" method="get" role="search">
                             <input type="hidden" name="category" t-att-value="category.slug"/>
