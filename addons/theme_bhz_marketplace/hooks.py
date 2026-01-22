@@ -26,7 +26,7 @@ def post_init_hook(env_or_cr, registry=None):
             # avoid blocking install if theme application fails
             pass
 
-    # Pages to create if missing (attached to marketplace website)
+    # Pages to create/update if missing (attached to marketplace website or global)
     pages_spec = [
         ("/", "Marketplace Home", "theme_bhz_marketplace.page_home"),
         ("/marketplace/shop", "Marketplace Shop", "theme_bhz_marketplace.page_shop"),
@@ -40,22 +40,28 @@ def post_init_hook(env_or_cr, registry=None):
     ]
 
     Page = env["website.page"]
-    home_page = False
     for url, name, view_xmlid in pages_spec:
-        page = Page.search([("url", "=", url), ("website_id", "=", site.id)], limit=1)
+        view = env.ref(view_xmlid, raise_if_not_found=False)
+        if not view:
+            continue
+        domain = [
+            ("url", "=", url),
+            "|",
+            ("website_id", "=", site.id),
+            ("website_id", "=", False),
+        ]
+        page = Page.search(domain, limit=1)
         values = {
             "url": url,
             "name": name,
             "website_id": site.id,
-            "view_id": env.ref(view_xmlid).id,
+            "view_id": view.id,
             "website_published": True,
         }
         if page:
             page.write(values)
         else:
-            page = Page.create(values)
-        if url == "/":
-            home_page = page
+            Page.create(values)
 
     # Menus (main + children) only for this site
     Menu = env["website.menu"]
