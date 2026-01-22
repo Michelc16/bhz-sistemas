@@ -15,13 +15,21 @@ class BhzSellerReputation(models.Model):
     rating_avg = fields.Float()
     score = fields.Float(compute="_compute_score", store=True)
 
-    _constraints = [
-        models.UniqueConstraint(
-            "seller_id",
-            "seller_reputation_uniq",
-            "Reputação já cadastrada para este seller.",
-        ),
-    ]
+    def init(self):
+        super().init()
+        cr = self._cr
+        # Deduplicar reputações por seller, mantendo o menor id
+        cr.execute(
+            """
+            DELETE FROM bhz_seller_reputation r
+            USING bhz_seller_reputation d
+            WHERE r.seller_id = d.seller_id AND r.id > d.id
+            """
+        )
+        # Índice único para garantir 1 reputação por seller
+        cr.execute(
+            "CREATE UNIQUE INDEX IF NOT EXISTS bhz_seller_reputation_seller_uniq ON bhz_seller_reputation (seller_id)"
+        )
 
     @api.depends("total_orders", "late_ship_rate", "cancel_rate", "return_rate", "rating_avg")
     def _compute_score(self):
