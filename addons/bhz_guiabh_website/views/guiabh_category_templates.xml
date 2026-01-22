@@ -32,8 +32,8 @@
     {
       "@type": "ListItem",
       "position": <t t-esc="loop.index"/>,
-      "name": "<t t-esc=\"crumb.get('label')\"/>",
-      "item": "<t t-esc=\"request.httprequest.url_root.rstrip('/') + crumb.get('url')\"/>"
+      "name": "<t t-esc='crumb.get(\"label\")'/>",
+      "item": "<t t-esc='request.httprequest.url_root.rstrip(\"/\") + crumb.get(\"url\")'/>"
     }<t t-if="not loop.last">,</t>
     </t>
   ]
