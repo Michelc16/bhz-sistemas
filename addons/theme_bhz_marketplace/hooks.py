@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
-from odoo import api, SUPERUSER_ID
+from odoo import api
 
 
-def post_init_hook(cr, registry):
-    env = api.Environment(cr, SUPERUSER_ID, {})
+def post_init_hook(env):
+    """Apply the theme and create basic pages/menus for the marketplace website only."""
+    env = env.su()
     Website = env["website"]
 
-    # Ensure isolated website for the marketplace
+    # Isolated website lookup/creation
     site = Website.search([("name", "=", "BHZ Marketplace")], limit=1)
     if not site:
-        site = Website.create({"name": "BHZ Marketplace"})
+        site = Website.search([], limit=1) or Website.create({"name": "BHZ Marketplace"})
 
     # Apply theme only to this website
     if hasattr(site, "_set_theme"):
