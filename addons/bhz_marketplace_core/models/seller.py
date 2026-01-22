@@ -35,8 +35,12 @@ class BhzMarketplaceSeller(models.Model):
     product_count = fields.Integer(compute="_compute_counts")
     order_count = fields.Integer(compute="_compute_counts")
 
-    _sql_constraints = [
-        ("shop_slug_uniq", "unique(shop_slug)", "Slug já está em uso."),
+    _constraints = [
+        models.UniqueConstraint(
+            "shop_slug",
+            "shop_slug_uniq",
+            "Slug já está em uso.",
+        ),
     ]
 
     @api.depends("shop_slug")

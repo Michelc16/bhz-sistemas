@@ -11,10 +11,12 @@ def post_init_hook(env_or_cr, registry=None):
         env = api.Environment(env_or_cr, SUPERUSER_ID, {})
     Website = env["website"]
 
-    # Isolated website lookup/creation
-    site = Website.search([("name", "=", "BHZ Marketplace")], limit=1)
+    # Isolated website lookup/creation (prefer existing current website)
+    site = Website.get_current_website()
     if not site:
-        site = Website.search([], limit=1) or Website.create({"name": "BHZ Marketplace"})
+        site = Website.search([], limit=1)
+    if not site:
+        site = Website.create({"name": "BHZ Marketplace"})
 
     # Apply theme only to this website
     if hasattr(site, "_set_theme"):
@@ -26,7 +28,7 @@ def post_init_hook(env_or_cr, registry=None):
 
     # Pages to create if missing (attached to marketplace website)
     pages_spec = [
-        ("/marketplace", "Marketplace Home", "theme_bhz_marketplace.page_home"),
+        ("/", "Marketplace Home", "theme_bhz_marketplace.page_home"),
         ("/marketplace/shop", "Marketplace Shop", "theme_bhz_marketplace.page_shop"),
         ("/marketplace/product", "Marketplace Produto", "theme_bhz_marketplace.page_product"),
         ("/marketplace/seller", "Marketplace Loja do Vendedor", "theme_bhz_marketplace.page_seller"),
@@ -38,9 +40,10 @@ def post_init_hook(env_or_cr, registry=None):
     ]
 
     Page = env["website.page"]
+    home_page = False
     for url, name, view_xmlid in pages_spec:
         if not Page.search([("url", "=", url), ("website_id", "=", site.id)], limit=1):
-            Page.create(
+            page = Page.create(
                 {
                     "url": url,
                     "name": name,
@@ -48,12 +51,22 @@ def post_init_hook(env_or_cr, registry=None):
                     "view_id": env.ref(view_xmlid).id,
                 }
             )
+        else:
+            page = Page.search([("url", "=", url), ("website_id", "=", site.id)], limit=1)
+            page.write({"name": name, "view_id": env.ref(view_xmlid).id})
+        if url == "/":
+            home_page = page
+
+    if home_page:
+        site.write({"homepage_id": home_page.id})
 
     # Menus (main + children) only for this site
     Menu = env["website.menu"]
-    main_menu = Menu.search([("website_id", "=", site.id), ("url", "=", "/marketplace")], limit=1)
+    main_menu = Menu.search([("website_id", "=", site.id), ("url", "=", "/")], limit=1)
     if not main_menu:
-        main_menu = Menu.create({"name": "Marketplace", "url": "/marketplace", "website_id": site.id, "sequence": 5})
+        main_menu = Menu.create({"name": "Marketplace", "url": "/", "website_id": site.id, "sequence": 5})
+    else:
+        main_menu.write({"name": "Marketplace", "url": "/", "website_id": site.id})
 
     def _ensure_menu(name, url, sequence):
         if not Menu.search([("website_id", "=", site.id), ("parent_id", "=", main_menu.id), ("url", "=", url)], limit=1):

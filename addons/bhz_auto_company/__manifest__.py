@@ -3,6 +3,7 @@
     "version": "19.0.1.0.0",
     "summary": "Força cadastros a serem criados na empresa do usuário",
     "author": "BHZ Sistemas",
+    "license": "LGPL-3",
     "category": "Extra Tools",
     "website": "https://bhzsistemas.com.br",
     "depends": [

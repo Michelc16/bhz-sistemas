@@ -7,7 +7,7 @@ class BhzSellerReputation(models.Model):
     _description = "Reputação do seller"
     _order = "score desc"
 
-    seller_id = fields.Many2one("bhz.marketplace.seller", required=True, unique=True)
+    seller_id = fields.Many2one("bhz.marketplace.seller", required=True)
     total_orders = fields.Integer()
     late_ship_rate = fields.Float()
     cancel_rate = fields.Float()
@@ -15,8 +15,12 @@ class BhzSellerReputation(models.Model):
     rating_avg = fields.Float()
     score = fields.Float(compute="_compute_score", store=True)
 
-    _sql_constraints = [
-        ("seller_reputation_uniq", "unique(seller_id)", "Reputação já cadastrada para este seller."),
+    _constraints = [
+        models.UniqueConstraint(
+            "seller_id",
+            "seller_reputation_uniq",
+            "Reputação já cadastrada para este seller.",
+        ),
     ]
 
     @api.depends("total_orders", "late_ship_rate", "cancel_rate", "return_rate", "rating_avg")
