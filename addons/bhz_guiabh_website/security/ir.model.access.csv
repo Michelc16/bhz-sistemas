@@ -1,15 +1,7 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_guiabh_event_user,access_guiabh_event_user,model_guiabh_event,base.group_user,1,1,1,1
-access_guiabh_place_user,access_guiabh_place_user,model_guiabh_place,base.group_user,1,1,1,1
-access_guiabh_region_user,access_guiabh_region_user,model_guiabh_region,base.group_user,1,1,1,1
-access_guiabh_event_category_user,access_guiabh_event_category_user,model_guiabh_event_category,base.group_user,1,1,1,1
-access_guiabh_place_type_user,access_guiabh_place_type_user,model_guiabh_place_type,base.group_user,1,1,1,1
-access_guiabh_tag_user,access_guiabh_tag_user,model_guiabh_tag,base.group_user,1,1,1,1
-access_guiabh_favorite_user,guiabh.favorite user,model_guiabh_favorite,base.group_user,1,1,1,1
-access_guiabh_lead_user,guiabh.lead user,model_guiabh_lead,base.group_user,1,1,1,0
-access_guiabh_ad_user,guiabh.ad user,model_guiabh_ad,base.group_user,1,1,1,1
-access_guiabh_pref_user,guiabh.preference user,model_guiabh_preference,base.group_user,1,1,1,1
-access_guiabh_banner_user,guiabh.banner user,model_guiabh_banner,website.group_website_designer,1,1,1,1
-access_guiabh_cinema_movie_user,guiabh.cinema.movie user,model_guiabh_cinema_movie,base.group_user,1,1,1,1
-access_guiabh_football_team_user,guiabh.football.team user,model_guiabh_football_team,base.group_user,1,1,1,1
-access_guiabh_football_match_user,guiabh.football.match user,model_guiabh_football_match,base.group_user,1,1,1,1
+access_guiabh_category,access_guiabh_category,model_guiabh_category,base.group_user,1,1,1,1
+access_guiabh_event,access_guiabh_event,model_guiabh_event,base.group_user,1,1,1,1
+access_guiabh_place,access_guiabh_place,model_guiabh_place,base.group_user,1,1,1,1
+access_guiabh_movie,access_guiabh_movie,model_guiabh_movie,base.group_user,1,1,1,1
+access_guiabh_match,access_guiabh_match,model_guiabh_match,base.group_user,1,1,1,1
+access_guiabh_news,access_guiabh_news,model_guiabh_news,base.group_user,1,1,1,1

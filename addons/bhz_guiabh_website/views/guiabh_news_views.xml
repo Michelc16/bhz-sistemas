@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <record id="view_guiabh_place_list" model="ir.ui.view">
-        <field name="name">guiabh.place.list</field>
-        <field name="model">guiabh.place</field>
+    <record id="view_guiabh_news_list" model="ir.ui.view">
+        <field name="name">guiabh.news.list</field>
+        <field name="model">guiabh.news</field>
         <field name="arch" type="xml">
-            <list string="Lugares">
+            <list string="Notícias">
                 <field name="name"/>
                 <field name="category_id"/>
-                <field name="address"/>
-                <field name="phone"/>
+                <field name="publish_date"/>
+                <field name="author_name"/>
                 <field name="featured"/>
                 <field name="website_published"/>
                 <field name="company_id" groups="base.group_multi_company"/>
@@ -17,18 +17,18 @@
         </field>
     </record>
 
-    <record id="view_guiabh_place_form" model="ir.ui.view">
-        <field name="name">guiabh.place.form</field>
-        <field name="model">guiabh.place</field>
+    <record id="view_guiabh_news_form" model="ir.ui.view">
+        <field name="name">guiabh.news.form</field>
+        <field name="model">guiabh.news</field>
         <field name="arch" type="xml">
-            <form string="Lugar">
+            <form string="Notícia">
                 <sheet>
                     <group>
                         <group>
                             <field name="name"/>
                             <field name="category_id"/>
-                            <field name="address"/>
-                            <field name="phone"/>
+                            <field name="publish_date"/>
+                            <field name="author_name"/>
                         </group>
                         <group>
                             <field name="featured"/>
@@ -39,7 +39,7 @@
                         </group>
                     </group>
                     <notebook>
-                        <page string="Descrição">
+                        <page string="Conteúdo">
                             <field name="description"/>
                         </page>
                         <page string="SEO">
@@ -54,9 +54,9 @@
         </field>
     </record>
 
-    <record id="view_guiabh_place_kanban" model="ir.ui.view">
-        <field name="name">guiabh.place.kanban</field>
-        <field name="model">guiabh.place</field>
+    <record id="view_guiabh_news_kanban" model="ir.ui.view">
+        <field name="name">guiabh.news.kanban</field>
+        <field name="model">guiabh.news</field>
         <field name="arch" type="xml">
             <kanban default_group_by="category_id">
                 <templates>
@@ -66,7 +66,7 @@
                                 <field name="name"/>
                             </div>
                             <div class="o_kanban_secondary_left">
-                                <field name="address"/>
+                                <field name="publish_date"/>
                             </div>
                             <div class="o_kanban_primary_right">
                                 <field name="website_published"/>
@@ -78,23 +78,23 @@
         </field>
     </record>
 
-    <record id="view_guiabh_place_search" model="ir.ui.view">
-        <field name="name">guiabh.place.search</field>
-        <field name="model">guiabh.place</field>
+    <record id="view_guiabh_news_search" model="ir.ui.view">
+        <field name="name">guiabh.news.search</field>
+        <field name="model">guiabh.news</field>
         <field name="arch" type="xml">
-            <search string="Pesquisar Lugares">
+            <search string="Pesquisar Notícias">
                 <field name="name"/>
                 <field name="category_id"/>
-                <filter string="Destacados" name="featured" domain="[('featured','=',True)]"/>
-                <filter string="Publicados" name="published" domain="[('website_published','=',True)]"/>
+                <filter string="Destacadas" name="featured" domain="[('featured','=',True)]"/>
+                <filter string="Publicadas" name="published" domain="[('website_published','=',True)]"/>
             </search>
         </field>
     </record>
 
-    <record id="action_guiabh_place" model="ir.actions.act_window">
-        <field name="name">Lugares</field>
-        <field name="res_model">guiabh.place</field>
+    <record id="action_guiabh_news" model="ir.actions.act_window">
+        <field name="name">Notícias</field>
+        <field name="res_model">guiabh.news</field>
         <field name="view_mode">list,form,kanban</field>
-        <field name="search_view_id" ref="view_guiabh_place_search"/>
+        <field name="search_view_id" ref="view_guiabh_news_search"/>
     </record>
 </odoo>

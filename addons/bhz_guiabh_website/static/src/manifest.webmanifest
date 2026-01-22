@@ -1,9 +1,0 @@
-{
-  "name": "GuiaBH",
-  "short_name": "GuiaBH",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#1f6feb",
-  "icons": []
-}

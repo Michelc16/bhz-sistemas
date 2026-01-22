@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <menuitem id="menu_guiabh_root" name="GuiaBH" sequence="20" />
+
+    <menuitem id="menu_guiabh_content" name="Conteúdo" parent="menu_guiabh_root" sequence="10" />
+
+    <menuitem id="menu_guiabh_categories" name="Categorias" parent="menu_guiabh_content" action="action_guiabh_category" sequence="5" />
+    <menuitem id="menu_guiabh_events" name="Eventos" parent="menu_guiabh_content" action="action_guiabh_event" sequence="10" />
+    <menuitem id="menu_guiabh_places" name="Lugares" parent="menu_guiabh_content" action="action_guiabh_place" sequence="20" />
+    <menuitem id="menu_guiabh_movies" name="Filmes" parent="menu_guiabh_content" action="action_guiabh_movie" sequence="30" />
+    <menuitem id="menu_guiabh_matches" name="Jogos" parent="menu_guiabh_content" action="action_guiabh_match" sequence="40" />
+    <menuitem id="menu_guiabh_news" name="Notícias" parent="menu_guiabh_content" action="action_guiabh_news" sequence="50" />
+</odoo>

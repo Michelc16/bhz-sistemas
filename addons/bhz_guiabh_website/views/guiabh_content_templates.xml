@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="guiabh_content_detail" name="GuiaBH Content Detail">
+        <t t-call="website.layout">
+            <t t-set="main_object" t-value="record"/>
+            <t t-set="page_title" t-value="page_title"/>
+            <t t-set="page_description" t-value="page_description"/>
+            <t t-set="canonical_url" t-value="canonical_url"/>
+
+            <t t-jquery="head" t-operation="append">
+                <meta property="og:title" t-att-content="page_title"/>
+                <meta property="og:description" t-att-content="page_description"/>
+                <meta property="og:url" t-att-content="canonical_url"/>
+                <meta property="og:image" t-att-content="og_image"/>
+                <meta property="og:type" t-att-content="schema_type in ('Event','SportsEvent') and 'event' or 'article'"/>
+                <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "<t t-esc='schema_type'/>",
+  "name": "<t t-esc='record.name'/>",
+  "description": "<t t-esc='page_description'/>",
+  "url": "<t t-esc='request.httprequest.url'/>",
+  "image": "<t t-esc='og_image'/>",
+  <t t-if="schema_type in ('Event','SportsEvent')">
+  "startDate": "<t t-esc=\"getattr(record, 'start_datetime', False) or getattr(record, 'match_datetime', False) or ''\"/>",
+  "location": "<t t-esc=\"getattr(record, 'location', False) or getattr(record, 'venue', False) or ''\"/>",
+  </t>
+  <t t-if="schema_type == 'Movie'">
+  "datePublished": "<t t-esc=\"getattr(record, 'release_date', False) or ''\"/>",
+  </t>
+  <t t-if="schema_type == 'Place'">
+  "address": "<t t-esc=\"getattr(record, 'address', False) or ''\"/>",
+  </t>
+  <t t-if="schema_type == 'Article'">
+  "datePublished": "<t t-esc=\"getattr(record, 'publish_date', False) or ''\"/>",
+  "author": {
+    "@type": "Person",
+    "name": "<t t-esc=\"getattr(record, 'author_name', False) or 'GuiaBH'\"/>"
+  }
+  </t>
+  "publisher": "GuiaBH"
+}
+                </script>
+                <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    <t t-foreach="breadcrumb" t-as="crumb">
+    {
+      "@type": "ListItem",
+      "position": <t t-esc="loop.index"/>,
+      "name": "<t t-esc=\"crumb.get('label')\"/>",
+      "item": "<t t-esc=\"request.httprequest.url_root.rstrip('/') + crumb.get('url')\"/>"
+    }<t t-if="not loop.last">,</t>
+    </t>
+  ]
+}
+                </script>
+            </t>
+
+            <t t-call-assets="theme_guiabh_website.assets_frontend"/>
+
+            <main id="guiabh-detail" class="guiabh-home" role="main">
+                <nav class="guiabh-breadcrumb">
+                    <t t-foreach="breadcrumb" t-as="crumb">
+                        <a t-att-href="crumb.get('url')" class="guiabh-breadcrumb__item">
+                            <t t-esc="crumb.get('label')"/>
+                        </a>
+                        <t t-if="not loop.last">
+                            <span class="guiabh-breadcrumb__sep">/</span>
+                        </t>
+                    </t>
+                </nav>
+
+                <section class="guiabh-hero">
+                    <div class="guiabh-hero__content">
+                        <p class="guiabh-kicker"><t t-esc="schema_type"/></p>
+                        <h1><t t-esc="record.name"/></h1>
+                        <p class="guiabh-hero__lead">
+                            <t t-esc="description or 'Em breve mais detalhes.'"/>
+                        </p>
+                        <div class="guiabh-hero__meta">
+                            <t t-if="getattr(record, 'start_datetime', False)">
+                                <span>Início: <t t-esc="record.start_datetime"/></span>
+                            </t>
+                            <t t-if="getattr(record, 'match_datetime', False)">
+                                <span>Quando: <t t-esc="record.match_datetime"/></span>
+                            </t>
+                            <t t-if="getattr(record, 'release_date', False)">
+                                <span>Estreia: <t t-esc="record.release_date"/></span>
+                            </t>
+                            <t t-if="getattr(record, 'publish_date', False)">
+                                <span>Publicado: <t t-esc="record.publish_date"/></span>
+                            </t>
+                            <t t-if="getattr(record, 'location', False)">
+                                <span>Local: <t t-esc="record.location"/></span>
+                            </t>
+                            <t t-if="getattr(record, 'venue', False)">
+                                <span>Arena: <t t-esc="record.venue"/></span>
+                            </t>
+                            <t t-if="getattr(record, 'address', False)">
+                                <span>Endereço: <t t-esc="record.address"/></span>
+                            </t>
+                        </div>
+                    </div>
+                    <div class="guiabh-hero__visual">
+                        <div class="guiabh-hero__card">
+                            <t t-if="record.cover_image">
+                                <img t-att-src="'/web/image/%s/%s/cover_image' % (record._name, record.id)" alt="Capa" style="width:100%; border-radius:12px;"/>
+                            </t>
+                            <t t-else="">
+                                <div style="width:100%; height:140px; border-radius:12px; background:linear-gradient(135deg, #4fd1c5, #151a21); display:flex; align-items:center; justify-content:center; color:#0c0f14; font-weight:700;">
+                                    Imagem em breve
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="guiabh-section">
+                    <div class="guiabh-section__header">
+                        <p class="guiabh-kicker">Descrição</p>
+                        <h2>Mais detalhes</h2>
+                    </div>
+                    <div class="guiabh-card">
+                        <t t-if="record.description">
+                            <t t-raw="record.description"/>
+                        </t>
+                        <t t-else="">
+                            <p>Conteúdo será publicado em breve.</p>
+                        </t>
+                    </div>
+                </section>
+            </main>
+        </t>
+    </template>
+</odoo>

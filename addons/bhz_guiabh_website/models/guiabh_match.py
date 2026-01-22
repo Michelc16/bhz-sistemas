@@ -2,26 +2,26 @@ from odoo import fields, models
 from ._mixins import guiabh_base_fields
 
 
-class GuiaBHPlace(models.Model):
-    _name = "guiabh.place"
-    _description = "GuiaBH Place"
+class GuiaBHMatch(models.Model):
+    _name = "guiabh.match"
+    _description = "GuiaBH Match"
     _inherit = [
         "website.published.mixin",
         "website.seo.metadata",
         "website.slug.mixin",
     ]
-    _order = "name"
+    _order = "match_datetime desc"
 
     name = fields.Char(required=True)
     description = fields.Html()
     category_id = fields.Many2one("guiabh.category", string="Categoria", ondelete="set null")
-    address = fields.Char(string="Endereço")
-    phone = fields.Char(string="Telefone")
+    match_datetime = fields.Datetime(string="Data/Hora")
+    venue = fields.Char(string="Local")
 
     locals().update(guiabh_base_fields())
 
     _sql_constraints = [
-        ("guiabh_place_slug_company_uniq", "unique(slug, company_id)", "Slug deve ser único por empresa."),
+        ("guiabh_match_slug_company_uniq", "unique(slug, company_id)", "Slug deve ser único por empresa."),
     ]
 
     def _slug_name(self):

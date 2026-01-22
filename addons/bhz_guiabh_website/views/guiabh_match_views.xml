@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <record id="view_guiabh_place_list" model="ir.ui.view">
-        <field name="name">guiabh.place.list</field>
-        <field name="model">guiabh.place</field>
+    <record id="view_guiabh_match_list" model="ir.ui.view">
+        <field name="name">guiabh.match.list</field>
+        <field name="model">guiabh.match</field>
         <field name="arch" type="xml">
-            <list string="Lugares">
+            <list string="Jogos">
                 <field name="name"/>
                 <field name="category_id"/>
-                <field name="address"/>
-                <field name="phone"/>
+                <field name="match_datetime"/>
+                <field name="venue"/>
                 <field name="featured"/>
                 <field name="website_published"/>
                 <field name="company_id" groups="base.group_multi_company"/>
@@ -17,18 +17,18 @@
         </field>
     </record>
 
-    <record id="view_guiabh_place_form" model="ir.ui.view">
-        <field name="name">guiabh.place.form</field>
-        <field name="model">guiabh.place</field>
+    <record id="view_guiabh_match_form" model="ir.ui.view">
+        <field name="name">guiabh.match.form</field>
+        <field name="model">guiabh.match</field>
         <field name="arch" type="xml">
-            <form string="Lugar">
+            <form string="Jogo">
                 <sheet>
                     <group>
                         <group>
                             <field name="name"/>
                             <field name="category_id"/>
-                            <field name="address"/>
-                            <field name="phone"/>
+                            <field name="match_datetime"/>
+                            <field name="venue"/>
                         </group>
                         <group>
                             <field name="featured"/>
@@ -54,9 +54,9 @@
         </field>
     </record>
 
-    <record id="view_guiabh_place_kanban" model="ir.ui.view">
-        <field name="name">guiabh.place.kanban</field>
-        <field name="model">guiabh.place</field>
+    <record id="view_guiabh_match_kanban" model="ir.ui.view">
+        <field name="name">guiabh.match.kanban</field>
+        <field name="model">guiabh.match</field>
         <field name="arch" type="xml">
             <kanban default_group_by="category_id">
                 <templates>
@@ -66,7 +66,7 @@
                                 <field name="name"/>
                             </div>
                             <div class="o_kanban_secondary_left">
-                                <field name="address"/>
+                                <field name="match_datetime"/>
                             </div>
                             <div class="o_kanban_primary_right">
                                 <field name="website_published"/>
@@ -78,11 +78,11 @@
         </field>
     </record>
 
-    <record id="view_guiabh_place_search" model="ir.ui.view">
-        <field name="name">guiabh.place.search</field>
-        <field name="model">guiabh.place</field>
+    <record id="view_guiabh_match_search" model="ir.ui.view">
+        <field name="name">guiabh.match.search</field>
+        <field name="model">guiabh.match</field>
         <field name="arch" type="xml">
-            <search string="Pesquisar Lugares">
+            <search string="Pesquisar Jogos">
                 <field name="name"/>
                 <field name="category_id"/>
                 <filter string="Destacados" name="featured" domain="[('featured','=',True)]"/>
@@ -91,10 +91,10 @@
         </field>
     </record>
 
-    <record id="action_guiabh_place" model="ir.actions.act_window">
-        <field name="name">Lugares</field>
-        <field name="res_model">guiabh.place</field>
+    <record id="action_guiabh_match" model="ir.actions.act_window">
+        <field name="name">Jogos</field>
+        <field name="res_model">guiabh.match</field>
         <field name="view_mode">list,form,kanban</field>
-        <field name="search_view_id" ref="view_guiabh_place_search"/>
+        <field name="search_view_id" ref="view_guiabh_match_search"/>
     </record>
 </odoo>

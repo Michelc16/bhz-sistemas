@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="guiabh_category_page" name="GuiaBH Category Page">
+        <t t-call="website.layout">
+            <t t-set="main_object" t-value="category"/>
+            <t t-set="page_title" t-value="seo_title"/>
+            <t t-set="page_description" t-value="seo_description"/>
+            <t t-set="canonical_url" t-value="canonical_url"/>
+
+            <t t-jquery="head" t-operation="append">
+                <meta property="og:title" t-att-content="seo_title"/>
+                <meta property="og:description" t-att-content="seo_description"/>
+                <meta property="og:url" t-att-content="canonical_url"/>
+                <meta property="og:image" t-att-content="og_image"/>
+                <meta property="og:type" content="website"/>
+                <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "<t t-esc='seo_title'/>",
+  "description": "<t t-esc='seo_description'/>",
+  "url": "<t t-esc='request.httprequest.url'/>",
+  "image": "<t t-esc='og_image'/>"
+}
+                </script>
+                <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    <t t-foreach="breadcrumb" t-as="crumb">
+    {
+      "@type": "ListItem",
+      "position": <t t-esc="loop.index"/>,
+      "name": "<t t-esc=\"crumb.get('label')\"/>",
+      "item": "<t t-esc=\"request.httprequest.url_root.rstrip('/') + crumb.get('url')\"/>"
+    }<t t-if="not loop.last">,</t>
+    </t>
+  ]
+}
+                </script>
+            </t>
+
+            <t t-call-assets="theme_guiabh_website.assets_frontend"/>
+
+            <main id="guiabh-category" class="guiabh-home" role="main">
+                <nav class="guiabh-breadcrumb">
+                    <t t-foreach="breadcrumb" t-as="crumb">
+                        <a t-att-href="crumb.get('url')" class="guiabh-breadcrumb__item">
+                            <t t-esc="crumb.get('label')"/>
+                        </a>
+                        <t t-if="not loop.last">
+                            <span class="guiabh-breadcrumb__sep">/</span>
+                        </t>
+                    </t>
+                </nav>
+                <section class="guiabh-hero">
+                    <div class="guiabh-hero__content">
+                        <p class="guiabh-kicker">Categoria</p>
+                        <h1><t t-esc="category.name"/></h1>
+                        <p class="guiabh-hero__lead">
+                            <t t-if="category.website_meta_description">
+                                <t t-esc="category.website_meta_description"/>
+                            </t>
+                            <t t-elif="category.description">
+                                <t t-esc="category.description"/>
+                            </t>
+                            <t t-else>Seleção curada do GuiaBH.</t>
+                        </p>
+                        <form class="guiabh-search" action="/website/search" method="get" role="search">
+                            <input type="hidden" name="category" t-att-value="category.slug"/>
+                            <label for="guiabh-cat-search" class="sr-only">Buscar</label>
+                            <input id="guiabh-cat-search" name="search" type="search" placeholder="Buscar nesta categoria" required="required"/>
+                            <button type="submit" class="guiabh-button guiabh-button--primary">Buscar</button>
+                        </form>
+                    </div>
+                    <div class="guiabh-hero__visual">
+                        <div class="guiabh-hero__badge">GuiaBH</div>
+                        <div class="guiabh-hero__card">
+                            <p>Slug</p>
+                            <strong>/<t t-esc="category.slug"/></strong>
+                            <span>Disponível no site</span>
+                        </div>
+                        <div class="guiabh-hero__card">
+                            <t t-if="category.cover_image">
+                                <img t-att-src="'/web/image/guiabh.category/%s/cover_image' % category.id" alt="Capa da categoria" style="width:100%; border-radius:12px;"/>
+                            </t>
+                            <t t-else="">
+                                <div style="width:100%; height:120px; border-radius:12px; background:linear-gradient(135deg, #4fd1c5, #151a21); display:flex; align-items:center; justify-content:center; color:#0c0f14; font-weight:700;">
+                                    Imagem em breve
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="sec-events" class="guiabh-section guiabh-section--grid">
+                    <div class="guiabh-section__header">
+                        <p class="guiabh-kicker">Eventos</p>
+                        <h2>Agenda em destaque</h2>
+                    </div>
+                    <div class="guiabh-grid">
+                        <t t-if="events">
+                            <t t-foreach="events" t-as="event">
+                                <article class="guiabh-card">
+                                    <h3><t t-esc="event.name"/></h3>
+                                    <p><t t-esc="event.location or 'Local a definir'"/></p>
+                                    <p><t t-esc="event.start_datetime or 'Data em breve'"/></p>
+                                    <p class="guiabh-highlight__meta">/<t t-esc="event.slug or 'evento'"/></p>
+                                </article>
+                            </t>
+                        </t>
+                        <t t-else="">
+                            <p>Nenhum evento publicado.</p>
+                        </t>
+                    </div>
+                </section>
+
+                <section id="sec-places" class="guiabh-section guiabh-section--grid">
+                    <div class="guiabh-section__header">
+                        <p class="guiabh-kicker">Lugares</p>
+                        <h2>Onde viver esta categoria</h2>
+                    </div>
+                    <div class="guiabh-grid">
+                        <t t-if="places">
+                            <t t-foreach="places" t-as="place">
+                                <article class="guiabh-card">
+                                    <h3><t t-esc="place.name"/></h3>
+                                    <p><t t-esc="place.address or 'Endereço em breve'"/></p>
+                                    <p class="guiabh-highlight__meta">/<t t-esc="place.slug or 'lugar'"/></p>
+                                </article>
+                            </t>
+                        </t>
+                        <t t-else="">
+                            <p>Nenhum lugar publicado.</p>
+                        </t>
+                    </div>
+                </section>
+
+                <section id="sec-movies" class="guiabh-section guiabh-section--grid">
+                    <div class="guiabh-section__header">
+                        <p class="guiabh-kicker">Filmes</p>
+                        <h2>Estreias e cartaz</h2>
+                    </div>
+                    <div class="guiabh-grid">
+                        <t t-if="movies">
+                            <t t-foreach="movies" t-as="movie">
+                                <article class="guiabh-card">
+                                    <h3><t t-esc="movie.name"/></h3>
+                                    <p>Estreia: <t t-esc="movie.release_date or 'Em breve'"/></p>
+                                    <p class="guiabh-highlight__meta">/<t t-esc="movie.slug or 'filme'"/></p>
+                                </article>
+                            </t>
+                        </t>
+                        <t t-else="">
+                            <p>Nenhum filme publicado.</p>
+                        </t>
+                    </div>
+                </section>
+
+                <section id="sec-matches" class="guiabh-section guiabh-section--grid">
+                    <div class="guiabh-section__header">
+                        <p class="guiabh-kicker">Jogos</p>
+                        <h2>Partidas e arenas</h2>
+                    </div>
+                    <div class="guiabh-grid">
+                        <t t-if="matches">
+                            <t t-foreach="matches" t-as="match">
+                                <article class="guiabh-card">
+                                    <h3><t t-esc="match.name"/></h3>
+                                    <p><t t-esc="match.venue or 'Local em breve'"/></p>
+                                    <p><t t-esc="match.match_datetime or 'Data em breve'"/></p>
+                                    <p class="guiabh-highlight__meta">/<t t-esc="match.slug or 'jogo'"/></p>
+                                </article>
+                            </t>
+                        </t>
+                        <t t-else="">
+                            <p>Nenhum jogo publicado.</p>
+                        </t>
+                    </div>
+                </section>
+
+                <section id="sec-news" class="guiabh-section guiabh-section--grid">
+                    <div class="guiabh-section__header">
+                        <p class="guiabh-kicker">Notícias</p>
+                        <h2>Atualizações recentes</h2>
+                    </div>
+                    <div class="guiabh-grid">
+                        <t t-if="news">
+                            <t t-foreach="news" t-as="article">
+                                <article class="guiabh-card">
+                                    <h3><t t-esc="article.name"/></h3>
+                                    <p><t t-esc="article.author_name or 'GuiaBH'"/></p>
+                                    <p><t t-esc="article.publish_date or 'Data em breve'"/></p>
+                                    <p class="guiabh-highlight__meta">/<t t-esc="article.slug or 'noticia'"/></p>
+                                </article>
+                            </t>
+                        </t>
+                        <t t-else="">
+                            <p>Nenhuma notícia publicada.</p>
+                        </t>
+                    </div>
+                </section>
+            </main>
+        </t>
+    </template>
+</odoo>

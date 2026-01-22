@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <record id="view_guiabh_place_list" model="ir.ui.view">
-        <field name="name">guiabh.place.list</field>
-        <field name="model">guiabh.place</field>
+    <!-- Views -->
+    <record id="view_guiabh_category_list" model="ir.ui.view">
+        <field name="name">guiabh.category.list</field>
+        <field name="model">guiabh.category</field>
         <field name="arch" type="xml">
-            <list string="Lugares">
+            <list string="Categorias">
                 <field name="name"/>
-                <field name="category_id"/>
-                <field name="address"/>
-                <field name="phone"/>
+                <field name="parent_id"/>
                 <field name="featured"/>
                 <field name="website_published"/>
                 <field name="company_id" groups="base.group_multi_company"/>
@@ -17,24 +16,24 @@
         </field>
     </record>
 
-    <record id="view_guiabh_place_form" model="ir.ui.view">
-        <field name="name">guiabh.place.form</field>
-        <field name="model">guiabh.place</field>
+    <record id="view_guiabh_category_form" model="ir.ui.view">
+        <field name="name">guiabh.category.form</field>
+        <field name="model">guiabh.category</field>
         <field name="arch" type="xml">
-            <form string="Lugar">
+            <form string="Categoria">
                 <sheet>
                     <group>
                         <group>
                             <field name="name"/>
-                            <field name="category_id"/>
-                            <field name="address"/>
-                            <field name="phone"/>
-                        </group>
-                        <group>
+                            <field name="parent_id"/>
                             <field name="featured"/>
                             <field name="website_published"/>
                             <field name="slug"/>
+                        </group>
+                        <group>
                             <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="website_meta_title"/>
+                            <field name="website_meta_description"/>
                             <field name="cover_image"/>
                         </group>
                     </group>
@@ -54,11 +53,11 @@
         </field>
     </record>
 
-    <record id="view_guiabh_place_kanban" model="ir.ui.view">
-        <field name="name">guiabh.place.kanban</field>
-        <field name="model">guiabh.place</field>
+    <record id="view_guiabh_category_kanban" model="ir.ui.view">
+        <field name="name">guiabh.category.kanban</field>
+        <field name="model">guiabh.category</field>
         <field name="arch" type="xml">
-            <kanban default_group_by="category_id">
+            <kanban class="o_kanban_small_column" default_group_by="parent_id">
                 <templates>
                     <t t-name="kanban-box">
                         <div class="oe_kanban_global_click">
@@ -66,7 +65,7 @@
                                 <field name="name"/>
                             </div>
                             <div class="o_kanban_secondary_left">
-                                <field name="address"/>
+                                <field name="parent_id"/>
                             </div>
                             <div class="o_kanban_primary_right">
                                 <field name="website_published"/>
@@ -78,23 +77,24 @@
         </field>
     </record>
 
-    <record id="view_guiabh_place_search" model="ir.ui.view">
-        <field name="name">guiabh.place.search</field>
-        <field name="model">guiabh.place</field>
+    <record id="view_guiabh_category_search" model="ir.ui.view">
+        <field name="name">guiabh.category.search</field>
+        <field name="model">guiabh.category</field>
         <field name="arch" type="xml">
-            <search string="Pesquisar Lugares">
+            <search string="Pesquisar Categorias">
                 <field name="name"/>
-                <field name="category_id"/>
-                <filter string="Destacados" name="featured" domain="[('featured','=',True)]"/>
-                <filter string="Publicados" name="published" domain="[('website_published','=',True)]"/>
+                <field name="parent_id"/>
+                <filter string="Destacadas" name="featured" domain="[('featured','=',True)]"/>
+                <filter string="Publicado" name="published" domain="[('website_published','=',True)]"/>
             </search>
         </field>
     </record>
 
-    <record id="action_guiabh_place" model="ir.actions.act_window">
-        <field name="name">Lugares</field>
-        <field name="res_model">guiabh.place</field>
+    <!-- Action -->
+    <record id="action_guiabh_category" model="ir.actions.act_window">
+        <field name="name">Categorias</field>
+        <field name="res_model">guiabh.category</field>
         <field name="view_mode">list,form,kanban</field>
-        <field name="search_view_id" ref="view_guiabh_place_search"/>
+        <field name="search_view_id" ref="view_guiabh_category_search"/>
     </record>
 </odoo>
