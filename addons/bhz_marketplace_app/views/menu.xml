@@ -1,32 +1,33 @@
 <odoo>
-  <menuitem id="menu_bhz_marketplace_app_root"
+  <menuitem id="menu_bhz_marketplace_root"
             name="BHZ Marketplace"
-            sequence="15"
+            sequence="10"
+            groups="bhz_marketplace_core.group_marketplace_manager"
             web_icon="bhz_marketplace_app,static/description/icon.png"
             action="bhz_marketplace_app.action_bhz_marketplace_dashboard"/>
 
-  <menuitem id="menu_bhz_marketplace_operations" name="Operação" parent="menu_bhz_marketplace_app_root" sequence="10"/>
+  <menuitem id="menu_bhz_marketplace_operations" name="Operação" parent="menu_bhz_marketplace_root" sequence="10"/>
   <menuitem id="menu_bhz_marketplace_sellers_app" name="Vendedores" parent="menu_bhz_marketplace_operations" action="bhz_marketplace_app.action_bhz_app_sellers" sequence="10"/>
   <menuitem id="menu_bhz_marketplace_products_app" name="Produtos" parent="menu_bhz_marketplace_operations" action="bhz_marketplace_app.action_bhz_app_products" sequence="20"/>
   <menuitem id="menu_bhz_marketplace_orders_app" name="Pedidos" parent="menu_bhz_marketplace_operations" action="bhz_marketplace_app.action_bhz_app_orders" sequence="30"/>
 
-  <menuitem id="menu_bhz_marketplace_after_sales" name="Pós-venda" parent="menu_bhz_marketplace_app_root" sequence="20"/>
+  <menuitem id="menu_bhz_marketplace_after_sales" name="Pós-venda" parent="menu_bhz_marketplace_root" sequence="20"/>
   <menuitem id="menu_bhz_marketplace_shipments_app" name="Entregas" parent="menu_bhz_marketplace_after_sales" action="bhz_marketplace_app.action_bhz_app_shipments" sequence="10"/>
   <menuitem id="menu_bhz_marketplace_returns_app" name="Devoluções/Disputas" parent="menu_bhz_marketplace_after_sales" action="bhz_marketplace_app.action_bhz_app_returns" sequence="20"/>
 
-  <menuitem id="menu_bhz_marketplace_finance" name="Financeiro" parent="menu_bhz_marketplace_app_root" sequence="30"/>
+  <menuitem id="menu_bhz_marketplace_finance" name="Financeiro" parent="menu_bhz_marketplace_root" sequence="30"/>
   <menuitem id="menu_bhz_marketplace_payouts_app" name="Repasses" parent="menu_bhz_marketplace_finance" action="bhz_marketplace_app.action_bhz_app_payouts" sequence="10"/>
 
-  <menuitem id="menu_bhz_marketplace_marketing" name="Marketing" parent="menu_bhz_marketplace_app_root" sequence="40"/>
+  <menuitem id="menu_bhz_marketplace_marketing" name="Marketing" parent="menu_bhz_marketplace_root" sequence="40"/>
   <menuitem id="menu_bhz_marketplace_reputation_app" name="Reputação" parent="menu_bhz_marketplace_marketing" action="bhz_marketplace_app.action_bhz_app_reputation" sequence="10"/>
   <menuitem id="menu_bhz_marketplace_ads_app" name="Ads" parent="menu_bhz_marketplace_marketing" action="bhz_marketplace_app.action_bhz_app_ads" sequence="20"/>
 
-  <menuitem id="menu_bhz_marketplace_support" name="Atendimento" parent="menu_bhz_marketplace_app_root" sequence="50"/>
+  <menuitem id="menu_bhz_marketplace_support" name="Atendimento" parent="menu_bhz_marketplace_root" sequence="50"/>
   <menuitem id="menu_bhz_marketplace_questions_app" name="Perguntas" parent="menu_bhz_marketplace_support" action="bhz_marketplace_app.action_bhz_app_questions" sequence="10"/>
 
-  <menuitem id="menu_bhz_marketplace_integrations_app" name="Integrações" parent="menu_bhz_marketplace_app_root" sequence="60"/>
+  <menuitem id="menu_bhz_marketplace_integrations_app" name="Integrações" parent="menu_bhz_marketplace_root" sequence="60"/>
   <menuitem id="menu_bhz_marketplace_connector_accounts_app" name="Contas ERP" parent="menu_bhz_marketplace_integrations_app" action="bhz_marketplace_app.action_bhz_app_connectors_accounts" sequence="10"/>
   <menuitem id="menu_bhz_marketplace_connector_jobs_app" name="Jobs" parent="menu_bhz_marketplace_integrations_app" action="bhz_marketplace_app.action_bhz_app_connectors_jobs" sequence="20"/>
 
-  <menuitem id="menu_bhz_marketplace_settings_app" name="Configurações" parent="menu_bhz_marketplace_app_root" sequence="70" action="bhz_marketplace_app.action_bhz_app_settings"/>
+  <menuitem id="menu_bhz_marketplace_settings_app" name="Configurações" parent="menu_bhz_marketplace_root" sequence="70" action="bhz_marketplace_app.action_bhz_app_settings"/>
 </odoo>

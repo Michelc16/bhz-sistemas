@@ -50,7 +50,7 @@
   <record id="action_bhz_marketplace_dashboard_helper" model="ir.actions.act_window">
     <field name="name">Dashboard</field>
     <field name="res_model">bhz.marketplace.dashboard</field>
-    <field name="view_mode">kanban,list,form</field>
+    <field name="view_mode">kanban,form</field>
     <field name="target">current</field>
   </record>
 </odoo>

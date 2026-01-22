@@ -71,6 +71,6 @@
   <record id="action_bhz_marketplace_seller" model="ir.actions.act_window">
     <field name="name">Sellers</field>
     <field name="res_model">bhz.marketplace.seller</field>
-    <field name="view_mode">tree,form</field>
+    <field name="view_mode">list,form</field>
   </record>
 </odoo>
