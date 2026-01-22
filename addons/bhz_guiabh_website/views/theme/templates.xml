@@ -70,15 +70,15 @@
   "@context": "https://schema.org",
   "@type": "WebSite",
   "name": "GuiaBH",
-  "url": "<t t-esc=\"request and request.website and request.website.domain_url or request.httprequest.url_root\"/>",
+  "url": "<t t-esc='request and request.website and request.website.domain_url or request.httprequest.url_root'/>",
   "potentialAction": {
     "@type": "SearchAction",
-    "target": "<t t-esc=\"(request and request.httprequest.url_root or '/') + 'website/search?search={query}'\"/>",
+    "target": "<t t-esc='(request and request.httprequest.url_root or \"/\") + \"website/search?search={query}\"'/>",
     "query-input": "required name=query"
   }
 }
-                </script>
-            </t>
+                    </script>
+                </t>
 
             <t t-call-assets="theme_guiabh_website.assets_frontend"/>
             <t t-call="bhz_guiabh_website.theme_guiabh_website_header"/>
