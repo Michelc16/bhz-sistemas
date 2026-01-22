@@ -22,8 +22,8 @@
   "url": "<t t-esc='request.httprequest.url'/>",
   "image": "<t t-esc='og_image'/>",
   <t t-if="schema_type in ('Event','SportsEvent')">
-  "startDate": "<t t-esc=\"getattr(record, 'start_datetime', False) or getattr(record, 'match_datetime', False) or ''\"/>",
-  "location": "<t t-esc=\"getattr(record, 'location', False) or getattr(record, 'venue', False) or ''\"/>",
+  "startDate": "<t t-esc='getattr(record, \"start_datetime\", False) or getattr(record, \"match_datetime\", False) or \"\"'/>",
+  "location": "<t t-esc='getattr(record, \"location\", False) or getattr(record, \"venue\", False) or \"\"'/>",
   </t>
   <t t-if="schema_type == 'Movie'">
   "datePublished": "<t t-esc=\"getattr(record, 'release_date', False) or ''\"/>",
