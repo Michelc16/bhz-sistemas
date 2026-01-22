@@ -4,6 +4,13 @@ from odoo import models
 class ResUsers(models.Model):
     _inherit = "res.users"
 
+    def _on_webclient_bootstrap(self):
+        """Garantir compatibilidade com o webclient quando Odoo chama este método."""
+        parent = getattr(super(), "_on_webclient_bootstrap", None)
+        if parent:
+            return parent()
+        return {}
+
     def _init_odoobot(self):
         """
         Este método é chamado quando o Odoo configura o bot para um usuário novo.
