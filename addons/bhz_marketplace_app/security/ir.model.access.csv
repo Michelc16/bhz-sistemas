@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_marketplace_dashboard_manager,bhz.marketplace.dashboard.manager,model_bhz_marketplace_dashboard,bhz_marketplace_core.group_marketplace_manager,1,1,1,1
+access_marketplace_dashboard_seller,bhz.marketplace.dashboard.seller,model_bhz_marketplace_dashboard,bhz_marketplace_core.group_marketplace_seller,1,0,0,0

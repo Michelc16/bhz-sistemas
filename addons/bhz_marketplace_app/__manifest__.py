@@ -20,6 +20,7 @@
     ],
     "data": [
         "security/security.xml",
+        "security/ir.model.access.csv",
         "views/actions.xml",
         "views/dashboard_views.xml",
         "views/menu.xml",
