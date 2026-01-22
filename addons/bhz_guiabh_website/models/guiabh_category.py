@@ -34,6 +34,8 @@ class GuiaBHCategory(models.Model):
         return records
 
     def write(self, vals):
+        if not vals.get("slug") and vals.get("name"):
+            vals["slug"] = slugify_value(vals["name"])
         res = super().write(vals)
         if any(k in vals for k in ("name", "slug", "website_published", "company_id")):
             self._sync_website_menus()

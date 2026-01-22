@@ -28,3 +28,8 @@ class GuiaBHMovie(models.Model):
         if not vals.get("slug") and vals.get("name"):
             vals["slug"] = slugify_value(vals["name"])
         return super().create(vals)
+
+    def write(self, vals):
+        if not vals.get("slug") and vals.get("name"):
+            vals["slug"] = slugify_value(vals["name"])
+        return super().write(vals)
