@@ -42,23 +42,20 @@ def post_init_hook(env_or_cr, registry=None):
     Page = env["website.page"]
     home_page = False
     for url, name, view_xmlid in pages_spec:
-        if not Page.search([("url", "=", url), ("website_id", "=", site.id)], limit=1):
-            page = Page.create(
-                {
-                    "url": url,
-                    "name": name,
-                    "website_id": site.id,
-                    "view_id": env.ref(view_xmlid).id,
-                }
-            )
+        page = Page.search([("url", "=", url), ("website_id", "=", site.id)], limit=1)
+        values = {
+            "url": url,
+            "name": name,
+            "website_id": site.id,
+            "view_id": env.ref(view_xmlid).id,
+            "website_published": True,
+        }
+        if page:
+            page.write(values)
         else:
-            page = Page.search([("url", "=", url), ("website_id", "=", site.id)], limit=1)
-            page.write({"name": name, "view_id": env.ref(view_xmlid).id})
+            page = Page.create(values)
         if url == "/":
             home_page = page
-
-    if home_page:
-        site.write({"homepage_id": home_page.id})
 
     # Menus (main + children) only for this site
     Menu = env["website.menu"]
@@ -69,11 +66,17 @@ def post_init_hook(env_or_cr, registry=None):
         main_menu.write({"name": "Marketplace", "url": "/", "website_id": site.id})
 
     def _ensure_menu(name, url, sequence):
-        if not Menu.search([("website_id", "=", site.id), ("parent_id", "=", main_menu.id), ("url", "=", url)], limit=1):
-            Menu.create(
-                {"name": name, "url": url, "website_id": site.id, "parent_id": main_menu.id, "sequence": sequence}
-            )
+        menu = Menu.search(
+            [("website_id", "=", site.id), ("parent_id", "=", main_menu.id), ("url", "=", url)],
+            limit=1,
+        )
+        values = {"name": name, "url": url, "website_id": site.id, "parent_id": main_menu.id, "sequence": sequence}
+        if menu:
+            menu.write(values)
+        else:
+            Menu.create(values)
 
+    _ensure_menu("Home", "/", 1)
     _ensure_menu("Categorias", "/marketplace/categories", 10)
     _ensure_menu("Ofertas", "/marketplace/shop", 20)
     _ensure_menu("Lojas", "/marketplace/seller", 30)
