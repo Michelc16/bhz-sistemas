@@ -10,10 +10,12 @@ def post_init_hook(env):
     if admin:
         targets |= admin
 
+    group_internal = env.ref("base.group_user", raise_if_not_found=False)
+    group_portal = env.ref("base.group_portal", raise_if_not_found=False)
     group_manager = env.ref("bhz_marketplace_core.group_marketplace_manager", raise_if_not_found=False)
     group_seller = env.ref("bhz_marketplace_core.group_marketplace_seller", raise_if_not_found=False)
 
-    def _add_users_to_group(group, users):
+    def _write_users(group, users, mode):
         if not group:
             return
         if "users_ids" in group._fields:
@@ -25,8 +27,16 @@ def post_init_hook(env):
 
         for u in users:
             current = group[field]
-            if u not in current:
+            if mode == "add" and u not in current:
                 group.write({field: [(4, u.id)]})
+            if mode == "remove" and u in current:
+                group.write({field: [(3, u.id)]})
 
-    _add_users_to_group(group_seller, targets)
-    _add_users_to_group(group_manager, targets)
+    # Garantir que sejam usuários internos e não portal
+    if group_portal:
+        _write_users(group_portal, targets, "remove")
+    if group_internal:
+        _write_users(group_internal, targets, "add")
+
+    _write_users(group_seller, targets, "add")
+    _write_users(group_manager, targets, "add")
