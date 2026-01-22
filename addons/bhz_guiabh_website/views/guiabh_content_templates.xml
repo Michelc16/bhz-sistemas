@@ -26,16 +26,16 @@
   "location": "<t t-esc='getattr(record, \"location\", False) or getattr(record, \"venue\", False) or \"\"'/>",
   </t>
   <t t-if="schema_type == 'Movie'">
-  "datePublished": "<t t-esc=\"getattr(record, 'release_date', False) or ''\"/>",
+  "datePublished": "<t t-esc='getattr(record, \"release_date\", False) or \"\"'/>",
   </t>
   <t t-if="schema_type == 'Place'">
-  "address": "<t t-esc=\"getattr(record, 'address', False) or ''\"/>",
+  "address": "<t t-esc='getattr(record, \"address\", False) or \"\"'/>",
   </t>
   <t t-if="schema_type == 'Article'">
-  "datePublished": "<t t-esc=\"getattr(record, 'publish_date', False) or ''\"/>",
+  "datePublished": "<t t-esc='getattr(record, \"publish_date\", False) or \"\"'/>",
   "author": {
     "@type": "Person",
-    "name": "<t t-esc=\"getattr(record, 'author_name', False) or 'GuiaBH'\"/>"
+    "name": "<t t-esc='getattr(record, \"author_name\", False) or \"GuiaBH\"'/>"
   }
   </t>
   "publisher": "GuiaBH"
@@ -47,12 +47,12 @@
   "@type": "BreadcrumbList",
   "itemListElement": [
     <t t-foreach="breadcrumb" t-as="crumb">
-    {
-      "@type": "ListItem",
-      "position": <t t-esc="loop.index"/>,
-      "name": "<t t-esc=\"crumb.get('label')\"/>",
-      "item": "<t t-esc=\"request.httprequest.url_root.rstrip('/') + crumb.get('url')\"/>"
-    }<t t-if="not loop.last">,</t>
+            {
+              "@type": "ListItem",
+              "position": <t t-esc="loop.index"/>,
+              "name": "<t t-esc='crumb.get(\"label\")'/>",
+              "item": "<t t-esc='request.httprequest.url_root.rstrip(\"/\") + crumb.get(\"url\")'/>"
+            }<t t-if="not loop.last">,</t>
     </t>
   ]
 }
