@@ -149,7 +149,7 @@
                     </div>
                 </section>
 
-                <section id="destaques" class="guiabh-section guiabh-section--carousel" data-carousel>
+                <section id="destaques" class="guiabh-section guiabh-section--carousel" data-carousel="1">
                     <div class="guiabh-section__header">
                         <p class="guiabh-kicker">Destaques em movimento</p>
                         <h2>Roteiros curados da semana.</h2>
@@ -158,7 +158,7 @@
                             <button type="button" class="guiabh-button guiabh-button--ghost" data-carousel-next aria-label="Próximo">→</button>
                         </div>
                     </div>
-                    <div class="guiabh-carousel" data-carousel-track>
+                    <div class="guiabh-carousel" data-carousel-track="1">
                         <article class="guiabh-highlight">
                             <div class="guiabh-highlight__tag">Sábado</div>
                             <h3>Jazz no Horizonte</h3>
