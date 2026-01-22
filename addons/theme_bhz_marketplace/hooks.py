@@ -2,9 +2,13 @@
 from odoo import api, SUPERUSER_ID
 
 
-def post_init_hook(cr, registry):
+def post_init_hook(env_or_cr, registry=None):
     """Apply the theme and create basic pages/menus for the marketplace website only."""
-    env = api.Environment(cr, SUPERUSER_ID, {})
+    if registry is None:
+        # Odoo 17+/19 may pass env directly
+        env = env_or_cr.sudo() if hasattr(env_or_cr, "sudo") else env_or_cr
+    else:
+        env = api.Environment(env_or_cr, SUPERUSER_ID, {})
     Website = env["website"]
 
     # Isolated website lookup/creation
