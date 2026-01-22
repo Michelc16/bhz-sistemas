@@ -1,5 +1,5 @@
-from odoo import fields, models
-from ._mixins import guiabh_base_fields
+from odoo import api, fields, models
+from ._mixins import guiabh_base_fields, slugify_value
 
 
 class GuiaBHNews(models.Model):
@@ -8,7 +8,6 @@ class GuiaBHNews(models.Model):
     _inherit = [
         "website.published.mixin",
         "website.seo.metadata",
-        "website.slug.mixin",
     ]
     _order = "publish_date desc, name"
 
@@ -24,5 +23,8 @@ class GuiaBHNews(models.Model):
         ("guiabh_news_slug_company_uniq", "unique(slug, company_id)", "Slug deve ser único por empresa."),
     ]
 
-    def _slug_name(self):
-        return self.name
+    @api.model
+    def create(self, vals):
+        if not vals.get("slug") and vals.get("name"):
+            vals["slug"] = slugify_value(vals["name"])
+        return super().create(vals)

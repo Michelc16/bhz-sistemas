@@ -11,6 +11,7 @@
         "base",
         "website",
         "web",
+        "http_routing",
     ],
     "data": [
         "security/ir.model.access.csv",

@@ -1,8 +1,5 @@
-import re
-import unicodedata
-
 from odoo import api, fields, models
-from ._mixins import guiabh_base_fields
+from ._mixins import guiabh_base_fields, slugify_value
 
 
 class GuiaBHCategory(models.Model):
@@ -11,7 +8,6 @@ class GuiaBHCategory(models.Model):
     _inherit = [
         "website.published.mixin",
         "website.seo.metadata",
-        "website.slug.mixin",
     ]
     _order = "name"
 
@@ -29,20 +25,10 @@ class GuiaBHCategory(models.Model):
         ("guiabh_category_slug_company_uniq", "unique(slug, company_id)", "Slug deve ser único por empresa."),
     ]
 
-    def _slug_name(self):
-        return self.name
-
-    def _slugify(self, text):
-        """Local slugify compatível com versões sem o helper no odoo.tools."""
-        text = unicodedata.normalize("NFKD", text or "")
-        text = text.encode("ascii", "ignore").decode("ascii")
-        text = re.sub(r"[^a-zA-Z0-9-]+", "-", text.lower())
-        return text.strip("-")
-
     @api.model
     def create(self, vals):
         if not vals.get("slug") and vals.get("name"):
-            vals["slug"] = self._slugify(vals["name"])
+            vals["slug"] = slugify_value(vals["name"])
         records = super().create(vals)
         records._sync_website_menus()
         return records
