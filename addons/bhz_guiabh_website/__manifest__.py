@@ -25,7 +25,6 @@
         "views/guiabh_category_templates.xml",
         "views/guiabh_content_templates.xml",
         "views/guiabh_menus.xml",
-        "data/homepage.xml",
     ],
     "demo": [],
     "assets": {
