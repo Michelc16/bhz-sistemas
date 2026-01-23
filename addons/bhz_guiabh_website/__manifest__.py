@@ -25,6 +25,8 @@
         "views/guiabh_category_templates.xml",
         "views/guiabh_content_templates.xml",
         "views/guiabh_menus.xml",
+    ],
+    "qweb": [
         "views/theme/templates.xml",
     ],
     "demo": [],

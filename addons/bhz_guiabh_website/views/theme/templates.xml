@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<odoo>
-    <data>
-        <!-- Custom header -->
-        <template id="theme_guiabh_website_header" name="GuiaBH Header">
+<templates xml:space="preserve">
+    <!-- Custom header -->
+    <template id="theme_guiabh_website_header" name="GuiaBH Header">
             <header class="guiabh-header o_no_autohide">
                 <div class="guiabh-header__brand">
                     <a href="/" class="guiabh-logo" aria-label="GuiaBH">
@@ -20,10 +19,10 @@
                     <a href="/login" class="guiabh-button guiabh-button--primary">Entrar</a>
                 </div>
             </header>
-        </template>
+    </template>
 
-        <!-- Custom footer -->
-        <template id="theme_guiabh_website_footer" name="GuiaBH Footer">
+    <!-- Custom footer -->
+    <template id="theme_guiabh_website_footer" name="GuiaBH Footer">
             <t t-set="datetime" t-value="__import__('datetime')"/>
             <footer class="guiabh-footer">
                 <div class="guiabh-footer__brand">
@@ -56,10 +55,10 @@
                     <span>BHZ Sistemas.</span>
                 </div>
             </footer>
-        </template>
+    </template>
 
-        <!-- Landing page: not set as default home; accessible via /theme/guiabh/home -->
-        <template id="theme_guiabh_website_homepage" name="GuiaBH Home" page="True" url="/theme/guiabh/home">
+    <!-- Landing page: not set as default home; accessible via /theme/guiabh/home -->
+    <template id="theme_guiabh_website_homepage" name="GuiaBH Home" page="True" url="/theme/guiabh/home">
             <t t-call="website.layout">
                 <t t-set="page_title">GuiaBH — Descubra Belo Horizonte</t>
                 <t t-set="page_description">Agenda curada de cultura, gastronomia, esportes e lazer em BH, com buscas rápidas e destaques semanais.</t>
@@ -198,6 +197,5 @@
 
                 <t t-call="bhz_guiabh_website.theme_guiabh_website_footer"/>
             </t>
-        </template>
-    </data>
-</odoo>
+    </template>
+</templates>
