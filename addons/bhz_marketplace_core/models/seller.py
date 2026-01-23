@@ -35,21 +35,13 @@ class BhzMarketplaceSeller(models.Model):
     product_count = fields.Integer(compute="_compute_counts")
     order_count = fields.Integer(compute="_compute_counts")
 
-    def init(self):
-        super().init()
-        cr = self._cr
-        # Deduplicar slugs mantendo o menor id
-        cr.execute(
-            """
-            DELETE FROM bhz_marketplace_seller s
-            USING bhz_marketplace_seller d
-            WHERE s.shop_slug = d.shop_slug AND s.id > d.id
-            """
-        )
-        # Garantir unicidade por índice SQL
-        cr.execute(
-            "CREATE UNIQUE INDEX IF NOT EXISTS bhz_marketplace_seller_slug_uniq ON bhz_marketplace_seller (shop_slug)"
-        )
+    @api.constrains("shop_slug")
+    def _check_unique_slug(self):
+        for rec in self:
+            if rec.shop_slug:
+                conflict = self.search_count([("shop_slug", "=", rec.shop_slug)]) > 1
+                if conflict:
+                    raise ValidationError("Slug já está em uso.")
 
     @api.depends("shop_slug")
     def _compute_counts(self):

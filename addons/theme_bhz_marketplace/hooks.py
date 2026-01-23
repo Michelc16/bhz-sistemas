@@ -57,6 +57,7 @@ def post_init_hook(env_or_cr, registry=None):
             "website_id": site.id,
             "view_id": view.id,
             "website_published": True,
+            "is_published": True,
         }
         if page:
             page.write(values)
