@@ -13,7 +13,6 @@
     "data": [
         "data/website.xml",
         "data/menus.xml",
-        "data/pages.xml",
         "views/layouts.xml",
         "views/home.xml",
         "views/shop.xml",
@@ -21,11 +20,11 @@
         "views/seller.xml",
         "views/dashboard.xml",
         "views/static_pages.xml",
+        "data/pages.xml",
     ],
     "assets": {
         "web.assets_frontend": [
             "theme_bhz_marketplace/static/src/css/marketplace.css",
-            "theme_bhz_marketplace/static/src/js/marketplace.js",
         ],
         "web._assets_primary_variables": [],
     },
