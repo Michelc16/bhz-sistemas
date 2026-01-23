@@ -39,4 +39,5 @@
     "installable": True,
     "application": True,
     "theme": True,
+    "post_init_hook": "post_init_hook",
 }
