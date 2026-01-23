@@ -1,5 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <template id="page_dashboard" name="Dashboard Vendedor" page="True" url="/marketplace/dashboard">
+  <data>
+    <template id="page_dashboard" name="Dashboard Vendedor" page="True" url="/marketplace/dashboard">
     <t t-call="website.layout">
       <main id="wrap" class="oe_structure">
         <div class="container py-5">
@@ -66,4 +68,5 @@
       </main>
     </t>
   </template>
+  </data>
 </odoo>
