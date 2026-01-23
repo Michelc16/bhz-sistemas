@@ -1,7 +1,7 @@
 <odoo>
   <template id="page_search" name="Busca Marketplace" page="True" url="/marketplace/search">
     <t t-call="website.layout">
-      <div class="oe_structure">
+      <div id="wrap" class="oe_structure">
         <div class="container py-5">
           <h1 class="h4 mb-4">Resultados da busca</h1>
           <t t-set="term" t-value="request.params.get('search')"/>
@@ -38,7 +38,7 @@
 
   <template id="page_categories" name="Categorias Marketplace" page="True" url="/marketplace/categories">
     <t t-call="website.layout">
-      <div class="oe_structure">
+      <div id="wrap" class="oe_structure">
         <div class="container py-5">
           <h1 class="h4 mb-4">Categorias</h1>
           <t t-set="cats" t-value="request.env['product.public.category'].sudo().search([], order='name')"/>
@@ -64,7 +64,7 @@
 
   <template id="page_how_it_works" name="Como funciona" page="True" url="/marketplace/how-it-works">
     <t t-call="website.layout">
-      <div class="oe_structure">
+      <div id="wrap" class="oe_structure">
         <div class="container py-5">
           <h1 class="h3 mb-4">Como funciona o BHZ Marketplace</h1>
           <div class="row g-4">
@@ -100,7 +100,7 @@
 
   <template id="page_become_seller" name="Seja um vendedor" page="True" url="/marketplace/become-a-seller">
     <t t-call="website.layout">
-      <div class="oe_structure">
+      <div id="wrap" class="oe_structure">
         <div class="container py-5">
           <div class="row align-items-center g-4">
             <div class="col-lg-7">

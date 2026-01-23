@@ -1,7 +1,7 @@
 <odoo>
   <template id="page_home" name="Marketplace Home" page="True" url="/">
     <t t-call="website.layout">
-      <div class="oe_structure">
+      <div id="wrap" class="oe_structure">
         <div class="bhz-hero text-white">
           <div class="container py-5">
             <div class="row align-items-center g-4">

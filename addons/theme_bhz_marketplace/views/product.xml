@@ -1,7 +1,7 @@
 <odoo>
   <template id="page_product" name="Marketplace Product" page="True" url="/marketplace/product">
     <t t-call="website.layout">
-      <div class="oe_structure">
+      <div id="wrap" class="oe_structure">
         <t t-set="product" t-value="request.env['product.template'].sudo().browse(int(request.params.get('product_id', 0)))"/>
         <t t-if="not product or not product.exists()">
           <div class="container py-5">

@@ -1,7 +1,7 @@
 <odoo>
   <template id="page_dashboard" name="Dashboard Vendedor" page="True" url="/marketplace/dashboard">
     <t t-call="website.layout">
-      <div class="oe_structure">
+      <div id="wrap" class="oe_structure">
         <div class="container py-5">
           <div class="d-flex align-items-center justify-content-between mb-4">
             <div>
