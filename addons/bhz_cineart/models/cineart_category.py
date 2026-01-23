@@ -18,9 +18,6 @@ class GuiabhCineartCategory(models.Model):
         index=True,
     )
 
-    _sql_constraints = [
-        ("cineart_category_code_unique", "unique(code)", "O código da categoria deve ser único."),
-    ]
 
     @api.model
     def _ensure_company_categories(self, company=False):

@@ -1,104 +1,102 @@
 <odoo>
-  <data>
-    <template id="page_home" name="Marketplace Home" page="True" url="/">
-      <t t-call="website.layout">
-        <main id="wrap" class="oe_structure">
-          <div class="bhz-hero text-white">
-            <div class="container py-5">
-              <div class="row align-items-center g-4">
-                <div class="col-lg-7">
-                  <h1 class="display-5 fw-bold mb-3">O marketplace para vender e comprar rápido.</h1>
-                  <p class="lead mb-4">Frete ágil, lojas verificadas e ofertas exclusivas para você.</p>
-                  <div class="d-flex flex-wrap gap-3">
-                    <a class="btn btn-light btn-lg text-primary" href="/marketplace/shop">Ver ofertas</a>
-                    <a class="btn btn-outline-light btn-lg" href="/marketplace/become-a-seller">Quero vender</a>
-                  </div>
+  <template id="page_home" name="Marketplace Home" page="True" url="/">
+    <t t-call="website.layout">
+      <main id="wrap" class="oe_structure">
+        <div class="bhz-hero text-white">
+          <div class="container py-5">
+            <div class="row align-items-center g-4">
+              <div class="col-lg-7">
+                <h1 class="display-5 fw-bold mb-3">O marketplace para vender e comprar rápido.</h1>
+                <p class="lead mb-4">Frete ágil, lojas verificadas e ofertas exclusivas para você.</p>
+                <div class="d-flex flex-wrap gap-3">
+                  <a class="btn btn-light btn-lg text-primary" href="/marketplace/shop">Ver ofertas</a>
+                  <a class="btn btn-outline-light btn-lg" href="/marketplace/become-a-seller">Quero vender</a>
                 </div>
-                <div class="col-lg-5">
-                  <div class="card shadow-lg border-0">
-                    <div class="card-body">
-                      <h5 class="card-title mb-3">Pesquisa rápida</h5>
-                      <form action="/marketplace/search" method="get">
-                        <div class="input-group mb-3">
-                          <input class="form-control" type="search" name="search" placeholder="Buscar produtos ou lojas"/>
-                          <button class="btn btn-primary" type="submit">Buscar</button>
-                        </div>
-                      </form>
-                      <div class="d-flex gap-2 flex-wrap">
-                        <span class="badge bg-light text-dark">Entrega rápida</span>
-                        <span class="badge bg-light text-dark">Lojas verificadas</span>
-                        <span class="badge bg-light text-dark">Promoções diárias</span>
+              </div>
+              <div class="col-lg-5">
+                <div class="card shadow-lg border-0">
+                  <div class="card-body">
+                    <h5 class="card-title mb-3">Pesquisa rápida</h5>
+                    <form action="/marketplace/search" method="get">
+                      <div class="input-group mb-3">
+                        <input class="form-control" type="search" name="search" placeholder="Buscar produtos ou lojas"/>
+                        <button class="btn btn-primary" type="submit">Buscar</button>
                       </div>
+                    </form>
+                    <div class="d-flex gap-2 flex-wrap">
+                      <span class="badge bg-light text-dark">Entrega rápida</span>
+                      <span class="badge bg-light text-dark">Lojas verificadas</span>
+                      <span class="badge bg-light text-dark">Promoções diárias</span>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+        </div>
 
-          <div class="container py-5">
-            <div class="d-flex align-items-center justify-content-between mb-3">
-              <h2 class="h4 mb-0">Destaques de hoje</h2>
-              <a class="text-decoration-none" href="/marketplace/shop">Ver tudo</a>
-            </div>
-            <t t-set="products" t-value="request.env['product.template'].sudo().search([('website_published','=',True)], limit=8)"/>
-            <div class="row g-3">
-              <t t-foreach="products" t-as="p">
-                <div class="col-6 col-md-3">
-                  <a t-att-href="'/marketplace/product?product_id=%s' % p.id" class="card h-100 text-decoration-none shadow-sm">
-                    <t t-if="p.image_512">
-                      <img class="card-img-top" t-att-src="'/web/image/product.template/%s/image_512' % p.id" alt="" style="object-fit:cover; aspect-ratio:1/1;"/>
-                    </t>
-                    <div class="card-body">
-                      <div class="text-truncate fw-semibold" t-esc="p.name"/>
-                      <div class="text-primary fw-bold" t-esc="p.list_price"/>
-                      <div class="text-muted small" t-esc="p.bhz_seller_id.name or 'Loja parceira'"/>
-                    </div>
-                  </a>
-                </div>
-              </t>
-              <t t-if="not products">
-                <div class="col-12">
-                  <div class="alert alert-info mb-0">Nenhum produto publicado ainda.</div>
-                </div>
-              </t>
-            </div>
+        <div class="container py-5">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h2 class="h4 mb-0">Destaques de hoje</h2>
+            <a class="text-decoration-none" href="/marketplace/shop">Ver tudo</a>
           </div>
+          <t t-set="products" t-value="request.env['product.template'].sudo().search([('website_published','=',True)], limit=8)"/>
+          <div class="row g-3">
+            <t t-foreach="products" t-as="p">
+              <div class="col-6 col-md-3">
+                <a t-att-href="'/marketplace/product?product_id=%s' % p.id" class="card h-100 text-decoration-none shadow-sm">
+                  <t t-if="p.image_512">
+                    <img class="card-img-top" t-att-src="'/web/image/product.template/%s/image_512' % p.id" alt="" style="object-fit:cover; aspect-ratio:1/1;"/>
+                  </t>
+                  <div class="card-body">
+                    <div class="text-truncate fw-semibold" t-esc="p.name"/>
+                    <div class="text-primary fw-bold" t-esc="p.list_price"/>
+                    <div class="text-muted small" t-esc="p.bhz_seller_id.name or 'Loja parceira'"/>
+                  </div>
+                </a>
+              </div>
+            </t>
+            <t t-if="not products">
+              <div class="col-12">
+                <div class="alert alert-info mb-0">Nenhum produto publicado ainda.</div>
+              </div>
+            </t>
+          </div>
+        </div>
 
-          <div class="container pb-5">
-            <div class="d-flex align-items-center justify-content-between mb-3">
-              <h2 class="h4 mb-0">Lojas verificadas</h2>
-              <a class="text-decoration-none" href="/marketplace/seller">Ver todas</a>
-            </div>
-            <t t-set="sellers" t-value="request.env['bhz.marketplace.seller'].sudo().search([('state','=','approved')], limit=6)"/>
-            <div class="row g-3">
-              <t t-foreach="sellers" t-as="s">
-                <div class="col-6 col-md-4 col-lg-3">
-                  <div class="card h-100 shadow-sm border-0">
-                    <div class="card-body d-flex flex-column gap-2">
-                      <div class="d-flex align-items-center gap-2">
-                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center" style="width:44px; height:44px;">
-                          <span class="fw-bold text-primary" t-esc="(s.name or 'L')[0]"/>
-                        </div>
-                        <div>
-                          <div class="fw-semibold text-truncate" t-esc="s.name"/>
-                          <div class="text-muted small">Aprovada</div>
-                        </div>
+        <div class="container pb-5">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h2 class="h4 mb-0">Lojas verificadas</h2>
+            <a class="text-decoration-none" href="/marketplace/seller">Ver todas</a>
+          </div>
+          <t t-set="sellers" t-value="request.env['bhz.marketplace.seller'].sudo().search([('state','=','approved')], limit=6)"/>
+          <div class="row g-3">
+            <t t-foreach="sellers" t-as="s">
+              <div class="col-6 col-md-4 col-lg-3">
+                <div class="card h-100 shadow-sm border-0">
+                  <div class="card-body d-flex flex-column gap-2">
+                    <div class="d-flex align-items-center gap-2">
+                      <div class="rounded-circle bg-light d-flex align-items-center justify-content-center" style="width:44px; height:44px;">
+                        <span class="fw-bold text-primary" t-esc="(s.name or 'L')[0]"/>
                       </div>
-                      <a t-att-href="'/marketplace/seller?seller_id=%s' % s.id" class="btn btn-outline-primary btn-sm mt-auto">Ver loja</a>
+                      <div>
+                        <div class="fw-semibold text-truncate" t-esc="s.name"/>
+                        <div class="text-muted small">Aprovada</div>
+                      </div>
                     </div>
+                    <a t-att-href="'/marketplace/seller?seller_id=%s' % s.id" class="btn btn-outline-primary btn-sm mt-auto">Ver loja</a>
                   </div>
                 </div>
-              </t>
-              <t t-if="not sellers">
-                <div class="col-12">
-                  <div class="alert alert-info mb-0">Nenhuma loja aprovada no momento.</div>
-                </div>
-              </t>
-            </div>
+              </div>
+            </t>
+            <t t-if="not sellers">
+              <div class="col-12">
+                <div class="alert alert-info mb-0">Nenhuma loja aprovada no momento.</div>
+              </div>
+            </t>
           </div>
-        </main>
-      </t>
-    </template>
-  </data>
+        </div>
+      </main>
+    </t>
+  </template>
 </odoo>

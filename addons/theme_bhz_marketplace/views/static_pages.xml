@@ -1,135 +1,133 @@
 <odoo>
-  <data>
-    <template id="page_search" name="Busca Marketplace" page="True" url="/marketplace/search">
-      <t t-call="website.layout">
-        <main id="wrap" class="oe_structure">
-          <div class="container py-5">
-            <h1 class="h4 mb-4">Resultados da busca</h1>
-            <t t-set="term" t-value="request.params.get('search')"/>
-            <t t-set="domain" t-value="[['website_published','=',True]]"/>
-            <t t-if="term">
-              <t t-set="domain" t-value="domain + [('name','ilike', term)]"/>
+  <template id="page_search" name="Busca Marketplace" page="True" url="/marketplace/search">
+    <t t-call="website.layout">
+      <main id="wrap" class="oe_structure">
+        <div class="container py-5">
+          <h1 class="h4 mb-4">Resultados da busca</h1>
+          <t t-set="term" t-value="request.params.get('search')"/>
+          <t t-set="domain" t-value="[['website_published','=',True]]"/>
+          <t t-if="term">
+            <t t-set="domain" t-value="domain + [('name','ilike', term)]"/>
+          </t>
+          <t t-set="products" t-value="request.env['product.template'].sudo().search(domain, limit=40)"/>
+          <div class="row g-3">
+            <t t-foreach="products" t-as="p">
+              <div class="col-6 col-md-3">
+                <a t-att-href="'/marketplace/product?product_id=%s' % p.id" class="card h-100 text-decoration-none shadow-sm">
+                  <t t-if="p.image_512">
+                    <img class="card-img-top" t-att-src="'/web/image/product.template/%s/image_512' % p.id" alt="" style="object-fit:cover; aspect-ratio:1/1;"/>
+                  </t>
+                  <div class="card-body">
+                    <div class="fw-semibold text-truncate" t-esc="p.name"/>
+                    <div class="text-primary fw-bold" t-esc="p.list_price"/>
+                    <div class="text-muted small" t-esc="p.bhz_seller_id.name or 'Loja'"/>
+                  </div>
+                </a>
+              </div>
             </t>
-            <t t-set="products" t-value="request.env['product.template'].sudo().search(domain, limit=40)"/>
-            <div class="row g-3">
-              <t t-foreach="products" t-as="p">
-                <div class="col-6 col-md-3">
-                  <a t-att-href="'/marketplace/product?product_id=%s' % p.id" class="card h-100 text-decoration-none shadow-sm">
-                    <t t-if="p.image_512">
-                      <img class="card-img-top" t-att-src="'/web/image/product.template/%s/image_512' % p.id" alt="" style="object-fit:cover; aspect-ratio:1/1;"/>
-                    </t>
-                    <div class="card-body">
-                      <div class="fw-semibold text-truncate" t-esc="p.name"/>
-                      <div class="text-primary fw-bold" t-esc="p.list_price"/>
-                      <div class="text-muted small" t-esc="p.bhz_seller_id.name or 'Loja'"/>
-                    </div>
-                  </a>
-                </div>
-              </t>
-              <t t-if="not products">
-                <div class="col-12">
-                  <div class="alert alert-info mb-0">Nenhum resultado para <strong t-esc="term or ''"/>.</div>
-                </div>
-              </t>
-            </div>
+            <t t-if="not products">
+              <div class="col-12">
+                <div class="alert alert-info mb-0">Nenhum resultado para <strong t-esc="term or ''"/>.</div>
+              </div>
+            </t>
           </div>
-        </main>
-      </t>
-    </template>
+        </div>
+      </main>
+    </t>
+  </template>
 
-    <template id="page_categories" name="Categorias Marketplace" page="True" url="/marketplace/categories">
-      <t t-call="website.layout">
-        <main id="wrap" class="oe_structure">
-          <div class="container py-5">
-            <h1 class="h4 mb-4">Categorias</h1>
-            <t t-set="cats" t-value="request.env['product.public.category'].sudo().search([], order='name')"/>
-            <div class="row g-3">
-              <t t-foreach="cats" t-as="c">
-                <div class="col-6 col-md-3">
-                  <a t-att-href="'/shop/category/%s' % c.id" class="card h-100 text-decoration-none shadow-sm p-3">
-                    <div class="fw-semibold text-truncate" t-esc="c.name"/>
-                    <div class="text-muted small">Ver produtos</div>
-                  </a>
-                </div>
-              </t>
-              <t t-if="not cats">
-                <div class="col-12">
-                  <div class="alert alert-info mb-0">Nenhuma categoria cadastrada.</div>
-                </div>
-              </t>
-            </div>
+  <template id="page_categories" name="Categorias Marketplace" page="True" url="/marketplace/categories">
+    <t t-call="website.layout">
+      <main id="wrap" class="oe_structure">
+        <div class="container py-5">
+          <h1 class="h4 mb-4">Categorias</h1>
+          <t t-set="cats" t-value="request.env['product.public.category'].sudo().search([], order='name')"/>
+          <div class="row g-3">
+            <t t-foreach="cats" t-as="c">
+              <div class="col-6 col-md-3">
+                <a t-att-href="'/shop/category/%s' % c.id" class="card h-100 text-decoration-none shadow-sm p-3">
+                  <div class="fw-semibold text-truncate" t-esc="c.name"/>
+                  <div class="text-muted small">Ver produtos</div>
+                </a>
+              </div>
+            </t>
+            <t t-if="not cats">
+              <div class="col-12">
+                <div class="alert alert-info mb-0">Nenhuma categoria cadastrada.</div>
+              </div>
+            </t>
           </div>
-        </main>
-      </t>
-    </template>
+        </div>
+      </main>
+    </t>
+  </template>
 
-    <template id="page_how_it_works" name="Como funciona" page="True" url="/marketplace/how-it-works">
-      <t t-call="website.layout">
-        <main id="wrap" class="oe_structure">
-          <div class="container py-5">
-            <h1 class="h3 mb-4">Como funciona o BHZ Marketplace</h1>
-            <div class="row g-4">
-              <div class="col-md-4">
-                <div class="card h-100 shadow-sm">
-                  <div class="card-body">
-                    <h5>1. Lojas verificadas</h5>
-                    <p class="text-muted mb-0">Sellers passam por aprovação e entregam com SLA garantido.</p>
-                  </div>
+  <template id="page_how_it_works" name="Como funciona" page="True" url="/marketplace/how-it-works">
+    <t t-call="website.layout">
+      <main id="wrap" class="oe_structure">
+        <div class="container py-5">
+          <h1 class="h3 mb-4">Como funciona o BHZ Marketplace</h1>
+          <div class="row g-4">
+            <div class="col-md-4">
+              <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                  <h5>1. Lojas verificadas</h5>
+                  <p class="text-muted mb-0">Sellers passam por aprovação e entregam com SLA garantido.</p>
                 </div>
               </div>
-              <div class="col-md-4">
-                <div class="card h-100 shadow-sm">
-                  <div class="card-body">
-                    <h5>2. Produtos publicados</h5>
-                    <p class="text-muted mb-0">Listagens com fotos, preço, frete e avaliações visíveis.</p>
-                  </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                  <h5>2. Produtos publicados</h5>
+                  <p class="text-muted mb-0">Listagens com fotos, preço, frete e avaliações visíveis.</p>
                 </div>
               </div>
-              <div class="col-md-4">
-                <div class="card h-100 shadow-sm">
-                  <div class="card-body">
-                    <h5>3. Pagamentos e repasses</h5>
-                    <p class="text-muted mb-0">Pagamentos integrados e repasses automatizados para sellers.</p>
-                  </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                  <h5>3. Pagamentos e repasses</h5>
+                  <p class="text-muted mb-0">Pagamentos integrados e repasses automatizados para sellers.</p>
                 </div>
               </div>
             </div>
           </div>
-        </main>
-      </t>
-    </template>
+        </div>
+      </main>
+    </t>
+  </template>
 
-    <template id="page_become_seller" name="Seja um vendedor" page="True" url="/marketplace/become-a-seller">
-      <t t-call="website.layout">
-        <main id="wrap" class="oe_structure">
-          <div class="container py-5">
-            <div class="row align-items-center g-4">
-              <div class="col-lg-7">
-                <h1 class="h3 mb-3">Venda no BHZ Marketplace</h1>
-                <p class="lead text-muted">Cadastre sua loja, publique produtos e receba em poucos cliques.</p>
-                <ul class="list-unstyled">
-                  <li>• Aprovação rápida de sellers</li>
-                  <li>• Integração com logística e pagamentos</li>
-                  <li>• Dashboard com pedidos e repasses</li>
-                </ul>
-                <a class="btn btn-primary btn-lg" href="/my/marketplace">Ir para o portal do vendedor</a>
-              </div>
-              <div class="col-lg-5">
-                <div class="card shadow-sm">
-                  <div class="card-body">
-                    <h5 class="mb-3">Como começar</h5>
-                    <ol class="mb-0 text-muted">
-                      <li>Crie sua conta e peça aprovação.</li>
-                      <li>Publique seus produtos.</li>
-                      <li>Ative frete e acompanhe pedidos.</li>
-                    </ol>
-                  </div>
+  <template id="page_become_seller" name="Seja um vendedor" page="True" url="/marketplace/become-a-seller">
+    <t t-call="website.layout">
+      <main id="wrap" class="oe_structure">
+        <div class="container py-5">
+          <div class="row align-items-center g-4">
+            <div class="col-lg-7">
+              <h1 class="h3 mb-3">Venda no BHZ Marketplace</h1>
+              <p class="lead text-muted">Cadastre sua loja, publique produtos e receba em poucos cliques.</p>
+              <ul class="list-unstyled">
+                <li>• Aprovação rápida de sellers</li>
+                <li>• Integração com logística e pagamentos</li>
+                <li>• Dashboard com pedidos e repasses</li>
+              </ul>
+              <a class="btn btn-primary btn-lg" href="/my/marketplace">Ir para o portal do vendedor</a>
+            </div>
+            <div class="col-lg-5">
+              <div class="card shadow-sm">
+                <div class="card-body">
+                  <h5 class="mb-3">Como começar</h5>
+                  <ol class="mb-0 text-muted">
+                    <li>Crie sua conta e peça aprovação.</li>
+                    <li>Publique seus produtos.</li>
+                    <li>Ative frete e acompanhe pedidos.</li>
+                  </ol>
                 </div>
               </div>
             </div>
           </div>
-        </main>
-      </t>
-    </template>
-  </data>
+        </div>
+      </main>
+    </t>
+  </template>
 </odoo>
