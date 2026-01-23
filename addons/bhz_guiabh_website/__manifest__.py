@@ -25,7 +25,6 @@
         "views/guiabh_category_templates.xml",
         "views/guiabh_content_templates.xml",
         "views/guiabh_menus.xml",
-        "views/theme/templates.xml",
         "data/homepage.xml",
     ],
     "demo": [],
@@ -39,4 +38,7 @@
     "application": True,
     "theme": True,
     "post_init_hook": "post_init_hook",
+    "qweb": [
+        "views/theme/templates.xml",
+    ],
 }
