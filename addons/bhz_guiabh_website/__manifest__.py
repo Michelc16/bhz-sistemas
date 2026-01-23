@@ -16,7 +16,6 @@
     "data": [
         "security/ir.model.access.csv",
         "data/ir_cron.xml",
-        "data/homepage.xml",
         "views/guiabh_category_views.xml",
         "views/guiabh_event_views.xml",
         "views/guiabh_place_views.xml",
@@ -27,6 +26,7 @@
         "views/guiabh_content_templates.xml",
         "views/guiabh_menus.xml",
         "views/theme/templates.xml",
+        "data/homepage.xml",
     ],
     "demo": [],
     "assets": {
