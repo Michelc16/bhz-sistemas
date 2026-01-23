@@ -1,7 +1,7 @@
 <odoo>
   <template id="page_seller" name="Marketplace Seller" page="True" url="/marketplace/seller">
     <t t-call="website.layout">
-      <div id="wrap" class="oe_structure">
+      <div class="oe_structure">
         <t t-set="seller" t-value="request.env['bhz.marketplace.seller'].sudo().browse(int(request.params.get('seller_id', 0)))"/>
         <t t-if="not seller or not seller.exists()">
           <div class="container py-5">
