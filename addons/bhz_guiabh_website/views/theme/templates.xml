@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<odoo>
-    <data noupdate="0">
+<templates id="template" xml:space="preserve">
         <!-- Custom header -->
         <template id="theme_guiabh_website_header" name="GuiaBH Header">
             <header class="guiabh-header o_no_autohide">
@@ -199,5 +198,4 @@
                 <t t-call="bhz_guiabh_website.theme_guiabh_website_footer"/>
             </t>
     </template>
-    </data>
-</odoo>
+</templates>
