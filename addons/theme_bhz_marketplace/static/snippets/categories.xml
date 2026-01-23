@@ -1,7 +1,9 @@
 <odoo>
-  <template id="s_bhz_categories" name="BHZ Categories" inherit_id="website.s_dynamic_filter">
-    <xpath expr="//div[contains(@class,'s_dynamic_filter_title')]/h3" position="replace">
-      <h3 class="s_title">Compre por categoria</h3>
-    </xpath>
-  </template>
+  <data>
+    <template id="s_bhz_categories" name="BHZ Categories" inherit_id="website.s_dynamic_filter">
+      <xpath expr="//div[contains(@class,'s_dynamic_filter_title')]/h3" position="replace">
+        <h3 class="s_title">Compre por categoria</h3>
+      </xpath>
+    </template>
+  </data>
 </odoo>

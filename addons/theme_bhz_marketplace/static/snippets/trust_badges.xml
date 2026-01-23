@@ -1,7 +1,9 @@
 <odoo>
-  <template id="s_bhz_trust_badges" name="BHZ Trust Badges" inherit_id="website.s_company_team">
-    <xpath expr="//h2" position="replace">
-      <h2>Confiança e segurança</h2>
-    </xpath>
-  </template>
+  <data>
+    <template id="s_bhz_trust_badges" name="BHZ Trust Badges" inherit_id="website.s_company_team">
+      <xpath expr="//h2" position="replace">
+        <h2>Confiança e segurança</h2>
+      </xpath>
+    </template>
+  </data>
 </odoo>
