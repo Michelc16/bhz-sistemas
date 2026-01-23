@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo noupdate="0">
+    <!-- Point the default homepage to the GuiaBH theme template -->
+    <record id="website.homepage" model="website.page">
+        <field name="view_id" ref="bhz_guiabh_website.theme_guiabh_website_homepage"/>
+        <field name="website_published">True</field>
+    </record>
+</odoo>
