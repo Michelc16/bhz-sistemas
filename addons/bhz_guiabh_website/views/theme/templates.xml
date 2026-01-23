@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <data>
+    <data noupdate="0">
         <!-- Custom header -->
         <template id="theme_guiabh_website_header" name="GuiaBH Header">
             <header class="guiabh-header o_no_autohide">
