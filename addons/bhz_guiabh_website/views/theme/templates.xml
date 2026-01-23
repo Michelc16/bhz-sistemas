@@ -154,8 +154,8 @@
                         <p class="guiabh-kicker">Destaques em movimento</p>
                         <h2>Roteiros curados da semana.</h2>
                         <div class="guiabh-carousel__controls">
-                            <button type="button" class="guiabh-button guiabh-button--ghost" data-carousel-prev aria-label="Anterior">←</button>
-                            <button type="button" class="guiabh-button guiabh-button--ghost" data-carousel-next aria-label="Próximo">→</button>
+                            <button type="button" class="guiabh-button guiabh-button--ghost" data-carousel-prev="1" aria-label="Anterior">←</button>
+                            <button type="button" class="guiabh-button guiabh-button--ghost" data-carousel-next="1" aria-label="Próximo">→</button>
                         </div>
                     </div>
                     <div class="guiabh-carousel" data-carousel-track="1">
