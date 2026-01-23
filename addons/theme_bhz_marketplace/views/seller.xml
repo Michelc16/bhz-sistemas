@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <data>
-    <template id="page_seller" name="Marketplace Seller" page="True" url="/marketplace/seller">
+  <template id="page_seller" name="Marketplace Seller" page="True" url="/marketplace/seller">
     <t t-call="website.layout">
       <main id="wrap" class="oe_structure">
         <t t-set="seller" t-value="request.env['bhz.marketplace.seller'].sudo().browse(int(request.params.get('seller_id', 0)))"/>
@@ -45,8 +44,7 @@
             </div>
           </div>
         </t>
-      </main>
-    </t>
-  </template>
-  </data>
+        </main>
+      </t>
+    </template>
 </odoo>

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <data>
-    <template id="page_home" name="Marketplace Home" page="True" url="/">
+  <template id="page_home" name="Marketplace Home" page="True" url="/">
     <t t-call="website.layout">
       <main id="wrap" class="oe_structure">
         <div class="bhz-hero text-white">
@@ -98,8 +97,7 @@
             </t>
           </div>
         </div>
-      </main>
-    </t>
-  </template>
-  </data>
+        </main>
+      </t>
+    </template>
 </odoo>
