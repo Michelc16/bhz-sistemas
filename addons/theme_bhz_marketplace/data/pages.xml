@@ -1,3 +1,9 @@
 <odoo>
-  <!-- Páginas são criadas no post_init_hook para manter o tema isolado. -->
+  <!-- Home page binding to the marketplace template, published and ready for default website -->
+  <record id="page_home_record" model="website.page">
+    <field name="url">/</field>
+    <field name="name">Marketplace Home</field>
+    <field name="view_id" ref="theme_bhz_marketplace.page_home"/>
+    <field name="website_published">True</field>
+  </record>
 </odoo>
