@@ -1,5 +1,5 @@
 <odoo>
-  <template id="page_product" name="Marketplace Product">
+  <template id="page_product" name="Marketplace Product" page="True" url="/marketplace/product">
     <t t-call="website.layout">
       <t t-set="product" t-value="request.env['product.template'].sudo().browse(int(request.params.get('product_id', 0)))"/>
       <t t-if="not product or not product.exists()">

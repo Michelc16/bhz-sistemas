@@ -1,5 +1,5 @@
 <odoo>
-  <template id="page_home" name="Marketplace Home">
+  <template id="page_home" name="Marketplace Home" page="True" url="/">
     <t t-call="website.layout">
       <div class="bhz-hero text-white">
         <div class="container py-5">

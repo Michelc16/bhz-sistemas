@@ -1,5 +1,5 @@
 <odoo>
-  <template id="page_shop" name="Marketplace Shop">
+  <template id="page_shop" name="Marketplace Shop" page="True" url="/marketplace/shop">
     <t t-call="website.layout">
       <div class="container py-5">
         <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4">
