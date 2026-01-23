@@ -1,71 +1,72 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <!-- Custom header -->
-    <template id="theme_guiabh_website_header" name="GuiaBH Header">
-        <header class="guiabh-header o_no_autohide">
-            <div class="guiabh-header__brand">
-                <a href="/" class="guiabh-logo" aria-label="GuiaBH">
-                    <span class="guiabh-logo__mark">GBH</span>
-                    <span class="guiabh-logo__text">GuiaBH</span>
-                </a>
-            </div>
-            <nav class="guiabh-nav" aria-label="Navegação principal">
-                <a href="#categorias" class="guiabh-nav__link">Categorias</a>
-                <a href="#destaques" class="guiabh-nav__link">Destaques</a>
-                <a href="#descubra" class="guiabh-nav__link">Descubra</a>
-            </nav>
-            <div class="guiabh-header__cta">
-                <a href="/contato" class="guiabh-button guiabh-button--ghost">Anuncie</a>
-                <a href="/login" class="guiabh-button guiabh-button--primary">Entrar</a>
-            </div>
-        </header>
-    </template>
+    <data>
+        <!-- Custom header -->
+        <template id="theme_guiabh_website_header" name="GuiaBH Header">
+            <header class="guiabh-header o_no_autohide">
+                <div class="guiabh-header__brand">
+                    <a href="/" class="guiabh-logo" aria-label="GuiaBH">
+                        <span class="guiabh-logo__mark">GBH</span>
+                        <span class="guiabh-logo__text">GuiaBH</span>
+                    </a>
+                </div>
+                <nav class="guiabh-nav" aria-label="Navegação principal">
+                    <a href="#categorias" class="guiabh-nav__link">Categorias</a>
+                    <a href="#destaques" class="guiabh-nav__link">Destaques</a>
+                    <a href="#descubra" class="guiabh-nav__link">Descubra</a>
+                </nav>
+                <div class="guiabh-header__cta">
+                    <a href="/contato" class="guiabh-button guiabh-button--ghost">Anuncie</a>
+                    <a href="/login" class="guiabh-button guiabh-button--primary">Entrar</a>
+                </div>
+            </header>
+        </template>
 
-    <!-- Custom footer -->
-    <template id="theme_guiabh_website_footer" name="GuiaBH Footer">
-        <t t-set="datetime" t-value="__import__('datetime')"/>
-        <footer class="guiabh-footer">
-            <div class="guiabh-footer__brand">
-                <div class="guiabh-logo guiabh-logo--muted">
-                    <span class="guiabh-logo__mark">GBH</span>
-                    <span class="guiabh-logo__text">GuiaBH</span>
+        <!-- Custom footer -->
+        <template id="theme_guiabh_website_footer" name="GuiaBH Footer">
+            <t t-set="datetime" t-value="__import__('datetime')"/>
+            <footer class="guiabh-footer">
+                <div class="guiabh-footer__brand">
+                    <div class="guiabh-logo guiabh-logo--muted">
+                        <span class="guiabh-logo__mark">GBH</span>
+                        <span class="guiabh-logo__text">GuiaBH</span>
+                    </div>
+                    <p>Guia curado de cultura, gastronomia e lazer em Belo Horizonte.</p>
                 </div>
-                <p>Guia curado de cultura, gastronomia e lazer em Belo Horizonte.</p>
-            </div>
-            <div class="guiabh-footer__links">
-                <div>
-                    <h4>Explorar</h4>
-                    <ul>
-                        <li><a href="#categorias">Categorias</a></li>
-                        <li><a href="#destaques">Destaques</a></li>
-                        <li><a href="#descubra">Descubra</a></li>
-                    </ul>
+                <div class="guiabh-footer__links">
+                    <div>
+                        <h4>Explorar</h4>
+                        <ul>
+                            <li><a href="#categorias">Categorias</a></li>
+                            <li><a href="#destaques">Destaques</a></li>
+                            <li><a href="#descubra">Descubra</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4>Institucional</h4>
+                        <ul>
+                            <li><a href="/sobre">Sobre</a></li>
+                            <li><a href="/politica-de-privacidade">Privacidade</a></li>
+                            <li><a href="/contato">Contato</a></li>
+                        </ul>
+                    </div>
                 </div>
-                <div>
-                    <h4>Institucional</h4>
-                    <ul>
-                        <li><a href="/sobre">Sobre</a></li>
-                        <li><a href="/politica-de-privacidade">Privacidade</a></li>
-                        <li><a href="/contato">Contato</a></li>
-                    </ul>
+                <div class="guiabh-footer__meta">
+                    <span>© <t t-esc="datetime.date.today().year"/> GuiaBH.</span>
+                    <span>BHZ Sistemas.</span>
                 </div>
-            </div>
-            <div class="guiabh-footer__meta">
-                <span>© <t t-esc="datetime.date.today().year"/> GuiaBH.</span>
-                <span>BHZ Sistemas.</span>
-            </div>
-        </footer>
-    </template>
+            </footer>
+        </template>
 
-    <!-- Landing page: not set as default home; accessible via /theme/guiabh/home -->
-    <template id="theme_guiabh_website_homepage" name="GuiaBH Home" page="True" url="/theme/guiabh/home">
-        <t t-call="website.layout">
-            <t t-set="page_title">GuiaBH — Descubra Belo Horizonte</t>
-            <t t-set="page_description">Agenda curada de cultura, gastronomia, esportes e lazer em BH, com buscas rápidas e destaques semanais.</t>
-            <t t-set="page_og_title">GuiaBH — Descubra Belo Horizonte</t>
-            <t t-set="page_og_description">Explorar eventos, restaurantes e experiências na capital mineira.</t>
-            <t t-set="page_schema">
-                <script type="application/ld+json">
+        <!-- Landing page: not set as default home; accessible via /theme/guiabh/home -->
+        <template id="theme_guiabh_website_homepage" name="GuiaBH Home" page="True" url="/theme/guiabh/home">
+            <t t-call="website.layout">
+                <t t-set="page_title">GuiaBH — Descubra Belo Horizonte</t>
+                <t t-set="page_description">Agenda curada de cultura, gastronomia, esportes e lazer em BH, com buscas rápidas e destaques semanais.</t>
+                <t t-set="page_og_title">GuiaBH — Descubra Belo Horizonte</t>
+                <t t-set="page_og_description">Explorar eventos, restaurantes e experiências na capital mineira.</t>
+                <t t-set="page_schema">
+                    <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "WebSite",
@@ -80,122 +81,123 @@
                     </script>
                 </t>
 
-            <t t-call-assets="theme_guiabh_website.assets_frontend"/>
-            <t t-call="bhz_guiabh_website.theme_guiabh_website_header"/>
+                <t t-call-assets="theme_guiabh_website.assets_frontend"/>
+                <t t-call="bhz_guiabh_website.theme_guiabh_website_header"/>
 
-            <main id="guiabh-home" class="guiabh-home" role="main">
-                <section class="guiabh-hero">
-                    <div class="guiabh-hero__content">
-                        <p class="guiabh-kicker">Guia curado de Belo Horizonte</p>
-                        <h1>Descubra o próximo lugar para viver BH agora.</h1>
-                        <p class="guiabh-hero__lead">Eventos, gastronomia, esporte e experiências selecionadas para quem quer aproveitar a cidade.</p>
-                        <form class="guiabh-search" action="/website/search" method="get" role="search">
-                            <label for="guiabh-search-input" class="sr-only">Buscar</label>
-                            <input id="guiabh-search-input" name="search" type="search" placeholder="Buscar por bairro, evento ou experiência" required="required" />
-                            <button type="submit" class="guiabh-button guiabh-button--primary">Buscar agora</button>
-                        </form>
-                        <div class="guiabh-hero__meta">
-                            <span>Explore rapidamente: </span>
-                            <a href="#categorias">Categorias</a>
-                            <a href="#destaques">Destaques</a>
-                            <a href="#descubra">Descubra</a>
+                <main id="guiabh-home" class="guiabh-home" role="main">
+                    <section class="guiabh-hero">
+                        <div class="guiabh-hero__content">
+                            <p class="guiabh-kicker">Guia curado de Belo Horizonte</p>
+                            <h1>Descubra o próximo lugar para viver BH agora.</h1>
+                            <p class="guiabh-hero__lead">Eventos, gastronomia, esporte e experiências selecionadas para quem quer aproveitar a cidade.</p>
+                            <form class="guiabh-search" action="/website/search" method="get" role="search">
+                                <label for="guiabh-search-input" class="sr-only">Buscar</label>
+                                <input id="guiabh-search-input" name="search" type="search" placeholder="Buscar por bairro, evento ou experiência" required="required" />
+                                <button type="submit" class="guiabh-button guiabh-button--primary">Buscar agora</button>
+                            </form>
+                            <div class="guiabh-hero__meta">
+                                <span>Explore rapidamente: </span>
+                                <a href="#categorias">Categorias</a>
+                                <a href="#destaques">Destaques</a>
+                                <a href="#descubra">Descubra</a>
+                            </div>
                         </div>
-                    </div>
-                    <div class="guiabh-hero__visual">
-                        <div class="guiabh-hero__badge">BH 360°</div>
-                        <div class="guiabh-hero__card">
-                            <p>Agenda inteligente</p>
-                            <strong>+120 eventos da semana</strong>
-                            <span>Atualizado diariamente</span>
+                        <div class="guiabh-hero__visual">
+                            <div class="guiabh-hero__badge">BH 360°</div>
+                            <div class="guiabh-hero__card">
+                                <p>Agenda inteligente</p>
+                                <strong>+120 eventos da semana</strong>
+                                <span>Atualizado diariamente</span>
+                            </div>
+                            <div class="guiabh-hero__card">
+                                <p>Gastronomia</p>
+                                <strong>40 novos lugares</strong>
+                                <span>Selecionados por curadores locais</span>
+                            </div>
                         </div>
-                        <div class="guiabh-hero__card">
-                            <p>Gastronomia</p>
-                            <strong>40 novos lugares</strong>
-                            <span>Selecionados por curadores locais</span>
-                        </div>
-                    </div>
-                </section>
+                    </section>
 
-                <section id="categorias" class="guiabh-section guiabh-section--grid">
-                    <div class="guiabh-section__header">
-                        <p class="guiabh-kicker">Categorias visuais</p>
-                        <h2>O melhor de BH, separado por momentos.</h2>
-                    </div>
-                    <div class="guiabh-grid">
-                        <article class="guiabh-card">
-                            <div class="guiabh-card__icon">GA</div>
-                            <h3>Gastronomia</h3>
-                            <p>Bistrôs autorais, cafés e botecos clássicos.</p>
-                            <a href="/category/gastronomia" class="guiabh-link">Ver lugares</a>
-                        </article>
-                        <article class="guiabh-card">
-                            <div class="guiabh-card__icon">EV</div>
-                            <h3>Eventos</h3>
-                            <p>Mostras, shows, feiras e experiências ao vivo.</p>
-                            <a href="/category/eventos" class="guiabh-link">Ver agenda</a>
-                        </article>
-                        <article class="guiabh-card">
-                            <div class="guiabh-card__icon">ES</div>
-                            <h3>Esportes</h3>
-                            <p>Futebol, corridas de rua e esportes urbanos.</p>
-                            <a href="/category/esportes" class="guiabh-link">Ver esportes</a>
-                        </article>
-                        <article class="guiabh-card">
-                            <div class="guiabh-card__icon">AR</div>
-                            <h3>Ao ar livre</h3>
-                            <p>Parques, trilhas e experiências para respirar BH.</p>
-                            <a href="/category/ao-ar-livre" class="guiabh-link">Explorar</a>
-                        </article>
-                    </div>
-                </section>
-
-                <section id="destaques" class="guiabh-section guiabh-section--carousel" data-carousel="1">
-                    <div class="guiabh-section__header">
-                        <p class="guiabh-kicker">Destaques em movimento</p>
-                        <h2>Roteiros curados da semana.</h2>
-                        <div class="guiabh-carousel__controls">
-                            <button type="button" class="guiabh-button guiabh-button--ghost" data-carousel-prev="1" aria-label="Anterior">←</button>
-                            <button type="button" class="guiabh-button guiabh-button--ghost" data-carousel-next="1" aria-label="Próximo">→</button>
+                    <section id="categorias" class="guiabh-section guiabh-section--grid">
+                        <div class="guiabh-section__header">
+                            <p class="guiabh-kicker">Categorias visuais</p>
+                            <h2>O melhor de BH, separado por momentos.</h2>
                         </div>
-                    </div>
-                    <div class="guiabh-carousel" data-carousel-track="1">
-                        <article class="guiabh-highlight">
-                            <div class="guiabh-highlight__tag">Sábado</div>
-                            <h3>Jazz no Horizonte</h3>
-                            <p>Trio instrumental no topo do Mirante com vista 360°.</p>
-                            <span class="guiabh-highlight__meta">19h — Mirante</span>
-                        </article>
-                        <article class="guiabh-highlight">
-                            <div class="guiabh-highlight__tag">Domingo</div>
-                            <h3>Brunch em Santa Tereza</h3>
-                            <p>Sabores mineiros, cafés especiais e música ao vivo.</p>
-                            <span class="guiabh-highlight__meta">10h — Rua Mármore</span>
-                        </article>
-                        <article class="guiabh-highlight">
-                            <div class="guiabh-highlight__tag">Quarta</div>
-                            <h3>Mostra de Cinema Independente</h3>
-                            <p>Curadoria de filmes nacionais com debate pós-sessão.</p>
-                            <span class="guiabh-highlight__meta">20h — Cine Centro</span>
-                        </article>
-                    </div>
-                </section>
-
-                <section id="descubra" class="guiabh-section guiabh-section--cta">
-                    <div class="guiabh-cta">
-                        <div>
-                            <p class="guiabh-kicker">Descubra e salve</p>
-                            <h2>Monte suas listas e compartilhe com a turma.</h2>
-                            <p class="guiabh-cta__lead">Em breve, contas pessoais para você favoritar e planejar roteiros. Enquanto isso, explore a curadoria aberta.</p>
+                        <div class="guiabh-grid">
+                            <article class="guiabh-card">
+                                <div class="guiabh-card__icon">GA</div>
+                                <h3>Gastronomia</h3>
+                                <p>Bistrôs autorais, cafés e botecos clássicos.</p>
+                                <a href="/category/gastronomia" class="guiabh-link">Ver lugares</a>
+                            </article>
+                            <article class="guiabh-card">
+                                <div class="guiabh-card__icon">EV</div>
+                                <h3>Eventos</h3>
+                                <p>Mostras, shows, feiras e experiências ao vivo.</p>
+                                <a href="/category/eventos" class="guiabh-link">Ver agenda</a>
+                            </article>
+                            <article class="guiabh-card">
+                                <div class="guiabh-card__icon">ES</div>
+                                <h3>Esportes</h3>
+                                <p>Futebol, corridas de rua e esportes urbanos.</p>
+                                <a href="/category/esportes" class="guiabh-link">Ver esportes</a>
+                            </article>
+                            <article class="guiabh-card">
+                                <div class="guiabh-card__icon">AR</div>
+                                <h3>Ao ar livre</h3>
+                                <p>Parques, trilhas e experiências para respirar BH.</p>
+                                <a href="/category/ao-ar-livre" class="guiabh-link">Explorar</a>
+                            </article>
                         </div>
-                        <div class="guiabh-cta__actions">
-                            <a href="/contato" class="guiabh-button guiabh-button--primary">Fale com um curador</a>
-                            <a href="/newsletter" class="guiabh-button guiabh-button--ghost">Receba a agenda</a>
-                        </div>
-                    </div>
-                </section>
-            </main>
+                    </section>
 
-            <t t-call="bhz_guiabh_website.theme_guiabh_website_footer"/>
-        </t>
-    </template>
+                    <section id="destaques" class="guiabh-section guiabh-section--carousel" data-carousel="1">
+                        <div class="guiabh-section__header">
+                            <p class="guiabh-kicker">Destaques em movimento</p>
+                            <h2>Roteiros curados da semana.</h2>
+                            <div class="guiabh-carousel__controls">
+                                <button type="button" class="guiabh-button guiabh-button--ghost" data-carousel-prev="1" aria-label="Anterior">←</button>
+                                <button type="button" class="guiabh-button guiabh-button--ghost" data-carousel-next="1" aria-label="Próximo">→</button>
+                            </div>
+                        </div>
+                        <div class="guiabh-carousel" data-carousel-track="1">
+                            <article class="guiabh-highlight">
+                                <div class="guiabh-highlight__tag">Sábado</div>
+                                <h3>Jazz no Horizonte</h3>
+                                <p>Trio instrumental no topo do Mirante com vista 360°.</p>
+                                <span class="guiabh-highlight__meta">19h — Mirante</span>
+                            </article>
+                            <article class="guiabh-highlight">
+                                <div class="guiabh-highlight__tag">Domingo</div>
+                                <h3>Brunch em Santa Tereza</h3>
+                                <p>Sabores mineiros, cafés especiais e música ao vivo.</p>
+                                <span class="guiabh-highlight__meta">10h — Rua Mármore</span>
+                            </article>
+                            <article class="guiabh-highlight">
+                                <div class="guiabh-highlight__tag">Quarta</div>
+                                <h3>Mostra de Cinema Independente</h3>
+                                <p>Curadoria de filmes nacionais com debate pós-sessão.</p>
+                                <span class="guiabh-highlight__meta">20h — Cine Centro</span>
+                            </article>
+                        </div>
+                    </section>
+
+                    <section id="descubra" class="guiabh-section guiabh-section--cta">
+                        <div class="guiabh-cta">
+                            <div>
+                                <p class="guiabh-kicker">Descubra e salve</p>
+                                <h2>Monte suas listas e compartilhe com a turma.</h2>
+                                <p class="guiabh-cta__lead">Em breve, contas pessoais para você favoritar e planejar roteiros. Enquanto isso, explore a curadoria aberta.</p>
+                            </div>
+                            <div class="guiabh-cta__actions">
+                                <a href="/contato" class="guiabh-button guiabh-button--primary">Fale com um curador</a>
+                                <a href="/newsletter" class="guiabh-button guiabh-button--ghost">Receba a agenda</a>
+                            </div>
+                        </div>
+                    </section>
+                </main>
+
+                <t t-call="bhz_guiabh_website.theme_guiabh_website_footer"/>
+            </t>
+        </template>
+    </data>
 </odoo>
