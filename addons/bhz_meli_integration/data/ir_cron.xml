@@ -1,5 +1,6 @@
 <odoo>
-    <data noupdate="1">
+    <data noupdate="0">
+
         <record id="ir_cron_meli_fetch_orders" model="ir.cron">
             <field name="name">BHZ ML: Buscar pedidos</field>
             <field name="model_id" ref="model_meli_order"/>
@@ -7,7 +8,8 @@
             <field name="code">model.cron_fetch_orders()</field>
             <field name="interval_number">10</field>
             <field name="interval_type">minutes</field>
-            <field name="active">True</field>
+            <field name="active" eval="True"/>
+            <field name="user_id" ref="base.user_root"/>
         </record>
 
         <record id="ir_cron_meli_fetch_items" model="ir.cron">
@@ -17,7 +19,9 @@
             <field name="code">model.cron_fetch_items()</field>
             <field name="interval_number">30</field>
             <field name="interval_type">minutes</field>
-            <field name="active">True</field>
+            <field name="active" eval="True"/>
+            <field name="user_id" ref="base.user_root"/>
         </record>
+
     </data>
 </odoo>
