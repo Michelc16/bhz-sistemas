@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <data>
   <template id="page_dashboard" name="Dashboard Vendedor" page="True" url="/marketplace/dashboard">
     <t t-call="website.layout">
       <main id="wrap" class="oe_structure">
@@ -12,12 +11,16 @@
             </div>
             <a class="btn btn-primary" href="/my/marketplace">Acessar portal</a>
           </div>
+
           <div class="row g-3">
             <div class="col-md-4">
               <div class="card h-100 shadow-sm">
                 <div class="card-body">
                   <h5 class="card-title">Pedidos</h5>
-                  <t t-set="orders" t-value="request.env['sale.order'].sudo().search([('order_line.bhz_seller_id','!=',False)], limit=5) if request.env.registry.get('bhz_marketplace_core') or request.env['sale.order.line']._fields.get('bhz_seller_id') else []"/>
+
+                  <t t-set="has_bhz_seller_line" t-value="bool(request.env['sale.order.line']._fields.get('bhz_seller_id'))"/>
+                  <t t-set="orders" t-value="request.env['sale.order'].sudo().search([('order_line.bhz_seller_id','!=',False)], limit=5) if has_bhz_seller_line else []"/>
+
                   <ul class="list-unstyled mb-0">
                     <t t-foreach="orders" t-as="o">
                       <li class="d-flex justify-content-between small py-1 border-bottom" t-att-title="o.name">
@@ -32,11 +35,15 @@
                 </div>
               </div>
             </div>
+
             <div class="col-md-4">
               <div class="card h-100 shadow-sm">
                 <div class="card-body">
                   <h5 class="card-title">Repasses</h5>
-                  <t t-set="payouts" t-value="request.env['bhz.seller.payout'].sudo().search([], limit=5)"/>
+
+                  <t t-set="PayoutModel" t-value="request.env['bhz.seller.payout'].sudo() if request.env.registry.get('bhz.seller.payout') else False"/>
+                  <t t-set="payouts" t-value="PayoutModel.search([], limit=5) if PayoutModel else []"/>
+
                   <ul class="list-unstyled mb-0">
                     <t t-foreach="payouts" t-as="p">
                       <li class="d-flex justify-content-between small py-1 border-bottom">
@@ -51,6 +58,7 @@
                 </div>
               </div>
             </div>
+
             <div class="col-md-4">
               <div class="card h-100 shadow-sm">
                 <div class="card-body">
@@ -63,10 +71,10 @@
                 </div>
               </div>
             </div>
+
           </div>
         </div>
-        </main>
-      </t>
-    </template>
-  </data>
+      </main>
+    </t>
+  </template>
 </odoo>

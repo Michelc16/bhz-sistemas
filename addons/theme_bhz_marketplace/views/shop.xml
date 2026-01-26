@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <data>
   <template id="page_shop" name="Marketplace Shop" page="True" url="/marketplace/shop">
     <t t-call="website.layout">
       <main id="wrap" class="oe_structure">
@@ -27,7 +26,8 @@
                   <div class="card-body">
                     <div class="fw-semibold text-truncate" t-esc="p.name"/>
                     <div class="text-primary fw-bold" t-esc="p.list_price"/>
-                    <div class="text-muted small" t-esc="p.bhz_seller_id.name or 'Loja parceira'"/>
+                    <div class="text-muted small"
+                         t-esc="(p.bhz_seller_id.name if ('bhz_seller_id' in p._fields and p.bhz_seller_id) else 'Loja parceira')"/>
                   </div>
                 </a>
               </div>
@@ -39,8 +39,7 @@
             </t>
           </div>
         </div>
-        </main>
-      </t>
-    </template>
-  </data>
+      </main>
+    </t>
+  </template>
 </odoo>

@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <data>
+
   <template id="page_search" name="Busca Marketplace" page="True" url="/marketplace/search">
     <t t-call="website.layout">
       <main id="wrap" class="oe_structure">
         <div class="container py-5">
           <h1 class="h4 mb-4">Resultados da busca</h1>
+
           <t t-set="term" t-value="request.params.get('search')"/>
           <t t-set="domain" t-value="[['website_published','=',True]]"/>
           <t t-if="term">
             <t t-set="domain" t-value="domain + [('name','ilike', term)]"/>
           </t>
+
           <t t-set="products" t-value="request.env['product.template'].sudo().search(domain, limit=40)"/>
           <div class="row g-3">
             <t t-foreach="products" t-as="p">
@@ -22,7 +24,8 @@
                   <div class="card-body">
                     <div class="fw-semibold text-truncate" t-esc="p.name"/>
                     <div class="text-primary fw-bold" t-esc="p.list_price"/>
-                    <div class="text-muted small" t-esc="p.bhz_seller_id.name or 'Loja'"/>
+                    <div class="text-muted small"
+                         t-esc="(p.bhz_seller_id.name if ('bhz_seller_id' in p._fields and p.bhz_seller_id) else 'Loja')"/>
                   </div>
                 </a>
               </div>
@@ -34,9 +37,9 @@
             </t>
           </div>
         </div>
-        </main>
-      </t>
-    </template>
+      </main>
+    </t>
+  </template>
 
   <template id="page_categories" name="Categorias Marketplace" page="True" url="/marketplace/categories">
     <t t-call="website.layout">
@@ -60,9 +63,9 @@
             </t>
           </div>
         </div>
-        </main>
-      </t>
-    </template>
+      </main>
+    </t>
+  </template>
 
   <template id="page_how_it_works" name="Como funciona" page="True" url="/marketplace/how-it-works">
     <t t-call="website.layout">
@@ -96,9 +99,9 @@
             </div>
           </div>
         </div>
-        </main>
-      </t>
-    </template>
+      </main>
+    </t>
+  </template>
 
   <template id="page_become_seller" name="Seja um vendedor" page="True" url="/marketplace/become-a-seller">
     <t t-call="website.layout">
@@ -129,8 +132,8 @@
             </div>
           </div>
         </div>
-        </main>
-      </t>
-    </template>
-  </data>
+      </main>
+    </t>
+  </template>
+
 </odoo>

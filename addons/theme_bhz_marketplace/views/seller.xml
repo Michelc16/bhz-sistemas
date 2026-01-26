@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <data>
   <template id="page_seller" name="Marketplace Seller" page="True" url="/marketplace/seller">
     <t t-call="website.layout">
       <main id="wrap" class="oe_structure">
+
         <t t-set="SellerModel" t-value="request.env['bhz.marketplace.seller'].sudo() if request.env.registry.get('bhz.marketplace.seller') else False"/>
         <t t-set="seller" t-value="SellerModel.browse(int(request.params.get('seller_id', 0))) if SellerModel else False"/>
+
         <t t-if="not seller or not seller.exists()">
           <div class="container py-5">
             <div class="alert alert-warning">Loja não encontrada.</div>
           </div>
         </t>
+
         <t t-if="seller and seller.exists()">
           <div class="container py-5">
             <div class="d-flex align-items-center gap-3 mb-4">
@@ -22,8 +24,12 @@
                 <div class="text-muted">Loja verificada</div>
               </div>
             </div>
+
             <h2 class="h5 mb-3">Produtos</h2>
-            <t t-set="products" t-value="request.env['product.template'].sudo().search([('bhz_seller_id','=',seller.id), ('website_published','=',True)])"/>
+
+            <t t-set="products"
+               t-value="request.env['product.template'].sudo().search([('bhz_seller_id','=',seller.id), ('website_published','=',True)]) if request.env['product.template']._fields.get('bhz_seller_id') else []"/>
+
             <div class="row g-3">
               <t t-foreach="products" t-as="p">
                 <div class="col-6 col-md-3">
@@ -38,6 +44,7 @@
                   </a>
                 </div>
               </t>
+
               <t t-if="not products">
                 <div class="col-12">
                   <div class="alert alert-info mb-0">Nenhum produto publicado por esta loja.</div>
@@ -46,8 +53,8 @@
             </div>
           </div>
         </t>
-        </main>
-      </t>
-    </template>
-  </data>
+
+      </main>
+    </t>
+  </template>
 </odoo>

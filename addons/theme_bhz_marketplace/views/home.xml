@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <data>
   <template id="page_home" name="Marketplace Home" page="True" url="/">
     <t t-call="website.layout">
       <main id="wrap" class="oe_structure">
@@ -42,6 +41,7 @@
             <h2 class="h4 mb-0">Destaques de hoje</h2>
             <a class="text-decoration-none" href="/marketplace/shop">Ver tudo</a>
           </div>
+
           <t t-set="products" t-value="request.env['product.template'].sudo().search([('website_published','=',True)], limit=8)"/>
           <div class="row g-3">
             <t t-foreach="products" t-as="p">
@@ -53,7 +53,8 @@
                   <div class="card-body">
                     <div class="text-truncate fw-semibold" t-esc="p.name"/>
                     <div class="text-primary fw-bold" t-esc="p.list_price"/>
-                    <div class="text-muted small" t-esc="(p.bhz_seller_id.name if ('bhz_seller_id' in p._fields and p.bhz_seller_id) else 'Loja parceira')"/>
+                    <div class="text-muted small"
+                         t-esc="(p.bhz_seller_id.name if ('bhz_seller_id' in p._fields and p.bhz_seller_id) else 'Loja parceira')"/>
                   </div>
                 </a>
               </div>
@@ -71,8 +72,10 @@
             <h2 class="h4 mb-0">Lojas verificadas</h2>
             <a class="text-decoration-none" href="/marketplace/seller">Ver todas</a>
           </div>
+
           <t t-set="SellerModel" t-value="request.env['bhz.marketplace.seller'].sudo() if request.env.registry.get('bhz.marketplace.seller') else False"/>
           <t t-set="sellers" t-value="SellerModel.search([('state','=','approved')], limit=6) if SellerModel else []"/>
+
           <div class="row g-3">
             <t t-foreach="sellers" t-as="s">
               <div class="col-6 col-md-4 col-lg-3">
@@ -99,8 +102,8 @@
             </t>
           </div>
         </div>
+
       </main>
     </t>
   </template>
-  </data>
 </odoo>
