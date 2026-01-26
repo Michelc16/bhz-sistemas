@@ -16,7 +16,7 @@
               <div class="card h-100 shadow-sm">
                 <div class="card-body">
                   <h5 class="card-title">Pedidos</h5>
-                  <t t-set="orders" t-value="request.env['sale.order'].sudo().search([('order_line.bhz_seller_id','!=',False)], limit=5)"/>
+                  <t t-set="orders" t-value="request.env['sale.order'].sudo().search([('order_line.bhz_seller_id','!=',False)], limit=5) if request.env.registry.get('bhz_marketplace_core') or request.env['sale.order.line']._fields.get('bhz_seller_id') else []"/>
                   <ul class="list-unstyled mb-0">
                     <t t-foreach="orders" t-as="o">
                       <li class="d-flex justify-content-between small py-1 border-bottom" t-att-title="o.name">

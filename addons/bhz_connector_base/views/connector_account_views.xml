@@ -1,0 +1,44 @@
+<odoo>
+  <record id="view_bhz_connector_account_tree" model="ir.ui.view">
+    <field name="name">bhz.connector.account.tree</field>
+    <field name="model">bhz.connector.account</field>
+    <field name="arch" type="xml">
+      <list>
+        <field name="name"/>
+        <field name="seller_id"/>
+        <field name="connector_type"/>
+        <field name="state"/>
+        <field name="last_sync_at"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="view_bhz_connector_account_form" model="ir.ui.view">
+    <field name="name">bhz.connector.account.form</field>
+    <field name="model">bhz.connector.account</field>
+    <field name="arch" type="xml">
+      <form string="Conta de conector">
+        <header>
+          <field name="state" widget="statusbar" statusbar_visible="draft,connected,error"/>
+        </header>
+        <sheet>
+          <group>
+            <field name="name"/>
+            <field name="seller_id"/>
+            <field name="connector_type"/>
+            <field name="api_key"/>
+            <field name="api_secret"/>
+            <field name="base_url"/>
+            <field name="last_sync_at"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_bhz_connector_account" model="ir.actions.act_window">
+    <field name="name">Contas ERP</field>
+    <field name="res_model">bhz.connector.account</field>
+    <field name="view_mode">list,form</field>
+  </record>
+</odoo>

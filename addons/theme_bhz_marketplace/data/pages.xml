@@ -1,11 +1,5 @@
 <odoo>
   <data>
-    <!-- Home page binding to the marketplace template, published and ready for default website -->
-    <record id="page_home_record" model="website.page">
-      <field name="url">/</field>
-      <field name="name">Marketplace Home</field>
-      <field name="view_id" ref="theme_bhz_marketplace.page_home"/>
-      <field name="website_published">True</field>
-    </record>
+    <!-- Pages are created from templates (page=True) to avoid overriding existing websites. -->
   </data>
 </odoo>

@@ -1,0 +1,37 @@
+<odoo>
+  <template id="portal_my_marketplace_connectors" name="Portal Marketplace Connectors">
+    <t t-call="portal.portal_layout">
+      <t t-set="breadcrumbs" t-value="[(portal_url('/my'), 'Home'), ('Integrações', False)]"/>
+      <div class="o_portal_wrap">
+        <h2>Integrações ERP</h2>
+        <h4>Contas</h4>
+        <table class="table table-sm">
+          <thead><tr><th>Nome</th><th>Tipo</th><th>Status</th></tr></thead>
+          <tbody>
+            <t t-foreach="accounts" t-as="acc">
+              <tr>
+                <td><t t-esc="acc.name"/></td>
+                <td><t t-esc="acc.connector_type"/></td>
+                <td><t t-esc="acc.state"/></td>
+              </tr>
+            </t>
+          </tbody>
+        </table>
+        <h4>Jobs</h4>
+        <table class="table table-sm">
+          <thead><tr><th>Conta</th><th>Tipo</th><th>Status</th><th>Tentativas</th></tr></thead>
+          <tbody>
+            <t t-foreach="jobs" t-as="job">
+              <tr>
+                <td><t t-esc="job.account_id.name"/></td>
+                <td><t t-esc="job.job_type"/></td>
+                <td><t t-esc="job.state"/></td>
+                <td><t t-esc="job.attempts"/></td>
+              </tr>
+            </t>
+          </tbody>
+        </table>
+      </div>
+    </t>
+  </template>
+</odoo>

@@ -24,7 +24,7 @@
                 <p class="text-muted" t-esc="product.website_description or product.description_sale"/>
                 <div class="d-flex gap-2 my-3">
                   <span class="badge bg-success">Frete rápido</span>
-                  <span class="badge bg-secondary" t-esc="product.bhz_seller_id.name or 'Loja'"/>
+                  <span class="badge bg-secondary" t-esc="(product.bhz_seller_id.name if ('bhz_seller_id' in product._fields and product.bhz_seller_id) else 'Loja')"/>
                 </div>
                 <a t-att-href="'/shop/product/%s' % product.id" class="btn btn-primary btn-lg">Comprar</a>
               </div>
