@@ -1,36 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <template id="page_home" name="Marketplace Home" page="True" url="/">
-    <t t-call="website.layout">
-      <main id="wrap" class="oe_structure">
-        <section class="s_banner oe_structure bg-light">
-          <div class="container py-5">
-            <div class="row align-items-center g-4">
-              <div class="col-lg-7">
-                <h1 class="display-5 fw-bold mb-3">BHZ Marketplace</h1>
-                <p class="lead mb-4">Compre e venda com rapidez: ofertas, lojas verificadas e suporte completo.</p>
-                <div class="d-flex flex-wrap gap-3">
-                  <a class="btn btn-primary btn-lg" href="/marketplace/shop">Ver ofertas</a>
-                  <a class="btn btn-outline-primary btn-lg" href="/marketplace/become-a-seller">Quero vender</a>
+  <data>
+
+    <template id="page_home" name="Marketplace Home" page="True" url="/">
+      <t t-call="website.layout">
+        <main id="wrap" class="oe_structure">
+          <section class="s_banner oe_structure bg-light">
+            <div class="container py-5">
+              <div class="row align-items-center g-4">
+                <div class="col-lg-7">
+                  <h1 class="display-5 fw-bold mb-3">BHZ Marketplace</h1>
+                  <p class="lead mb-4">Compre e venda com rapidez: ofertas, lojas verificadas e suporte completo.</p>
+                  <div class="d-flex flex-wrap gap-3">
+                    <a class="btn btn-primary btn-lg" href="/marketplace/shop">Ver ofertas</a>
+                    <a class="btn btn-outline-primary btn-lg" href="/marketplace/become-a-seller">Quero vender</a>
+                  </div>
                 </div>
-              </div>
-              <div class="col-lg-5">
-                <div class="card shadow border-0">
-                  <div class="card-body">
-                    <h5 class="card-title mb-3">Pesquisa rápida</h5>
-                    <form action="/marketplace/search" method="get">
-                      <div class="input-group">
-                        <input class="form-control" type="search" name="search" placeholder="Buscar produtos ou lojas"/>
-                        <button class="btn btn-primary" type="submit">Buscar</button>
-                      </div>
-                    </form>
+                <div class="col-lg-5">
+                  <div class="card shadow border-0">
+                    <div class="card-body">
+                      <h5 class="card-title mb-3">Pesquisa rápida</h5>
+                      <form action="/marketplace/search" method="get">
+                        <div class="input-group">
+                          <input class="form-control" type="search" name="search" placeholder="Buscar produtos ou lojas"/>
+                          <button class="btn btn-primary" type="submit">Buscar</button>
+                        </div>
+                      </form>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </section>
-      </main>
-    </t>
-  </template>
+          </section>
+        </main>
+      </t>
+    </template>
+
+  </data>
 </odoo>

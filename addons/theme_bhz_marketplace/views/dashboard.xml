@@ -1,80 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <template id="page_dashboard" name="Dashboard Vendedor" page="True" url="/marketplace/dashboard">
-    <t t-call="website.layout">
-      <main id="wrap" class="oe_structure">
-        <div class="container py-5">
-          <div class="d-flex align-items-center justify-content-between mb-4">
-            <div>
-              <h1 class="h4 mb-1">Dashboard do Vendedor</h1>
-              <p class="text-muted mb-0">Visão rápida de pedidos, produtos e repasses.</p>
-            </div>
-            <a class="btn btn-primary" href="/my/marketplace">Acessar portal</a>
+  <data>
+
+    <template id="page_dashboard" name="Dashboard Vendedor" page="True" url="/marketplace/dashboard">
+      <t t-call="website.layout">
+        <main id="wrap" class="oe_structure">
+          <div class="container py-5">
+            <h1 class="h4 mb-2">Dashboard do Vendedor</h1>
+            <p class="text-muted">Área inicial do vendedor (portal vem do bhz_marketplace_core).</p>
+            <a class="btn btn-outline-primary" href="/my">Abrir Portal</a>
           </div>
+        </main>
+      </t>
+    </template>
 
-          <div class="row g-3">
-            <div class="col-md-4">
-              <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                  <h5 class="card-title">Pedidos</h5>
-
-                  <t t-set="has_bhz_seller_line" t-value="bool(request.env['sale.order.line']._fields.get('bhz_seller_id'))"/>
-                  <t t-set="orders" t-value="request.env['sale.order'].sudo().search([('order_line.bhz_seller_id','!=',False)], limit=5) if has_bhz_seller_line else []"/>
-
-                  <ul class="list-unstyled mb-0">
-                    <t t-foreach="orders" t-as="o">
-                      <li class="d-flex justify-content-between small py-1 border-bottom" t-att-title="o.name">
-                        <span class="text-truncate" style="max-width: 160px;" t-esc="o.name"/>
-                        <span class="fw-semibold" t-esc="o.amount_total"/>
-                      </li>
-                    </t>
-                    <t t-if="not orders">
-                      <li class="text-muted small">Nenhum pedido.</li>
-                    </t>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-md-4">
-              <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                  <h5 class="card-title">Repasses</h5>
-
-                  <t t-set="PayoutModel" t-value="request.env['bhz.seller.payout'].sudo() if request.env.registry.get('bhz.seller.payout') else False"/>
-                  <t t-set="payouts" t-value="PayoutModel.search([], limit=5) if PayoutModel else []"/>
-
-                  <ul class="list-unstyled mb-0">
-                    <t t-foreach="payouts" t-as="p">
-                      <li class="d-flex justify-content-between small py-1 border-bottom">
-                        <span class="text-truncate" style="max-width: 160px;" t-esc="p.seller_id.name"/>
-                        <span class="fw-semibold" t-esc="p.amount"/>
-                      </li>
-                    </t>
-                    <t t-if="not payouts">
-                      <li class="text-muted small">Nenhum repasse.</li>
-                    </t>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-md-4">
-              <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                  <h5 class="card-title">Atendimento</h5>
-                  <p class="small text-muted">Acesse suas perguntas e devoluções pelo portal.</p>
-                  <div class="d-flex flex-column gap-2">
-                    <a class="btn btn-outline-primary btn-sm" href="/my/marketplace/returns">Devoluções/Disputas</a>
-                    <a class="btn btn-outline-primary btn-sm" href="/my/marketplace">Portal do Vendedor</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </main>
-    </t>
-  </template>
+  </data>
 </odoo>

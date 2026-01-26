@@ -2,7 +2,6 @@
 <odoo>
   <data noupdate="0">
 
-    <!-- HOME "/" -->
     <record id="bhz_page_home" model="website.page">
       <field name="name">BHZ Marketplace</field>
       <field name="url">/</field>
@@ -10,37 +9,36 @@
       <field name="is_published">True</field>
     </record>
 
-    <!-- Marketplace pages -->
     <record id="bhz_page_shop" model="website.page">
-      <field name="name">Marketplace Shop</field>
+      <field name="name">Comprar</field>
       <field name="url">/marketplace/shop</field>
       <field name="view_id" ref="theme_bhz_marketplace.page_shop"/>
       <field name="is_published">True</field>
     </record>
 
     <record id="bhz_page_product" model="website.page">
-      <field name="name">Marketplace Product</field>
+      <field name="name">Produto</field>
       <field name="url">/marketplace/product</field>
       <field name="view_id" ref="theme_bhz_marketplace.page_product"/>
       <field name="is_published">True</field>
     </record>
 
     <record id="bhz_page_seller" model="website.page">
-      <field name="name">Seller Page</field>
+      <field name="name">Loja</field>
       <field name="url">/marketplace/seller</field>
       <field name="view_id" ref="theme_bhz_marketplace.page_seller"/>
       <field name="is_published">True</field>
     </record>
 
     <record id="bhz_page_dashboard" model="website.page">
-      <field name="name">Dashboard do Vendedor</field>
+      <field name="name">Dashboard</field>
       <field name="url">/marketplace/dashboard</field>
       <field name="view_id" ref="theme_bhz_marketplace.page_dashboard"/>
       <field name="is_published">True</field>
     </record>
 
     <record id="bhz_page_search" model="website.page">
-      <field name="name">Busca Marketplace</field>
+      <field name="name">Busca</field>
       <field name="url">/marketplace/search</field>
       <field name="view_id" ref="theme_bhz_marketplace.page_search"/>
       <field name="is_published">True</field>
@@ -53,7 +51,7 @@
       <field name="is_published">True</field>
     </record>
 
-    <record id="bhz_page_how_it_works" model="website.page">
+    <record id="bhz_page_how" model="website.page">
       <field name="name">Como funciona</field>
       <field name="url">/marketplace/how-it-works</field>
       <field name="view_id" ref="theme_bhz_marketplace.page_how_it_works"/>
@@ -61,7 +59,7 @@
     </record>
 
     <record id="bhz_page_become_seller" model="website.page">
-      <field name="name">Seja um vendedor</field>
+      <field name="name">Quero vender</field>
       <field name="url">/marketplace/become-a-seller</field>
       <field name="view_id" ref="theme_bhz_marketplace.page_become_seller"/>
       <field name="is_published">True</field>

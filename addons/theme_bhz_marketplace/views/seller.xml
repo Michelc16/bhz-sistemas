@@ -1,60 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <template id="page_seller" name="Marketplace Seller" page="True" url="/marketplace/seller">
-    <t t-call="website.layout">
-      <main id="wrap" class="oe_structure">
+  <data>
 
-        <t t-set="SellerModel" t-value="request.env['bhz.marketplace.seller'].sudo() if request.env.registry.get('bhz.marketplace.seller') else False"/>
-        <t t-set="seller" t-value="SellerModel.browse(int(request.params.get('seller_id', 0))) if SellerModel else False"/>
-
-        <t t-if="not seller or not seller.exists()">
+    <template id="page_seller" name="Marketplace Seller" page="True" url="/marketplace/seller">
+      <t t-call="website.layout">
+        <main id="wrap" class="oe_structure">
           <div class="container py-5">
-            <div class="alert alert-warning">Loja não encontrada.</div>
+            <h1 class="h4 mb-3">Loja</h1>
+            <p class="text-muted">Página do seller (aqui entraremos com dados do core depois).</p>
           </div>
-        </t>
+        </main>
+      </t>
+    </template>
 
-        <t t-if="seller and seller.exists()">
-          <div class="container py-5">
-            <div class="d-flex align-items-center gap-3 mb-4">
-              <div class="rounded-circle bg-light d-flex align-items-center justify-content-center" style="width:64px; height:64px;">
-                <span class="fw-bold text-primary" t-esc="(seller.name or 'L')[0]"/>
-              </div>
-              <div>
-                <h1 class="h4 mb-1" t-esc="seller.name"/>
-                <div class="text-muted">Loja verificada</div>
-              </div>
-            </div>
-
-            <h2 class="h5 mb-3">Produtos</h2>
-
-            <t t-set="products"
-               t-value="request.env['product.template'].sudo().search([('bhz_seller_id','=',seller.id), ('website_published','=',True)]) if request.env['product.template']._fields.get('bhz_seller_id') else []"/>
-
-            <div class="row g-3">
-              <t t-foreach="products" t-as="p">
-                <div class="col-6 col-md-3">
-                  <a t-att-href="'/marketplace/product?product_id=%s' % p.id" class="card h-100 text-decoration-none shadow-sm">
-                    <t t-if="p.image_512">
-                      <img class="card-img-top" t-att-src="'/web/image/product.template/%s/image_512' % p.id" alt="" style="object-fit:cover; aspect-ratio:1/1;"/>
-                    </t>
-                    <div class="card-body">
-                      <div class="fw-semibold text-truncate" t-esc="p.name"/>
-                      <div class="text-primary fw-bold" t-esc="p.list_price"/>
-                    </div>
-                  </a>
-                </div>
-              </t>
-
-              <t t-if="not products">
-                <div class="col-12">
-                  <div class="alert alert-info mb-0">Nenhum produto publicado por esta loja.</div>
-                </div>
-              </t>
-            </div>
-          </div>
-        </t>
-
-      </main>
-    </t>
-  </template>
+  </data>
 </odoo>
