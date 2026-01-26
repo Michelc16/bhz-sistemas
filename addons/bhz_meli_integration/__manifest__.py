@@ -16,6 +16,7 @@
         "views/menu.xml",
         "data/ir_cron.xml",
     ],
+    "post_init_hook": "post_init_hook",
     "application": True,
     "installable": True,
 }
