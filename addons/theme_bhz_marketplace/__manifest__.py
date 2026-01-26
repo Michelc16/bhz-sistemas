@@ -10,15 +10,17 @@
     "depends": [
         "website",
         "website_sale",
+        "portal",
         "bhz_marketplace_core",
     ],
- 
+
+    # ✅ registros (schema DATA)
     "data": [
-        "data/website.xml",
+        "data/pages.xml",
         "data/menus.xml",
-        
     ],
-    
+
+    # ✅ templates (schema QWEB)
     "qweb": [
         "views/layouts.xml",
         "views/home.xml",

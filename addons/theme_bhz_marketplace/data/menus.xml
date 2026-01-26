@@ -1,5 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <data>
-    <!-- Menus são criados dinamicamente no post_init_hook para não afetar outros sites. -->
+  <data noupdate="0">
+
+    <!-- Menu principal do Website -->
+    <record id="bhz_menu_marketplace_root" model="website.menu">
+      <field name="name">Marketplace</field>
+      <field name="url">/marketplace/shop</field>
+      <field name="sequence">10</field>
+    </record>
+
+    <record id="bhz_menu_marketplace_shop" model="website.menu">
+      <field name="name">Comprar</field>
+      <field name="parent_id" ref="bhz_menu_marketplace_root"/>
+      <field name="url">/marketplace/shop</field>
+      <field name="sequence">10</field>
+    </record>
+
+    <record id="bhz_menu_marketplace_categories" model="website.menu">
+      <field name="name">Categorias</field>
+      <field name="parent_id" ref="bhz_menu_marketplace_root"/>
+      <field name="url">/marketplace/categories</field>
+      <field name="sequence">20</field>
+    </record>
+
+    <record id="bhz_menu_marketplace_how" model="website.menu">
+      <field name="name">Como funciona</field>
+      <field name="parent_id" ref="bhz_menu_marketplace_root"/>
+      <field name="url">/marketplace/how-it-works</field>
+      <field name="sequence">30</field>
+    </record>
+
+    <record id="bhz_menu_marketplace_sell" model="website.menu">
+      <field name="name">Vender</field>
+      <field name="parent_id" ref="bhz_menu_marketplace_root"/>
+      <field name="url">/marketplace/become-a-seller</field>
+      <field name="sequence">40</field>
+    </record>
+
+    <record id="bhz_menu_marketplace_dashboard" model="website.menu">
+      <field name="name">Dashboard</field>
+      <field name="parent_id" ref="bhz_menu_marketplace_root"/>
+      <field name="url">/marketplace/dashboard</field>
+      <field name="sequence">50</field>
+    </record>
+
   </data>
 </odoo>
