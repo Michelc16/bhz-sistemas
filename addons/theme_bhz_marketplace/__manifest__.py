@@ -1,19 +1,25 @@
 # -*- coding: utf-8 -*-
 {
-    "name": "BHZ Marketplace Theme",
-    "summary": "Tema do BHZ Marketplace",
+    "name": "Theme BHZ Marketplace",
+    "summary": "Tema isolado para o marketplace BHZ (home, loja, produto, vendedor, dashboard).",
     "version": "19.0.1.0.0",
-    "category": "Website/Theme",
-    "license": "LGPL-3",
+    "category": "Theme/Marketplace",
     "author": "BHZ Sistemas",
+    "license": "LGPL-3",
     "website": "https://bhzsistemas.com.br",
     "depends": [
         "website",
-        # importante: tema depende do core do marketplace
+        "website_sale",
         "bhz_marketplace_core",
     ],
+ 
     "data": [
-        # Views / templates do website (páginas)
+        "data/website.xml",
+        "data/menus.xml",
+        
+    ],
+    
+    "qweb": [
         "views/layouts.xml",
         "views/home.xml",
         "views/shop.xml",
@@ -22,15 +28,13 @@
         "views/dashboard.xml",
         "views/static_pages.xml",
     ],
-    # NÃO coloque essas páginas em "qweb"
-    # "qweb": [],  # <- não usar no tema (deixa fora)
+
     "assets": {
         "web.assets_frontend": [
-            # se você tiver scss/js do tema, inclua aqui
-            # "theme_bhz_marketplace/static/src/scss/theme.scss",
-            # "theme_bhz_marketplace/static/src/js/theme.js",
+            "theme_bhz_marketplace/static/src/css/marketplace.css",
         ],
     },
+
     "installable": True,
     "application": False,
 }
