@@ -1,18 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <data>
 
     <template id="page_dashboard" name="Dashboard Vendedor" page="True" url="/marketplace/dashboard">
       <t t-call="website.layout">
         <main id="wrap" class="oe_structure">
           <div class="container py-5">
             <h1 class="h4 mb-2">Dashboard do Vendedor</h1>
-            <p class="text-muted">Área inicial do vendedor (portal vem do bhz_marketplace_core).</p>
+            <p class="text-muted">Área inicial do vendedor (portal vem do core).</p>
             <a class="btn btn-outline-primary" href="/my">Abrir Portal</a>
           </div>
         </main>
       </t>
     </template>
 
-  </data>
 </odoo>

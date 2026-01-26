@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <data>
 
     <template id="page_search" name="Busca Marketplace" page="True" url="/marketplace/search">
       <t t-call="website.layout">
         <main id="wrap" class="oe_structure">
           <div class="container py-5">
             <h1 class="h4 mb-3">Busca</h1>
-            <p class="text-muted">Use o campo de busca do topo para procurar.</p>
+            <p class="text-muted">Use a busca para encontrar produtos e lojas.</p>
           </div>
         </main>
       </t>
@@ -38,12 +37,11 @@
         <main id="wrap" class="oe_structure">
           <div class="container py-5">
             <h1 class="h4 mb-3">Quero vender</h1>
-            <p class="text-muted">Cadastro e aprovação do seller (fluxo no bhz_marketplace_core).</p>
+            <p class="text-muted">Cadastro e aprovação do seller (fluxo no core).</p>
             <a class="btn btn-primary" href="/my">Acessar portal</a>
           </div>
         </main>
       </t>
     </template>
 
-  </data>
 </odoo>

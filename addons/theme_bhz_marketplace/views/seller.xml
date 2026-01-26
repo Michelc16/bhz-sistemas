@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <data>
 
     <template id="page_seller" name="Marketplace Seller" page="True" url="/marketplace/seller">
       <t t-call="website.layout">
         <main id="wrap" class="oe_structure">
           <div class="container py-5">
             <h1 class="h4 mb-3">Loja</h1>
-            <p class="text-muted">Página do seller (aqui entraremos com dados do core depois).</p>
+            <p class="text-muted">Página do seller (dados virão do bhz_marketplace_core).</p>
           </div>
         </main>
       </t>
     </template>
 
-  </data>
 </odoo>

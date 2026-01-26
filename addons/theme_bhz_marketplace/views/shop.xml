@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <data>
 
     <template id="page_shop" name="Marketplace Shop" page="True" url="/marketplace/shop">
       <t t-call="website.layout">
@@ -24,6 +23,7 @@
                   </a>
                 </div>
               </t>
+
               <t t-if="not products">
                 <div class="col-12">
                   <div class="alert alert-info mb-0">Nenhum produto publicado ainda.</div>
@@ -35,5 +35,4 @@
       </t>
     </template>
 
-  </data>
 </odoo>
