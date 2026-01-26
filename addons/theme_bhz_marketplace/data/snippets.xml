@@ -1,4 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <!-- Registro das views de snippets (definidas em static/snippets/*.xml) via inherit_id é desnecessário porque são templates de snippet.
-       Mantemos o arquivo para cumprir a estrutura solicitada. -->
+  <data>
+    <!-- Placeholder (arquivo precisa ter <data> para passar no schema quando está no manifest).
+         Os snippets reais podem ser adicionados depois aqui. -->
+  </data>
 </odoo>
