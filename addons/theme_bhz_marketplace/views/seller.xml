@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
+  <data>
   <template id="page_seller" name="Marketplace Seller" page="True" url="/marketplace/seller">
     <t t-call="website.layout">
       <main id="wrap" class="oe_structure">
@@ -48,4 +49,5 @@
         </main>
       </t>
     </template>
+  </data>
 </odoo>
