@@ -1,23 +1,23 @@
 /** @odoo-module **/
 
-// Server-side renders slides and indicators; JS only bootstraps Carousel when needed.
+// Server-side renders slides/indicators; this widget only (re)initializes Bootstrap Carousel safely.
 import publicWidget from "@web/legacy/js/public/public_widget";
 
 publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
     selector: ".js-bhz-featured-carousel",
     disabledInEditableMode: false,
 
-    async start() {
+    start() {
         this.sectionEl = this.el.closest(".s_guiabh_featured_carousel");
         this.interval = this._readInterval();
         this.prevButton = this.el.querySelector(".carousel-control-prev");
         this.nextButton = this.el.querySelector(".carousel-control-next");
-        this._boundPrev = this._onPrevClick.bind(this);
-        this._boundNext = this._onNextClick.bind(this);
-        await this._super(...arguments);
+        this._boundPrev = (ev) => this._onPrevClick(ev);
+        this._boundNext = (ev) => this._onNextClick(ev);
         this._bindNav();
         this._ensureActives();
         this._initCarousel();
+        return this._super(...arguments);
     },
 
     _disposeCarousel() {
@@ -52,43 +52,32 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         if (!items.length || !window.bootstrap?.Carousel) {
             return;
         }
-        if (items.length < 2) {
+        // Dispose any previous instance to avoid multiple initializations.
+        this._disposeCarousel();
+        // Only autoplay and show controls if more than one slide.
+        const multiple = items.length > 1;
+        this.prevButton?.classList.toggle("d-none", !multiple);
+        this.nextButton?.classList.toggle("d-none", !multiple);
+        if (indicatorsWrapper) {
+            const hasButtons = indicators.length === items.length && multiple;
+            indicatorsWrapper.classList.toggle("d-none", !hasButtons);
+        }
+        if (!multiple) {
             return;
         }
-        if (indicatorsWrapper && indicators.length !== items.length) {
-            return;
-        }
-        const interval = this.interval;
+        // Initialize Bootstrap Carousel manually.
         this._bootstrapCarousel = new window.bootstrap.Carousel(this.el, {
-            interval,
+            interval: this.interval,
             ride: false,
-            pause: "hover",
+            pause: false,
             touch: true,
             wrap: true,
         });
-        if (interval) {
-            this._bootstrapCarousel.cycle();
-        } else {
-            this._bootstrapCarousel.pause();
-        }
-    },
-
-    _applyIntervalToInstance() {
-        if (!this._bootstrapCarousel) {
-            return;
-        }
-        if (this.interval <= 0 || this._isEditor()) {
-            this._bootstrapCarousel._config.interval = false;
-            this._bootstrapCarousel.pause();
-        } else {
-            this._bootstrapCarousel._config.interval = this.interval;
-            this._bootstrapCarousel.cycle();
-        }
     },
 
     _readInterval() {
-        const attr = (this.sectionEl && this.sectionEl.dataset.interval) || this.el.dataset.interval || this.el.dataset.bsInterval || "5000";
-        const parsed = parseInt(attr, 10);
+        const raw = (this.sectionEl && this.sectionEl.dataset.interval) || this.el.dataset.interval || this.el.dataset.bsInterval || "5000";
+        const parsed = parseInt(raw, 10);
         const interval = Number.isNaN(parsed) ? 5000 : parsed;
         this.el.dataset.interval = interval;
         this.el.dataset.bsInterval = interval;
@@ -106,21 +95,13 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
     },
 
     _bindNav() {
-        if (this.prevButton) {
-            this.prevButton.addEventListener("click", this._boundPrev);
-        }
-        if (this.nextButton) {
-            this.nextButton.addEventListener("click", this._boundNext);
-        }
+        this.prevButton?.addEventListener("click", this._boundPrev);
+        this.nextButton?.addEventListener("click", this._boundNext);
     },
 
     _unbindNav() {
-        if (this.prevButton) {
-            this.prevButton.removeEventListener("click", this._boundPrev);
-        }
-        if (this.nextButton) {
-            this.nextButton.removeEventListener("click", this._boundNext);
-        }
+        this.prevButton?.removeEventListener("click", this._boundPrev);
+        this.nextButton?.removeEventListener("click", this._boundNext);
     },
 
     _onPrevClick(ev) {
