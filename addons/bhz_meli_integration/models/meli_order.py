@@ -1,4 +1,3 @@
-# bhz_meli_integration/models/meli_order.py
 import logging
 from datetime import timedelta
 
