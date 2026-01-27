@@ -1,10 +1,10 @@
 /** @odoo-module **/
 
-// Server-side already renders slides; JS keeps carousel stable (editor-safe) and can refresh payload dynamically.
+// Server-side renders the container; JS populates via JSON, keeps carousel stable (editor-safe) and refreshes periodically.
 import publicWidget from "@web/legacy/js/public/public_widget";
 import { rpc } from "@web/core/network/rpc";
 
-const DEFAULT_REFRESH_MS = 60000; // polling only in public mode
+const DEFAULT_REFRESH_MS = 300000; // 5 min, only in public mode
 const DEBUG = Boolean(window?.odoo?.debug);
 
 publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
@@ -38,7 +38,7 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         this._bindNav();
         await this._render(); // first render with existing server HTML
 
-        if (!this.editableMode && this.refreshMs > 0) {
+        if (!this._isEditor() && this.refreshMs > 0) {
             this._pollTimer = setInterval(() => this._render(), this.refreshMs);
         }
     },
@@ -52,7 +52,7 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
     },
 
     async _fetchAndApply() {
-        if (this.editableMode) {
+        if (this._isEditor()) {
             return;
         }
         const params = { limit: parseInt(this.sectionEl?.dataset.limit || "12", 10), carousel_id: this.el.id };
@@ -134,12 +134,15 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
             indicatorsWrapper.classList.toggle("d-none", !(multiple && hasButtons));
         }
         const emptyAlert = this.el.closest(".s_guiabh_featured_carousel")?.querySelector(".js-bhz-featured-empty");
-        if (emptyAlert) {
-            emptyAlert.classList.toggle("d-none", items.length > 0);
-        }
+        const isEmpty = items.length === 0;
+        this.el.classList.toggle("d-none", isEmpty && !this._isEditor());
+        emptyAlert?.classList.toggle("d-none", !isEmpty);
     },
 
     _initCarousel() {
+        if (this._isEditor()) {
+            return;
+        }
         const items = this.el.querySelectorAll(".carousel-item");
         const indicatorsWrapper = this.el.querySelector(".js-bhz-featured-indicators");
         const indicators = indicatorsWrapper ? indicatorsWrapper.querySelectorAll("button[data-bs-slide-to]") : [];
@@ -152,11 +155,11 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         if (indicatorsWrapper && indicators.length !== items.length) {
             return;
         }
-        const interval = !this.editableMode ? this.interval : false;
+        const interval = this.interval;
         this._bootstrapCarousel = new window.bootstrap.Carousel(this.el, {
             interval,
             ride: false,
-            pause: this.editableMode ? true : "hover",
+            pause: "hover",
             touch: true,
             wrap: true,
         });
@@ -171,7 +174,7 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         if (!this._bootstrapCarousel) {
             return;
         }
-        if (this.interval <= 0) {
+        if (this.interval <= 0 || this._isEditor()) {
             this._bootstrapCarousel._config.interval = false;
             this._bootstrapCarousel.pause();
         } else {
@@ -187,6 +190,10 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         this.el.dataset.interval = interval;
         this.el.dataset.bsInterval = interval;
         return interval;
+    },
+
+    _isEditor() {
+        return this.editableMode || document.body.classList.contains("editor_enable");
     },
 
     destroy() {

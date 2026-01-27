@@ -33,12 +33,16 @@
 
                     <button t-attf-class="carousel-control-prev o_not_editable #{'d-none' if len(featured_events) &lt;= 1 else ''}"
                             type="button"
+                            t-att-data-bs-target="'#%s' % target_id"
+                            data-bs-slide="prev"
                             contenteditable="false">
                         <span class="carousel-control-prev-icon" aria-hidden="true"/>
                         <span class="visually-hidden">Anterior</span>
                     </button>
                     <button t-attf-class="carousel-control-next o_not_editable #{'d-none' if len(featured_events) &lt;= 1 else ''}"
                             type="button"
+                            t-att-data-bs-target="'#%s' % target_id"
+                            data-bs-slide="next"
                             contenteditable="false">
                         <span class="carousel-control-next-icon" aria-hidden="true"/>
                         <span class="visually-hidden">Próximo</span>
