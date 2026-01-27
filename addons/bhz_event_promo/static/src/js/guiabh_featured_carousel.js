@@ -1,11 +1,7 @@
 /** @odoo-module **/
 
-// Server-side renders the container; JS populates via JSON, keeps carousel stable (editor-safe) and refreshes periodically.
+// Server-side renders slides and indicators; JS only bootstraps Carousel when needed.
 import publicWidget from "@web/legacy/js/public/public_widget";
-import { rpc } from "@web/core/network/rpc";
-
-const DEFAULT_REFRESH_MS = 300000; // 5 min, only in public mode
-const DEBUG = Boolean(window?.odoo?.debug);
 
 publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
     selector: ".js-bhz-featured-carousel",
@@ -14,84 +10,14 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
     async start() {
         this.sectionEl = this.el.closest(".s_guiabh_featured_carousel");
         this.interval = this._readInterval();
-        this.refreshMs = parseInt(this.sectionEl?.dataset.refresh || DEFAULT_REFRESH_MS, 10);
         this.prevButton = this.el.querySelector(".carousel-control-prev");
         this.nextButton = this.el.querySelector(".carousel-control-next");
         this._boundPrev = this._onPrevClick.bind(this);
         this._boundNext = this._onNextClick.bind(this);
-        this._intervalListener = (ev) => {
-            const newVal = parseInt(ev.detail?.interval, 10);
-            if (Number.isNaN(newVal)) {
-                return;
-            }
-            this.interval = newVal;
-            this.el.dataset.interval = newVal;
-            this.el.dataset.bsInterval = newVal;
-            this._applyIntervalToInstance();
-        };
-        this.el.addEventListener("guiabh-featured-interval-update", this._intervalListener);
-
-        // Avoid auto-init before we control the DOM
-        this.el.removeAttribute("data-bs-ride");
-
         await this._super(...arguments);
         this._bindNav();
-        await this._render(); // first render with existing server HTML
-
-        if (!this._isEditor() && this.refreshMs > 0) {
-            this._pollTimer = setInterval(() => this._render(), this.refreshMs);
-        }
-    },
-
-    async _render() {
-        await this._fetchAndApply();
-        this._disposeCarousel();
         this._ensureActives();
-        this._toggleControls();
         this._initCarousel();
-    },
-
-    async _fetchAndApply() {
-        if (this._isEditor()) {
-            return;
-        }
-        const params = { limit: parseInt(this.sectionEl?.dataset.limit || "12", 10), carousel_id: this.el.id };
-        const routes = [
-            "/_bhz_event_promo/featured",
-            "/bhz_event_promo/featured_carousel_data",
-            "/bhz_event_promo/snippet/featured_events",
-        ];
-        for (const route of routes) {
-            try {
-                const payload = await rpc(route, params);
-                if (!payload || this.isDestroyed()) {
-                    return;
-                }
-                this._applyPayload(payload);
-                return;
-            } catch (err) {
-                if (DEBUG) {
-                    console.warn("BHZ featured carousel: RPC failed", route, err);
-                }
-            }
-        }
-    },
-
-    _applyPayload(payload) {
-        const items_html = payload.items_html || payload.slides || "";
-        const indicators_html = payload.indicators_html || payload.indicators || "";
-        const inner = this.el.querySelector(".js-bhz-featured-inner");
-        const indicatorsWrapper = this.el.querySelector(".js-bhz-featured-indicators");
-        if (inner && typeof items_html === "string" && items_html.trim()) {
-            inner.innerHTML = items_html;
-        }
-        if (indicatorsWrapper) {
-            if (typeof indicators_html === "string" && indicators_html.trim()) {
-                indicatorsWrapper.innerHTML = indicators_html;
-            } else {
-                indicatorsWrapper.innerHTML = "";
-            }
-        }
     },
 
     _disposeCarousel() {
@@ -114,29 +40,6 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
             first.classList.add("active");
             first.setAttribute("aria-current", "true");
         }
-    },
-
-    _toggleControls() {
-        const items = this.el.querySelectorAll(".carousel-item");
-        const multiple = items.length > 1;
-        const indicatorsWrapper = this.el.querySelector(".js-bhz-featured-indicators");
-        this.prevButton?.classList.toggle("d-none", !multiple);
-        this.nextButton?.classList.toggle("d-none", !multiple);
-        if (indicatorsWrapper) {
-            const hasButtons = indicatorsWrapper.querySelector("button");
-            const classes = indicatorsWrapper.className.split(" ").filter(Boolean);
-            const filtered = classes.filter((cls) => cls !== "carousel-indicators");
-            if (multiple && hasButtons) {
-                indicatorsWrapper.className = ["carousel-indicators", ...filtered].join(" ");
-            } else {
-                indicatorsWrapper.className = filtered.join(" ");
-            }
-            indicatorsWrapper.classList.toggle("d-none", !(multiple && hasButtons));
-        }
-        const emptyAlert = this.el.closest(".s_guiabh_featured_carousel")?.querySelector(".js-bhz-featured-empty");
-        const isEmpty = items.length === 0;
-        this.el.classList.toggle("d-none", isEmpty && !this._isEditor());
-        emptyAlert?.classList.toggle("d-none", !isEmpty);
     },
 
     _initCarousel() {
@@ -197,13 +100,7 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
     },
 
     destroy() {
-        if (this._pollTimer) {
-            clearInterval(this._pollTimer);
-        }
         this._disposeCarousel();
-        if (this._intervalListener) {
-            this.el.removeEventListener("guiabh-featured-interval-update", this._intervalListener);
-        }
         this._unbindNav();
         return this._super(...arguments);
     },
