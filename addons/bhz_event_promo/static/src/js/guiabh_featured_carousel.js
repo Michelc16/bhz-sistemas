@@ -53,6 +53,9 @@ odoo.define('bhz_event_promo.guiabh_featured_carousel', function (require) {
                 this._applyPayload(payload);
             } catch (err) {
                 // Fallback to empty payload to avoid breaking the page.
+                if (odoo.debug) {
+                    console.warn("BHZ featured carousel: RPC failed", err);
+                }
                 this._applyPayload({
                     items_html: "",
                     indicators_html: "",
