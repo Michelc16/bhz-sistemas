@@ -15,9 +15,9 @@
         "views/templates.xml",
         "views/announced_events_snippet.xml",
         "views/featured_carousel_snippet.xml",
-        "views/website_home_inherit.xml",
         "views/snippets/options.xml",
         "views/bhz_event_import_views.xml",
+        "data/remove_auto_insertion.xml",
     ],
     # Frontend assets must live in web.assets_frontend so they load on all public pages
     # (blog, home, landing, etc.). Editor assets remain in website.assets_editor.

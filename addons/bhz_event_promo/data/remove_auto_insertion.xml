@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- If the old auto-insert view still exists from prior installs, deactivate it -->
+    <record id="bhz_event_promo.website_home_featured_carousel" model="ir.ui.view">
+        <field name="active" eval="False"/>
+    </record>
+</odoo>
