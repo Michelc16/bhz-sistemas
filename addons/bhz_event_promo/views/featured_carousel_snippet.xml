@@ -49,17 +49,26 @@
     <template id="featured_carousel_items" name="GuiaBH - Featured Carousel Items">
         <t t-set="render_part" t-value="render_part or 'items'"/>
         <t t-set="events" t-value="events or []"/>
+        <t t-set="event_fields" t-value="request.env['event.event']._fields"/>
+        <t t-set="has_image_1920" t-value="'image_1920' in event_fields"/>
+        <t t-set="has_image_1024" t-value="'image_1024' in event_fields"/>
+        <t t-set="has_image_512" t-value="'image_512' in event_fields"/>
         <t t-if="render_part == 'items'">
             <t t-foreach="enumerate(events)" t-as="ev_info">
                 <t t-set="idx" t-value="ev_info[0]"/>
                 <t t-set="ev" t-value="ev_info[1]"/>
+                <t t-set="img_src"
+                   t-value="ev.promo_cover_image and ('/web/image/event.event/%s/promo_cover_image' % ev.id)
+                            or (has_image_1920 and '/web/image/event.event/%s/image_1920' % ev.id)
+                            or (has_image_1024 and '/web/image/event.event/%s/image_1024' % ev.id)
+                            or (has_image_512 and '/web/image/event.event/%s/image_512' % ev.id)
+                            or '/web/static/img/placeholder.png'"/>
                 <div t-attf-class="carousel-item #{'active' if idx == 0 else ''}">
                     <a t-att-href="'/agenda/event/%s' % ev.id">
-                        <t t-set="img_field" t-value="ev.promo_cover_image and 'promo_cover_image' or 'image_1920'"/>
                         <img class="d-block w-100 guiabh-featured-img"
                              t-att-alt="ev.name or ''"
                              loading="lazy"
-                             t-att-src="'/web/image/event.event/%s/%s' % (ev.id, img_field)"/>
+                             t-att-src="img_src"/>
                     </a>
                 </div>
             </t>

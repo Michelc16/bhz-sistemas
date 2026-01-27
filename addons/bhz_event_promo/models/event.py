@@ -200,9 +200,29 @@ class EventEvent(models.Model):
         if require_featured and "is_featured" in self._fields:
             domain.append(("is_featured", "=", True))
 
-        if require_image and ("promo_cover_image" in self._fields or "image_1920" in self._fields):
-            # Accept either custom promo cover or the standard event image as fallback.
-            domain += ["|", ("promo_cover_image", "!=", False), ("image_1920", "!=", False)]
+        if require_image:
+            # Build a resilient OR domain with the image fields that actually exist on event.event
+            image_candidates = [
+                fname
+                for fname in [
+                    "promo_cover_image",
+                    "image_1920",
+                    "image_1024",
+                    "image_512",
+                ]
+                if fname in self._fields
+            ]
+            if image_candidates:
+                if len(image_candidates) == 1:
+                    domain.append((image_candidates[0], "!=", False))
+                else:
+                    # Build nested OR: (field1 != False) OR (field2 != False) OR ...
+                    or_domain = []
+                    for idx, field_name in enumerate(image_candidates):
+                        if idx:
+                            or_domain.append("|")
+                        or_domain.append((field_name, "!=", False))
+                    domain += or_domain
 
         if category_ids and "promo_category_id" in self._fields:
             category_ids = [int(cid) for cid in category_ids if cid]
