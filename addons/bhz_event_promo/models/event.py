@@ -242,13 +242,7 @@ class EventEvent(models.Model):
         elif "date_begin" in self._fields:
             domain.append(("date_begin", ">=", now))
 
-        if "website_published" in self._fields and "is_published" in self._fields:
-            domain += [
-                "|",
-                ("website_published", "=", True),
-                ("is_published", "=", True),
-            ]
-        elif "website_published" in self._fields:
+        if "website_published" in self._fields:
             domain.append(("website_published", "=", True))
         elif "is_published" in self._fields:
             domain.append(("is_published", "=", True))
@@ -257,12 +251,12 @@ class EventEvent(models.Model):
 
     @api.model
     def guiabh_get_featured_events(self, limit=12):
-        """Return events for destaque snippets; fallback to any published with image."""
-        domain = self._prepare_public_events_domain(require_featured=True)
-        events = self.sudo().search(domain, limit=limit, order="date_begin asc, id desc")
+        """Return featured events for website widgets; always require a promo image."""
+        domain = self._prepare_public_events_domain(require_featured=True, require_image=True)
+        events = self.sudo().search(domain, limit=limit, order="write_date desc, date_begin asc, id desc")
         if not events:
             domain = self._prepare_public_events_domain(require_featured=False, require_image=True)
-            events = self.sudo().search(domain, limit=limit, order="date_begin asc, id desc")
+            events = self.sudo().search(domain, limit=limit, order="write_date desc, date_begin asc, id desc")
         return events
 
     @api.model

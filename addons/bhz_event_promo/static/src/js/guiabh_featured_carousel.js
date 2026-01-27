@@ -12,16 +12,16 @@ odoo.define('bhz_event_promo.guiabh_featured_carousel', function (require) {
     }
 
     publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
-        selector: '.guiabh-featured-carousel',
+        selector: '.js-bhz-featured-carousel',
         disabledInEditableMode: false,
 
         async start() {
             this.sectionEl = this.el.closest(".s_guiabh_featured_carousel");
-            this.carouselInner = this.el.querySelector(".carousel-inner");
-            this.indicatorsWrapper = this.el.querySelector(".carousel-indicators");
+            this.carouselInner = this.el.querySelector(".js-bhz-featured-inner");
+            this.indicatorsWrapper = this.el.querySelector(".js-bhz-featured-indicators");
             this.prevButton = this.el.querySelector(".carousel-control-prev");
             this.nextButton = this.el.querySelector(".carousel-control-next");
-            this.emptyMessage = this.el.parentElement.querySelector(".js-guiabh-featured-empty");
+            this.emptyMessage = this.sectionEl?.querySelector(".js-bhz-featured-empty");
             this.limit = parseInt(this.sectionEl?.dataset.limit || "12", 10);
             this.interval = this._readInterval();
             this.items = [];
@@ -44,7 +44,7 @@ odoo.define('bhz_event_promo.guiabh_featured_carousel', function (require) {
             const params = { limit: this.limit, carousel_id: this.el.id };
             try {
                 const payload = await rpc.query({
-                    route: "/bhz_event_promo/snippet/featured_events",
+                    route: "/_bhz_event_promo/featured",
                     params,
                 });
                 if (!payload || this.isDestroyed) {
@@ -54,23 +54,23 @@ odoo.define('bhz_event_promo.guiabh_featured_carousel', function (require) {
             } catch (err) {
                 // Fallback to empty payload to avoid breaking the page.
                 this._applyPayload({
-                    slides: "",
-                    indicators: "",
+                    items_html: "",
+                    indicators_html: "",
                     has_events: false,
                     has_multiple: false,
                 });
             }
         },
 
-        _applyPayload({ slides, indicators, has_events, has_multiple }) {
-            if (this.carouselInner && typeof slides === "string") {
-                this.carouselInner.innerHTML = slides;
+        _applyPayload({ items_html, indicators_html, has_events, has_multiple }) {
+            if (this.carouselInner && typeof items_html === "string") {
+                this.carouselInner.innerHTML = items_html;
             }
-            if (this.indicatorsWrapper && typeof indicators === "string") {
-                this.indicatorsWrapper.innerHTML = indicators;
+            if (this.indicatorsWrapper && typeof indicators_html === "string") {
+                this.indicatorsWrapper.innerHTML = indicators_html;
             }
-            this.carouselInner = this.el.querySelector(".carousel-inner");
-            this.indicatorsWrapper = this.el.querySelector(".carousel-indicators");
+            this.carouselInner = this.el.querySelector(".js-bhz-featured-inner");
+            this.indicatorsWrapper = this.el.querySelector(".js-bhz-featured-indicators");
             this.prevButton = this.el.querySelector(".carousel-control-prev");
             this.nextButton = this.el.querySelector(".carousel-control-next");
             this.items = Array.from(this.carouselInner?.querySelectorAll(".carousel-item") || []);

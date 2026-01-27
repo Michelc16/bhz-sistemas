@@ -7,63 +7,72 @@
                  data-limit="12"
                  data-interval="5000">
             <div class="container">
-                <t t-set="events" t-value="request.env['event.event'].guiabh_get_featured_events(12)"/>
                 <t t-set="uniq_raw" t-value="request.env.context.get('snippet_key') or request.env.uid or 0"/>
                 <t t-set="uniq" t-value="''.join([c for c in str(uniq_raw) if c.isalnum()]) or '1'"/>
                 <t t-set="interval" t-value="int(request.env.context.get('interval') or 5000)"/>
                 <t t-set="target_id" t-value="'guiabhFeaturedCarousel%s' % uniq"/>
                 <div t-att-id="target_id"
-                     class="carousel slide guiabh-featured-carousel"
-                     t-att-data-bs-ride="events and len(events) &gt; 1 and 'carousel' or None"
-                     t-att-data-bs-interval="events and len(events) &gt; 1 and interval or None">
-                    <div class="carousel-inner">
-                        <t t-foreach="enumerate(events)" t-as="ev_info">
-                            <t t-set="idx" t-value="ev_info[0]"/>
-                            <t t-set="ev" t-value="ev_info[1]"/>
-                            <div t-attf-class="carousel-item #{'active' if idx == 0 else ''}">
-                                <a t-att-href="'/agenda/event/%s' % ev.id">
-                                    <img class="d-block w-100 guiabh-featured-img"
-                                         t-att-alt="ev.name or ''"
-                                         t-att-src="ev.promo_cover_image and ('/web/image/event.event/%s/promo_cover_image' % ev.id) or ('/web/image/event.event/%s/image_1920' % ev.id)"/>
-                                </a>
-                            </div>
-                        </t>
-                    </div>
+                     class="carousel slide guiabh-featured-carousel js-bhz-featured-carousel"
+                     data-bs-ride="carousel"
+                     t-att-data-bs-interval="interval"
+                     data-bs-touch="true">
+                    <div class="carousel-inner js-bhz-featured-inner"></div>
 
-                    <button t-attf-class="carousel-control-prev o_not_editable #{'d-none' if not events or len(events) &lt;= 1 else ''}"
+                    <button class="carousel-control-prev o_not_editable d-none"
                             type="button"
                             t-att-data-bs-target="'#%s' % target_id"
-                            data-bs-slide="prev" contenteditable="false">
+                            data-bs-slide="prev"
+                            contenteditable="false">
                         <span class="carousel-control-prev-icon" aria-hidden="true"/>
                         <span class="visually-hidden">Anterior</span>
                     </button>
-                    <button t-attf-class="carousel-control-next o_not_editable #{'d-none' if not events or len(events) &lt;= 1 else ''}"
+                    <button class="carousel-control-next o_not_editable d-none"
                             type="button"
                             t-att-data-bs-target="'#%s' % target_id"
-                            data-bs-slide="next" contenteditable="false">
+                            data-bs-slide="next"
+                            contenteditable="false">
                         <span class="carousel-control-next-icon" aria-hidden="true"/>
                         <span class="visually-hidden">Próximo</span>
                     </button>
 
-                    <div class="carousel-indicators indicators-below o_not_editable"
-                         t-att-class="(not events or len(events) &lt;= 1) and 'd-none' or False"
-                         contenteditable="false">
-                        <t t-foreach="enumerate(events)" t-as="ev_info">
-                            <t t-set="idx" t-value="ev_info[0]"/>
-                            <button type="button"
-                                    t-att-data-bs-target="'#%s' % target_id"
-                                    t-att-data-bs-slide-to="idx"
-                                    t-attf-class="#{'active' if idx == 0 else ''}"
-                                    t-att-aria-current="idx == 0 and 'true' or False"
-                                    t-att-aria-label="'Slide %s' % (idx + 1)"/>
-                        </t>
-                    </div>
+                    <div class="carousel-indicators indicators-below js-bhz-featured-indicators o_not_editable d-none"
+                         contenteditable="false"></div>
                 </div>
 
-                <div t-if="not events" class="alert alert-secondary mb-0 text-center js-guiabh-featured-empty">
+                <div class="alert alert-secondary mb-0 text-center js-bhz-featured-empty js-guiabh-featured-empty d-none">
                     Nenhum evento em destaque no momento.
                 </div>
             </div>
         </section>
+    </template>
+
+    <template id="featured_carousel_items" name="GuiaBH - Featured Carousel Items">
+        <t t-set="render_part" t-value="render_part or 'items'"/>
+        <t t-set="events" t-value="events or []"/>
+        <t t-if="render_part == 'items'">
+            <t t-foreach="enumerate(events)" t-as="ev_info">
+                <t t-set="idx" t-value="ev_info[0]"/>
+                <t t-set="ev" t-value="ev_info[1]"/>
+                <div t-attf-class="carousel-item #{'active' if idx == 0 else ''}">
+                    <a t-att-href="'/agenda/event/%s' % ev.id">
+                        <img class="d-block w-100 guiabh-featured-img"
+                             t-att-alt="ev.name or ''"
+                             loading="lazy"
+                             t-att-src="ev.promo_cover_image and ('/web/image/event.event/%s/promo_cover_image' % ev.id) or ('/web/image/event.event/%s/image_1920' % ev.id)"/>
+                    </a>
+                </div>
+            </t>
+        </t>
+        <t t-elif="render_part == 'indicators'">
+            <t t-foreach="enumerate(events)" t-as="ev_info">
+                <t t-set="idx" t-value="ev_info[0]"/>
+                <button type="button"
+                        t-att-data-bs-target="carousel_target"
+                        t-att-data-bs-slide-to="idx"
+                        t-attf-class="#{'active' if idx == 0 else ''}"
+                        t-att-aria-current="idx == 0 and 'true' or False"
+                        t-att-aria-label="'Slide %s' % (idx + 1)"/>
+            </t>
+        </t>
     </template>
 </odoo>
