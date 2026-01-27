@@ -1,9 +1,7 @@
+// NOTE: Server-side now renders the slides; this JS is kept only for interval live update in the editor.
 /** @odoo-module **/
 
 import publicWidget from "@web/legacy/js/public/public_widget";
-import { rpc } from "@web/core/network/rpc";
-
-const DEBUG = Boolean(window?.odoo?.debug);
 
 publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
     selector: ".js-bhz-featured-carousel",
@@ -11,15 +9,7 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
 
     async start() {
         this.sectionEl = this.el.closest(".s_guiabh_featured_carousel");
-        this.carouselInner = this.el.querySelector(".js-bhz-featured-inner");
-        this.indicatorsWrapper = this.el.querySelector(".js-bhz-featured-indicators");
-        this.prevButton = this.el.querySelector(".carousel-control-prev");
-        this.nextButton = this.el.querySelector(".carousel-control-next");
-        this.emptyMessage = this.sectionEl?.querySelector(".js-bhz-featured-empty");
-        this.limit = parseInt(this.sectionEl?.dataset.limit || "12", 10);
         this.interval = this._readInterval();
-        this.items = [];
-        this.indicators = [];
         this._intervalListener = (ev) => {
             const newVal = parseInt(ev.detail?.interval, 10);
             if (Number.isNaN(newVal)) {
@@ -31,93 +21,23 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
             this._applyIntervalToInstance();
         };
         this.el.addEventListener("guiabh-featured-interval-update", this._intervalListener);
-        await Promise.all([this._fetchSlides(), this._super(...arguments)]);
+        await this._super(...arguments);
+        this._refreshCarousel();
     },
 
-    async _fetchSlides() {
-        const params = { limit: this.limit, carousel_id: this.el.id };
-        const routes = [
-            "/_bhz_event_promo/featured", // current
-            "/bhz_event_promo/featured_carousel_data", // legacy alias
-            "/bhz_event_promo/snippet/featured_events", // very old
-        ];
-        for (const route of routes) {
-            try {
-                const payload = await rpc(route, params);
-                if (!payload || this.isDestroyed) {
-                    return;
-                }
-                this._applyPayload(payload);
-                return;
-            } catch (err) {
-                if (DEBUG) {
-                    console.warn("BHZ featured carousel: RPC failed", route, err);
-                }
-            }
-        }
-        // Fallback to empty payload to avoid breaking the page.
-        this._applyPayload({
-            items_html: "",
-            indicators_html: "",
-            has_events: false,
-            has_multiple: false,
-        });
-    },
-
-    _applyPayload({ items_html, indicators_html, has_events, has_multiple }) {
-        if (this.carouselInner && typeof items_html === "string") {
-            this.carouselInner.innerHTML = items_html;
-        }
-        if (this.indicatorsWrapper && typeof indicators_html === "string") {
-            this.indicatorsWrapper.innerHTML = indicators_html;
-        }
-        this.carouselInner = this.el.querySelector(".js-bhz-featured-inner");
-        this.indicatorsWrapper = this.el.querySelector(".js-bhz-featured-indicators");
-        this.prevButton = this.el.querySelector(".carousel-control-prev");
-        this.nextButton = this.el.querySelector(".carousel-control-next");
-        this.items = Array.from(this.carouselInner?.querySelectorAll(".carousel-item") || []);
-        this.indicators = Array.from(this.indicatorsWrapper?.querySelectorAll("button[data-bs-slide-to]") || []);
-        if (this.items.length) {
-            const hasActiveSlide = this.items.some((item) => item.classList.contains("active"));
-            if (!hasActiveSlide) {
-                this.items[0].classList.add("active");
-            }
-        }
-        if (this.indicators.length) {
-            const hasActiveIndicator = this.indicators.some((item) => item.classList.contains("active"));
-            if (!hasActiveIndicator) {
-                this.indicators[0].classList.add("active");
-            }
-        }
-
-        const hasEvents = this.items.length > 0;
-        const hasMultipleActive = has_multiple && this.items.length > 1;
-        if (this.emptyMessage) {
-            this.emptyMessage.classList.toggle("d-none", hasEvents);
-        }
-        this.indicatorsWrapper?.classList.toggle("d-none", !hasMultipleActive);
-        this.prevButton?.classList.toggle("d-none", !hasMultipleActive);
-        this.nextButton?.classList.toggle("d-none", !hasMultipleActive);
-        this._refreshCarousel(hasMultipleActive);
-        this._applyIntervalToInstance();
-        this._notifyContentChanged();
-    },
-
-    _refreshCarousel(has_multiple) {
+    _refreshCarousel() {
         if (this._bootstrapCarousel) {
             this._bootstrapCarousel.dispose();
             this._bootstrapCarousel = null;
         }
-        if (!has_multiple || !this.items.length) {
-            return;
-        }
-        if (has_multiple && this.indicators.length < this.items.length) {
-            return;
-        }
         if (!window.bootstrap?.Carousel) {
             return;
         }
-        const interval = has_multiple ? this.interval : false;
+        const items = this.el.querySelectorAll(".carousel-item");
+        if (!items.length) {
+            return;
+        }
+        const interval = items.length > 1 ? this.interval : false;
         this._bootstrapCarousel = new window.bootstrap.Carousel(this.el, {
             interval,
             ride: false,
@@ -135,17 +55,13 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         if (!this._bootstrapCarousel) {
             return;
         }
-        if (!this.items.length || this.items.length <= 1 || this.interval <= 0) {
+        if (this.interval <= 0) {
             this._bootstrapCarousel._config.interval = false;
             this._bootstrapCarousel.pause();
         } else {
             this._bootstrapCarousel._config.interval = this.interval;
             this._bootstrapCarousel.cycle();
         }
-    },
-
-    _notifyContentChanged() {
-        this.el.dispatchEvent(new CustomEvent("content_changed", { bubbles: true }));
     },
 
     _readInterval() {

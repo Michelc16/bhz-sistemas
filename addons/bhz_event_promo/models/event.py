@@ -271,14 +271,12 @@ class EventEvent(models.Model):
         return domain
 
     @api.model
-    def guiabh_get_featured_events(self, limit=12):
-        """Return featured events for website widgets; always require a promo image."""
+    def guiabh_get_featured_events(self, limit=12, order="write_date desc, date_begin asc, id desc"):
+        """Featured events for website snippets.
+        Server-side rendering uses only promo_cover_image (no image_1920 dependency).
+        """
         domain = self._prepare_public_events_domain(require_featured=True, require_image=True)
-        events = self.sudo().search(domain, limit=limit, order="write_date desc, date_begin asc, id desc")
-        if not events:
-            domain = self._prepare_public_events_domain(require_featured=False, require_image=True)
-            events = self.sudo().search(domain, limit=limit, order="write_date desc, date_begin asc, id desc")
-        return events
+        return self.sudo().search(domain, limit=limit, order=order)
 
     @api.model
     def guiabh_get_announced_events(self, limit=12, category_ids=None, order_mode="recent"):
