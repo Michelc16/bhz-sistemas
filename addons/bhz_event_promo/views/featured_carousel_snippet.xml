@@ -55,10 +55,11 @@
                 <t t-set="ev" t-value="ev_info[1]"/>
                 <div t-attf-class="carousel-item #{'active' if idx == 0 else ''}">
                     <a t-att-href="'/agenda/event/%s' % ev.id">
+                        <t t-set="img_field" t-value="ev.promo_cover_image and 'promo_cover_image' or 'image_1920'"/>
                         <img class="d-block w-100 guiabh-featured-img"
                              t-att-alt="ev.name or ''"
                              loading="lazy"
-                             t-att-src="ev.promo_cover_image and ('/web/image/event.event/%s/promo_cover_image' % ev.id) or ('/web/image/event.event/%s/image_1920' % ev.id)"/>
+                             t-att-src="'/web/image/event.event/%s/%s' % (ev.id, img_field)"/>
                     </a>
                 </div>
             </t>

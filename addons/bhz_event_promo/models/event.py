@@ -200,8 +200,9 @@ class EventEvent(models.Model):
         if require_featured and "is_featured" in self._fields:
             domain.append(("is_featured", "=", True))
 
-        if require_image and "promo_cover_image" in self._fields:
-            domain.append(("promo_cover_image", "!=", False))
+        if require_image and ("promo_cover_image" in self._fields or "image_1920" in self._fields):
+            # Accept either custom promo cover or the standard event image as fallback.
+            domain += ["|", ("promo_cover_image", "!=", False), ("image_1920", "!=", False)]
 
         if category_ids and "promo_category_id" in self._fields:
             category_ids = [int(cid) for cid in category_ids if cid]
