@@ -200,8 +200,29 @@ class EventEvent(models.Model):
         if require_featured and "is_featured" in self._fields:
             domain.append(("is_featured", "=", True))
 
-        if require_image and "promo_cover_image" in self._fields:
-            domain.append(("promo_cover_image", "!=", False))
+        if require_image:
+            # Build a resilient OR domain with the image fields that actually exist on event.event
+            image_candidates = [
+                fname
+                for fname in [
+                    "promo_cover_image",
+                    "image_1920",
+                    "image_1024",
+                    "image_512",
+                ]
+                if fname in self._fields
+            ]
+            if image_candidates:
+                if len(image_candidates) == 1:
+                    domain.append((image_candidates[0], "!=", False))
+                else:
+                    # Build nested OR: (field1 != False) OR (field2 != False) OR ...
+                    or_domain = []
+                    for idx, field_name in enumerate(image_candidates):
+                        if idx:
+                            or_domain.append("|")
+                        or_domain.append((field_name, "!=", False))
+                    domain += or_domain
 
         if category_ids and "promo_category_id" in self._fields:
             category_ids = [int(cid) for cid in category_ids if cid]
@@ -242,13 +263,7 @@ class EventEvent(models.Model):
         elif "date_begin" in self._fields:
             domain.append(("date_begin", ">=", now))
 
-        if "website_published" in self._fields and "is_published" in self._fields:
-            domain += [
-                "|",
-                ("website_published", "=", True),
-                ("is_published", "=", True),
-            ]
-        elif "website_published" in self._fields:
+        if "website_published" in self._fields:
             domain.append(("website_published", "=", True))
         elif "is_published" in self._fields:
             domain.append(("is_published", "=", True))
@@ -256,10 +271,12 @@ class EventEvent(models.Model):
         return domain
 
     @api.model
-    def guiabh_get_featured_events(self, limit=12):
-        """Return events flagged as featured for website snippets."""
-        domain = self._prepare_public_events_domain(require_featured=True)
-        return self.sudo().search(domain, limit=limit, order="date_begin asc, id desc")
+    def guiabh_get_featured_events(self, limit=12, order="write_date desc, date_begin asc, id desc"):
+        """Featured events for website snippets.
+        Server-side rendering uses only promo_cover_image (no image_1920 dependency).
+        """
+        domain = self._prepare_public_events_domain(require_featured=True, require_image=True)
+        return self.sudo().search(domain, limit=limit, order=order)
 
     @api.model
     def guiabh_get_announced_events(self, limit=12, category_ids=None, order_mode="recent"):
@@ -472,8 +489,11 @@ class EventEvent(models.Model):
     # ---------------------------------------------------------- Datetime helper
     def _get_display_timezone(self):
         website = getattr(request, "website", False)
-        if website and website.tz:
+        # Odoo 19 website does not expose tz; fall back safely.
+        if website and hasattr(website, "tz") and website.tz:
             return website.tz
+        if website and hasattr(website, "timezone") and website.timezone:
+            return website.timezone
         return self.env.context.get("tz") or self.env.user.tz or "UTC"
 
     def _localize_datetime(self, dt):

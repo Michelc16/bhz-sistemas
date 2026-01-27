@@ -1,10 +1,10 @@
 /** @odoo-module **/
 
+import { registry } from "@web/core/registry";
 import { BaseOptionComponent } from "@html_builder/core/utils";
 import { Plugin } from "@html_editor/plugin";
 import { SNIPPET_SPECIFIC } from "@html_builder/utils/option_sequence";
 import { withSequence } from "@html_editor/utils/resource";
-import { registry } from "@web/core/registry";
 
 class GuiabhFeaturedCarouselOption extends BaseOptionComponent {
     static selector = ".s_guiabh_featured_carousel";
@@ -71,6 +71,8 @@ class GuiabhFeaturedCarouselOptionPlugin extends Plugin {
     };
 }
 
-registry
-    .category("website-plugins")
-    .add(GuiabhFeaturedCarouselOptionPlugin.id, GuiabhFeaturedCarouselOptionPlugin);
+if (registry?.category) {
+    registry
+        .category("website-plugins")
+        .add(GuiabhFeaturedCarouselOptionPlugin.id, GuiabhFeaturedCarouselOptionPlugin);
+}

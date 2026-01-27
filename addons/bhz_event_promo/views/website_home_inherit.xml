@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="website_home_featured_carousel"
+              inherit_id="website.homepage"
+              name="BHZ - Home Featured Carousel">
+        <xpath expr="//div[@id='wrap']" position="inside">
+            <t t-call="bhz_event_promo.s_guiabh_featured_carousel"/>
+        </xpath>
+    </template>
+</odoo>
