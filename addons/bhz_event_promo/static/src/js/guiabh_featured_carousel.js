@@ -15,6 +15,10 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         this.sectionEl = this.el.closest(".s_guiabh_featured_carousel");
         this.interval = this._readInterval();
         this.refreshMs = parseInt(this.sectionEl?.dataset.refresh || DEFAULT_REFRESH_MS, 10);
+        this.prevButton = this.el.querySelector(".carousel-control-prev");
+        this.nextButton = this.el.querySelector(".carousel-control-next");
+        this._boundPrev = this._onPrevClick.bind(this);
+        this._boundNext = this._onNextClick.bind(this);
         this._intervalListener = (ev) => {
             const newVal = parseInt(ev.detail?.interval, 10);
             if (Number.isNaN(newVal)) {
@@ -31,6 +35,7 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         this.el.removeAttribute("data-bs-ride");
 
         await this._super(...arguments);
+        this._bindNav();
         await this._render(); // first render with existing server HTML
 
         if (!this.editableMode && this.refreshMs > 0) {
@@ -114,11 +119,9 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
     _toggleControls() {
         const items = this.el.querySelectorAll(".carousel-item");
         const multiple = items.length > 1;
-        const prev = this.el.querySelector(".carousel-control-prev");
-        const next = this.el.querySelector(".carousel-control-next");
         const indicatorsWrapper = this.el.querySelector(".js-bhz-featured-indicators");
-        prev?.classList.toggle("d-none", !multiple);
-        next?.classList.toggle("d-none", !multiple);
+        this.prevButton?.classList.toggle("d-none", !multiple);
+        this.nextButton?.classList.toggle("d-none", !multiple);
         if (indicatorsWrapper) {
             const hasButtons = indicatorsWrapper.querySelector("button");
             const classes = indicatorsWrapper.className.split(" ").filter(Boolean);
@@ -138,10 +141,18 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
 
     _initCarousel() {
         const items = this.el.querySelectorAll(".carousel-item");
+        const indicatorsWrapper = this.el.querySelector(".js-bhz-featured-indicators");
+        const indicators = indicatorsWrapper ? indicatorsWrapper.querySelectorAll("button[data-bs-slide-to]") : [];
         if (!items.length || !window.bootstrap?.Carousel) {
             return;
         }
-        const interval = items.length > 1 && !this.editableMode ? this.interval : false;
+        if (items.length < 2) {
+            return;
+        }
+        if (indicatorsWrapper && indicators.length !== items.length) {
+            return;
+        }
+        const interval = !this.editableMode ? this.interval : false;
         this._bootstrapCarousel = new window.bootstrap.Carousel(this.el, {
             interval,
             ride: false,
@@ -186,6 +197,37 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         if (this._intervalListener) {
             this.el.removeEventListener("guiabh-featured-interval-update", this._intervalListener);
         }
+        this._unbindNav();
         return this._super(...arguments);
+    },
+
+    _bindNav() {
+        if (this.prevButton) {
+            this.prevButton.addEventListener("click", this._boundPrev);
+        }
+        if (this.nextButton) {
+            this.nextButton.addEventListener("click", this._boundNext);
+        }
+    },
+
+    _unbindNav() {
+        if (this.prevButton) {
+            this.prevButton.removeEventListener("click", this._boundPrev);
+        }
+        if (this.nextButton) {
+            this.nextButton.removeEventListener("click", this._boundNext);
+        }
+    },
+
+    _onPrevClick(ev) {
+        ev?.preventDefault?.();
+        ev?.stopPropagation?.();
+        this._bootstrapCarousel?.prev();
+    },
+
+    _onNextClick(ev) {
+        ev?.preventDefault?.();
+        ev?.stopPropagation?.();
+        this._bootstrapCarousel?.next();
     },
 });

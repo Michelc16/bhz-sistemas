@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<odoo noupdate="1">
-    <!-- Deactivate old auto-insert views if they exist; forcecreate=0 avoids creating missing views -->
-    <record id="bhz_event_promo.website_home_featured_carousel" model="ir.ui.view" forcecreate="0">
-        <field name="active" eval="False"/>
-    </record>
-    <record id="bhz_event_promo.website_home_featured_carousel_homepage" model="ir.ui.view" forcecreate="0">
-        <field name="active" eval="False"/>
-    </record>
-    <record id="bhz_event_promo.website_home_featured_carousel_layout" model="ir.ui.view" forcecreate="0">
-        <field name="active" eval="False"/>
-    </record>
+<odoo>
+    <data noupdate="1">
+        <!-- Deactivate old auto-insert views if they exist; forcecreate=0 avoids creating missing views -->
+        <record id="bhz_event_promo.website_home_featured_carousel" model="ir.ui.view" forcecreate="0">
+            <field name="active" eval="False"/>
+        </record>
+        <record id="bhz_event_promo.website_home_featured_carousel_homepage" model="ir.ui.view" forcecreate="0">
+            <field name="active" eval="False"/>
+        </record>
+        <record id="bhz_event_promo.website_home_featured_carousel_layout" model="ir.ui.view" forcecreate="0">
+            <field name="active" eval="False"/>
+        </record>
+    </data>
 </odoo>
