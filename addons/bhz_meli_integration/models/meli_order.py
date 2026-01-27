@@ -39,7 +39,7 @@ class MeliOrder(models.Model):
     sale_order_id = fields.Many2one("sale.order", string="Pedido de Venda Odoo")
 
     # ---------------------------------------------------------
-    # Helpers de data / formatação (evita "cortar" pedidos)
+    # Helpers de data / formatação
     # ---------------------------------------------------------
     def _iso_with_tz_offset(self, dt_utc, tz_name):
         """
@@ -51,27 +51,25 @@ class MeliOrder(models.Model):
         if isinstance(dt_utc, str):
             dt_utc = fields.Datetime.from_string(dt_utc)
 
-        # Odoo armazena datetime em UTC (naive). Vamos assumir UTC e converter pro tz.
         tz = pytz.timezone(tz_name or "UTC")
+
+        # Odoo armazena datetime em UTC (naive). Vamos assumir UTC e converter pro tz.
         dt_utc = pytz.utc.localize(dt_utc)
         dt_local = dt_utc.astimezone(tz)
 
         # Formato: 2026-01-26T10:20:30.000-03:00
-        # isoformat() => 2026-01-26T07:20:30-03:00, então adicionamos .000
         s = dt_local.isoformat()
         if "." not in s:
-            # coloca .000 antes do offset
             if s.endswith("Z"):
                 s = s.replace("Z", ".000Z")
             else:
-                # tem offset tipo -03:00
                 s = s[:-6] + ".000" + s[-6:]
         return s
 
     def _prepare_orders_date_from_candidates(self, account):
         """
         Retorna uma lista de candidatos para 'order.date_created.from' (1º com offset local, 2º em UTC Z).
-        Isso evita o "resultado vazio" por diferença de timezone/offset.
+        Evita resultado vazio por diferença de timezone/offset.
         """
         last_order = self.search(
             [("account_id", "=", account.id)],
@@ -86,33 +84,78 @@ class MeliOrder(models.Model):
             # pega 10min antes pra não perder pedido em borda
             start_dt = base_dt - timedelta(minutes=10)
         else:
-            # primeiro sync: últimos 15 dias (mais seguro)
+            # primeiro sync: últimos 15 dias (altere para 120 se quiser puxar histórico maior)
             now_dt = fields.Datetime.now()
             if isinstance(now_dt, str):
                 now_dt = fields.Datetime.from_string(now_dt)
             start_dt = now_dt - timedelta(days=15)
 
-        # timezone "visível" da empresa/usuário; se não houver, usa America/Sao_Paulo como fallback
         tz_name = (
             self.env.user.tz
             or (account.company_id and account.company_id.partner_id.tz)
             or "America/Sao_Paulo"
         )
 
-        # candidato 1: com offset local
         c1 = self._iso_with_tz_offset(start_dt, tz_name)
 
         # candidato 2: UTC com Z (fallback)
-        start_dt_utc = start_dt
-        start_dt_utc = pytz.utc.localize(start_dt_utc)
+        start_dt_utc = pytz.utc.localize(start_dt)
         c2 = start_dt_utc.strftime("%Y-%m-%dT%H:%M:%S.000Z")
 
-        # remove None e duplicados
         out = []
         for c in [c1, c2]:
             if c and c not in out:
                 out.append(c)
         return out
+
+    def _ml_datetime_to_odoo(self, value):
+        """
+        Converte ISO 8601 do ML (ex: 2026-01-13T10:48:24.000-04:00)
+        para string compatível com Odoo: 'YYYY-MM-DD HH:MM:SS' (UTC naive).
+        """
+        if not value:
+            return False
+
+        # datetime python
+        if hasattr(value, "tzinfo"):
+            dt = value
+            if dt.tzinfo:
+                dt = dt.astimezone(fields.Datetime.UTC).replace(tzinfo=None)
+            return fields.Datetime.to_string(dt)
+
+        if isinstance(value, str):
+            s = value.strip()
+
+            # Melhor caminho (normalmente disponível no Odoo)
+            try:
+                from dateutil.parser import isoparse  # type: ignore
+                dt = isoparse(s)
+                if getattr(dt, "tzinfo", None):
+                    dt = dt.astimezone(fields.Datetime.UTC).replace(tzinfo=None)
+                return fields.Datetime.to_string(dt)
+            except Exception:
+                pass
+
+            # Fallback sem dateutil
+            try:
+                s2 = s.replace("T", " ")
+                if s2.endswith("Z"):
+                    s2 = s2[:-1]
+                # corta timezone tipo -04:00 / +03:00
+                if len(s2) >= 6 and (s2[-6] in ["+", "-"]) and s2[-3] == ":":
+                    s2 = s2[:-6]
+                # remove milissegundos
+                if "." in s2:
+                    s2 = s2.split(".")[0]
+
+                # agora deve ficar 'YYYY-MM-DD HH:MM:SS'
+                dt = fields.Datetime.from_string(s2)
+                return fields.Datetime.to_string(dt)
+            except Exception:
+                _logger.warning("[ML] Não consegui converter datetime do ML: %r", value)
+                return False
+
+        return False
 
     # ---------------------------------------------------------
     # Chamadas API (com retry)
@@ -136,7 +179,7 @@ class MeliOrder(models.Model):
     def _import_orders_for_account(self, account):
         """
         Busca pedidos no ML e cria registros meli.order.
-        Importante: se vier vazio, loga WARNING com evidência.
+        Corrige date_created ISO+timezone antes de salvar.
         """
         if not account.ml_user_id:
             _logger.warning("[ML] Conta %s sem ml_user_id. Pulei importação de pedidos.", account.name)
@@ -144,9 +187,7 @@ class MeliOrder(models.Model):
 
         imported = 0
         limit = 50
-        offset = 0
 
-        # tenta mais de um formato de date_from pra evitar "0 results"
         date_from_candidates = self._prepare_orders_date_from_candidates(account)
 
         for date_from in date_from_candidates:
@@ -161,8 +202,6 @@ class MeliOrder(models.Model):
                     "offset": offset,
                     "limit": limit,
                     "order.date_created.from": date_from,
-                    # sort: o ML aceita por padrão; se não aceitar, ele ignora sem erro
-                    # então mantemos simples e não dependemos disso
                 }
 
                 try:
@@ -189,7 +228,6 @@ class MeliOrder(models.Model):
                 payload = resp.json() if resp.text else {}
                 results = payload.get("results") or []
 
-                # Se vazio logo de cara, deixa evidência
                 if not results and offset == 0:
                     total = None
                     try:
@@ -202,7 +240,6 @@ class MeliOrder(models.Model):
                         date_from,
                         total,
                     )
-                    # tenta o próximo candidato de date_from
                     break
 
                 if not results:
@@ -232,16 +269,17 @@ class MeliOrder(models.Model):
                         "account_id": account.id,
                         "buyer_name": buyer_name,
                         "buyer_email": buyer.get("email"),
-                        "date_created": ml_order.get("date_created"),
+                        # ✅ CORREÇÃO: converte ISO com timezone -> formato Odoo
+                        "date_created": self._ml_datetime_to_odoo(ml_order.get("date_created")),
                         "total_amount": ml_order.get("total_amount") or 0.0,
                         "status": ml_order.get("status"),
                         "raw_data": ml_order,
                     }
+
                     rec = self.create(vals)
                     imported += 1
                     imported_this_candidate += 1
 
-                    # cria sale.order básico (igual você já faz)
                     try:
                         self._create_sale_order_from_meli(rec)
                     except Exception:
@@ -251,7 +289,6 @@ class MeliOrder(models.Model):
                     break
                 offset += limit
 
-            # se deu certo com esse candidato, não precisa tentar os próximos
             if imported_this_candidate > 0:
                 return imported_this_candidate
 
