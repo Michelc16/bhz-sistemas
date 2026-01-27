@@ -242,6 +242,16 @@ class GuiaBHAgendaController(http.Controller):
     def featured_carousel_feed(self, limit=12, carousel_id=None):
         return self._render_featured_payload(limit=limit, carousel_id=carousel_id)
 
+    @http.route(
+        "/bhz_event_promo/featured_carousel_data",
+        type="json",
+        auth="public",
+        website=True,
+    )
+    def featured_carousel_feed_legacy(self, limit=12, carousel_id=None):
+        """Extra legacy alias used by older JS/assets."""
+        return self._render_featured_payload(limit=limit, carousel_id=carousel_id)
+
     # ------------------------------------------------------------------ Helpers
 
     def _render_featured_payload(self, limit=12, carousel_id=None):

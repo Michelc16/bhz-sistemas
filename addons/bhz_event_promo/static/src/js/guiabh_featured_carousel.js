@@ -36,23 +36,32 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
 
     async _fetchSlides() {
         const params = { limit: this.limit, carousel_id: this.el.id };
-        try {
-            const payload = await rpc("/_bhz_event_promo/featured", params);
-            if (!payload || this.isDestroyed) {
+        const routes = [
+            "/_bhz_event_promo/featured", // current
+            "/bhz_event_promo/featured_carousel_data", // legacy alias
+            "/bhz_event_promo/snippet/featured_events", // very old
+        ];
+        for (const route of routes) {
+            try {
+                const payload = await rpc(route, params);
+                if (!payload || this.isDestroyed) {
+                    return;
+                }
+                this._applyPayload(payload);
                 return;
+            } catch (err) {
+                if (DEBUG) {
+                    console.warn("BHZ featured carousel: RPC failed", route, err);
+                }
             }
-            this._applyPayload(payload);
-        } catch (err) {
-            if (DEBUG) {
-                console.warn("BHZ featured carousel: RPC failed", err);
-            }
-            this._applyPayload({
-                items_html: "",
-                indicators_html: "",
-                has_events: false,
-                has_multiple: false,
-            });
         }
+        // Fallback to empty payload to avoid breaking the page.
+        this._applyPayload({
+            items_html: "",
+            indicators_html: "",
+            has_events: false,
+            has_multiple: false,
+        });
     },
 
     _applyPayload({ items_html, indicators_html, has_events, has_multiple }) {
