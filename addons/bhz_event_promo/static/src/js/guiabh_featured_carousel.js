@@ -1,9 +1,11 @@
 /** @odoo-module **/
 
-// Server-side already renders slides; JS keeps carousel stable (editor-safe) and optionally refreshes payload.
+// Server-side already renders slides; JS keeps carousel stable (editor-safe) and can refresh payload dynamically.
 import publicWidget from "@web/legacy/js/public/public_widget";
+import { rpc } from "@web/core/network/rpc";
 
 const DEFAULT_REFRESH_MS = 60000; // polling only in public mode
+const DEBUG = Boolean(window?.odoo?.debug);
 
 publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
     selector: ".js-bhz-featured-carousel",
@@ -37,11 +39,54 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
     },
 
     async _render() {
-        // In this implementation, slides are already server-rendered; just normalize and init bootstrap.
+        await this._fetchAndApply();
         this._disposeCarousel();
         this._ensureActives();
         this._toggleControls();
         this._initCarousel();
+    },
+
+    async _fetchAndApply() {
+        if (this.editableMode) {
+            return;
+        }
+        const params = { limit: parseInt(this.sectionEl?.dataset.limit || "12", 10), carousel_id: this.el.id };
+        const routes = [
+            "/_bhz_event_promo/featured",
+            "/bhz_event_promo/featured_carousel_data",
+            "/bhz_event_promo/snippet/featured_events",
+        ];
+        for (const route of routes) {
+            try {
+                const payload = await rpc(route, params);
+                if (!payload || this.isDestroyed()) {
+                    return;
+                }
+                this._applyPayload(payload);
+                return;
+            } catch (err) {
+                if (DEBUG) {
+                    console.warn("BHZ featured carousel: RPC failed", route, err);
+                }
+            }
+        }
+    },
+
+    _applyPayload(payload) {
+        const items_html = payload.items_html || payload.slides || "";
+        const indicators_html = payload.indicators_html || payload.indicators || "";
+        const inner = this.el.querySelector(".js-bhz-featured-inner");
+        const indicatorsWrapper = this.el.querySelector(".js-bhz-featured-indicators");
+        if (inner && typeof items_html === "string" && items_html.trim()) {
+            inner.innerHTML = items_html;
+        }
+        if (indicatorsWrapper) {
+            if (typeof indicators_html === "string" && indicators_html.trim()) {
+                indicatorsWrapper.innerHTML = indicators_html;
+            } else {
+                indicatorsWrapper.innerHTML = "";
+            }
+        }
     },
 
     _disposeCarousel() {
