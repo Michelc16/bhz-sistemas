@@ -127,20 +127,15 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
     },
 
     _initCarousel() {
-        // In edit mode we still initialize the carousel so the user can preview.
-        // Auto-refresh is still disabled in edit mode to avoid DOM mutations while editing.
+        if (this._isEditor()) {
+            return;
+        }
         const items = this.el.querySelectorAll(".carousel-item");
         const indicatorsWrapper = this.el.querySelector(".js-bhz-featured-indicators");
         const indicators = indicatorsWrapper ? indicatorsWrapper.querySelectorAll("button[data-bs-slide-to]") : [];
         if (!items.length || !window.bootstrap?.Carousel) {
             return;
         }
-        // Sync attributes for Bootstrap behaviour (and for non-JS fallback).
-        const intervalStr = String(this.interval || 5000);
-        this.el.dataset.bsInterval = intervalStr;
-        this.el.dataset.bsRide = this.autoplay ? "carousel" : "false";
-        this.el.setAttribute("data-bs-interval", intervalStr);
-        this.el.setAttribute("data-bs-ride", this.autoplay ? "carousel" : "false");
         // Dispose any previous instance to avoid multiple initializations.
         this._disposeCarousel();
         // Only autoplay and show controls if more than one slide.
@@ -194,7 +189,7 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
     },
 
     _readRefreshMs() {
-        const raw = (this.sectionEl && this.sectionEl.dataset.bhzRefreshMs) || this.el.dataset.bhzRefreshMs;
+        const raw = (this.sectionEl && (this.sectionEl.dataset.bhzRefreshMs || this.sectionEl.getAttribute('data-bhz-refresh-ms'))) || (this.el.dataset.bhzRefreshMs || this.el.getAttribute('data-bhz-refresh-ms'));
         const parsed = parseInt(raw || "0", 10);
         if (Number.isNaN(parsed) || parsed < 0) {
             return 0;
@@ -223,34 +218,28 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
     },
 
     _isEditor() {
-        // IMPORTANT:
-        // - When logged in, the website top bar exists even outside edit mode.
-        //   Using it as a signal would disable auto-refresh for admins.
-        // - We must only treat *real* edit/builder modes as "editor".
         const body = document.body;
         const html = document.documentElement;
-
-        // Classes that reliably indicate the website editor/builder is active.
         const editClassHints = [
             "editor_enable",
-            "o_we_edit_mode",
-            "o_edit_mode",
-            "o_builder_edit_mode",
-            "o_website_editor",
             "o_web_editor",
+            "o_website_editor",
+            "o_edit_mode",
+            "o_we_edit_mode",
+            "o_editable_mode",
+            "o_builder_edit_mode",
+            "o_editable",
         ];
         const hasEditorClass = editClassHints.some(
             (cls) => body?.classList?.contains(cls) || html?.classList?.contains(cls)
         );
-
-        // Some elements become contenteditable in edit mode.
-        // NOTE: `.o_editable` can exist for logged-in users even outside edit mode,
-        // so we avoid using it as a signal; it would disable auto-refresh for admins.
+        const hasManipulator =
+            !!document.getElementById("oe_manipulators") ||
+            !!document.querySelector(".o_web_editor, .o_we_website_top_actions");
         const hasEditableAncestor = !!this.el?.closest(
-            ".oe_editable, [contenteditable='true']"
+            ".o_editable, .oe_editable, .oe_structure, [contenteditable='true']"
         );
-
-        return this.editableMode || hasEditorClass || hasEditableAncestor;
+        return this.editableMode || hasEditorClass || hasManipulator || hasEditableAncestor;
     },
 
     destroy() {

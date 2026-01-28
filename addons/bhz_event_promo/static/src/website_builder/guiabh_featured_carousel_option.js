@@ -27,14 +27,14 @@ class GuiabhFeaturedCarouselOption extends BaseOptionComponent {
 
     _readRefresh() {
         const section = this.el || document.createElement("div");
-        const raw = section.dataset?.bhzRefreshMs || section.getAttribute?.("data-bhz-refresh-ms") || "0";
+        const raw = section.dataset?.bhzRefreshMs || section.getAttribute?.('data-bhz-refresh-ms') || "0";
         const parsed = parseInt(raw, 10);
         return Number.isNaN(parsed) ? 0 : parsed;
     }
 
     _readAutoplay() {
         const section = this.el || document.createElement("div");
-        const raw = section.dataset?.bhzAutoplay ?? section.getAttribute?.("data-bhz-autoplay");
+        const raw = section.dataset?.bhzAutoplay;
         if (raw === undefined || raw === null || raw === "") {
             return true;
         }
@@ -84,10 +84,12 @@ class GuiabhFeaturedCarouselOption extends BaseOptionComponent {
             : null;
         const valStr = String(value);
         section.dataset.interval = valStr;
-        section.setAttribute("data-interval", valStr);
+        section.setAttribute('data-interval', valStr);
         if (carousel) {
             carousel.dataset.interval = valStr;
             carousel.dataset.bsInterval = valStr;
+            carousel.setAttribute('data-bs-interval', valStr);
+            carousel.setAttribute('data-interval', valStr);
         }
         carousel?.dispatchEvent(
             new CustomEvent("guiabh-featured-interval-update", {
@@ -105,7 +107,7 @@ class GuiabhFeaturedCarouselOption extends BaseOptionComponent {
         }
         const valStr = String(value);
         section.dataset.bhzRefreshMs = valStr;
-        section.setAttribute("data-bhz-refresh-ms", valStr);
+        section.setAttribute('data-bhz-refresh-ms', valStr);
         this.requestSave();
     }
 
@@ -115,7 +117,7 @@ class GuiabhFeaturedCarouselOption extends BaseOptionComponent {
             return;
         }
         section.dataset.bhzAutoplay = String(value);
-        section.setAttribute("data-bhz-autoplay", String(value));
+        section.setAttribute('data-bhz-autoplay', String(value));
         this.requestSave();
     }
 
