@@ -7,7 +7,8 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
     selector: ".js-bhz-featured-carousel",
     disabledInEditableMode: false,
 
-    start() {
+    async start() {
+        await this._super(...arguments);
         this.sectionEl = this.el.closest(".s_guiabh_featured_carousel");
         this.interval = this._readInterval();
         this.prevButton = this.el.querySelector(".carousel-control-prev");
@@ -17,7 +18,7 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         this._bindNav();
         this._ensureActives();
         this._initCarousel();
-        return this._super(...arguments);
+        return this;
     },
 
     _disposeCarousel() {
