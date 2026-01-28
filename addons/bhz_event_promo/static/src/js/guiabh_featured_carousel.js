@@ -236,7 +236,7 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         const hasManipulator =
             !!document.getElementById("oe_manipulators") ||
             !!document.querySelector(".o_web_editor, .o_we_website_top_actions");
-        // Important: `.oe_structure` exists on *published* pages too (it's the website builder wrapper),
+        // IMPORTANT: `.oe_structure` exists on *published* pages too (it's the website builder wrapper),
         // so it must NOT be used as a signal that we are in edit mode.
         const hasEditableAncestor = !!this.el?.closest(
             ".o_editable, .oe_editable, [contenteditable='true']"
