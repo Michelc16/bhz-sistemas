@@ -127,15 +127,20 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
     },
 
     _initCarousel() {
-        if (this._isEditor()) {
-            return;
-        }
+        // In edit mode we still initialize the carousel so the user can preview.
+        // Auto-refresh is still disabled in edit mode to avoid DOM mutations while editing.
         const items = this.el.querySelectorAll(".carousel-item");
         const indicatorsWrapper = this.el.querySelector(".js-bhz-featured-indicators");
         const indicators = indicatorsWrapper ? indicatorsWrapper.querySelectorAll("button[data-bs-slide-to]") : [];
         if (!items.length || !window.bootstrap?.Carousel) {
             return;
         }
+        // Sync attributes for Bootstrap behaviour (and for non-JS fallback).
+        const intervalStr = String(this.interval || 5000);
+        this.el.dataset.bsInterval = intervalStr;
+        this.el.dataset.bsRide = this.autoplay ? "carousel" : "false";
+        this.el.setAttribute("data-bs-interval", intervalStr);
+        this.el.setAttribute("data-bs-ride", this.autoplay ? "carousel" : "false");
         // Dispose any previous instance to avoid multiple initializations.
         this._disposeCarousel();
         // Only autoplay and show controls if more than one slide.
