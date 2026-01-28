@@ -15,7 +15,8 @@
                 <t t-set="featured_events" t-value="request.env['event.event'].sudo().guiabh_get_featured_events(limit=limit)"/>
                 <div t-att-id="target_id"
                      class="carousel slide guiabh-featured-carousel js-bhz-featured-carousel"
-                     data-bs-touch="true">
+                     data-bs-touch="true"
+                     t-att-data-bs-interval="interval">
                     <div class="carousel-inner js-bhz-featured-inner">
                         <t t-foreach="enumerate(featured_events)" t-as="ev_info">
                             <t t-set="idx" t-value="ev_info[0]"/>

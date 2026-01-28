@@ -70,7 +70,7 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         this._bootstrapCarousel = new window.bootstrap.Carousel(this.el, {
             interval: this.interval,
             ride: false,
-            pause: false,
+            pause: "hover",
             touch: true,
             wrap: true,
         });
