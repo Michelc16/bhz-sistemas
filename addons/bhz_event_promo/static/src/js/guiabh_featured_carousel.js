@@ -223,30 +223,34 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
     },
 
     _isEditor() {
+        // IMPORTANT:
+        // - When logged in, the website top bar exists even outside edit mode.
+        //   Using it as a signal would disable auto-refresh for admins.
+        // - We must only treat *real* edit/builder modes as "editor".
         const body = document.body;
         const html = document.documentElement;
+
+        // Classes that reliably indicate the website editor/builder is active.
         const editClassHints = [
             "editor_enable",
-            "o_web_editor",
-            "o_website_editor",
-            "o_edit_mode",
             "o_we_edit_mode",
-            "o_editable_mode",
+            "o_edit_mode",
             "o_builder_edit_mode",
-            "o_editable",
+            "o_website_editor",
+            "o_web_editor",
         ];
         const hasEditorClass = editClassHints.some(
             (cls) => body?.classList?.contains(cls) || html?.classList?.contains(cls)
         );
-        const hasManipulator =
-            !!document.getElementById("oe_manipulators") ||
-            !!document.querySelector(".o_web_editor, .o_we_website_top_actions");
-        // IMPORTANT: `.oe_structure` exists on *published* pages too (it's the website builder wrapper),
-        // so it must NOT be used as a signal that we are in edit mode.
+
+        // Some elements become contenteditable in edit mode.
+        // NOTE: `.o_editable` can exist for logged-in users even outside edit mode,
+        // so we avoid using it as a signal; it would disable auto-refresh for admins.
         const hasEditableAncestor = !!this.el?.closest(
-            ".o_editable, .oe_editable, [contenteditable='true']"
+            ".oe_editable, [contenteditable='true']"
         );
-        return this.editableMode || hasEditorClass || hasManipulator || hasEditableAncestor;
+
+        return this.editableMode || hasEditorClass || hasEditableAncestor;
     },
 
     destroy() {
