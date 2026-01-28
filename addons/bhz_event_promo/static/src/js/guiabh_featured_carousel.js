@@ -28,7 +28,7 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
 
     async _refreshContent() {
         // Pull latest featured events to avoid stale slides persisted in the page arch.
-        if (!this.el || !this.sectionEl) {
+        if (!this.el || !this.sectionEl || !this.el.isConnected) {
             return;
         }
         if (this._isEditor()) {
@@ -42,9 +42,6 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
             ".js-bhz-featured-empty, .js-guiabh-featured-empty"
         );
 
-        // Dispose before DOM mutations to avoid dangling bootstrap instances.
-        this._disposeCarousel();
-
         try {
             const payload = await rpc("/_bhz_event_promo/featured", {
                 limit,
@@ -53,22 +50,6 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
 
             if (this.isDestroyed || !payload) {
                 return;
-            }
-
-            if (inner && typeof payload.items_html === "string") {
-                inner.innerHTML = payload.items_html;
-            }
-            if (indicatorsWrapper) {
-                if (payload.has_multiple && typeof payload.indicators_html === "string") {
-                    indicatorsWrapper.innerHTML = payload.indicators_html;
-                    indicatorsWrapper.classList.toggle("d-none", false);
-                } else {
-                    indicatorsWrapper.innerHTML = "";
-                    indicatorsWrapper.classList.add("d-none");
-                }
-            }
-            if (emptyEl) {
-                emptyEl.classList.toggle("d-none", !!payload.has_events);
             }
 
             if (payload.config) {
@@ -92,7 +73,29 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
             this._lastPayloadSignature = signature;
 
             if (unchanged) {
+                // No DOM mutation needed; make sure carousel stays alive.
+                this._ensureActives();
+                this._initCarousel();
                 return;
+            }
+
+            // Dispose before DOM mutations to avoid dangling bootstrap instances.
+            this._disposeCarousel();
+
+            if (inner && typeof payload.items_html === "string") {
+                inner.innerHTML = payload.items_html;
+            }
+            if (indicatorsWrapper) {
+                if (payload.has_multiple && typeof payload.indicators_html === "string") {
+                    indicatorsWrapper.innerHTML = payload.indicators_html;
+                    indicatorsWrapper.classList.toggle("d-none", false);
+                } else {
+                    indicatorsWrapper.innerHTML = "";
+                    indicatorsWrapper.classList.add("d-none");
+                }
+            }
+            if (emptyEl) {
+                emptyEl.classList.toggle("d-none", !!payload.has_events);
             }
         } catch (_err) {
             // Fail silently on public pages; fallback DOM remains visible.
@@ -204,7 +207,14 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         if (!refreshMs) {
             return;
         }
-        this._refreshTimer = setInterval(() => this._refreshContent(), refreshMs);
+        this._refreshTimer = setInterval(() => {
+            if (!document.body.contains(this.el)) {
+                clearInterval(this._refreshTimer);
+                this._refreshTimer = null;
+                return;
+            }
+            this._refreshContent();
+        }, refreshMs);
     },
 
     _isEditor() {
