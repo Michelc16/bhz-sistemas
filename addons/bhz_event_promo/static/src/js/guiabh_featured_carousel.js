@@ -13,6 +13,7 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         await this._super(...arguments);
         this.sectionEl = this.el.closest(".s_guiabh_featured_carousel");
         this.interval = this._readInterval();
+        this.autoplay = this._readAutoplay();
         this.prevButton = this.el.querySelector(".carousel-control-prev");
         this.nextButton = this.el.querySelector(".carousel-control-next");
         this._boundPrev = (ev) => this._onPrevClick(ev);
@@ -21,12 +22,16 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         this._bindNav();
         this._ensureActives();
         this._initCarousel();
+        this._scheduleRefresh();
         return this;
     },
 
     async _refreshContent() {
         // Pull latest featured events to avoid stale slides persisted in the page arch.
         if (!this.el || !this.sectionEl) {
+            return;
+        }
+        if (this._isEditor()) {
             return;
         }
         const limit = this._readLimit();
@@ -65,9 +70,35 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
             if (emptyEl) {
                 emptyEl.classList.toggle("d-none", !!payload.has_events);
             }
+
+            if (payload.config) {
+                this.autoplay = payload.config.autoplay;
+                this.interval = payload.config.interval_ms || this.interval;
+                this.sectionEl.dataset.interval = this.interval;
+                this.sectionEl.dataset.bhzAutoplay = String(this.autoplay);
+                this.sectionEl.dataset.bhzRefreshMs = payload.config.refresh_ms || this.sectionEl.dataset.bhzRefreshMs;
+                this._scheduleRefresh();
+            }
+
+            const signature = JSON.stringify({
+                items: payload.items_html,
+                indicators: payload.indicators_html,
+                has_events: payload.has_events,
+                autoplay: this.autoplay,
+                interval: this.interval,
+                refresh: this._readRefreshMs(),
+            });
+            const unchanged = signature === this._lastPayloadSignature;
+            this._lastPayloadSignature = signature;
+
+            if (unchanged) {
+                return;
+            }
         } catch (_err) {
             // Fail silently on public pages; fallback DOM remains visible.
         }
+        this._ensureActives();
+        this._initCarousel();
     },
 
     _disposeCarousel() {
@@ -85,7 +116,7 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         }
         const indicatorsWrapper = this.el.querySelector(".js-bhz-featured-indicators");
         const indicators = indicatorsWrapper ? indicatorsWrapper.querySelectorAll("button[data-bs-slide-to]") : [];
-        if (indicators.length && !indicatorsWrapper.querySelector(".active")) {
+        if (indicatorsWrapper && indicators.length && !indicatorsWrapper.querySelector(".active")) {
             const first = indicatorsWrapper.querySelector('button[data-bs-slide-to="0"]') || indicators[0];
             first.classList.add("active");
             first.setAttribute("aria-current", "true");
@@ -117,13 +148,15 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         }
         // Initialize Bootstrap Carousel manually.
         this._bootstrapCarousel = new window.bootstrap.Carousel(this.el, {
-            interval: this.interval,
-            ride: true,
-            pause: false,
+            interval: this.autoplay ? this.interval : false,
+            ride: this.autoplay ? "carousel" : false,
+            pause: this.autoplay ? false : true,
             touch: true,
             wrap: true,
         });
-        this._bootstrapCarousel.cycle();
+        if (this.autoplay) {
+            this._bootstrapCarousel.cycle();
+        }
     },
 
     _readLimit() {
@@ -144,11 +177,45 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         return interval;
     },
 
+    _readAutoplay() {
+        const raw = (this.sectionEl && this.sectionEl.dataset.bhzAutoplay) || this.el.dataset.bhzAutoplay;
+        if (raw === undefined || raw === null || raw === "") {
+            return true;
+        }
+        return String(raw).toLowerCase() !== "false";
+    },
+
+    _readRefreshMs() {
+        const raw = (this.sectionEl && this.sectionEl.dataset.bhzRefreshMs) || this.el.dataset.bhzRefreshMs;
+        const parsed = parseInt(raw || "0", 10);
+        if (Number.isNaN(parsed) || parsed < 0) {
+            return 0;
+        }
+        return parsed;
+    },
+
+    _scheduleRefresh() {
+        if (this._isEditor()) {
+            return;
+        }
+        const refreshMs = this._readRefreshMs();
+        clearInterval(this._refreshTimer);
+        this._refreshTimer = null;
+        if (!refreshMs) {
+            return;
+        }
+        this._refreshTimer = setInterval(() => this._refreshContent(), refreshMs);
+    },
+
     _isEditor() {
         return this.editableMode || document.body.classList.contains("editor_enable");
     },
 
     destroy() {
+        if (this._refreshTimer) {
+            clearInterval(this._refreshTimer);
+            this._refreshTimer = null;
+        }
         this._disposeCarousel();
         this._unbindNav();
         return this._super(...arguments);

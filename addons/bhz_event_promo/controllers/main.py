@@ -296,6 +296,23 @@ class GuiaBHAgendaController(http.Controller):
             "indicators": indicators_html,
             "has_events": bool(events),
             "has_multiple": len(events) > 1,
+            "config": self._get_featured_config(),
+        }
+
+    def _get_featured_config(self):
+        website = getattr(request, "website", False)
+        company = website.company_id if website else request.env.company
+        def _pick(field_name, default=None):
+            if website and website[field_name] not in (False, None):
+                return website[field_name]
+            if company and company[field_name] not in (False, None):
+                return company[field_name]
+            return default
+
+        return {
+            "autoplay": bool(_pick("bhz_featured_carousel_autoplay", True)),
+            "interval_ms": int(_pick("bhz_featured_carousel_interval_ms", 5000) or 5000),
+            "refresh_ms": int(_pick("bhz_featured_carousel_refresh_ms", 0) or 0),
         }
 
     def _sanitize_limit(self, limit):

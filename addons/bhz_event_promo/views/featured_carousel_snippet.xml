@@ -5,7 +5,9 @@
                  data-snippet="bhz_event_promo.s_guiabh_featured_carousel"
                  data-name="GuiaBH - Carrossel de Destaques"
                  data-limit="12"
-                 data-interval="5000">
+                 data-interval="5000"
+                 data-bhz-refresh-ms="0"
+                 data-bhz-autoplay="true">
             <div class="container">
                 <t t-set="uniq_raw" t-value="request.env.context.get('snippet_key') or request.env.uid or 0"/>
                 <t t-set="uniq" t-value="''.join([c for c in str(uniq_raw) if c.isalnum()]) or '1'"/>
@@ -55,7 +57,7 @@
                                 <t t-set="idx" t-value="ev_info[0]"/>
                                 <button type="button"
                                         t-att-data-bs-target="'#%s' % target_id"
-                                        t-att-data-bs-slide-to="idx"
+                                        t-attf-data-bs-slide-to="#{idx}"
                                         t-attf-class="#{'active' if idx == 0 else ''}"
                                         t-att-aria-current="idx == 0 and 'true' or False"
                                         t-att-aria-label="'Slide %s' % (idx + 1)"/>
@@ -103,7 +105,7 @@
                 <t t-set="idx" t-value="ev_info[0]"/>
                 <button type="button"
                         t-att-data-bs-target="carousel_target"
-                        t-att-data-bs-slide-to="idx"
+                        t-attf-data-bs-slide-to="#{idx}"
                         t-attf-class="#{'active' if idx == 0 else ''}"
                         t-att-aria-current="idx == 0 and 'true' or False"
                         t-att-aria-label="'Slide %s' % (idx + 1)"/>
