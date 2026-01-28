@@ -312,7 +312,7 @@ class GuiaBHAgendaController(http.Controller):
         return {
             "autoplay": bool(_pick("bhz_featured_carousel_autoplay", True)),
             "interval_ms": int(_pick("bhz_featured_carousel_interval_ms", 5000) or 5000),
-            "refresh_ms": int(_pick("bhz_featured_carousel_refresh_ms", 0) or 0),
+            "refresh_ms": int(_pick("bhz_featured_carousel_refresh_ms", 60000) or 0),
         }
 
     def _sanitize_limit(self, limit):

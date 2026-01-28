@@ -208,7 +208,28 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
     },
 
     _isEditor() {
-        return this.editableMode || document.body.classList.contains("editor_enable");
+        const body = document.body;
+        const html = document.documentElement;
+        const editClassHints = [
+            "editor_enable",
+            "o_web_editor",
+            "o_website_editor",
+            "o_edit_mode",
+            "o_we_edit_mode",
+            "o_editable_mode",
+            "o_builder_edit_mode",
+            "o_editable",
+        ];
+        const hasEditorClass = editClassHints.some(
+            (cls) => body?.classList?.contains(cls) || html?.classList?.contains(cls)
+        );
+        const hasManipulator =
+            !!document.getElementById("oe_manipulators") ||
+            !!document.querySelector(".o_web_editor, .o_we_website_top_actions");
+        const hasEditableAncestor = !!this.el?.closest(
+            ".o_editable, .oe_editable, .oe_structure, [contenteditable='true']"
+        );
+        return this.editableMode || hasEditorClass || hasManipulator || hasEditableAncestor;
     },
 
     destroy() {

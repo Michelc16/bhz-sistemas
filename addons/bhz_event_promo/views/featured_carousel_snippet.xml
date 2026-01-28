@@ -6,7 +6,7 @@
                  data-name="GuiaBH - Carrossel de Destaques"
                  data-limit="12"
                  data-interval="5000"
-                 data-bhz-refresh-ms="0"
+                 data-bhz-refresh-ms="60000"
                  data-bhz-autoplay="true">
             <div class="container">
                 <t t-set="uniq_raw" t-value="request.env.context.get('snippet_key') or request.env.uid or 0"/>

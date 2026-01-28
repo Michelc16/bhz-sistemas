@@ -16,6 +16,6 @@ class ResCompany(models.Model):
     )
     bhz_featured_carousel_refresh_ms = fields.Integer(
         string="Atualização do carrossel (ms)",
-        default=0,
+        default=60000,
         help="Frequência de atualização automática do carrossel de destaques. 0 desabilita.",
     )
