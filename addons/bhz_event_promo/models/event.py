@@ -7,7 +7,7 @@ from urllib.parse import urlparse
 
 import pytz
 import requests
-from odoo import api, fields, models, tools
+from odoo import api, fields, models
 from odoo.http import request
 
 _logger = logging.getLogger(__name__)
@@ -75,7 +75,6 @@ class EventEvent(models.Model):
     is_accessible_pcd = fields.Boolean(string="Acessível para PCD", default=False)
     producer_name = fields.Char(string="Produtor / Realização")
     is_featured = fields.Boolean(string="Destaque na agenda", default=False)
-    featured_until = fields.Datetime(string="Destacar até", help="Data limite para manter o evento em destaque no site.")
     is_sponsored = fields.Boolean(string="Patrocinado", default=False)
     ticket_kind = fields.Selection(
         [
@@ -276,51 +275,8 @@ class EventEvent(models.Model):
         """Featured events for website snippets.
         Server-side rendering uses only promo_cover_image (no image_1920 dependency).
         """
-        website = getattr(request, "website", False)
-        website_id = website.id if website else False
-        ids = self._cached_featured_ids(website_id, limit, order)
-        return self.sudo().browse(ids)
-
-    @tools.lru_cache()
-    def _cached_featured_ids(self, website_id, limit, order):
         domain = self._prepare_public_events_domain(require_featured=True, require_image=True)
-        if website_id:
-            domain += ["|", ("website_id", "=", False), ("website_id", "=", website_id)]
-        if "featured_until" in self._fields:
-            domain += ["|", ("featured_until", "=", False), ("featured_until", ">=", fields.Datetime.now())]
-        records = self.sudo().search(domain, limit=limit, order=order)
-        return records.ids
-
-    def _invalidate_featured_cache(self):
-        try:
-            self._cached_featured_ids.clear_cache(self)
-        except Exception:
-            pass
-
-    def write(self, vals):
-        res = super().write(vals)
-        if {"is_featured", "featured_until", "promo_cover_image"} & set(vals.keys()):
-            self._invalidate_featured_cache()
-        return res
-
-    def create(self, vals_list):
-        records = super().create(vals_list)
-        if any(v.get("is_featured") or v.get("featured_until") for v in (vals_list if isinstance(vals_list, list) else [vals_list])):
-            records._invalidate_featured_cache()
-        return records
-
-    def unlink(self):
-        res = super().unlink()
-        self._invalidate_featured_cache()
-        return res
-
-    def is_featured_valid(self):
-        self.ensure_one()
-        if not self.is_featured:
-            return False
-        if self.featured_until and self.featured_until < fields.Datetime.now():
-            return False
-        return True
+        return self.sudo().search(domain, limit=limit, order=order)
 
     @api.model
     def guiabh_get_announced_events(self, limit=12, category_ids=None, order_mode="recent"):
