@@ -1,7 +1,9 @@
 /** @odoo-module **/
 
-// Server-side renders slides/indicators; this widget only (re)initializes Bootstrap Carousel safely.
+// Server-side renders slides/indicators; this widget refreshes the feed
+// on page load and (re)initializes Bootstrap Carousel safely.
 import publicWidget from "@web/legacy/js/public/public_widget";
+import { rpc } from "@web/core/network/rpc";
 
 publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
     selector: ".js-bhz-featured-carousel",
@@ -15,10 +17,57 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         this.nextButton = this.el.querySelector(".carousel-control-next");
         this._boundPrev = (ev) => this._onPrevClick(ev);
         this._boundNext = (ev) => this._onNextClick(ev);
+        await this._refreshContent();
         this._bindNav();
         this._ensureActives();
         this._initCarousel();
         return this;
+    },
+
+    async _refreshContent() {
+        // Pull latest featured events to avoid stale slides persisted in the page arch.
+        if (!this.el || !this.sectionEl) {
+            return;
+        }
+        const limit = this._readLimit();
+        const carouselId = this.el.id || this.sectionEl.id || undefined;
+        const inner = this.el.querySelector(".js-bhz-featured-inner");
+        const indicatorsWrapper = this.el.querySelector(".js-bhz-featured-indicators");
+        const emptyEl = this.sectionEl.querySelector(
+            ".js-bhz-featured-empty, .js-guiabh-featured-empty"
+        );
+
+        // Dispose before DOM mutations to avoid dangling bootstrap instances.
+        this._disposeCarousel();
+
+        try {
+            const payload = await rpc("/_bhz_event_promo/featured", {
+                limit,
+                carousel_id: carouselId,
+            });
+
+            if (this.isDestroyed || !payload) {
+                return;
+            }
+
+            if (inner && typeof payload.items_html === "string") {
+                inner.innerHTML = payload.items_html;
+            }
+            if (indicatorsWrapper) {
+                if (payload.has_multiple && typeof payload.indicators_html === "string") {
+                    indicatorsWrapper.innerHTML = payload.indicators_html;
+                    indicatorsWrapper.classList.toggle("d-none", false);
+                } else {
+                    indicatorsWrapper.innerHTML = "";
+                    indicatorsWrapper.classList.add("d-none");
+                }
+            }
+            if (emptyEl) {
+                emptyEl.classList.toggle("d-none", !!payload.has_events);
+            }
+        } catch (_err) {
+            // Fail silently on public pages; fallback DOM remains visible.
+        }
     },
 
     _disposeCarousel() {
@@ -69,11 +118,21 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         // Initialize Bootstrap Carousel manually.
         this._bootstrapCarousel = new window.bootstrap.Carousel(this.el, {
             interval: this.interval,
-            ride: false,
+            ride: true,
             pause: false,
             touch: true,
             wrap: true,
         });
+        this._bootstrapCarousel.cycle();
+    },
+
+    _readLimit() {
+        const raw = (this.sectionEl && this.sectionEl.dataset.limit) || this.el.dataset.limit;
+        const parsed = parseInt(raw || "12", 10);
+        if (Number.isNaN(parsed)) {
+            return 12;
+        }
+        return Math.min(Math.max(parsed, 1), 24);
     },
 
     _readInterval() {
