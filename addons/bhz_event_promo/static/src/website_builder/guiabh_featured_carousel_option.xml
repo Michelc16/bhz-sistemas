@@ -14,28 +14,6 @@
                        class="form-control"/>
             </div>
         </BuilderRow>
-
-        <BuilderRow label.translate="Auto-refresh (ms)">
-            <div class="o_we_number_input w-100">
-                <input type="number"
-                       min="0"
-                       max="600000"
-                       step="1000"
-                       t-att-value="this.refreshMs"
-                       t-on-input="this.onRefreshInput"
-                       t-on-change="this.onRefreshChange"
-                       class="form-control"/>
-            </div>
-            <small class="text-muted">0 desabilita. Ex.: 60000 = 1 minuto.</small>
-        </BuilderRow>
-
-        <BuilderRow label.translate="Autoplay">
-            <div class="o_we_checkbox">
-                <input type="checkbox"
-                       t-att-checked="this.autoplay"
-                       t-on-change="this.onAutoplayToggle"/>
-            </div>
-        </BuilderRow>
     </t>
 
 </templates>

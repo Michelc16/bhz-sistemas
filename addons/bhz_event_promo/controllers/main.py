@@ -230,87 +230,26 @@ class GuiaBHAgendaController(http.Controller):
         website=True,
     )
     def snippet_featured_events(self, limit=12, carousel_id=None):
-        """Legacy route kept for backward compatibility."""
-        return self._render_featured_payload(limit=limit, carousel_id=carousel_id)
-
-    @http.route(
-        "/_bhz_event_promo/featured",
-        type="json",
-        auth="public",
-        website=True,
-    )
-    def featured_carousel_feed(self, limit=12, carousel_id=None):
-        return self._render_featured_payload(limit=limit, carousel_id=carousel_id)
-
-    @http.route(
-        "/bhz_event_promo/featured_carousel_data",
-        type="json",
-        auth="public",
-        website=True,
-    )
-    def featured_carousel_feed_legacy(self, limit=12, carousel_id=None):
-        """Extra legacy alias used by older JS/assets."""
-        return self._render_featured_payload(limit=limit, carousel_id=carousel_id)
-
-    # ------------------------------------------------------------------ Helpers
-
-    def _render_featured_payload(self, limit=12, carousel_id=None):
         limit = self._sanitize_limit(limit)
+        events = (
+            request.env["event.event"]
+            .sudo()
+            .guiabh_get_featured_events(limit=limit)
+        )
         carousel_target = "#%s" % carousel_id if carousel_id else ""
-        view = request.env["ir.ui.view"].sudo()
-        event_env = request.env["event.event"]
-        if getattr(request, "website", False):
-            event_env = event_env.with_context(website_id=request.website.id)
-        try:
-            events = event_env.sudo().guiabh_get_featured_events(limit=limit)
-        except Exception:
-            events = event_env.sudo().browse()
-
-        if events:
-            _logger.debug(
-                "Featured carousel domain -> website=%s | count=%s | sample=%s",
-                getattr(request, "website", False) and request.website.id,
-                len(events),
-                events.ids[:5],
-            )
-
-        try:
-            items_html = view._render_template(
-                "bhz_event_promo.featured_carousel_items",
-                {"events": events, "carousel_target": carousel_target, "render_part": "items"},
-            )
-            indicators_html = view._render_template(
-                "bhz_event_promo.featured_carousel_items",
-                {"events": events, "carousel_target": carousel_target, "render_part": "indicators"},
-            )
-        except Exception as exc:
-            _logger.warning("Failed to render featured carousel items: %s", exc)
-            items_html = ""
-            indicators_html = ""
-
+        slides = request.env["ir.ui.view"]._render_template(
+            "bhz_event_promo.guiabh_featured_carousel_slides",
+            {"events": events, "carousel_target": carousel_target},
+        )
+        indicators = request.env["ir.ui.view"]._render_template(
+            "bhz_event_promo.guiabh_featured_carousel_indicators",
+            {"events": events, "carousel_target": carousel_target},
+        )
         return {
-            "items_html": items_html,
-            "indicators_html": indicators_html,
-            # Backward compatibility keys (pre-Odoo19 refactor)
-            "slides": items_html,
-            "indicators": indicators_html,
+            "slides": slides,
+            "indicators": indicators,
             "has_events": bool(events),
             "has_multiple": len(events) > 1,
-            "config": self._get_featured_config(),
-        }
-
-    def _get_featured_config(self):
-        """Return default config for the featured carousel.
-
-        The snippet is configured via data-attributes (data-bhz-*).
-        Keeping only defaults here avoids relying on stored fields on
-        website/company, which can break during upgrades if the DB schema
-        is temporarily out of sync.
-        """
-        return {
-            "autoplay": True,
-            "interval_ms": 5000,
-            "refresh_ms": 60000,
         }
 
     def _sanitize_limit(self, limit):

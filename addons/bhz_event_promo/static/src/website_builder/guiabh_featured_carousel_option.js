@@ -1,10 +1,10 @@
 /** @odoo-module **/
 
-import { registry } from "@web/core/registry";
 import { BaseOptionComponent } from "@html_builder/core/utils";
 import { Plugin } from "@html_editor/plugin";
 import { SNIPPET_SPECIFIC } from "@html_builder/utils/option_sequence";
 import { withSequence } from "@html_editor/utils/resource";
+import { registry } from "@web/core/registry";
 
 class GuiabhFeaturedCarouselOption extends BaseOptionComponent {
     static selector = ".s_guiabh_featured_carousel";
@@ -13,8 +13,6 @@ class GuiabhFeaturedCarouselOption extends BaseOptionComponent {
     setup() {
         super.setup(...arguments);
         this.interval = this._readInterval();
-        this.refreshMs = this._readRefresh();
-        this.autoplay = this._readAutoplay();
     }
 
     _readInterval() {
@@ -23,22 +21,6 @@ class GuiabhFeaturedCarouselOption extends BaseOptionComponent {
         const raw = carousel?.dataset.interval || section.dataset?.interval || "5000";
         const parsed = parseInt(raw, 10);
         return Number.isNaN(parsed) ? 5000 : parsed;
-    }
-
-    _readRefresh() {
-        const section = this.el || document.createElement("div");
-        const raw = section.dataset?.bhzRefreshMs || "0";
-        const parsed = parseInt(raw, 10);
-        return Number.isNaN(parsed) ? 0 : parsed;
-    }
-
-    _readAutoplay() {
-        const section = this.el || document.createElement("div");
-        const raw = section.dataset?.bhzAutoplay;
-        if (raw === undefined || raw === null || raw === "") {
-            return true;
-        }
-        return String(raw).toLowerCase() !== "false";
     }
 
     onIntervalInput(ev) {
@@ -50,22 +32,6 @@ class GuiabhFeaturedCarouselOption extends BaseOptionComponent {
         const value = this._sanitize(ev.target.value);
         ev.target.value = value;
         this._applyInterval(value);
-    }
-
-    onRefreshInput(ev) {
-        const value = this._sanitizeRefresh(ev.target.value);
-        ev.target.value = value;
-    }
-
-    onRefreshChange(ev) {
-        const value = this._sanitizeRefresh(ev.target.value);
-        ev.target.value = value;
-        this._applyRefresh(value);
-    }
-
-    onAutoplayToggle(ev) {
-        const checked = !!ev.target.checked;
-        this._applyAutoplay(checked);
     }
 
     _sanitize(value) {
@@ -96,31 +62,6 @@ class GuiabhFeaturedCarouselOption extends BaseOptionComponent {
         );
         this.requestSave();
     }
-
-    _applyRefresh(value) {
-        const section = this.el;
-        if (!section) {
-            return;
-        }
-        const valStr = String(value);
-        section.dataset.bhzRefreshMs = valStr;
-        this.requestSave();
-    }
-
-    _applyAutoplay(value) {
-        const section = this.el;
-        if (!section) {
-            return;
-        }
-        section.dataset.bhzAutoplay = String(value);
-        this.requestSave();
-    }
-
-    _sanitizeRefresh(value) {
-        const parsed = parseInt(value || "0", 10) || 0;
-        const clamped = Math.min(Math.max(parsed, 0), 600000);
-        return clamped;
-    }
 }
 
 class GuiabhFeaturedCarouselOptionPlugin extends Plugin {
@@ -130,8 +71,6 @@ class GuiabhFeaturedCarouselOptionPlugin extends Plugin {
     };
 }
 
-if (registry?.category) {
-    registry
-        .category("website-plugins")
-        .add(GuiabhFeaturedCarouselOptionPlugin.id, GuiabhFeaturedCarouselOptionPlugin);
-}
+registry
+    .category("website-plugins")
+    .add(GuiabhFeaturedCarouselOptionPlugin.id, GuiabhFeaturedCarouselOptionPlugin);
