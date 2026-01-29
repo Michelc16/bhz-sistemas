@@ -300,19 +300,17 @@ class GuiaBHAgendaController(http.Controller):
         }
 
     def _get_featured_config(self):
-        website = getattr(request, "website", False)
-        company = website.company_id if website else request.env.company
-        def _pick(field_name, default=None):
-            if website and website[field_name] not in (False, None):
-                return website[field_name]
-            if company and company[field_name] not in (False, None):
-                return company[field_name]
-            return default
+        """Return default config for the featured carousel.
 
+        The snippet is configured via data-attributes (data-bhz-*).
+        Keeping only defaults here avoids relying on stored fields on
+        website/company, which can break during upgrades if the DB schema
+        is temporarily out of sync.
+        """
         return {
-            "autoplay": bool(_pick("bhz_featured_carousel_autoplay", True)),
-            "interval_ms": int(_pick("bhz_featured_carousel_interval_ms", 5000) or 5000),
-            "refresh_ms": int(_pick("bhz_featured_carousel_refresh_ms", 60000) or 0),
+            "autoplay": True,
+            "interval_ms": 5000,
+            "refresh_ms": 60000,
         }
 
     def _sanitize_limit(self, limit):
