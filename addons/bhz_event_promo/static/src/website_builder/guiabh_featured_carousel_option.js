@@ -1,57 +1,137 @@
 /** @odoo-module **/
 
-import { BaseOptionComponent } from "@website/builder/plugins/options";
+import { registry } from "@web/core/registry";
+import { BaseOptionComponent } from "@html_builder/core/utils";
+import { Plugin } from "@html_editor/plugin";
+import { SNIPPET_SPECIFIC } from "@html_builder/utils/option_sequence";
+import { withSequence } from "@html_editor/utils/resource";
 
-export class GuiabhFeaturedCarouselOption extends BaseOptionComponent {
+class GuiabhFeaturedCarouselOption extends BaseOptionComponent {
+    static selector = ".s_guiabh_featured_carousel";
     static template = "bhz_event_promo.GuiabhFeaturedCarouselOption";
 
     setup() {
-        super.setup();
-        this._syncFromTarget();
+        super.setup(...arguments);
+        this.interval = this._readInterval();
+        this.refreshMs = this._readRefresh();
+        this.autoplay = this._readAutoplay();
     }
 
-    // In the website builder, the selected snippet node is provided as props.target
-    _targetEl() {
-        return this.props?.target || this.el;
+    _readInterval() {
+        const section = this.el || document.createElement("div");
+        const carousel = section.querySelector?.(".guiabh-featured-carousel");
+        const raw = carousel?.dataset.interval || section.dataset?.interval || "5000";
+        const parsed = parseInt(raw, 10);
+        return Number.isNaN(parsed) ? 5000 : parsed;
     }
 
-    _syncFromTarget() {
-        const el = this._targetEl();
-        this.refreshMs = parseInt(el.getAttribute("data-bhz-refresh-ms") || "0", 10) || 0;
-        this.autoplay = (el.getAttribute("data-bhz-autoplay") || "true") !== "false";
+    _readRefresh() {
+        const section = this.el || document.createElement("div");
+        const raw = section.dataset?.bhzRefreshMs || "0";
+        const parsed = parseInt(raw, 10);
+        return Number.isNaN(parsed) ? 0 : parsed;
     }
 
-    _sanitizeRefresh(value) {
-        const ms = parseInt(value || "0", 10);
-        if (isNaN(ms) || ms < 0) return 0;
-        if (ms > 600000) return 600000;
-        return ms;
+    _readAutoplay() {
+        const section = this.el || document.createElement("div");
+        const raw = section.dataset?.bhzAutoplay;
+        if (raw === undefined || raw === null || raw === "") {
+            return true;
+        }
+        return String(raw).toLowerCase() !== "false";
     }
 
-    _applyRefresh(ms) {
-        const el = this._targetEl();
-        el.setAttribute("data-bhz-refresh-ms", String(ms));
-        this.refreshMs = ms;
+    onIntervalInput(ev) {
+        const value = this._sanitize(ev.target.value);
+        ev.target.value = value;
     }
 
-    _applyAutoplay(enabled) {
-        const el = this._targetEl();
-        el.setAttribute("data-bhz-autoplay", enabled ? "true" : "false");
-        this.autoplay = enabled;
+    onIntervalChange(ev) {
+        const value = this._sanitize(ev.target.value);
+        ev.target.value = value;
+        this._applyInterval(value);
+    }
+
+    onRefreshInput(ev) {
+        const value = this._sanitizeRefresh(ev.target.value);
+        ev.target.value = value;
     }
 
     onRefreshChange(ev) {
-        const ms = this._sanitizeRefresh(ev.target.value);
-        this._applyRefresh(ms);
-        this.env.editorBus.trigger("request_save");
+        const value = this._sanitizeRefresh(ev.target.value);
+        ev.target.value = value;
+        this._applyRefresh(value);
     }
 
-    onAutoplayChange(ev) {
-        this._applyAutoplay(ev.target.checked);
-        this.env.editorBus.trigger("request_save");
+    onAutoplayToggle(ev) {
+        const checked = !!ev.target.checked;
+        this._applyAutoplay(checked);
+    }
+
+    _sanitize(value) {
+        const parsed = parseInt(value || "0", 10) || 0;
+        const clamped = Math.min(Math.max(parsed, 1000), 20000);
+        return clamped;
+    }
+
+    _applyInterval(value) {
+        const section = this.el;
+        if (!section) {
+            return;
+        }
+        const carousel = section.querySelector
+            ? section.querySelector(".guiabh-featured-carousel")
+            : null;
+        const valStr = String(value);
+        section.dataset.interval = valStr;
+        if (carousel) {
+            carousel.dataset.interval = valStr;
+            carousel.dataset.bsInterval = valStr;
+        }
+        carousel?.dispatchEvent(
+            new CustomEvent("guiabh-featured-interval-update", {
+                bubbles: true,
+                detail: { interval: value },
+            })
+        );
+        this.requestSave();
+    }
+
+    _applyRefresh(value) {
+        const section = this.el;
+        if (!section) {
+            return;
+        }
+        const valStr = String(value);
+        section.dataset.bhzRefreshMs = valStr;
+        this.requestSave();
+    }
+
+    _applyAutoplay(value) {
+        const section = this.el;
+        if (!section) {
+            return;
+        }
+        section.dataset.bhzAutoplay = String(value);
+        this.requestSave();
+    }
+
+    _sanitizeRefresh(value) {
+        const parsed = parseInt(value || "0", 10) || 0;
+        const clamped = Math.min(Math.max(parsed, 0), 600000);
+        return clamped;
     }
 }
 
-export const guiabhFeaturedCarouselOption = {
-    Component: GuiabhFeaturedCarouselOption,
-};
+class GuiabhFeaturedCarouselOptionPlugin extends Plugin {
+    static id = "guiabhFeaturedCarouselOption";
+    resources = {
+        builder_options: [withSequence(SNIPPET_SPECIFIC, GuiabhFeaturedCarouselOption)],
+    };
+}
+
+if (registry?.category) {
+    registry
+        .category("website-plugins")
+        .add(GuiabhFeaturedCarouselOptionPlugin.id, GuiabhFeaturedCarouselOptionPlugin);
+}
