@@ -14,26 +14,20 @@
                 <t t-set="interval" t-value="int(request.env.context.get('interval') or request.env.context.get('data_interval') or 5000)"/>
                 <t t-set="limit" t-value="int(request.env.context.get('data_limit') or 12)"/>
                 <t t-set="target_id" t-value="'guiabhFeaturedCarousel%s' % uniq"/>
-                <t t-set="featured_events" t-value="request.env['event.event'].sudo().guiabh_get_featured_events(limit=limit)"/>
                 <div t-att-id="target_id"
                      class="carousel slide guiabh-featured-carousel js-bhz-featured-carousel"
                      data-bs-touch="true">
                     <div class="carousel-inner js-bhz-featured-inner">
-                        <t t-foreach="enumerate(featured_events)" t-as="ev_info">
-                            <t t-set="idx" t-value="ev_info[0]"/>
-                            <t t-set="ev" t-value="ev_info[1]"/>
-                            <div t-attf-class="carousel-item #{'active' if idx == 0 else ''}">
-                                <a t-att-href="'/agenda/event/%s' % ev.id">
-                                    <img class="d-block w-100 guiabh-featured-img"
-                                         t-att-alt="ev.name or ''"
-                                         loading="lazy"
-                                         t-att-src="'/web/image/event.event/%s/promo_cover_image' % ev.id"/>
-                                </a>
-                            </div>
-                        </t>
+                        <!--
+                            IMPORTANT:
+                            Do NOT render events here server-side.
+                            The website editor saves the snippet HTML into the page, so rendering events would
+                            persist stale slides even after the event is no longer featured.
+                            Slides are always injected/updated by JS via the snippet endpoint.
+                        -->
                     </div>
 
-                    <button t-attf-class="carousel-control-prev o_not_editable #{'d-none' if len(featured_events) &lt;= 1 else ''}"
+                    <button class="carousel-control-prev o_not_editable d-none"
                             type="button"
                             t-att-data-bs-target="'#%s' % target_id"
                             data-bs-slide="prev"
@@ -41,7 +35,7 @@
                         <span class="carousel-control-prev-icon" aria-hidden="true"/>
                         <span class="visually-hidden">Anterior</span>
                     </button>
-                    <button t-attf-class="carousel-control-next o_not_editable #{'d-none' if len(featured_events) &lt;= 1 else ''}"
+                    <button class="carousel-control-next o_not_editable d-none"
                             type="button"
                             t-att-data-bs-target="'#%s' % target_id"
                             data-bs-slide="next"
@@ -49,24 +43,11 @@
                         <span class="carousel-control-next-icon" aria-hidden="true"/>
                         <span class="visually-hidden">Próximo</span>
                     </button>
-
-                    <t t-if="len(featured_events) &gt; 1">
-                        <div class="carousel-indicators indicators-below js-bhz-featured-indicators o_not_editable"
-                             contenteditable="false">
-                            <t t-foreach="enumerate(featured_events)" t-as="ev_info">
-                                <t t-set="idx" t-value="ev_info[0]"/>
-                                <button type="button"
-                                        t-att-data-bs-target="'#%s' % target_id"
-                                        t-attf-data-bs-slide-to="#{idx}"
-                                        t-attf-class="#{'active' if idx == 0 else ''}"
-                                        t-att-aria-current="idx == 0 and 'true' or False"
-                                        t-att-aria-label="'Slide %s' % (idx + 1)"/>
-                            </t>
-                        </div>
-                    </t>
+                    <div class="carousel-indicators indicators-below js-bhz-featured-indicators o_not_editable d-none"
+                         contenteditable="false"/>
                 </div>
 
-                <div t-attf-class="alert alert-secondary mb-0 text-center js-bhz-featured-empty js-guiabh-featured-empty #{'d-none' if featured_events else ''}">
+                <div class="alert alert-secondary mb-0 text-center js-bhz-featured-empty js-guiabh-featured-empty d-none">
                     Nenhum evento em destaque no momento.
                 </div>
             </div>

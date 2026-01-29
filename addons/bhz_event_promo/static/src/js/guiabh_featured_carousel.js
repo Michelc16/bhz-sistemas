@@ -11,45 +11,23 @@ function _toInt(value, fallback) {
 publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
     selector: ".js-bhz-featured-carousel",
 
-    // NOTE: In Odoo 19, `publicWidget`'s super call (`this._super`) can break
-    // when overriding methods are declared with ES6 shorthand (`start() {}`),
-    // yielding `this._super is not a function` in web.assets_frontend_lazy.
-    // Use the classic function syntax to keep proper super wrapping.
-    start: function () {
+    async start() {
         this.sectionEl = this.el.closest(".s_guiabh_featured_carousel") || this.el;
         this.carouselId = this.el.getAttribute("id") || null;
 
         // Disable only in *real* edit mode (avoid false positives like oe_structure).
         if (this._isEditMode()) {
-            // Don't run carousel/init/refresh in the editor to avoid OWL patch
-            // errors ("removeChild ... not a child...").
-            return this._super.apply(this, arguments);
+            return this._super(...arguments);
         }
 
-        // The website editor can be injected after widgets start. If that
-        // happens while we are running timers and mutating DOM, OWL may crash
-        // with `removeChild ... not a child of this node`. Watch for the editor
-        // UI and disable ourselves as soon as it appears.
-        this._editorObserver = new MutationObserver(() => {
-            if (!this._editorObserver) {
-                return;
-            }
-            if (this._isEditMode()) {
-                try {
-                    if (this._refreshTimer) {
-                        clearInterval(this._refreshTimer);
-                        this._refreshTimer = null;
-                    }
-                    this._disposeCarousel();
-                } finally {
-                    this._editorObserver.disconnect();
-                    this._editorObserver = null;
-                }
-            }
-        });
-        this._editorObserver.observe(document.documentElement, { subtree: true, childList: true });
-
         this._applyAutoplayConfig();
+
+        // Always fetch the latest featured events once on load.
+        // This prevents stale slides remaining on the homepage after a featured
+        // flag is toggled (the website page HTML is persisted).
+        await this._refreshContent();
+
+        // Ensure a carousel instance exists even when refresh returns nothing.
         this._initCarousel();
 
         const refreshMs = this._getRefreshMs();
@@ -57,58 +35,31 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
             this._refreshTimer = setInterval(() => this._refreshContent(), refreshMs);
         }
 
-        return this._super.apply(this, arguments);
+        return this._super(...arguments);
     },
 
-    destroy: function () {
-        if (this._editorObserver) {
-            this._editorObserver.disconnect();
-            this._editorObserver = null;
-        }
+    destroy() {
         if (this._refreshTimer) {
             clearInterval(this._refreshTimer);
             this._refreshTimer = null;
         }
         this._disposeCarousel();
-        return this._super.apply(this, arguments);
+        return this._super(...arguments);
     },
 
     // -------------------------------------------------------------------------
     // Config
     // -------------------------------------------------------------------------
 
-    _isEditMode: function () {
+    _isEditMode() {
         const b = document.body;
         if (!b) return false;
-
         // Markers used by Odoo website editor across versions
-        if (
+        return (
             b.classList.contains("editor_enable") ||
             b.classList.contains("o_is_editing") ||
             b.classList.contains("o_we_editing") ||
             b.classList.contains("o_website_edit_mode")
-        ) {
-            return true;
-        }
-
-        // URL flags used by the website editor / preview.
-        try {
-            const params = new URLSearchParams(window.location.search || "");
-            if (
-                params.get("enable_editor") === "1" ||
-                params.get("editor") === "1" ||
-                params.get("edit") === "1"
-            ) {
-                return true;
-            }
-        } catch (e) {
-            // ignore
-        }
-
-        // Extra DOM markers seen in the editor UI; more reliable than body
-        // classes on some builds/asset bundles.
-        return !!document.querySelector(
-            ".o_we_toolbar, .o_we_website_top_actions, #oe_snippets, .o_website_builder"
         );
     },
 
