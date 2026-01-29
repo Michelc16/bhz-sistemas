@@ -17,7 +17,7 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
 
         // Disable only in *real* edit mode (avoid false positives like oe_structure).
         if (this._isEditMode()) {
-            return this._super(...arguments);
+            return publicWidget.Widget.prototype.start.apply(this, arguments);
         }
 
         this._applyAutoplayConfig();
@@ -35,7 +35,7 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
             this._refreshTimer = setInterval(() => this._refreshContent(), refreshMs);
         }
 
-        return this._super(...arguments);
+        return publicWidget.Widget.prototype.start.apply(this, arguments);
     },
 
     destroy() {
@@ -44,7 +44,7 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
             this._refreshTimer = null;
         }
         this._disposeCarousel();
-        return this._super(...arguments);
+        return publicWidget.Widget.prototype.destroy.apply(this, arguments);
     },
 
     // -------------------------------------------------------------------------
