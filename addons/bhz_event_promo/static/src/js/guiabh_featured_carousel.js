@@ -1,137 +1,185 @@
 /** @odoo-module **/
 
-// Server-side renders slides and indicators; JS only bootstraps Carousel when needed.
 import publicWidget from "@web/legacy/js/public/public_widget";
+import { rpc } from "@web/core/network/rpc";
+
+function _toInt(value, fallback) {
+    const n = parseInt(value, 10);
+    return Number.isNaN(n) ? fallback : n;
+}
 
 publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
     selector: ".js-bhz-featured-carousel",
-    disabledInEditableMode: false,
 
     async start() {
-        this.sectionEl = this.el.closest(".s_guiabh_featured_carousel");
-        this.interval = this._readInterval();
-        this.prevButton = this.el.querySelector(".carousel-control-prev");
-        this.nextButton = this.el.querySelector(".carousel-control-next");
-        this._boundPrev = this._onPrevClick.bind(this);
-        this._boundNext = this._onNextClick.bind(this);
-        await this._super(...arguments);
-        this._bindNav();
-        this._ensureActives();
+        this.sectionEl = this.el.closest(".s_guiabh_featured_carousel") || this.el;
+        this.carouselId = this.el.getAttribute("id") || null;
+
+        // Disable only in *real* edit mode (avoid false positives like oe_structure).
+        if (this._isEditMode()) {
+            return publicWidget.Widget.prototype.start.apply(this, arguments);
+        }
+
+        this._applyAutoplayConfig();
+
+        // Always fetch the latest featured events once on load.
+        // This prevents stale slides remaining on the homepage after a featured
+        // flag is toggled (the website page HTML is persisted).
+        await this._refreshContent();
+
+        // Ensure a carousel instance exists even when refresh returns nothing.
         this._initCarousel();
+
+        const refreshMs = this._getRefreshMs();
+        if (refreshMs > 0) {
+            this._refreshTimer = setInterval(() => this._refreshContent(), refreshMs);
+        }
+
+        return publicWidget.Widget.prototype.start.apply(this, arguments);
     },
+
+    destroy() {
+        if (this._refreshTimer) {
+            clearInterval(this._refreshTimer);
+            this._refreshTimer = null;
+        }
+        this._disposeCarousel();
+        return publicWidget.Widget.prototype.destroy.apply(this, arguments);
+    },
+
+    // -------------------------------------------------------------------------
+    // Config
+    // -------------------------------------------------------------------------
+
+    _isEditMode() {
+        const b = document.body;
+        if (!b) return false;
+        // Markers used by Odoo website editor across versions
+        return (
+            b.classList.contains("editor_enable") ||
+            b.classList.contains("o_is_editing") ||
+            b.classList.contains("o_we_editing") ||
+            b.classList.contains("o_website_edit_mode")
+        );
+    },
+
+    _getInterval() {
+        const raw =
+            this.el.dataset.bsInterval ||
+            this.el.dataset.interval ||
+            this.sectionEl?.dataset?.interval ||
+            this.sectionEl?.getAttribute?.("data-interval") ||
+            "5000";
+        const val = _toInt(raw, 5000);
+        return Math.min(Math.max(val, 1000), 20000);
+    },
+
+    _getRefreshMs() {
+        const raw =
+            this.sectionEl?.dataset?.bhzRefreshMs ||
+            this.sectionEl?.getAttribute?.("data-bhz-refresh-ms") ||
+            "0";
+        const val = _toInt(raw, 0);
+        return Math.min(Math.max(val, 0), 600000);
+    },
+
+    _getAutoplay() {
+        const raw =
+            this.sectionEl?.dataset?.bhzAutoplay ??
+            this.sectionEl?.getAttribute?.("data-bhz-autoplay");
+        if (raw === undefined || raw === null || raw === "") return true;
+        return String(raw).toLowerCase() !== "false";
+    },
+
+    _applyAutoplayConfig() {
+        const autoplay = this._getAutoplay();
+        const interval = this._getInterval();
+
+        // Normalize attributes for Bootstrap
+        this.el.dataset.bsInterval = String(interval);
+        this.el.dataset.interval = String(interval);
+
+        // Some templates/editor may force data-bs-ride="false".
+        // We override it to guarantee autoplay when enabled.
+        this.el.setAttribute("data-bs-ride", autoplay ? "carousel" : "false");
+    },
+
+    // -------------------------------------------------------------------------
+    // Bootstrap Carousel
+    // -------------------------------------------------------------------------
 
     _disposeCarousel() {
-        const existing = window.bootstrap?.Carousel?.getInstance?.(this.el);
-        if (existing) {
-            existing.dispose();
-        }
-        this._bootstrapCarousel = null;
-    },
-
-    _ensureActives() {
-        const items = this.el.querySelectorAll(".carousel-item");
-        if (items.length && !this.el.querySelector(".carousel-item.active")) {
-            items[0].classList.add("active");
-        }
-        const indicatorsWrapper = this.el.querySelector(".js-bhz-featured-indicators");
-        const indicators = indicatorsWrapper ? indicatorsWrapper.querySelectorAll("button[data-bs-slide-to]") : [];
-        if (indicators.length && !indicatorsWrapper.querySelector(".active")) {
-            const first = indicatorsWrapper.querySelector('button[data-bs-slide-to="0"]') || indicators[0];
-            first.classList.add("active");
-            first.setAttribute("aria-current", "true");
+        try {
+            const inst = window.bootstrap?.Carousel?.getInstance?.(this.el);
+            inst?.dispose?.();
+        } catch {
+            // ignore
         }
     },
 
     _initCarousel() {
-        if (this._isEditor()) {
-            return;
-        }
-        const items = this.el.querySelectorAll(".carousel-item");
-        const indicatorsWrapper = this.el.querySelector(".js-bhz-featured-indicators");
-        const indicators = indicatorsWrapper ? indicatorsWrapper.querySelectorAll("button[data-bs-slide-to]") : [];
-        if (!items.length || !window.bootstrap?.Carousel) {
-            return;
-        }
-        if (items.length < 2) {
-            return;
-        }
-        if (indicatorsWrapper && indicators.length !== items.length) {
-            return;
-        }
-        const interval = this.interval;
-        this._bootstrapCarousel = new window.bootstrap.Carousel(this.el, {
-            interval,
-            ride: false,
+        if (!window.bootstrap?.Carousel) return;
+
+        this._disposeCarousel();
+
+        const autoplay = this._getAutoplay();
+        const interval = this._getInterval();
+
+        window.bootstrap.Carousel.getOrCreateInstance(this.el, {
+            interval: autoplay ? interval : false,
+            ride: autoplay ? "carousel" : false,
             pause: "hover",
             touch: true,
-            wrap: true,
+            keyboard: true,
         });
-        if (interval) {
-            this._bootstrapCarousel.cycle();
-        } else {
-            this._bootstrapCarousel.pause();
-        }
     },
 
-    _applyIntervalToInstance() {
-        if (!this._bootstrapCarousel) {
+    // -------------------------------------------------------------------------
+    // Auto refresh (remove/add featured events automatically)
+    // -------------------------------------------------------------------------
+
+    async _refreshContent() {
+        // Avoid Owl DOM patch issues in editor
+        if (this._isEditMode()) return;
+
+        const limit = _toInt(
+            this.sectionEl?.dataset?.limit || this.sectionEl?.getAttribute?.("data-limit") || "12",
+            12
+        );
+
+        let payload;
+        try {
+            payload = await rpc("/_bhz_event_promo/featured", {
+                limit,
+                carousel_id: this.carouselId,
+            });
+        } catch {
             return;
         }
-        if (this.interval <= 0 || this._isEditor()) {
-            this._bootstrapCarousel._config.interval = false;
-            this._bootstrapCarousel.pause();
-        } else {
-            this._bootstrapCarousel._config.interval = this.interval;
-            this._bootstrapCarousel.cycle();
-        }
-    },
+        if (!payload) return;
 
-    _readInterval() {
-        const attr = (this.sectionEl && this.sectionEl.dataset.interval) || this.el.dataset.interval || this.el.dataset.bsInterval || "5000";
-        const parsed = parseInt(attr, 10);
-        const interval = Number.isNaN(parsed) ? 5000 : parsed;
-        this.el.dataset.interval = interval;
-        this.el.dataset.bsInterval = interval;
-        return interval;
-    },
+        const inner = this.el.querySelector(".js-bhz-featured-inner");
+        const indicators = this.el.querySelector(".js-bhz-featured-indicators");
+        const empty = this.sectionEl?.querySelector(".js-bhz-featured-empty");
 
-    _isEditor() {
-        return this.editableMode || document.body.classList.contains("editor_enable");
-    },
+        const itemsHtml = payload.items_html || payload.slides || "";
+        const indicatorsHtml = payload.indicators_html || payload.indicators || "";
 
-    destroy() {
-        this._disposeCarousel();
-        this._unbindNav();
-        return this._super(...arguments);
-    },
+        if (inner) inner.innerHTML = itemsHtml;
+        if (indicators) indicators.innerHTML = indicatorsHtml;
 
-    _bindNav() {
-        if (this.prevButton) {
-            this.prevButton.addEventListener("click", this._boundPrev);
-        }
-        if (this.nextButton) {
-            this.nextButton.addEventListener("click", this._boundNext);
-        }
-    },
+        const hasEvents = !!payload.has_events;
+        if (empty) empty.classList.toggle("d-none", hasEvents);
 
-    _unbindNav() {
-        if (this.prevButton) {
-            this.prevButton.removeEventListener("click", this._boundPrev);
-        }
-        if (this.nextButton) {
-            this.nextButton.removeEventListener("click", this._boundNext);
-        }
-    },
+        const hasMultiple = !!payload.has_multiple;
+        const prevBtn = this.el.querySelector(".carousel-control-prev");
+        const nextBtn = this.el.querySelector(".carousel-control-next");
+        prevBtn?.classList.toggle("d-none", !hasMultiple);
+        nextBtn?.classList.toggle("d-none", !hasMultiple);
+        indicators?.classList.toggle("d-none", !hasMultiple);
 
-    _onPrevClick(ev) {
-        ev?.preventDefault?.();
-        ev?.stopPropagation?.();
-        this._bootstrapCarousel?.prev();
-    },
-
-    _onNextClick(ev) {
-        ev?.preventDefault?.();
-        ev?.stopPropagation?.();
-        this._bootstrapCarousel?.next();
+        // Re-init after DOM replacement
+        this._applyAutoplayConfig();
+        this._initCarousel();
     },
 });
