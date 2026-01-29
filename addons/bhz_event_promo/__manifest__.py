@@ -27,11 +27,9 @@
             "bhz_event_promo/static/src/js/guiabh_announced_events.js",
             "bhz_event_promo/static/src/js/guiabh_featured_carousel.js",
         ],
-        # Keep editor bundle clean: custom editor widgets/templates were causing
-        # Owl lifecycle crashes when not all dependencies were present.
-        # The featured carousel is configured via data-* attributes and works
-        # without editor-side JS.
-        "website.assets_editor": [],
+        "website.assets_editor": [
+            "bhz_event_promo/static/src/website_builder/**/*",
+        ],
     },
     "installable": True,
     "application": False,

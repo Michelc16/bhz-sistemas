@@ -11,23 +11,18 @@ function _toInt(value, fallback) {
 publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
     selector: ".js-bhz-featured-carousel",
 
-    async start() {
+    start() {
         this.sectionEl = this.el.closest(".s_guiabh_featured_carousel") || this.el;
         this.carouselId = this.el.getAttribute("id") || null;
 
         // Disable only in *real* edit mode (avoid false positives like oe_structure).
         if (this._isEditMode()) {
-            return publicWidget.Widget.prototype.start.apply(this, arguments);
+            // In some website editor contexts the legacy widget may be mounted without _super.
+            // Avoid breaking the whole editor.
+            return this._super ? this._super.apply(this, arguments) : Promise.resolve();
         }
 
         this._applyAutoplayConfig();
-
-        // Always fetch the latest featured events once on load.
-        // This prevents stale slides remaining on the homepage after a featured
-        // flag is toggled (the website page HTML is persisted).
-        await this._refreshContent();
-
-        // Ensure a carousel instance exists even when refresh returns nothing.
         this._initCarousel();
 
         const refreshMs = this._getRefreshMs();
@@ -35,7 +30,7 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
             this._refreshTimer = setInterval(() => this._refreshContent(), refreshMs);
         }
 
-        return publicWidget.Widget.prototype.start.apply(this, arguments);
+        return this._super ? this._super.apply(this, arguments) : Promise.resolve();
     },
 
     destroy() {
@@ -44,7 +39,7 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
             this._refreshTimer = null;
         }
         this._disposeCarousel();
-        return publicWidget.Widget.prototype.destroy.apply(this, arguments);
+        return this._super ? this._super.apply(this, arguments) : undefined;
     },
 
     // -------------------------------------------------------------------------
@@ -53,14 +48,31 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
 
     _isEditMode() {
         const b = document.body;
-        if (!b) return false;
-        // Markers used by Odoo website editor across versions
-        return (
-            b.classList.contains("editor_enable") ||
-            b.classList.contains("o_is_editing") ||
-            b.classList.contains("o_we_editing") ||
-            b.classList.contains("o_website_edit_mode")
-        );
+        const docEl = document.documentElement;
+
+        const hasMarker = (body) =>
+            !!body &&
+            (
+                body.classList.contains("editor_enable") ||
+                body.classList.contains("o_is_editing") ||
+                body.classList.contains("o_we_editing") ||
+                body.classList.contains("o_website_edit_mode") ||
+                body.classList.contains("o_we_website_editor")
+            );
+
+        // Markers in current document
+        if (hasMarker(b)) return true;
+        if (docEl?.classList?.contains("o_we_preview")) return true;
+
+        // Markers in parent (website editor runs in an iframe, same-origin)
+        try {
+            const topBody = window.top?.document?.body;
+            if (topBody && topBody !== b && hasMarker(topBody)) return true;
+        } catch {
+            // ignore
+        }
+
+        return false;
     },
 
     _getInterval() {
@@ -125,13 +137,26 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         const autoplay = this._getAutoplay();
         const interval = this._getInterval();
 
-        window.bootstrap.Carousel.getOrCreateInstance(this.el, {
+        const inst = window.bootstrap.Carousel.getOrCreateInstance(this.el, {
             interval: autoplay ? interval : false,
-            ride: autoplay ? "carousel" : false,
-            pause: "hover",
+            ride: false, // we control cycling explicitly
+            pause: false, // guarantee autoplay even with overlays
             touch: true,
             keyboard: true,
+            wrap: true,
         });
+
+        // Bootstrap only auto-starts in some cases depending on attributes.
+        // Force cycle when enabled.
+        try {
+            if (autoplay) {
+                inst?.cycle?.();
+            } else {
+                inst?.pause?.();
+            }
+        } catch {
+            // ignore
+        }
     },
 
     // -------------------------------------------------------------------------
