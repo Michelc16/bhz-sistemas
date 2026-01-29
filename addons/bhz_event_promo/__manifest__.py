@@ -27,9 +27,12 @@
             "bhz_event_promo/static/src/js/guiabh_announced_events.js",
             "bhz_event_promo/static/src/js/guiabh_featured_carousel.js",
         ],
-        "website.assets_editor": [
-            "bhz_event_promo/static/src/website_builder/**/*",
-        ],
+        # IMPORTANT:
+        # Do not load website_builder (Owl/HTML builder) option hooks here.
+        # They caused JS module dependency failures in some Odoo.sh builds,
+        # which prevented our frontend JS from loading (breaking autoplay and
+        # auto-refresh). We keep the carousel behavior entirely in
+        # web.assets_frontend.
     },
     "installable": True,
     "application": False,
