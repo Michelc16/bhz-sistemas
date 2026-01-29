@@ -1,276 +1,154 @@
 /** @odoo-module **/
 
-// Server-side renders slides/indicators; this widget refreshes the feed
-// on page load and (re)initializes Bootstrap Carousel safely.
-import publicWidget from "@web/legacy/js/public/public_widget";
-import { rpc } from "@web/core/network/rpc";
+import publicWidget from '@web/legacy/js/public/public_widget';
+import { rpc } from '@web/core/network/rpc';
 
 publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
-    selector: ".js-bhz-featured-carousel",
+    selector: '.guiabh-featured-carousel',
     disabledInEditableMode: false,
 
     async start() {
-        await this._super(...arguments);
         this.sectionEl = this.el.closest(".s_guiabh_featured_carousel");
-        this.interval = this._readInterval();
-        this.autoplay = this._readAutoplay();
+        this.carouselInner = this.el.querySelector(".carousel-inner");
+        this.indicatorsWrapper = this.el.querySelector(".carousel-indicators");
         this.prevButton = this.el.querySelector(".carousel-control-prev");
         this.nextButton = this.el.querySelector(".carousel-control-next");
-        this._boundPrev = (ev) => this._onPrevClick(ev);
-        this._boundNext = (ev) => this._onNextClick(ev);
-        await this._refreshContent();
-        this._bindNav();
-        this._ensureActives();
-        this._initCarousel();
-        this._scheduleRefresh();
-        return this;
+        this.emptyMessage = this.el.parentElement.querySelector(".js-guiabh-featured-empty");
+        this.limit = parseInt(this.sectionEl?.dataset.limit || "12", 10);
+        this.interval = this._readInterval();
+        this.items = [];
+        this.indicators = [];
+        this._intervalListener = (ev) => {
+            const newVal = parseInt(ev.detail?.interval, 10);
+            if (Number.isNaN(newVal)) {
+                return;
+            }
+            this.interval = newVal;
+            this.el.dataset.interval = newVal;
+            this.el.dataset.bsInterval = newVal;
+            this._applyIntervalToInstance();
+        };
+        this.el.addEventListener("guiabh-featured-interval-update", this._intervalListener);
+        await Promise.all([this._fetchSlides(), this._super(...arguments)]);
     },
 
-    async _refreshContent() {
-        // Pull latest featured events to avoid stale slides persisted in the page arch.
-        if (!this.el || !this.sectionEl || !this.el.isConnected) {
-            return;
-        }
-        if (this._isEditor()) {
-            return;
-        }
-        const limit = this._readLimit();
-        const carouselId = this.el.id || this.sectionEl.id || undefined;
-        const inner = this.el.querySelector(".js-bhz-featured-inner");
-        const indicatorsWrapper = this.el.querySelector(".js-bhz-featured-indicators");
-        const emptyEl = this.sectionEl.querySelector(
-            ".js-bhz-featured-empty, .js-guiabh-featured-empty"
-        );
-
+    async _fetchSlides() {
+        const params = { limit: this.limit, carousel_id: this.el.id };
         try {
-            const payload = await rpc("/_bhz_event_promo/featured", {
-                limit,
-                carousel_id: carouselId,
-            });
-
-            if (this.isDestroyed || !payload) {
+            const payload = await rpc("/bhz_event_promo/snippet/featured_events", params);
+            if (!payload || this.isDestroyed) {
                 return;
             }
-
-            if (payload.config) {
-                this.autoplay = payload.config.autoplay;
-                this.interval = payload.config.interval_ms || this.interval;
-                this.sectionEl.dataset.interval = this.interval;
-                this.sectionEl.dataset.bhzAutoplay = String(this.autoplay);
-                this.sectionEl.dataset.bhzRefreshMs = payload.config.refresh_ms || this.sectionEl.dataset.bhzRefreshMs;
-                this._scheduleRefresh();
-            }
-
-            const signature = JSON.stringify({
-                items: payload.items_html,
-                indicators: payload.indicators_html,
-                has_events: payload.has_events,
-                autoplay: this.autoplay,
-                interval: this.interval,
-                refresh: this._readRefreshMs(),
-            });
-            const unchanged = signature === this._lastPayloadSignature;
-            this._lastPayloadSignature = signature;
-
-            if (unchanged) {
-                // No DOM mutation needed; make sure carousel stays alive.
-                this._ensureActives();
-                this._initCarousel();
-                return;
-            }
-
-            // Dispose before DOM mutations to avoid dangling bootstrap instances.
-            this._disposeCarousel();
-
-            if (inner && typeof payload.items_html === "string") {
-                inner.innerHTML = payload.items_html;
-            }
-            if (indicatorsWrapper) {
-                if (payload.has_multiple && typeof payload.indicators_html === "string") {
-                    indicatorsWrapper.innerHTML = payload.indicators_html;
-                    indicatorsWrapper.classList.toggle("d-none", false);
-                } else {
-                    indicatorsWrapper.innerHTML = "";
-                    indicatorsWrapper.classList.add("d-none");
-                }
-            }
-            if (emptyEl) {
-                emptyEl.classList.toggle("d-none", !!payload.has_events);
-            }
-        } catch (_err) {
-            // Fail silently on public pages; fallback DOM remains visible.
-        }
-        this._ensureActives();
-        this._initCarousel();
-    },
-
-    _disposeCarousel() {
-        const existing = window.bootstrap?.Carousel?.getInstance?.(this.el);
-        if (existing) {
-            existing.dispose();
-        }
-        this._bootstrapCarousel = null;
-    },
-
-    _ensureActives() {
-        const items = this.el.querySelectorAll(".carousel-item");
-        if (items.length && !this.el.querySelector(".carousel-item.active")) {
-            items[0].classList.add("active");
-        }
-        const indicatorsWrapper = this.el.querySelector(".js-bhz-featured-indicators");
-        const indicators = indicatorsWrapper ? indicatorsWrapper.querySelectorAll("button[data-bs-slide-to]") : [];
-        if (indicatorsWrapper && indicators.length && !indicatorsWrapper.querySelector(".active")) {
-            const first = indicatorsWrapper.querySelector('button[data-bs-slide-to="0"]') || indicators[0];
-            first.classList.add("active");
-            first.setAttribute("aria-current", "true");
+            this._applyPayload(payload);
+        } catch (err) {
+            console.error("Failed to load featured events", err);
         }
     },
 
-    _initCarousel() {
-        if (this._isEditor()) {
+    _applyPayload({ slides, indicators, has_events, has_multiple }) {
+        if (this.carouselInner && typeof slides === "string") {
+            this.carouselInner.innerHTML = slides;
+        }
+        if (this.indicatorsWrapper && typeof indicators === "string") {
+            this.indicatorsWrapper.innerHTML = indicators;
+        }
+        this.carouselInner = this.el.querySelector(".carousel-inner");
+        this.indicatorsWrapper = this.el.querySelector(".carousel-indicators");
+        this.prevButton = this.el.querySelector(".carousel-control-prev");
+        this.nextButton = this.el.querySelector(".carousel-control-next");
+        this.items = Array.from(this.carouselInner?.querySelectorAll(".carousel-item") || []);
+        this.indicators = Array.from(this.indicatorsWrapper?.querySelectorAll("button[data-bs-slide-to]") || []);
+        if (this.items.length) {
+            const hasActiveSlide = this.items.some((item) => item.classList.contains("active"));
+            if (!hasActiveSlide) {
+                this.items[0].classList.add("active");
+            }
+        }
+        if (this.indicators.length) {
+            const hasActiveIndicator = this.indicators.some((item) => item.classList.contains("active"));
+            if (!hasActiveIndicator) {
+                this.indicators[0].classList.add("active");
+            }
+        }
+
+        const hasEvents = this.items.length > 0;
+        const hasMultipleActive = this.items.length > 1 && this.indicators.length >= this.items.length;
+        if (this.emptyMessage) {
+            this.emptyMessage.classList.toggle("d-none", hasEvents);
+        }
+        this.indicatorsWrapper?.classList.toggle("d-none", !hasMultipleActive);
+        this.prevButton?.classList.toggle("d-none", !hasMultipleActive);
+        this.nextButton?.classList.toggle("d-none", !hasMultipleActive);
+        this._refreshCarousel(hasMultipleActive);
+        this._applyIntervalToInstance();
+        this._notifyContentChanged();
+    },
+
+    _refreshCarousel(has_multiple) {
+        if (this._bootstrapCarousel) {
+            this._bootstrapCarousel.dispose();
+            this._bootstrapCarousel = null;
+        }
+        if (!has_multiple || !this.items.length) {
             return;
         }
-        const items = this.el.querySelectorAll(".carousel-item");
-        const indicatorsWrapper = this.el.querySelector(".js-bhz-featured-indicators");
-        const indicators = indicatorsWrapper ? indicatorsWrapper.querySelectorAll("button[data-bs-slide-to]") : [];
-        if (!items.length || !window.bootstrap?.Carousel) {
+        if (has_multiple && this.indicators.length < this.items.length) {
+            console.warn("Carousel indicators mismatch slides; skipping bootstrap init");
             return;
         }
-        // Dispose any previous instance to avoid multiple initializations.
-        this._disposeCarousel();
-        // Only autoplay and show controls if more than one slide.
-        const multiple = items.length > 1;
-        this.prevButton?.classList.toggle("d-none", !multiple);
-        this.nextButton?.classList.toggle("d-none", !multiple);
-        if (indicatorsWrapper) {
-            const hasButtons = indicators.length === items.length && multiple;
-            indicatorsWrapper.classList.toggle("d-none", !hasButtons);
-        }
-        if (!multiple) {
+        if (!window.bootstrap?.Carousel) {
             return;
         }
-        // Initialize Bootstrap Carousel manually.
+        const interval = has_multiple ? this.interval : false;
         this._bootstrapCarousel = new window.bootstrap.Carousel(this.el, {
-            interval: this.autoplay ? this.interval : false,
-            ride: this.autoplay ? "carousel" : false,
-            pause: this.autoplay ? false : true,
-            touch: true,
+            interval,
+            ride: false,
+            pause: "hover",
             wrap: true,
         });
-        if (this.autoplay) {
+        if (!interval) {
+            this._bootstrapCarousel.pause();
+        } else {
             this._bootstrapCarousel.cycle();
         }
     },
 
-    _readLimit() {
-        const raw = (this.sectionEl && this.sectionEl.dataset.limit) || this.el.dataset.limit;
-        const parsed = parseInt(raw || "12", 10);
-        if (Number.isNaN(parsed)) {
-            return 12;
+    _applyIntervalToInstance() {
+        if (!this._bootstrapCarousel) {
+            return;
         }
-        return Math.min(Math.max(parsed, 1), 24);
+        if (!this.items.length || this.items.length <= 1 || this.interval <= 0) {
+            this._bootstrapCarousel._config.interval = false;
+            this._bootstrapCarousel.pause();
+        } else {
+            this._bootstrapCarousel._config.interval = this.interval;
+            this._bootstrapCarousel.cycle();
+        }
+    },
+
+    _notifyContentChanged() {
+        this.el.dispatchEvent(new CustomEvent("content_changed", { bubbles: true }));
     },
 
     _readInterval() {
-        const raw = (this.sectionEl && this.sectionEl.dataset.interval) || this.el.dataset.interval || this.el.dataset.bsInterval || "5000";
-        const parsed = parseInt(raw, 10);
+        const attr =
+            (this.sectionEl && this.sectionEl.dataset.interval) ||
+            this.el.dataset.interval ||
+            "5000";
+        const parsed = parseInt(attr, 10);
         const interval = Number.isNaN(parsed) ? 5000 : parsed;
         this.el.dataset.interval = interval;
         this.el.dataset.bsInterval = interval;
         return interval;
     },
 
-    _readAutoplay() {
-        const raw = (this.sectionEl && this.sectionEl.dataset.bhzAutoplay) || this.el.dataset.bhzAutoplay;
-        if (raw === undefined || raw === null || raw === "") {
-            return true;
-        }
-        return String(raw).toLowerCase() !== "false";
-    },
-
-    _readRefreshMs() {
-        const raw = (this.sectionEl && this.sectionEl.dataset.bhzRefreshMs) || this.el.dataset.bhzRefreshMs;
-        const parsed = parseInt(raw || "0", 10);
-        if (Number.isNaN(parsed) || parsed < 0) {
-            return 0;
-        }
-        return parsed;
-    },
-
-    _scheduleRefresh() {
-        if (this._isEditor()) {
-            return;
-        }
-        const refreshMs = this._readRefreshMs();
-        clearInterval(this._refreshTimer);
-        this._refreshTimer = null;
-        if (!refreshMs) {
-            return;
-        }
-        this._refreshTimer = setInterval(() => {
-            if (!document.body.contains(this.el)) {
-                clearInterval(this._refreshTimer);
-                this._refreshTimer = null;
-                return;
-            }
-            this._refreshContent();
-        }, refreshMs);
-    },
-
-    _isEditor() {
-        const body = document.body;
-        const html = document.documentElement;
-        const editClassHints = [
-            "editor_enable",
-            "o_web_editor",
-            "o_website_editor",
-            "o_edit_mode",
-            "o_we_edit_mode",
-            "o_editable_mode",
-            "o_builder_edit_mode",
-            "o_editable",
-        ];
-        const hasEditorClass = editClassHints.some(
-            (cls) => body?.classList?.contains(cls) || html?.classList?.contains(cls)
-        );
-        const hasManipulator =
-            !!document.getElementById("oe_manipulators") ||
-            !!document.querySelector(".o_web_editor, .o_we_website_top_actions");
-        const hasEditableAncestor = !!this.el?.closest(
-            ".o_editable, .oe_editable, .oe_structure, [contenteditable='true']"
-        );
-        return this.editableMode || hasEditorClass || hasManipulator || hasEditableAncestor;
-    },
-
     destroy() {
-        if (this._refreshTimer) {
-            clearInterval(this._refreshTimer);
-            this._refreshTimer = null;
+        if (this._bootstrapCarousel) {
+            this._bootstrapCarousel.dispose();
         }
-        this._disposeCarousel();
-        this._unbindNav();
+        if (this._intervalListener) {
+            this.el.removeEventListener("guiabh-featured-interval-update", this._intervalListener);
+        }
         return this._super(...arguments);
-    },
-
-    _bindNav() {
-        this.prevButton?.addEventListener("click", this._boundPrev);
-        this.nextButton?.addEventListener("click", this._boundNext);
-    },
-
-    _unbindNav() {
-        this.prevButton?.removeEventListener("click", this._boundPrev);
-        this.nextButton?.removeEventListener("click", this._boundNext);
-    },
-
-    _onPrevClick(ev) {
-        ev?.preventDefault?.();
-        ev?.stopPropagation?.();
-        this._bootstrapCarousel?.prev();
-    },
-
-    _onNextClick(ev) {
-        ev?.preventDefault?.();
-        ev?.stopPropagation?.();
-        this._bootstrapCarousel?.next();
     },
 });
