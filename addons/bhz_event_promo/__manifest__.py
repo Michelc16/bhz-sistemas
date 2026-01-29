@@ -25,7 +25,6 @@
         "web.assets_frontend": [
             "bhz_event_promo/static/src/scss/guiabh_event.scss",
             "bhz_event_promo/static/src/js/guiabh_announced_events.js",
-            "bhz_event_promo/static/src/js/guiabh_featured_carousel.js",
         ],
         "website.assets_editor": [
             "bhz_event_promo/static/src/website_builder/**/*",
