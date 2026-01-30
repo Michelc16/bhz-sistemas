@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <!-- Ações -->
+    <record id="action_guiabh_region" model="ir.actions.act_window">
+        <field name="name">Regiões</field>
+        <field name="res_model">guiabh.region</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_guiabh_event_category" model="ir.actions.act_window">
+        <field name="name">Categorias de Eventos</field>
+        <field name="res_model">guiabh.event.category</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_guiabh_place_type" model="ir.actions.act_window">
+        <field name="name">Tipos de Lugar</field>
+        <field name="res_model">guiabh.place.type</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_guiabh_tag" model="ir.actions.act_window">
+        <field name="name">Tags</field>
+        <field name="res_model">guiabh.tag</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Menus -->
+    <menuitem id="menu_guiabh_taxonomies" name="Taxonomias" parent="menu_guiabh_root" sequence="20"/>
+    <menuitem id="menu_guiabh_regions" name="Regiões" parent="menu_guiabh_taxonomies" action="action_guiabh_region" sequence="10"/>
+    <menuitem id="menu_guiabh_categories" name="Categorias de Eventos" parent="menu_guiabh_taxonomies" action="action_guiabh_event_category" sequence="20"/>
+    <menuitem id="menu_guiabh_place_types" name="Tipos de Lugar" parent="menu_guiabh_taxonomies" action="action_guiabh_place_type" sequence="30"/>
+    <menuitem id="menu_guiabh_tags" name="Tags" parent="menu_guiabh_taxonomies" action="action_guiabh_tag" sequence="40"/>
+
+    <!-- Views -->
+    <record id="view_guiabh_region_tree" model="ir.ui.view">
+        <field name="name">guiabh.region.tree</field>
+        <field name="model">guiabh.region</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="active"/>
+                <field name="website_id"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_guiabh_region_form" model="ir.ui.view">
+        <field name="name">guiabh.region.form</field>
+        <field name="model">guiabh.region</field>
+        <field name="arch" type="xml">
+            <form string="Região">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="active"/>
+                        <field name="website_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_guiabh_event_category_tree" model="ir.ui.view">
+        <field name="name">guiabh.event.category.tree</field>
+        <field name="model">guiabh.event.category</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="active"/>
+                <field name="website_id"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_guiabh_event_category_form" model="ir.ui.view">
+        <field name="name">guiabh.event.category.form</field>
+        <field name="model">guiabh.event.category</field>
+        <field name="arch" type="xml">
+            <form string="Categoria de Evento">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="active"/>
+                        <field name="website_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_guiabh_place_type_tree" model="ir.ui.view">
+        <field name="name">guiabh.place.type.tree</field>
+        <field name="model">guiabh.place.type</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="active"/>
+                <field name="website_id"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_guiabh_place_type_form" model="ir.ui.view">
+        <field name="name">guiabh.place.type.form</field>
+        <field name="model">guiabh.place.type</field>
+        <field name="arch" type="xml">
+            <form string="Tipo de Lugar">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="active"/>
+                        <field name="website_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_guiabh_tag_tree" model="ir.ui.view">
+        <field name="name">guiabh.tag.tree</field>
+        <field name="model">guiabh.tag</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="active"/>
+                <field name="website_id"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_guiabh_tag_form" model="ir.ui.view">
+        <field name="name">guiabh.tag.form</field>
+        <field name="model">guiabh.tag</field>
+        <field name="arch" type="xml">
+            <form string="Tag">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="active"/>
+                        <field name="website_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+  </data>
+</odoo>

@@ -1,0 +1,59 @@
+<odoo>
+  <record id="view_bhz_ai_policy_tree" model="ir.ui.view">
+    <field name="name">bhz.ai.policy.tree</field>
+    <field name="model">bhz.ai.policy</field>
+    <field name="arch" type="xml">
+      <list>
+        <field name="name"/>
+        <field name="active"/>
+        <field name="amount_limit"/>
+        <field name="require_approval_high_risk"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="view_bhz_ai_policy_form" model="ir.ui.view">
+    <field name="name">bhz.ai.policy.form</field>
+    <field name="model">bhz.ai.policy</field>
+    <field name="arch" type="xml">
+      <form>
+        <sheet>
+          <group>
+            <field name="name"/>
+            <field name="active"/>
+          </group>
+
+          <notebook>
+            <page string="Aprovação e Limites">
+              <group>
+                <field name="require_approval_high_risk"/>
+                <field name="require_approval_over_amount"/>
+                <field name="amount_limit"/>
+                <field name="currency_id"/>
+              </group>
+            </page>
+
+            <page string="Internet">
+              <group>
+                <field name="web_allowlist_domains" widget="text"/>
+                <field name="web_block_private_ips"/>
+              </group>
+            </page>
+
+            <page string="Segurança">
+              <group>
+                <field name="forbid_delete"/>
+              </group>
+            </page>
+          </notebook>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_bhz_ai_policy" model="ir.actions.act_window">
+    <field name="name">Policies</field>
+    <field name="res_model">bhz.ai.policy</field>
+    <field name="view_mode">list,form</field>
+  </record>
+</odoo>

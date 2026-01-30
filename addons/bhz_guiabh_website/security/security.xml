@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <record id="rule_guiabh_event_public" model="ir.rule">
+        <field name="name">Eventos publicados (público)</field>
+        <field name="model_id" ref="model_guiabh_event"/>
+        <field name="global" eval="False"/>
+        <field name="groups" eval="[(4, ref('base.group_public')), (4, ref('base.group_portal'))]"/>
+        <field name="domain_force">[("website_published", "=", True)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_guiabh_place_public" model="ir.rule">
+        <field name="name">Lugares publicados (público)</field>
+        <field name="model_id" ref="model_guiabh_place"/>
+        <field name="global" eval="False"/>
+        <field name="groups" eval="[(4, ref('base.group_public')), (4, ref('base.group_portal'))]"/>
+        <field name="domain_force">[("website_published", "=", True)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_guiabh_taxonomies_public" model="ir.rule">
+        <field name="name">Taxonomias ativas (público)</field>
+        <field name="model_id" ref="model_guiabh_region"/>
+        <field name="global" eval="False"/>
+        <field name="groups" eval="[(4, ref('base.group_public')), (4, ref('base.group_portal'))]"/>
+        <field name="domain_force">[("active", "=", True)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_guiabh_event_category_public" model="ir.rule">
+        <field name="name">Categorias de evento ativas (público)</field>
+        <field name="model_id" ref="model_guiabh_event_category"/>
+        <field name="global" eval="False"/>
+        <field name="groups" eval="[(4, ref('base.group_public')), (4, ref('base.group_portal'))]"/>
+        <field name="domain_force">[("active", "=", True)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_guiabh_place_type_public" model="ir.rule">
+        <field name="name">Tipos de lugar ativos (público)</field>
+        <field name="model_id" ref="model_guiabh_place_type"/>
+        <field name="global" eval="False"/>
+        <field name="groups" eval="[(4, ref('base.group_public')), (4, ref('base.group_portal'))]"/>
+        <field name="domain_force">[("active", "=", True)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_guiabh_tag_public" model="ir.rule">
+        <field name="name">Tags ativas (público)</field>
+        <field name="model_id" ref="model_guiabh_tag"/>
+        <field name="global" eval="False"/>
+        <field name="groups" eval="[(4, ref('base.group_public')), (4, ref('base.group_portal'))]"/>
+        <field name="domain_force">[("active", "=", True)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+  </data>
+</odoo>

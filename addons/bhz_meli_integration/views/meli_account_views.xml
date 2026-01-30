@@ -9,18 +9,29 @@
                             string="Conectar Mercado Livre"
                             type="object"
                             class="btn-primary"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,connected,authorized"/>
                 </header>
                 <sheet>
                     <group>
                         <field name="name"/>
                         <field name="company_id"/>
-                        <field name="state" readonly="1"/>
                     </group>
                     <group string="Dados Mercado Livre">
                         <field name="ml_user_id" readonly="1"/>
                         <field name="site_id" readonly="1"/>
+                        <field name="token_expires_at" readonly="1"/>
+                    </group>
+                    <group string="Sincronização">
+                        <field name="last_sync_orders_at" readonly="1"/>
+                        <field name="last_sync_products_at" readonly="1"/>
+                        <field name="last_error_at" readonly="1"/>
+                        <field name="last_error" readonly="1" widget="text"/>
+                    </group>
+                    <group string="Tokens (admin)" groups="base.group_system">
                         <field name="access_token" readonly="1"/>
                         <field name="refresh_token" readonly="1"/>
+                        <field name="authorization_code" readonly="1"/>
+                        <field name="auth_state_token" readonly="1"/>
                     </group>
                 </sheet>
             </form>
@@ -35,7 +46,11 @@
                 <field name="name"/>
                 <field name="company_id"/>
                 <field name="ml_user_id"/>
+                <field name="site_id"/>
                 <field name="state"/>
+                <field name="last_sync_orders_at"/>
+                <field name="last_sync_products_at"/>
+                <field name="last_error_at"/>
             </list>
         </field>
     </record>

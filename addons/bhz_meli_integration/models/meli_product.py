@@ -151,13 +151,14 @@ class MeliProduct(models.Model):
             account = account.with_company(company)
 
             try:
-                account.ensure_valid_token()
+                account_ctx.ensure_valid_token()
             except Exception as exc:
                 _logger.error("[ML] Conta %s: falha ao validar token (%s)", account.name, exc)
+                account_ctx._record_error(str(exc))
                 continue
 
-            if not account.ml_user_id:
-                _logger.warning("[ML] Conta %s sem ml_user_id. Pulei importação de itens.", account.name)
+            if not account_ctx.ml_user_id:
+                _logger.warning("[ML] Conta %s sem ml_user_id. Pulei importação de itens.", account_ctx.name)
                 continue
 
             account_imported = 0
@@ -253,9 +254,14 @@ class MeliProduct(models.Model):
             total_updated,
         )
 
+    @api.model
+    def cron_fetch_items(self):
+        """Compatibilidade com o nome antigo do cron."""
+        return self.cron_fetch_products()
+
     def action_manual_sync_products(self):
         """Botão manual para sincronizar anúncios do Mercado Livre."""
-        self.env["meli.product"].sudo().cron_fetch_items()
+        self.env["meli.product"].sudo().cron_fetch_products()
         return {
             "type": "ir.actions.client",
             "tag": "display_notification",

@@ -1,0 +1,444 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <!-- Cartões reutilizáveis -->
+    <template id="guiabh_event_card" name="Cartão Evento">
+      <div class="guiabh-card" itemscope="itemscope" itemtype="https://schema.org/Event">
+        <div class="cover">
+          <img t-att-src="event.cover_image and '/web/image/guiabh.event/%s/cover_image' % event.id or '/bhz_guiabh_website/static/src/img/placeholders/event_placeholder.svg'" loading="lazy" t-att-alt="event.name" itemprop="image"/>
+          <div class="badge" t-if="event.is_featured">Destaque</div>
+        </div>
+        <div class="content">
+          <t t-if="event.start_datetime">
+            <div class="guiabh-meta">
+              <i class="fa fa-calendar"></i>
+              <time itemprop="startDate" t-att-datetime="event.start_datetime" class="text-muted small" t-field="event.start_datetime" t-options="{'widget': 'datetime'}"/>
+            </div>
+          </t>
+          <h3 itemprop="name"><t t-esc="event.name"/></h3>
+          <div class="meta">
+            <span itemprop="location" t-if="event.venue_name"><i class="fa fa-map-marker"/> <t t-esc="event.venue_name"/></span>
+            <span t-if="event.region_id.name" class="text-chip"><t t-esc="event.region_id.name"/></span>
+          </div>
+          <p class="text-muted" itemprop="description"><t t-esc="event.short_description"/></p>
+          <div class="footer">
+            <span class="text-chip" t-if="event.price_type == 'free'">Gratuito</span>
+            <span class="text-chip" t-if="event.price_type == 'paid'"><t t-esc="'A partir de %s%s' % (event.currency_id and event.currency_id.symbol or 'R$', event.min_price or '')"/></span>
+            <a t-att-href="event.website_url or '/eventos/%s' % event.slug" class="btn btn-link">Ver detalhes</a>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <template id="guiabh_place_card" name="Cartão Lugar">
+      <div class="guiabh-card" itemscope="itemscope" itemtype="https://schema.org/Place">
+        <div class="cover">
+          <img t-att-src="place.cover_image and '/web/image/guiabh.place/%s/cover_image' % place.id or '/bhz_guiabh_website/static/src/img/placeholders/place_placeholder.svg'" loading="lazy" t-att-alt="place.name" itemprop="image"/>
+          <div class="badge" t-if="place.is_featured">Popular</div>
+        </div>
+        <div class="content">
+          <div class="guiabh-meta">
+            <i class="fa fa-map-marker" aria-hidden="true"></i>
+            <span itemprop="address"><t t-esc="place.region_id.name or place.address_text"/></span>
+          </div>
+          <h3 itemprop="name"><t t-esc="place.name"/></h3>
+          <p class="text-muted" itemprop="description"><t t-esc="place.short_description"/></p>
+          <div class="meta">
+            <span class="text-chip" t-if="place.place_type_id.name"><t t-esc="place.place_type_id.name"/></span>
+            <span class="text-chip" t-if="place.price_range"><t t-esc="place.price_range"/></span>
+          </div>
+          <div class="footer">
+            <a t-att-href="place.website_url or '/lugares/%s' % place.slug" class="btn btn-link">Saiba mais</a>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <!-- Home -->
+    <template id="guiabh_home" name="GuiaBH Home">
+      <t t-call="website.layout">
+        <t t-set="body_class" t-value="'guia-bh'"/>
+        <t t-set="website_meta_title">GuiaBH - Eventos e Lugares em Belo Horizonte</t>
+        <t t-set="website_meta_description">Encontre eventos, shows, teatros, bares e passeios em BH com uma experiência moderna.</t>
+        <section class="guiabh-hero" aria-label="Busca de eventos e lugares">
+          <div class="guia-container hero-grid">
+            <div>
+              <h1>Descubra agora o que fazer em BH</h1>
+              <p>Eventos imperdíveis, lugares apaixonantes e guias rápidos para planejar sua agenda.</p>
+              <div class="search-box">
+                <form action="/eventos" method="get">
+                  <input type="search" name="q" placeholder="Buscar eventos, artistas ou lugares" aria-label="Buscar"/>
+                  <button type="submit" class="btn btn-primary btn-guiabh">Buscar</button>
+                </form>
+                <div class="hero-chips js-guiabh-chip-filter" data-base-url="/eventos">
+                  <a class="hero-chip js-chip" data-param="when" data-value="today">Hoje</a>
+                  <a class="hero-chip js-chip" data-param="when" data-value="tomorrow">Amanhã</a>
+                  <a class="hero-chip js-chip" data-param="when" data-value="weekend">Fim de semana</a>
+                  <a class="hero-chip js-chip" data-param="free" data-value="1">Gratuitos</a>
+                </div>
+              </div>
+            </div>
+            <div>
+              <img src="/bhz_guiabh_website/static/src/img/placeholders/editorial_placeholder.svg" alt="BH inspiradora" class="img img-fluid" loading="lazy"/>
+            </div>
+          </div>
+        </section>
+
+        <section class="py-5" aria-label="Eventos em destaque">
+          <div class="guia-container">
+            <div class="guiabh-section-title">
+              <h2>Eventos em destaque</h2>
+              <a href="/eventos">Ver tudo</a>
+            </div>
+            <div class="guiabh-carousel">
+              <t t-if="featured_events">
+                <t t-foreach="featured_events" t-as="event">
+                  <t t-call="bhz_guiabh_website.guiabh_event_card"/>
+                </t>
+              </t>
+              <t t-else=""><p>Cadastre eventos para vê-los aqui.</p></t>
+            </div>
+          </div>
+        </section>
+
+        <section class="py-5" aria-label="Próximos eventos">
+          <div class="guia-container">
+            <div class="guiabh-section-title">
+              <h2>Próximos eventos</h2>
+              <a href="/eventos?ordenar=prox">Ordenar por data</a>
+            </div>
+            <div class="guiabh-grid">
+              <t t-foreach="upcoming_events" t-as="event"><t t-call="bhz_guiabh_website.guiabh_event_card"/></t>
+            </div>
+          </div>
+        </section>
+
+        <section class="py-5" aria-label="Onde ir em BH">
+          <div class="guia-container">
+            <div class="guiabh-section-title">
+              <h2>Onde ir em BH</h2>
+              <a href="/lugares">Ver todos os lugares</a>
+            </div>
+            <div class="guiabh-grid">
+              <t t-foreach="featured_places" t-as="place"><t t-call="bhz_guiabh_website.guiabh_place_card"/></t>
+            </div>
+          </div>
+        </section>
+
+        <section class="py-5" aria-label="Guias e editoriais">
+          <div class="guia-container">
+            <div class="guiabh-section-title">
+              <h2>Guias rápidos</h2>
+              <a href="/guias/fim-de-semana">Ver guias</a>
+            </div>
+            <div class="guiabh-grid">
+              <div class="guiabh-card">
+                <div class="cover"><img src="/bhz_guiabh_website/static/src/img/placeholders/editorial_placeholder.svg" alt="Guia do fim de semana" loading="lazy"/></div>
+                <div class="content">
+                  <h3>Guia do fim de semana</h3>
+                  <p class="text-muted">Escolhas rápidas para curtir BH sem pensar muito.</p>
+                  <div class="footer"><a href="/guias/fim-de-semana" class="btn btn-link">Abrir guia</a></div>
+                </div>
+              </div>
+              <div class="guiabh-card">
+                <div class="cover"><img src="/bhz_guiabh_website/static/src/img/placeholders/event_placeholder.svg" alt="Agenda gratuita" loading="lazy"/></div>
+                <div class="content">
+                  <h3>Eventos gratuitos da semana</h3>
+                  <p class="text-muted">Passeios e shows para aproveitar sem gastar.</p>
+                  <div class="footer"><a href="/eventos?free=1" class="btn btn-link">Ver agenda</a></div>
+                </div>
+              </div>
+              <div class="guiabh-card">
+                <div class="cover"><img src="/bhz_guiabh_website/static/src/img/placeholders/place_placeholder.svg" alt="Roteiro de bares" loading="lazy"/></div>
+                <div class="content">
+                  <h3>Roteiro de bares e rooftops</h3>
+                  <p class="text-muted">Seleção de bares com boa carta de drinks.</p>
+                  <div class="footer"><a href="/lugares?tipo=bares" class="btn btn-link">Abrir roteiro</a></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </t>
+    </template>
+
+    <!-- Listagem de eventos -->
+    <template id="guiabh_events" name="Eventos">
+      <t t-call="website.layout">
+        <t t-set="body_class" t-value="'guia-bh'"/>
+        <t t-set="website_meta_title">Eventos em Belo Horizonte</t>
+        <t t-set="website_meta_description">Busque shows, teatros, festas e experiências em Belo Horizonte filtrando por data, região e preço.</t>
+        <section class="py-5" aria-label="Filtros de eventos">
+          <div class="guia-container">
+            <div class="guiabh-section-title">
+              <h2>Eventos</h2>
+              <span class="text-muted"><t t-esc="pager.get('total')"/> resultados</span>
+            </div>
+            <form method="get" class="o_website_form">
+              <div class="row g-2 align-items-center">
+                <div class="col-md-3">
+                  <input type="search" name="q" t-att-value="search_q" class="form-control" placeholder="Buscar" aria-label="Buscar"/>
+                </div>
+                <div class="col-md-2">
+                  <select name="cat" class="form-select" aria-label="Categoria">
+                    <option value="">Categoria</option>
+                    <option t-foreach="categories" t-as="cat" t-att-value="cat.id" t-att-selected="str(current_filters.get('cat')) == str(cat.id)"><t t-esc="cat.name"/></option>
+                  </select>
+                </div>
+                <div class="col-md-2">
+                  <select name="reg" class="form-select" aria-label="Região">
+                    <option value="">Região</option>
+                    <option t-foreach="regions" t-as="reg" t-att-value="reg.id" t-att-selected="str(current_filters.get('reg')) == str(reg.id)"><t t-esc="reg.name"/></option>
+                  </select>
+                </div>
+                <div class="col-md-2">
+                  <select name="when" class="form-select" aria-label="Quando">
+                    <option value="">Quando</option>
+                    <option value="today" t-att-selected="current_filters.get('when') == 'today'">Hoje</option>
+                    <option value="tomorrow" t-att-selected="current_filters.get('when') == 'tomorrow'">Amanhã</option>
+                    <option value="weekend" t-att-selected="current_filters.get('when') == 'weekend'">Fim de semana</option>
+                  </select>
+                </div>
+                <div class="col-md-2 form-check form-switch">
+                  <input class="form-check-input" type="checkbox" role="switch" id="freeCheck" name="free" value="1" t-att-checked="'checked' if current_filters.get('free') else None"/>
+                  <label class="form-check-label" for="freeCheck">Apenas gratuitos</label>
+                </div>
+                <div class="col-md-1">
+                  <button class="btn btn-primary w-100" type="submit">Filtrar</button>
+                </div>
+              </div>
+            </form>
+            <div class="guiabh-chips mt-3">
+              <span class="guiabh-chip chip-ghost">Ordenar</span>
+              <a class="guiabh-chip" t-att-class="'active' if current_filters.get('ordenar') != 'prox' else ''" href="/eventos">Relevância</a>
+              <a class="guiabh-chip" t-att-class="'active' if current_filters.get('ordenar') == 'prox' else ''" href="/eventos?ordenar=prox">Data</a>
+            </div>
+          </div>
+        </section>
+        <section class="pb-5">
+          <div class="guia-container">
+            <div class="guiabh-grid">
+              <t t-if="events">
+                <t t-foreach="events" t-as="event"><t t-call="bhz_guiabh_website.guiabh_event_card"/></t>
+              </t>
+              <t t-else=""><p>Nenhum evento encontrado com estes filtros.</p></t>
+            </div>
+            <t t-call="website.pager"/>
+          </div>
+        </section>
+      </t>
+    </template>
+
+    <!-- Detalhe do evento -->
+    <template id="guiabh_event_detail" name="Evento Detalhe">
+      <t t-call="website.layout">
+        <t t-set="body_class" t-value="'guia-bh'"/>
+        <t t-set="website_meta_title"><t t-esc="event.name"/> | GuiaBH</t>
+        <t t-set="website_meta_description"><t t-esc="event.short_description or 'Evento em Belo Horizonte'"/></t>
+        <t t-set="og_title" t-value="event.name"/>
+        <t t-set="og_description" t-value="event.short_description"/>
+        <t t-set="og_image" t-value="event.cover_image and '/web/image/guiabh.event/%s/cover_image' % event.id"/>
+        <t t-set="json_ld">
+          <script type="application/ld+json">
+            <t t-raw="json.dumps({
+              '@context': 'https://schema.org',
+              '@type': 'Event',
+              'name': event.name,
+              'description': event.short_description,
+              'startDate': event.start_datetime and event.start_datetime.isoformat(),
+              'endDate': event.end_datetime and event.end_datetime.isoformat(),
+              'eventAttendanceMode': 'https://schema.org/OfflineEventAttendanceMode',
+              'location': {'@type': 'Place', 'name': event.venue_name, 'address': event.address_text},
+              'offers': {'@type': 'Offer', 'price': event.min_price or 0, 'priceCurrency': event.currency_id and event.currency_id.name or 'BRL', 'url': event.ticket_url or ''},
+              'image': (request.httprequest.host_url + ('/web/image/guiabh.event/%s/cover_image' % event.id)) if event.cover_image else (request.httprequest.host_url + 'bhz_guiabh_website/static/src/img/placeholders/event_placeholder.svg')
+            })"/>
+          </script>
+        </t>
+        <section class="py-5" aria-label="Detalhe do evento">
+          <div class="guia-container">
+            <div class="row g-4 align-items-start">
+              <div class="col-lg-7">
+                <img class="img img-fluid rounded" t-att-src="event.cover_image and '/web/image/guiabh.event/%s/cover_image' % event.id or '/bhz_guiabh_website/static/src/img/placeholders/event_placeholder.svg'" t-att-alt="event.name" loading="lazy"/>
+              </div>
+              <div class="col-lg-5">
+                <t t-if="event.start_datetime">
+                  <div class="guiabh-meta mb-2">
+                    <i class="fa fa-calendar"></i>
+                    <time t-att-datetime="event.start_datetime" class="text-muted small" t-field="event.start_datetime" t-options="{'widget': 'datetime'}"/>
+                  </div>
+                </t>
+                <h1 class="mb-3"><t t-esc="event.name"/></h1>
+                <p class="text-muted"><t t-esc="event.short_description"/></p>
+                <div class="guiabh-chips">
+                  <span class="guiabh-chip" t-if="event.region_id.name"><i class="fa fa-map-marker"/> <t t-esc="event.region_id.name"/></span>
+                  <span class="guiabh-chip" t-if="event.category_id.name"><i class="fa fa-tag"/> <t t-esc="event.category_id.name"/></span>
+                  <span class="guiabh-chip" t-if="event.price_type == 'free'">Gratuito</span>
+                  <span class="guiabh-chip" t-if="event.price_type == 'paid'"><t t-esc="'A partir de %s%s' % (event.currency_id and event.currency_id.symbol or 'R$', event.min_price or '')"/></span>
+                </div>
+                <div class="my-3">
+                  <strong>Local:</strong> <t t-esc="event.venue_name"/>
+                  <div class="text-muted"><t t-esc="event.address_text"/></div>
+                </div>
+                <div class="d-flex gap-2 mt-3">
+                  <a t-if="event.ticket_url" t-att-href="event.ticket_url" class="btn btn-primary btn-guiabh" target="_blank" rel="noopener">Comprar/saiba mais</a>
+                  <a href="#sobre" class="btn btn-secondary">Detalhes</a>
+                </div>
+              </div>
+            </div>
+            <div class="mt-5" id="sobre"><t t-raw="event.description_html"/></div>
+            <div class="mt-5" t-if="related_events">
+              <div class="guiabh-section-title"><h2>Eventos relacionados</h2></div>
+              <div class="guiabh-grid">
+                <t t-foreach="related_events" t-as="event"><t t-call="bhz_guiabh_website.guiabh_event_card"/></t>
+              </div>
+            </div>
+          </div>
+        </section>
+      </t>
+    </template>
+
+    <!-- Listagem de lugares -->
+    <template id="guiabh_places" name="Lugares">
+      <t t-call="website.layout">
+        <t t-set="body_class" t-value="'guia-bh'"/>
+        <t t-set="website_meta_title">Onde ir em Belo Horizonte</t>
+        <t t-set="website_meta_description">Encontre bares, restaurantes, cafés, baladas e passeios em BH.</t>
+        <section class="py-5" aria-label="Filtros de lugares">
+          <div class="guia-container">
+            <div class="guiabh-section-title">
+              <h2>Lugares</h2>
+              <span class="text-muted"><t t-esc="pager.get('total')"/> resultados</span>
+            </div>
+            <form method="get" class="o_website_form">
+              <div class="row g-2 align-items-center">
+                <div class="col-md-3"><input type="search" class="form-control" placeholder="Buscar" name="q" t-att-value="search_q" aria-label="Buscar"/></div>
+                <div class="col-md-3">
+                  <select name="tipo" class="form-select" aria-label="Tipo de lugar">
+                    <option value="">Tipo</option>
+                    <option t-foreach="place_types" t-as="tipo" t-att-value="tipo.id" t-att-selected="str(current_filters.get('tipo')) == str(tipo.id)"><t t-esc="tipo.name"/></option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <select name="reg" class="form-select" aria-label="Região">
+                    <option value="">Região</option>
+                    <option t-foreach="regions" t-as="reg" t-att-value="reg.id" t-att-selected="str(current_filters.get('reg')) == str(reg.id)"><t t-esc="reg.name"/></option>
+                  </select>
+                </div>
+                <div class="col-md-2"><input type="text" class="form-control" name="tags" placeholder="IDs de tags" t-att-value="current_filters.get('tags') or ''" aria-label="Tags"/></div>
+                <div class="col-md-1"><button class="btn btn-primary w-100" type="submit">Filtrar</button></div>
+              </div>
+            </form>
+          </div>
+        </section>
+        <section class="pb-5">
+          <div class="guia-container">
+            <div class="guiabh-grid">
+              <t t-if="places">
+                <t t-foreach="places" t-as="place"><t t-call="bhz_guiabh_website.guiabh_place_card"/></t>
+              </t>
+              <t t-else=""><p>Nenhum lugar encontrado com estes filtros.</p></t>
+            </div>
+            <t t-call="website.pager"/>
+          </div>
+        </section>
+      </t>
+    </template>
+
+    <!-- Detalhe do lugar -->
+    <template id="guiabh_place_detail" name="Lugar Detalhe">
+      <t t-call="website.layout">
+        <t t-set="body_class" t-value="'guia-bh'"/>
+        <t t-set="website_meta_title"><t t-esc="place.name"/> | Lugares em BH</t>
+        <t t-set="website_meta_description"><t t-esc="place.short_description"/></t>
+        <t t-set="og_title" t-value="place.name"/>
+        <t t-set="og_description" t-value="place.short_description"/>
+        <t t-set="og_image" t-value="place.cover_image and '/web/image/guiabh.place/%s/cover_image' % place.id"/>
+        <t t-set="json_ld">
+          <script type="application/ld+json">
+            <t t-raw="json.dumps({
+              '@context': 'https://schema.org',
+              '@type': 'LocalBusiness',
+              'name': place.name,
+              'description': place.short_description,
+              'image': (request.httprequest.host_url + ('/web/image/guiabh.place/%s/cover_image' % place.id)) if place.cover_image else (request.httprequest.host_url + 'bhz_guiabh_website/static/src/img/placeholders/place_placeholder.svg'),
+              'address': place.address_text,
+              'telephone': place.phone,
+              'priceRange': place.price_range or '$$'
+            })"/>
+          </script>
+        </t>
+        <section class="py-5" aria-label="Detalhe do lugar">
+          <div class="guia-container">
+            <div class="row g-4 align-items-start">
+              <div class="col-lg-7">
+                <img class="img img-fluid rounded" t-att-src="place.cover_image and '/web/image/guiabh.place/%s/cover_image' % place.id or '/bhz_guiabh_website/static/src/img/placeholders/place_placeholder.svg'" t-att-alt="place.name" loading="lazy"/>
+              </div>
+              <div class="col-lg-5">
+                <h1 class="mb-3"><t t-esc="place.name"/></h1>
+                <p class="text-muted"><t t-esc="place.short_description"/></p>
+                <div class="guiabh-chips">
+                  <span class="guiabh-chip" t-if="place.place_type_id.name"><t t-esc="place.place_type_id.name"/></span>
+                  <span class="guiabh-chip" t-if="place.region_id.name"><t t-esc="place.region_id.name"/></span>
+                  <span class="guiabh-chip" t-if="place.price_range"><t t-esc="place.price_range"/></span>
+                </div>
+                <div class="mt-3">
+                  <div><i class="fa fa-map-marker"/> <t t-esc="place.address_text"/></div>
+                  <div t-if="place.phone"><i class="fa fa-phone"/> <t t-esc="place.phone"/></div>
+                  <div t-if="place.instagram"><i class="fa fa-instagram"/> <t t-esc="place.instagram"/></div>
+                  <div t-if="place.website_link"><i class="fa fa-globe"/> <a t-att-href="place.website_link" target="_blank" rel="noopener">Site oficial</a></div>
+                </div>
+              </div>
+            </div>
+            <div class="mt-5"><t t-raw="place.description_html"/></div>
+            <div class="mt-5" t-if="place_events">
+              <div class="guiabh-section-title"><h2>Eventos nesse local</h2></div>
+              <div class="guiabh-grid">
+                <t t-foreach="place_events" t-as="event"><t t-call="bhz_guiabh_website.guiabh_event_card"/></t>
+              </div>
+            </div>
+            <div class="mt-5" t-if="related_places">
+              <div class="guiabh-section-title"><h2>Outros lugares recomendados</h2></div>
+              <div class="guiabh-grid">
+                <t t-foreach="related_places" t-as="place"><t t-call="bhz_guiabh_website.guiabh_place_card"/></t>
+              </div>
+            </div>
+          </div>
+        </section>
+      </t>
+    </template>
+
+    <!-- Guia do fim de semana -->
+    <template id="guiabh_weekend_guide" name="Guia do fim de semana">
+      <t t-call="website.layout">
+        <t t-set="body_class" t-value="'guia-bh'"/>
+        <t t-set="website_meta_title">Guia do fim de semana em BH</t>
+        <t t-set="website_meta_description">Sugestões curadas para curtir o fim de semana em Belo Horizonte.</t>
+        <section class="guiabh-hero" aria-label="Guia do fim de semana">
+          <div class="guia-container">
+            <h1>Fim de semana pronto em minutos</h1>
+            <p>Selecionamos eventos, lugares e rolês ao ar livre para você só apertar play.</p>
+          </div>
+        </section>
+        <section class="py-5">
+          <div class="guia-container">
+            <div class="guiabh-section-title">
+              <h2>Eventos sugeridos</h2>
+              <a href="/eventos?when=weekend">Ver todos</a>
+            </div>
+            <div class="guiabh-grid">
+              <t t-foreach="weekend_events" t-as="event"><t t-call="bhz_guiabh_website.guiabh_event_card"/></t>
+            </div>
+            <div class="mt-5">
+              <div class="guiabh-section-title"><h2>Checklist rápido</h2></div>
+              <ul>
+                <li>Combine com amigos no WhatsApp direto do card do evento.</li>
+                <li>Use os chips de “hoje” e “fim de semana” na home para refinar.</li>
+                <li>Salve seus lugares favoritos para lembrar depois.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </t>
+    </template>
+  </data>
+</odoo>

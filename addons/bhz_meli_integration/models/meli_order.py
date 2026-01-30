@@ -5,6 +5,7 @@ import requests
 import pytz
 
 from odoo import api, fields, models
+from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
@@ -183,6 +184,7 @@ class MeliOrder(models.Model):
         if not account.ml_user_id:
             _logger.warning("[ML] Conta %s sem ml_user_id. Pulei importação de pedidos.", account.name)
             return 0
+        account.ensure_valid_token()
 
         imported = 0
         limit = 50
@@ -329,6 +331,7 @@ class MeliOrder(models.Model):
                 _logger.warning("[ML] Conta %s: %s pedidos importados", account.name, imported)
             except Exception:
                 _logger.exception("[ML] Erro inesperado ao importar pedidos da conta %s", account.name)
+                account_ctx._record_error(str(exc))
 
         _logger.warning("[ML] (CRON) Importação finalizada. Total importado: %s", total_imported)
 
@@ -342,7 +345,13 @@ class MeliOrder(models.Model):
         """
         partner = None
         if meli_order.buyer_email:
-            partner = self.env["res.partner"].search([("email", "=", meli_order.buyer_email)], limit=1)
+            partner = self.env["res.partner"].search(
+                [
+                    ("email", "=", meli_order.buyer_email),
+                    ("company_id", "in", [False, meli_order.company_id.id]),
+                ],
+                limit=1,
+            )
         if not partner:
             partner = self.env["res.partner"].create(
                 {
