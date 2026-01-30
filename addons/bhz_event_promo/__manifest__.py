@@ -16,14 +16,19 @@
         "views/announced_events_snippet.xml",
         "views/featured_carousel_snippet.xml",
         "views/snippets/options.xml",
+        # NOTE: we intentionally do not extend res.config.settings / website.website.
+        # Keeping the module safe to deploy without requiring an immediate upgrade.
         "views/bhz_event_import_views.xml",
     ],
+    # Frontend assets must live in web.assets_frontend so they load on all public pages
+    # (blog, home, landing, etc.). Editor assets remain in website.assets_editor.
     "assets": {
         "web.assets_frontend": [
             "bhz_event_promo/static/src/scss/guiabh_event.scss",
             "bhz_event_promo/static/src/js/guiabh_announced_events.js",
+            "bhz_event_promo/static/src/js/guiabh_featured_carousel.js",
         ],
-        "website.website_builder_assets": [
+        "website.assets_editor": [
             "bhz_event_promo/static/src/website_builder/**/*",
         ],
     },
