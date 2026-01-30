@@ -104,29 +104,19 @@ export class GuiabhAnnouncedEvents extends Interaction {
         return allowed.includes(raw) ? raw : "recent";
     }
 
-    async fetchAndRender() {
+    fetchAndRender() {
         if (this._isWebsiteEditorActive()) {
-            return;
+            // Avoid DOM mutations inside the editor
+            return Promise.resolve();
         }
-        if (!this.gridEl) {
-            return;
-        }
-        this.limit = this._parseLimit(this.el.dataset.limit);
-        this.orderMode = this._getOrderMode();
-        const params = {
-            limit: this.limit,
-            category_ids: this._getCategoryIds(),
-            order_mode: this.orderMode,
-        };
-        try {
-            const result = await rpc("/bhz_event_promo/snippet/announced_events", params);
-            if (this.isDestroyed || !result) {
-                return;
-            }
-            this._updateContent(result);
-        } catch (_err) {
-            // Ignore RPC errors on public pages; snippet already has fallback content.
-        }
+        const params = this._getRpcParams();
+        return rpc("/bhz_event_promo/snippet/announced_events", params)
+            .then((result) => {
+                this._render(result);
+            })
+            .catch(() => {
+                this._render({ html: "", has_items: false });
+            });
     }
 
     _updateContent({ html, has_events }) {
