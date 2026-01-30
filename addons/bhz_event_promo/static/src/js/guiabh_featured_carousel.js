@@ -12,13 +12,21 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
     selector: ".js-bhz-featured-carousel",
 
     async start() {
+        // IMPORTANT (Odoo legacy Class + async):
+        // this._super is only available during the synchronous part of the call.
+        // If we await before calling it, it may be reset and become undefined.
+        const superStart = this._super?.bind(this);
+
         this.sectionEl = this.el.closest(".s_guiabh_featured_carousel") || this.el;
         this.carouselId = this.el.getAttribute("id") || null;
 
         // Disable only in *real* edit mode (avoid false positives like oe_structure).
         if (this._isEditMode()) {
-            return this._super(...arguments);
+            return superStart ? superStart(...arguments) : undefined;
         }
+
+        // Call parent start early (before any await) to avoid "this._super is not a function".
+        const parentResult = superStart ? superStart(...arguments) : undefined;
 
         this._applyAutoplayConfig();
 
@@ -35,16 +43,17 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
             this._refreshTimer = setInterval(() => this._refreshContent(), refreshMs);
         }
 
-        return this._super(...arguments);
+        return parentResult;
     },
 
     destroy() {
+        const superDestroy = this._super?.bind(this);
         if (this._refreshTimer) {
             clearInterval(this._refreshTimer);
             this._refreshTimer = null;
         }
         this._disposeCarousel();
-        return this._super(...arguments);
+        return superDestroy ? superDestroy(...arguments) : undefined;
     },
 
     // -------------------------------------------------------------------------
@@ -52,14 +61,28 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
     // -------------------------------------------------------------------------
 
     _isEditMode() {
+        // We must be VERY conservative here: mutating the snippet DOM while the
+        // website editor (Owl) is active can crash the editor with:
+        //   "removeChild ... node is not a child of this node".
         const b = document.body;
-        if (!b) return false;
-        // Markers used by Odoo website editor across versions
-        return (
-            b.classList.contains("editor_enable") ||
-            b.classList.contains("o_is_editing") ||
-            b.classList.contains("o_we_editing") ||
-            b.classList.contains("o_website_edit_mode")
+        const h = document.documentElement;
+
+        const classMarkers = [
+            "editor_enable",
+            "o_is_editing",
+            "o_we_editing",
+            "o_website_edit_mode",
+            "o_we_preview", // sometimes used during builder transitions
+        ];
+
+        const hasMarker = (el) =>
+            !!el && classMarkers.some((c) => el.classList && el.classList.contains(c));
+
+        if (hasMarker(b) || hasMarker(h)) return true;
+
+        // Fallback: detect builder UI nodes (covers cases where classes are not yet applied).
+        return !!document.querySelector(
+            ".o_we_toolbar, .o_we_sidebar, .o_website_editor, .o_we_customize_panel, .o_we_dialog"
         );
     },
 
