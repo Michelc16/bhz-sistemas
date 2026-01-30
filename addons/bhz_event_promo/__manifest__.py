@@ -1,6 +1,6 @@
 {
     "name": "GuiaBH - Eventos (Agenda + Terceiros + Botão custom)",
-    "version": "19.0.1.0.0",
+    "version": "19.0.1.0.1",
     "category": "Website",
     "summary": "Agenda de eventos com suporte a eventos de terceiros, link externo e botão personalizável.",
     "author": "BHZ Sistemas",
@@ -16,16 +16,22 @@
         "views/announced_events_snippet.xml",
         "views/featured_carousel_snippet.xml",
         "views/snippets/options.xml",
+        "views/res_config_settings_view.xml",
         "views/bhz_event_import_views.xml",
     ],
+    # Frontend assets must live in web.assets_frontend so they load on all public pages
+    # (blog, home, landing, etc.). Editor assets remain in website.assets_editor.
     "assets": {
         "web.assets_frontend": [
             "bhz_event_promo/static/src/scss/guiabh_event.scss",
             "bhz_event_promo/static/src/js/guiabh_announced_events.js",
+            "bhz_event_promo/static/src/js/guiabh_featured_carousel.js",
         ],
-        "website.website_builder_assets": [
-            "bhz_event_promo/static/src/website_builder/**/*",
-        ],
+        # Keep editor bundle clean: custom editor widgets/templates were causing
+        # Owl lifecycle crashes when not all dependencies were present.
+        # The featured carousel is configured via data-* attributes and works
+        # without editor-side JS.
+        "website.assets_editor": [],
     },
     "installable": True,
     "application": False,
