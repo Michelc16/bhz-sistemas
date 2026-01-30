@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="bhz_event_promo.GuiabhFeaturedCarouselOwl" owl="1">
+        <t t-if="props.innerEl">
+            <t t-portal="props.innerEl">
+                <t t-raw="state.items_html"/>
+            </t>
+        </t>
+        <t t-if="props.indicatorsEl">
+            <t t-portal="props.indicatorsEl">
+                <t t-raw="state.indicators_html"/>
+            </t>
+        </t>
+    </t>
+</templates>
