@@ -23,6 +23,11 @@ function _toBool(value, fallback) {
  * with: "removeChild: The node to be removed is not a child of this node."
  */
 function isWebsiteEditor() {
+    // In the website builder the page is loaded inside an iframe.
+    // Treat any iframe execution as editor context.
+    if (window.top !== window) {
+        return true;
+    }
     const loc = window.location;
     if (loc && loc.search && loc.search.includes("enable_editor=1")) return true;
     const body = document.body;
@@ -65,39 +70,12 @@ function isWebsiteEditor() {
     return false;
 }
 
-
-// Remove DOM artifacts injected by browser auto-translate (e.g. nested <font> tags).
-// These artifacts can break the website editor (Owl removeChild errors) because they
-// change the DOM unexpectedly while the builder is patching.
-function cleanupTranslateArtifacts(rootEl) {
-    if (!rootEl) return;
-    const fonts = rootEl.querySelectorAll("font[dir], font[style]");
-    fonts.forEach((fontEl) => {
-        // unwrap font tag: move its children before and remove it
-        const parent = fontEl.parentNode;
-        if (!parent) return;
-        while (fontEl.firstChild) {
-            parent.insertBefore(fontEl.firstChild, fontEl);
-        }
-        parent.removeChild(fontEl);
-    });
-}
-
 function ensureActiveSlide(innerEl) {
     if (!innerEl) return;
     const items = innerEl.querySelectorAll(".carousel-item");
     if (!items.length) return;
     if ([...items].some((el) => el.classList.contains("active"))) return;
     items[0].classList.add("active");
-}
-
-
-function safeReplaceHtml(el, html) {
-    if (!el) return;
-    const tpl = document.createElement("template");
-    tpl.innerHTML = html || "";
-    // Atomic replacement reduces DOM churn and prevents editor patch conflicts.
-    el.replaceChildren(...tpl.content.childNodes);
 }
 
 function setVisibility({ hasEvents, hasMultiple, prevBtn, nextBtn, indicatorsEl, emptyEl }) {
@@ -172,7 +150,7 @@ function startAutoplay({ carouselEl, intervalMs, hasMultiple }) {
 publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
     selector: ".s_guiabh_featured_carousel",
     // This is the key to stop running inside the website editor
-    disabledInEditableMode: false,
+    disabledInEditableMode: true,
 
     start() {
         this._superStart = this._super.bind(this);
@@ -182,10 +160,8 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         // Always call super synchronously
         const superRes = this._superStart();
 
-        // In the website editor, we avoid automatic DOM mutations (can break the builder),
-        // but we provide a manual "refresh preview" button so the user doesn't need to delete/re-add the snippet.
+        // Extra safety: do not run in editor at all
         if (isWebsiteEditor()) {
-            this._setupEditorPreview();
             return superRes;
         }
 
@@ -209,54 +185,7 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         }
     },
 
-    _setupEditorPreview() {
-        // In Website Builder, avoid background timers/autoplay and only refresh when user clicks.
-        const sectionEl = this.el;
-        const carouselEl = sectionEl.querySelector(".js-bhz-featured-carousel");
-        const innerEl = sectionEl.querySelector(".js-bhz-featured-inner");
-        const indicatorsEl = sectionEl.querySelector(".js-bhz-featured-indicators");
-        const emptyEl = sectionEl.querySelector(".js-bhz-featured-empty");
-        const prevBtn = sectionEl.querySelector(".carousel-control-prev");
-        const nextBtn = sectionEl.querySelector(".carousel-control-next");
-        const refreshBtn = sectionEl.querySelector(".js-bhz-featured-refresh");
-
-        if (!carouselEl || !innerEl) return;
-
-        // Prevent browser translate artifacts from being serialized into the page arch.
-        // Do it on next frame so the editor finishes initial patching first.
-        window.requestAnimationFrame(() => {
-            try { cleanupTranslateArtifacts(sectionEl); } catch (e) {}
-        });
-
-        const limit = _toInt(sectionEl.dataset.limit, 12);
-        const intervalMs = _toInt(sectionEl.dataset.interval, 5000);
-        const refreshMs = _toInt(sectionEl.dataset.bhzRefreshMs, 0);
-        const autoplay = false; // always false in builder
-
-        this._dom = { sectionEl, carouselEl, innerEl, indicatorsEl, emptyEl, prevBtn, nextBtn, refreshBtn };
-        this._cfg = { limit, intervalMs, refreshMs, autoplay };
-
-        if (refreshBtn) {
-            refreshBtn.addEventListener("click", (ev) => {
-                ev.preventDefault();
-                ev.stopPropagation();
-
-                // Refresh safely: update DOM in one atomic operation to avoid confusing the editor.
-                refreshBtn.disabled = true;
-                refreshBtn.classList.add("disabled");
-
-                Promise.resolve()
-                    .then(() => this._refresh({ force: true, safe: true }))
-                    .catch(() => {})
-                    .finally(() => {
-                        refreshBtn.disabled = false;
-                        refreshBtn.classList.remove("disabled");
-                    });
-            });
-        }
-    },
-
-    _setup() {
+    async _setup() {
         const sectionEl = this.el;
         const carouselEl = sectionEl.querySelector(".js-bhz-featured-carousel");
         const innerEl = sectionEl.querySelector(".js-bhz-featured-inner");
@@ -276,8 +205,7 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         this._dom = { sectionEl, carouselEl, innerEl, indicatorsEl, emptyEl, prevBtn, nextBtn };
         this._cfg = { limit, intervalMs, refreshMs, autoplay };
 
-        return Promise.resolve(this._refresh())
-            .then(() => {
+        await this._refresh();
 
         // Auto refresh
         if (refreshMs && refreshMs > 0) {
@@ -294,44 +222,52 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
                 hasMultiple: !!this._hasMultiple,
             });
         }
-            });
     },
 
-    _refresh(opts = {}) {
-        // Avoid automatic refresh in editor unless explicitly forced (preview button)
-        if (isWebsiteEditor() && !opts.force) return Promise.resolve();
+    async _refresh() {
+        // Do not refresh in editor / in case someone toggled
+        if (isWebsiteEditor()) return;
 
-        const { carouselEl, innerEl, indicatorsEl, emptyEl, prevBtn, nextBtn } = this._dom || {};
-        const { limit } = this._cfg || {};
-        if (!carouselEl || !innerEl) return Promise.resolve();
+        const { sectionEl, carouselEl, innerEl, indicatorsEl, emptyEl, prevBtn, nextBtn } = this._dom || {};
+        const { limit, intervalMs, autoplay } = this._cfg || {};
+        if (!carouselEl || !innerEl) return;
 
-        return rpc("/_bhz_event_promo/featured", {
-            limit: limit || 12,
-            carousel_id: carouselEl.getAttribute("id") || null,
-        }).then((payload) => {
-            const itemsHtml = (payload && (payload.items_html || payload.slides)) || "";
-            const indicatorsHtml = (payload && (payload.indicators_html || payload.indicators)) || "";
-            const hasEvents = !!(payload && payload.has_events);
-            const hasMultiple = !!(payload && payload.has_multiple);
-
-            // Update DOM
-            if (opts.safe) { safeReplaceHtml(innerEl, itemsHtml); } else { innerEl.innerHTML = itemsHtml; }
-            if (indicatorsEl) { if (opts.safe) { safeReplaceHtml(indicatorsEl, indicatorsHtml); } else { indicatorsEl.innerHTML = indicatorsHtml; } }
-
-            // Toggle UI
-            this._hasMultiple = hasMultiple;
-            setVisibility({ hasEvents, hasMultiple, prevBtn, nextBtn, indicatorsEl, emptyEl });
-
-            // Ensure first slide active (Bootstrap requirement)
-            const firstItem = innerEl.querySelector(".carousel-item");
-            if (firstItem && !innerEl.querySelector(".carousel-item.active")) {
-                firstItem.classList.add("active");
-            }
-        }).catch(() => {
+        let payload;
+        try {
+            payload = await rpc("/_bhz_event_promo/featured", {
+                limit: limit || 12,
+                carousel_id: carouselEl.getAttribute("id") || null,
+            });
+        } catch (e) {
             // On failure, show empty
             innerEl.innerHTML = "";
             if (indicatorsEl) indicatorsEl.innerHTML = "";
             setVisibility({ hasEvents: false, hasMultiple: false, prevBtn, nextBtn, indicatorsEl, emptyEl });
-        });
+            return;
+        }
+
+        const itemsHtml = payload?.items_html || payload?.slides || "";
+        const indicatorsHtml = payload?.indicators_html || payload?.indicators || "";
+        const hasEvents = !!payload?.has_events;
+        const hasMultiple = !!payload?.has_multiple;
+
+        // IMPORTANT: Only mutate DOM in public mode (we're in public here)
+        innerEl.innerHTML = itemsHtml || "";
+        if (indicatorsEl) indicatorsEl.innerHTML = indicatorsHtml || "";
+
+        ensureActiveSlide(innerEl);
+        setVisibility({ hasEvents, hasMultiple, prevBtn, nextBtn, indicatorsEl, emptyEl });
+
+        this._hasMultiple = hasMultiple;
+
+        // Restart autoplay instance to ensure it cycles with new slides
+        this._autoplayHandle?.stop?.();
+        if (autoplay) {
+            this._autoplayHandle = startAutoplay({
+                carouselEl,
+                intervalMs: intervalMs || 5000,
+                hasMultiple,
+            });
+        }
     },
 });

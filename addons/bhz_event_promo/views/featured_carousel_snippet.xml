@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="s_guiabh_featured_carousel" name="GuiaBH - Carrossel de Destaques">
-        <section class="s_guiabh_featured_carousel oe_snippet_body py-5 notranslate" translate="no"
+        <section class="s_guiabh_featured_carousel oe_snippet_body py-5"
                  data-snippet="bhz_event_promo.s_guiabh_featured_carousel"
                  data-name="GuiaBH - Carrossel de Destaques"
                  data-limit="12"
@@ -9,18 +9,6 @@
                  data-bhz-refresh-ms="60000"
                  data-bhz-autoplay="true">
             <div class="container">
-                <div class="o_edit_only mb-3">
-                    <div class="alert alert-info notranslate py-2 mb-0 d-flex flex-column flex-md-row gap-2 justify-content-between align-items-md-center">
-                        <div>
-                            <strong>Prévia do carrossel</strong>
-                            <span class="ms-1">Clique em “Atualizar prévia” para recarregar os eventos em destaque sem precisar remover o bloco.</span>
-                        </div>
-                        <button type="button" class="btn btn-sm btn-primary js-bhz-featured-refresh" data-bhz-refresh="1">
-                            Atualizar prévia
-                        </button>
-                    </div>
-                </div>
-
                 <t t-set="uniq_raw" t-value="request.env.context.get('snippet_key') or request.env.uid or 0"/>
                 <t t-set="uniq" t-value="''.join([c for c in str(uniq_raw) if c.isalnum()]) or '1'"/>
                 <t t-set="interval" t-value="int(request.env.context.get('interval') or request.env.context.get('data_interval') or 5000)"/>
@@ -29,7 +17,12 @@
                 <div t-att-id="target_id"
                      class="carousel slide guiabh-featured-carousel js-bhz-featured-carousel"
                      data-bs-touch="true" data-bs-interval="5000">
-                    <div class="carousel-inner js-bhz-featured-inner">
+                    <!--
+                        The carousel content is injected dynamically by JS.
+                        Mark as ignored by the website editor to avoid Owl patching issues
+                        when the DOM is updated in the builder.
+                    -->
+                    <div class="carousel-inner js-bhz-featured-inner" data-oe-ignore="true">
                         <!--
                             IMPORTANT:
                             Do NOT render events here server-side.
@@ -39,7 +32,7 @@
                         -->
                     </div>
 
-                    <button class="carousel-control-prev o_not_editable d-none"
+                    <button class="carousel-control-prev o_not_editable d-none" data-oe-ignore="true"
                             type="button"
                             t-att-data-bs-target="'#%s' % target_id"
                             data-bs-slide="prev"
@@ -47,7 +40,7 @@
                         <span class="carousel-control-prev-icon" aria-hidden="true"/>
                         <span class="visually-hidden">Anterior</span>
                     </button>
-                    <button class="carousel-control-next o_not_editable d-none"
+                    <button class="carousel-control-next o_not_editable d-none" data-oe-ignore="true"
                             type="button"
                             t-att-data-bs-target="'#%s' % target_id"
                             data-bs-slide="next"
@@ -56,10 +49,12 @@
                         <span class="visually-hidden">Próximo</span>
                     </button>
                     <div class="carousel-indicators indicators-below js-bhz-featured-indicators o_not_editable d-none"
+                         data-oe-ignore="true"
                          contenteditable="false"/>
                 </div>
 
-                <div class="alert alert-secondary mb-0 text-center js-bhz-featured-empty js-guiabh-featured-empty d-none">
+                <div class="alert alert-secondary mb-0 text-center js-bhz-featured-empty js-guiabh-featured-empty d-none"
+                     data-oe-ignore="true">
                     Nenhum evento em destaque no momento.
                 </div>
             </div>
