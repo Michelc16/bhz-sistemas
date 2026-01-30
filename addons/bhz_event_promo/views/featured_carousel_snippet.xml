@@ -16,9 +16,7 @@
                 <t t-set="target_id" t-value="'guiabhFeaturedCarousel%s' % uniq"/>
                 <div t-att-id="target_id"
                      class="carousel slide guiabh-featured-carousel js-bhz-featured-carousel"
-                     data-bs-touch="true"
-                     data-bs-ride="carousel"
-                     t-att-data-bs-interval="str(interval)">
+                     data-bs-touch="true" data-bs-interval="5000">
                     <div class="carousel-inner js-bhz-featured-inner">
                         <!--
                             IMPORTANT:

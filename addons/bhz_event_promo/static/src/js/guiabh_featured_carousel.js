@@ -3,239 +3,266 @@
 import publicWidget from "@web/legacy/js/public/public_widget";
 import { rpc } from "@web/core/network/rpc";
 
-/**
- * Featured Carousel (GuiaBH)
- *
- * Goals:
- * - Never run inside website editor iframe (prevents Owl DOM patch crashes).
- * - Fetch slides/indicators via JSON-RPC and inject HTML (server renders QWeb).
- * - Start Bootstrap Carousel autoplay reliably.
- *
- * This is intentionally NOT an Owl component to avoid template loading issues
- * and editor lifecycle conflicts.
- */
-
-function toInt(value, fallback) {
+function _toInt(value, fallback) {
     const n = parseInt(value, 10);
     return Number.isNaN(n) ? fallback : n;
 }
 
-function isInWebsiteEditor() {
-    // 1) Explicit query param used by website editor
-    const qs = window.location.search || "";
-    if (qs.includes("enable_editor=1") || qs.includes("edit=1") || qs.includes("website_editor=1")) {
-        return true;
-    }
+function _toBool(value, fallback) {
+    if (value === true || value === false) return value;
+    if (value === undefined || value === null || value === "") return fallback;
+    const s = String(value).toLowerCase().trim();
+    if (["1", "true", "yes", "y", "on"].includes(s)) return true;
+    if (["0", "false", "no", "n", "off"].includes(s)) return false;
+    return fallback;
+}
 
-    // 2) Editor iframe URLs
-    const path = window.location.pathname || "";
-    if (path.startsWith("/website/iframe") || path.startsWith("/website/iframefallback")) {
-        return true;
-    }
-    if (path.startsWith("/website/") && !path.startsWith("/website/page/")) {
-        // Most /website/* routes are editor-related helpers
-        return true;
-    }
-
-    // 3) DOM/body markers inserted by the builder
+/**
+ * Detects Website Builder / Edit mode robustly.
+ * We must NOT touch the DOM inside the editable iframe, otherwise Owl may crash
+ * with: "removeChild: The node to be removed is not a child of this node."
+ */
+function isWebsiteEditor() {
+    const loc = window.location;
+    if (loc && loc.search && loc.search.includes("enable_editor=1")) return true;
     const body = document.body;
     const html = document.documentElement;
-    if (!body || !html) return false;
+    const has = (el, cls) => !!el && el.classList && el.classList.contains(cls);
 
-    const bodyClasses = [
-        "editor_enable",
+    // Common markers
+    const markers = [
         "o_is_editing",
+        "o_we_editing",
+        "o_website_edit_mode",
+        "editor_enable",
         "o_is_editable",
-        "o_we_editor",
-        "o_we_preview",
+        "o_editable",
     ];
-    if (bodyClasses.some((c) => body.classList.contains(c)) || body.getAttribute("contenteditable") === "true") {
-        return true;
-    }
-    const htmlClasses = ["o_is_editable", "o_is_editing"];
-    if (htmlClasses.some((c) => html.classList.contains(c))) {
+    if (markers.some((c) => has(body, c) || has(html, c))) return true;
+
+    // Website builder UI elements
+    if (document.querySelector(".o_we_toolbar, .o_we_sidebar, .o_website_editor, .o_we_customize_panel")) {
         return true;
     }
 
-    // 4) Toolbar/snippets container presence
-    if (document.querySelector(".o_we_website_top_actions, .o_we_toolbar, #oe_snippets, .o_we_sidebar")) {
-        return true;
-    }
-    // 5) If we are inside the website iframe and the parent has the editor toolbar/snippets
+    // When inside iframe, parent often holds the toolbar
     try {
-        if (window.top !== window && window.parent && window.parent.document) {
-            if (window.parent.document.querySelector('.o_we_toolbar, #oe_snippets, .o_we_sidebar, .o_we_website_top_actions')) {
+        if (window.top && window.top !== window) {
+            const pdoc = window.top.document;
+            if (pdoc && pdoc.querySelector(".o_we_toolbar, .o_we_sidebar, .o_website_editor, .o_we_customize_panel")) {
                 return true;
             }
         }
-    } catch (_) {
-        // cross-origin, ignore
+    } catch (e) {
+        // cross-origin? ignore
     }
+
+    // Fallback: editor iframe endpoints
+    if (loc && typeof loc.pathname === "string") {
+        if (loc.pathname.startsWith("/website/")) return true;
+    }
+
     return false;
 }
 
+function ensureActiveSlide(innerEl) {
+    if (!innerEl) return;
+    const items = innerEl.querySelectorAll(".carousel-item");
+    if (!items.length) return;
+    if ([...items].some((el) => el.classList.contains("active"))) return;
+    items[0].classList.add("active");
+}
+
+function setVisibility({ hasEvents, hasMultiple, prevBtn, nextBtn, indicatorsEl, emptyEl }) {
+    if (emptyEl) emptyEl.classList.toggle("d-none", !!hasEvents);
+    if (prevBtn) prevBtn.classList.toggle("d-none", !(hasEvents && hasMultiple));
+    if (nextBtn) nextBtn.classList.toggle("d-none", !(hasEvents && hasMultiple));
+    if (indicatorsEl) indicatorsEl.classList.toggle("d-none", !(hasEvents && hasMultiple));
+}
+
+/**
+ * Bootstrap carousel init + safe fallback if bootstrap is not present.
+ */
+function startAutoplay({ carouselEl, intervalMs, hasMultiple }) {
+    if (!carouselEl || !hasMultiple) return { stop() {} };
+
+    // Prefer bootstrap if available
+    const bs = window.bootstrap;
+    if (bs && bs.Carousel) {
+        // Force correct attributes even if saved as "false" in HTML
+        carouselEl.setAttribute("data-bs-ride", "carousel");
+        carouselEl.setAttribute("data-bs-interval", String(intervalMs));
+
+        let inst = bs.Carousel.getInstance(carouselEl);
+        if (!inst) {
+            inst = new bs.Carousel(carouselEl, {
+                interval: intervalMs,
+                ride: "carousel",
+                pause: false,
+                touch: true,
+                wrap: true,
+            });
+        } else {
+            // update interval if possible
+            try {
+                inst._config.interval = intervalMs;
+            } catch (e) {}
+        }
+        try {
+            inst.cycle();
+        } catch (e) {}
+        return {
+            stop() {
+                try { inst.pause(); } catch (e) {}
+            },
+        };
+    }
+
+    // Fallback: manual slider
+    let timer = window.setInterval(() => {
+        const items = carouselEl.querySelectorAll(".carousel-item");
+        if (!items.length) return;
+        let activeIdx = -1;
+        items.forEach((el, idx) => {
+            if (el.classList.contains("active")) activeIdx = idx;
+        });
+        const nextIdx = activeIdx === -1 ? 0 : (activeIdx + 1) % items.length;
+
+        if (activeIdx >= 0) items[activeIdx].classList.remove("active");
+        items[nextIdx].classList.add("active");
+
+        // indicators
+        const indicators = carouselEl.querySelectorAll(".carousel-indicators [data-bs-slide-to], .carousel-indicators button");
+        if (indicators.length) {
+            indicators.forEach((b) => b.classList.remove("active"));
+            if (indicators[nextIdx]) indicators[nextIdx].classList.add("active");
+        }
+    }, intervalMs);
+
+    return { stop() { window.clearInterval(timer); } };
+}
+
 publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
-    selector: ".js-bhz-featured-carousel",
+    selector: ".s_guiabh_featured_carousel",
+    // This is the key to stop running inside the website editor
+    disabledInEditableMode: true,
 
     start() {
-        // Call parent start synchronously first (important in Odoo legacy widgets)
-        const superPromise = this._super.apply(this, arguments);
+        this._superStart = this._super.bind(this);
+        this._refreshTimer = null;
+        this._autoplayHandle = { stop() {} };
 
-        this._carouselEl = this.el;
-        this._innerEl = this.el.querySelector(".js-bhz-featured-inner");
-        this._indicatorsEl = this.el.querySelector(".js-bhz-featured-indicators");
-        this._emptyEl = this.el.closest("section")?.querySelector(".js-bhz-featured-empty");
+        // Always call super synchronously
+        const superRes = this._superStart();
 
-        // Read options
-        const section = this.el.closest("section");
-        const dataset = section ? section.dataset : {};
-        this._limit = toInt(dataset.limit, 12);
-        this._refreshMs = toInt(dataset.bhzRefreshMs, 60000);
-        this._autoplay = (dataset.bhzAutoplay || "true") !== "false";
-
-        // Bootstrap interval: prefer data-bs-interval on carousel, fallback to data-interval on section
-        const bsInterval = this.el.getAttribute("data-bs-interval");
-        const sectionInterval = dataset.interval;
-        this._interval = toInt(bsInterval || sectionInterval, 5000);
-
-        this._isEditor = isInWebsiteEditor();
-        if (this._isEditor) {
-            // Do NOT fetch/inject or init bootstrap in editor to avoid Owl crashes.
-            return superPromise;
+        // Extra safety: do not run in editor at all
+        if (isWebsiteEditor()) {
+            return superRes;
         }
 
-        // Initial load + optional refresh
-        this._loadAndRender();
-        if (this._refreshMs > 0) {
-            this._refreshTimer = setInterval(() => this._loadAndRender(), this._refreshMs);
-        }
-
-        return superPromise;
+        this._setup();
+        return superRes;
     },
 
     destroy() {
+        try { this._clearTimers(); } catch (e) {}
+        this._super.apply(this, arguments);
+    },
+
+    _clearTimers() {
         if (this._refreshTimer) {
-            clearInterval(this._refreshTimer);
+            window.clearInterval(this._refreshTimer);
             this._refreshTimer = null;
         }
-        this._disposeBootstrap();
-        return this._super.apply(this, arguments);
+        if (this._autoplayHandle) {
+            try { this._autoplayHandle.stop(); } catch (e) {}
+            this._autoplayHandle = { stop() {} };
+        }
     },
 
-    async _loadAndRender() {
-        if (!this._innerEl || !this._indicatorsEl) return;
+    async _setup() {
+        const sectionEl = this.el;
+        const carouselEl = sectionEl.querySelector(".js-bhz-featured-carousel");
+        const innerEl = sectionEl.querySelector(".js-bhz-featured-inner");
+        const indicatorsEl = sectionEl.querySelector(".js-bhz-featured-indicators");
+        const emptyEl = sectionEl.querySelector(".js-bhz-featured-empty");
+        const prevBtn = sectionEl.querySelector(".carousel-control-prev");
+        const nextBtn = sectionEl.querySelector(".carousel-control-next");
 
-        const carouselId = this._carouselEl.getAttribute("id");
-        try {
-            const payload = await rpc("/_bhz_event_promo/featured", {
-                limit: this._limit,
-                carousel_id: carouselId,
+        if (!carouselEl || !innerEl) return;
+
+        const limit = _toInt(sectionEl.dataset.limit, 12);
+        const intervalMs = _toInt(sectionEl.dataset.interval, 5000);
+        const refreshMs = _toInt(sectionEl.dataset.bhzRefreshMs, 60000);
+        const autoplay = _toBool(sectionEl.dataset.bhzAutoplay, true);
+
+        // Store for later
+        this._dom = { sectionEl, carouselEl, innerEl, indicatorsEl, emptyEl, prevBtn, nextBtn };
+        this._cfg = { limit, intervalMs, refreshMs, autoplay };
+
+        await this._refresh();
+
+        // Auto refresh
+        if (refreshMs && refreshMs > 0) {
+            this._refreshTimer = window.setInterval(() => {
+                this._refresh();
+            }, refreshMs);
+        }
+
+        // Autoplay
+        if (autoplay) {
+            this._autoplayHandle = startAutoplay({
+                carouselEl,
+                intervalMs,
+                hasMultiple: !!this._hasMultiple,
             });
-
-            const itemsHtml = (payload && payload.items_html) || "";
-            const indicatorsHtml = (payload && payload.indicators_html) || "";
-
-            // Inject HTML from server-rendered QWeb template
-            this._innerEl.innerHTML = itemsHtml;
-            this._indicatorsEl.innerHTML = indicatorsHtml;
-
-            const hasItems = !!this._innerEl.querySelector(".carousel-item");
-
-            // Toggle empty message + controls
-            this._toggleVisibility(hasItems);
-
-            // (Re)start bootstrap carousel autoplay
-            if (hasItems) {
-                this._restartBootstrap();
-            } else {
-                this._disposeBootstrap();
-            }
-        } catch (err) {
-            // Fail safe: show empty state, don't break page/editor
-            this._toggleVisibility(false);
-            this._disposeBootstrap();
-            // eslint-disable-next-line no-console
-            console.warn("BHZ Featured Carousel: failed to fetch/render", err);
         }
     },
 
-    _toggleVisibility(hasItems) {
-        const section = this.el.closest("section");
+    async _refresh() {
+        // Do not refresh in editor / in case someone toggled
+        if (isWebsiteEditor()) return;
 
-        // controls and indicators are marked o_not_editable + d-none initially
-        const prevBtn = section?.querySelector(".carousel-control-prev");
-        const nextBtn = section?.querySelector(".carousel-control-next");
+        const { sectionEl, carouselEl, innerEl, indicatorsEl, emptyEl, prevBtn, nextBtn } = this._dom || {};
+        const { limit, intervalMs, autoplay } = this._cfg || {};
+        if (!carouselEl || !innerEl) return;
 
-        if (prevBtn) prevBtn.classList.toggle("d-none", !hasItems);
-        if (nextBtn) nextBtn.classList.toggle("d-none", !hasItems);
-        if (this._indicatorsEl) this._indicatorsEl.classList.toggle("d-none", !hasItems);
-        if (this._emptyEl) this._emptyEl.classList.toggle("d-none", hasItems);
-    },
-
-    _disposeBootstrap() {
-        if (this._manualTimer) {
-            clearInterval(this._manualTimer);
-            this._manualTimer = null;
-        }
-        if (this._bsInstance) {
-            try {
-                this._bsInstance.dispose();
-            } catch (_) {
-                // ignore
-            }
-            this._bsInstance = null;
-        }
-    },
-
-    _restartBootstrap() {
-        // Bootstrap is loaded in website frontend; guard anyway.
-        const Bootstrap = window.bootstrap;
-        if (!Bootstrap || !Bootstrap.Carousel) {
-            // Fallback: manual slide rotation if Bootstrap Carousel isn't available.
-            this._disposeBootstrap();
-            if (!this._autoplay) {
-                return;
-            }
-            const items = Array.from(this._innerEl.querySelectorAll('.carousel-item'));
-            if (items.length <= 1) {
-                return;
-            }
-            const activate = (idx) => {
-                items.forEach((el, i) => {
-                    el.classList.toggle('active', i === idx);
-                });
-            };
-            let idx = items.findIndex((el) => el.classList.contains('active'));
-            if (idx < 0) {
-                idx = 0;
-                activate(0);
-            }
-            this._manualTimer = setInterval(() => {
-                idx = (idx + 1) % items.length;
-                activate(idx);
-            }, this._interval);
+        let payload;
+        try {
+            payload = await rpc("/_bhz_event_promo/featured", {
+                limit: limit || 12,
+                carousel_id: carouselEl.getAttribute("id") || null,
+            });
+        } catch (e) {
+            // On failure, show empty
+            innerEl.innerHTML = "";
+            if (indicatorsEl) indicatorsEl.innerHTML = "";
+            setVisibility({ hasEvents: false, hasMultiple: false, prevBtn, nextBtn, indicatorsEl, emptyEl });
             return;
         }
-        this._disposeBootstrap();
 
-        // Ensure required attributes for autoplay
-        this._carouselEl.setAttribute("data-bs-ride", this._autoplay ? "carousel" : "false");
-        this._carouselEl.setAttribute("data-bs-interval", String(this._interval));
+        const itemsHtml = payload?.items_html || payload?.slides || "";
+        const indicatorsHtml = payload?.indicators_html || payload?.indicators || "";
+        const hasEvents = !!payload?.has_events;
+        const hasMultiple = !!payload?.has_multiple;
 
-        // Create instance
-        this._bsInstance = new Bootstrap.Carousel(this._carouselEl, {
-            interval: this._autoplay ? this._interval : false,
-            ride: this._autoplay ? "carousel" : false,
-            pause: "hover",
-            touch: true,
-        });
+        // IMPORTANT: Only mutate DOM in public mode (we're in public here)
+        innerEl.innerHTML = itemsHtml || "";
+        if (indicatorsEl) indicatorsEl.innerHTML = indicatorsHtml || "";
 
-        if (this._autoplay) {
-            try {
-                this._bsInstance.cycle();
-            } catch (_) {
-                // ignore
-            }
+        ensureActiveSlide(innerEl);
+        setVisibility({ hasEvents, hasMultiple, prevBtn, nextBtn, indicatorsEl, emptyEl });
+
+        this._hasMultiple = hasMultiple;
+
+        // Restart autoplay instance to ensure it cycles with new slides
+        this._autoplayHandle?.stop?.();
+        if (autoplay) {
+            this._autoplayHandle = startAutoplay({
+                carouselEl,
+                intervalMs: intervalMs || 5000,
+                hasMultiple,
+            });
         }
     },
 });
