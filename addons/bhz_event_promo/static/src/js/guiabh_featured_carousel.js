@@ -145,7 +145,7 @@ function startAutoplay({ carouselEl, intervalMs, hasMultiple }) {
 publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
     selector: ".s_guiabh_featured_carousel",
     // This is the key to stop running inside the website editor
-    disabledInEditableMode: true,
+    disabledInEditableMode: false,
 
     start() {
         this._superStart = this._super.bind(this);
@@ -155,8 +155,10 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         // Always call super synchronously
         const superRes = this._superStart();
 
-        // Extra safety: do not run in editor at all
+        // In the website editor, we avoid automatic DOM mutations (can break the builder),
+        // but we provide a manual "refresh preview" button so the user doesn't need to delete/re-add the snippet.
         if (isWebsiteEditor()) {
+            this._setupEditorPreview();
             return superRes;
         }
 
@@ -219,9 +221,9 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         }
     },
 
-    async _refresh() {
-        // Do not refresh in editor / in case someone toggled
-        if (isWebsiteEditor()) return;
+    async _refresh(opts = {}) {
+        // Avoid automatic refresh in editor unless explicitly forced (preview button)
+        if (isWebsiteEditor() && !opts.force) return;
 
         const { sectionEl, carouselEl, innerEl, indicatorsEl, emptyEl, prevBtn, nextBtn } = this._dom || {};
         const { limit, intervalMs, autoplay } = this._cfg || {};
