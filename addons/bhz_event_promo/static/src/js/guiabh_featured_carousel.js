@@ -211,6 +211,15 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         const prevBtn = this.el.querySelector(".carousel-control-prev");
         const nextBtn = this.el.querySelector(".carousel-control-next");
 
+
+        // Do not run inside the website editor iframe (it will patch/clone DOM and Owl will crash).
+        // The editor loads /website/iframefallback (and other /website/iframe* routes).
+        const path = window.location && window.location.pathname || "";
+        if (isEditMode() || path.startsWith("/website/iframe")) {
+            return parentResult;
+        }
+
+
         // Mount a tiny Owl app (no DOM manual changes => avoids Owl removeChild crash).
         const mountPoint = document.createElement("div");
         mountPoint.className = "d-none";
