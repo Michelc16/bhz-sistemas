@@ -219,7 +219,7 @@ _setupEditorPreview() {
                 });
         });
     }
-}
+},
 
     _setup() {
         const sectionEl = this.el;
