@@ -299,35 +299,20 @@ class GuiaBHAgendaController(http.Controller):
             "config": self._get_featured_config(),
         }
 
-    def _get_featured_config(self, payload=None):
-        """Return config for the featured carousel.
-
-        IMPORTANT: This module should not depend on SQL columns added to
-        website.website / res.company / res.config.settings. Those columns would
-        require a module upgrade and can break the instance if code is deployed
-        without a successful upgrade.
-
-        Therefore, configuration comes from the snippet payload (data-* attrs)
-        with safe defaults.
-        """
-        payload = payload or {}
-        def _int(v, default):
-            try:
-                return int(v)
-            except (TypeError, ValueError):
-                return default
-
-        def _bool(v, default):
-            if v in (True, False):
-                return bool(v)
-            if isinstance(v, str):
-                return v.lower() in ("1", "true", "yes", "y", "on")
+    def _get_featured_config(self):
+        website = getattr(request, "website", False)
+        company = website.company_id if website else request.env.company
+        def _pick(field_name, default=None):
+            if website and website[field_name] not in (False, None):
+                return website[field_name]
+            if company and company[field_name] not in (False, None):
+                return company[field_name]
             return default
 
         return {
-            "autoplay": _bool(payload.get("autoplay"), True),
-            "interval_ms": _int(payload.get("interval_ms") or payload.get("interval"), 5000),
-            "refresh_ms": _int(payload.get("refresh_ms") or payload.get("refresh"), 0),
+            "autoplay": bool(_pick("bhz_featured_carousel_autoplay", True)),
+            "interval_ms": int(_pick("bhz_featured_carousel_interval_ms", 5000) or 5000),
+            "refresh_ms": int(_pick("bhz_featured_carousel_refresh_ms", 60000) or 0),
         }
 
     def _sanitize_limit(self, limit):
