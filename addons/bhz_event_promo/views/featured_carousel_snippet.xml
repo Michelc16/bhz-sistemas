@@ -57,6 +57,11 @@
                      data-oe-ignore="true">
                     Nenhum evento em destaque no momento.
                 </div>
+
+                <div class="alert alert-info mb-0 text-center js-bhz-featured-editor-hint d-none" data-oe-ignore="true">
+                    (Modo edição) A prévia ao vivo do carrossel é desativada para evitar erros no editor.
+                    Publique/visualize o site para ver os eventos em destaque carregarem automaticamente.
+                </div>
             </div>
         </section>
     </template>
