@@ -150,8 +150,9 @@ class GuiabhFeaturedCarouselRoot extends Component {
     }
 
     _applyVisibility() {
-        const { emptyEl, prevBtn, nextBtn,
-                carouselTarget: this.el?.getAttribute("id") ? ("#" + this.el.getAttribute("id")) : "", indicatorsEl } = this.props;
+        // Keep DOM changes minimal and predictable (do NOT re-parent/replace nodes),
+        // otherwise Owl can crash while patching ("removeChild ... is not a child").
+        const { emptyEl, prevBtn, nextBtn, indicatorsEl } = this.props;
 
         if (emptyEl) emptyEl.classList.toggle("d-none", !!this.state.has_events);
 
