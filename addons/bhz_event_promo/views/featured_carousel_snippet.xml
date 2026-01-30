@@ -17,7 +17,12 @@
                 <div t-att-id="target_id"
                      class="carousel slide guiabh-featured-carousel js-bhz-featured-carousel"
                      data-bs-touch="true" data-bs-interval="5000">
-                    <div class="carousel-inner js-bhz-featured-inner">
+                    <!--
+                        The carousel content is injected dynamically by JS.
+                        Mark as ignored by the website editor to avoid Owl patching issues
+                        when the DOM is updated in the builder.
+                    -->
+                    <div class="carousel-inner js-bhz-featured-inner" data-oe-ignore="true">
                         <!--
                             IMPORTANT:
                             Do NOT render events here server-side.
@@ -27,7 +32,7 @@
                         -->
                     </div>
 
-                    <button class="carousel-control-prev o_not_editable d-none"
+                    <button class="carousel-control-prev o_not_editable d-none" data-oe-ignore="true"
                             type="button"
                             t-att-data-bs-target="'#%s' % target_id"
                             data-bs-slide="prev"
@@ -35,7 +40,7 @@
                         <span class="carousel-control-prev-icon" aria-hidden="true"/>
                         <span class="visually-hidden">Anterior</span>
                     </button>
-                    <button class="carousel-control-next o_not_editable d-none"
+                    <button class="carousel-control-next o_not_editable d-none" data-oe-ignore="true"
                             type="button"
                             t-att-data-bs-target="'#%s' % target_id"
                             data-bs-slide="next"
@@ -44,11 +49,18 @@
                         <span class="visually-hidden">Próximo</span>
                     </button>
                     <div class="carousel-indicators indicators-below js-bhz-featured-indicators o_not_editable d-none"
+                         data-oe-ignore="true"
                          contenteditable="false"/>
                 </div>
 
-                <div class="alert alert-secondary mb-0 text-center js-bhz-featured-empty js-guiabh-featured-empty d-none">
+                <div class="alert alert-secondary mb-0 text-center js-bhz-featured-empty js-guiabh-featured-empty d-none"
+                     data-oe-ignore="true">
                     Nenhum evento em destaque no momento.
+                </div>
+
+                <div class="alert alert-info mb-0 text-center js-bhz-featured-editor-hint d-none" data-oe-ignore="true">
+                    (Modo edição) A prévia ao vivo do carrossel é desativada para evitar erros no editor.
+                    Publique/visualize o site para ver os eventos em destaque carregarem automaticamente.
                 </div>
             </div>
         </section>

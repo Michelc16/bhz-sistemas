@@ -23,44 +23,32 @@ function _toBool(value, fallback) {
  * with: "removeChild: The node to be removed is not a child of this node."
  */
 function isWebsiteEditor() {
+    /**
+     * Detect the *builder edit mode* reliably.
+     *
+     * ⚠️ Do NOT rely on iframe detection: the Website app often embeds the
+     * public website inside an iframe even when you're just browsing (not editing),
+     * which would incorrectly disable the carousel and leave it empty.
+     *
+     * We only consider it "editor" when Odoo explicitly enables the editor.
+     */
     const loc = window.location;
     if (loc && loc.search && loc.search.includes("enable_editor=1")) return true;
+
     const body = document.body;
     const html = document.documentElement;
     const has = (el, cls) => !!el && el.classList && el.classList.contains(cls);
 
-    // Common markers
+    // Common edit-mode markers set on the iframe document
     const markers = [
-        "o_is_editing",
-        "o_we_editing",
-        "o_website_edit_mode",
         "editor_enable",
         "o_is_editable",
         "o_editable",
+        "o_we_editing",
+        "o_is_editing",
+        "o_website_edit_mode",
     ];
     if (markers.some((c) => has(body, c) || has(html, c))) return true;
-
-    // Website builder UI elements
-    if (document.querySelector(".o_we_toolbar, .o_we_sidebar, .o_website_editor, .o_we_customize_panel")) {
-        return true;
-    }
-
-    // When inside iframe, parent often holds the toolbar
-    try {
-        if (window.top && window.top !== window) {
-            const pdoc = window.top.document;
-            if (pdoc && pdoc.querySelector(".o_we_toolbar, .o_we_sidebar, .o_website_editor, .o_we_customize_panel")) {
-                return true;
-            }
-        }
-    } catch (e) {
-        // cross-origin? ignore
-    }
-
-    // Fallback: editor iframe endpoints
-    if (loc && typeof loc.pathname === "string") {
-        if (loc.pathname.startsWith("/website/")) return true;
-    }
 
     return false;
 }
