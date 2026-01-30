@@ -21,20 +21,55 @@ function toInt(value, fallback) {
 }
 
 function isInWebsiteEditor() {
-    // Editor iframe URLs
+    // 1) Explicit query param used by website editor
+    const qs = window.location.search || "";
+    if (qs.includes("enable_editor=1") || qs.includes("edit=1") || qs.includes("website_editor=1")) {
+        return true;
+    }
+
+    // 2) Editor iframe URLs
     const path = window.location.pathname || "";
     if (path.startsWith("/website/iframe") || path.startsWith("/website/iframefallback")) {
         return true;
     }
-    // Body classes usually present when editing
-    const body = document.body;
-    if (!body) return false;
-    if (body.classList.contains("editor_enable") || body.classList.contains("o_is_editing")) {
+    if (path.startsWith("/website/") && !path.startsWith("/website/page/")) {
+        // Most /website/* routes are editor-related helpers
         return true;
     }
-    // Builder assets often add this
-    if (document.querySelector(".o_we_website_top_actions, .o_we_website_editor, .o_we_toolbar")) {
+
+    // 3) DOM/body markers inserted by the builder
+    const body = document.body;
+    const html = document.documentElement;
+    if (!body || !html) return false;
+
+    const bodyClasses = [
+        "editor_enable",
+        "o_is_editing",
+        "o_is_editable",
+        "o_we_editor",
+        "o_we_preview",
+    ];
+    if (bodyClasses.some((c) => body.classList.contains(c)) || body.getAttribute("contenteditable") === "true") {
         return true;
+    }
+    const htmlClasses = ["o_is_editable", "o_is_editing"];
+    if (htmlClasses.some((c) => html.classList.contains(c))) {
+        return true;
+    }
+
+    // 4) Toolbar/snippets container presence
+    if (document.querySelector(".o_we_website_top_actions, .o_we_toolbar, #oe_snippets, .o_we_sidebar")) {
+        return true;
+    }
+    // 5) If we are inside the website iframe and the parent has the editor toolbar/snippets
+    try {
+        if (window.top !== window && window.parent && window.parent.document) {
+            if (window.parent.document.querySelector('.o_we_toolbar, #oe_snippets, .o_we_sidebar, .o_we_website_top_actions')) {
+                return true;
+            }
+        }
+    } catch (_) {
+        // cross-origin, ignore
     }
     return false;
 }
@@ -138,6 +173,10 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
     },
 
     _disposeBootstrap() {
+        if (this._manualTimer) {
+            clearInterval(this._manualTimer);
+            this._manualTimer = null;
+        }
         if (this._bsInstance) {
             try {
                 this._bsInstance.dispose();
@@ -152,6 +191,29 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         // Bootstrap is loaded in website frontend; guard anyway.
         const Bootstrap = window.bootstrap;
         if (!Bootstrap || !Bootstrap.Carousel) {
+            // Fallback: manual slide rotation if Bootstrap Carousel isn't available.
+            this._disposeBootstrap();
+            if (!this._autoplay) {
+                return;
+            }
+            const items = Array.from(this._innerEl.querySelectorAll('.carousel-item'));
+            if (items.length <= 1) {
+                return;
+            }
+            const activate = (idx) => {
+                items.forEach((el, i) => {
+                    el.classList.toggle('active', i === idx);
+                });
+            };
+            let idx = items.findIndex((el) => el.classList.contains('active'));
+            if (idx < 0) {
+                idx = 0;
+                activate(0);
+            }
+            this._manualTimer = setInterval(() => {
+                idx = (idx + 1) % items.length;
+                activate(idx);
+            }, this._interval);
             return;
         }
         this._disposeBootstrap();
