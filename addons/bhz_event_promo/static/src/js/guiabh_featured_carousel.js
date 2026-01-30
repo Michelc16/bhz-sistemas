@@ -209,8 +209,6 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         }
     },
 
-
-,
     _setupEditorPreview() {
         // In Website Builder, avoid background timers/autoplay and only refresh when user clicks.
         const sectionEl = this.el;
@@ -256,7 +254,7 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
                     });
             });
         }
-    }
+    },
 
     _setup() {
         const sectionEl = this.el;
