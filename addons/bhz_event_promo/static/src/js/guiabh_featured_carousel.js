@@ -65,12 +65,39 @@ function isWebsiteEditor() {
     return false;
 }
 
+
+// Remove DOM artifacts injected by browser auto-translate (e.g. nested <font> tags).
+// These artifacts can break the website editor (Owl removeChild errors) because they
+// change the DOM unexpectedly while the builder is patching.
+function cleanupTranslateArtifacts(rootEl) {
+    if (!rootEl) return;
+    const fonts = rootEl.querySelectorAll("font[dir], font[style]");
+    fonts.forEach((fontEl) => {
+        // unwrap font tag: move its children before and remove it
+        const parent = fontEl.parentNode;
+        if (!parent) return;
+        while (fontEl.firstChild) {
+            parent.insertBefore(fontEl.firstChild, fontEl);
+        }
+        parent.removeChild(fontEl);
+    });
+}
+
 function ensureActiveSlide(innerEl) {
     if (!innerEl) return;
     const items = innerEl.querySelectorAll(".carousel-item");
     if (!items.length) return;
     if ([...items].some((el) => el.classList.contains("active"))) return;
     items[0].classList.add("active");
+}
+
+
+function safeReplaceHtml(el, html) {
+    if (!el) return;
+    const tpl = document.createElement("template");
+    tpl.innerHTML = html || "";
+    // Atomic replacement reduces DOM churn and prevents editor patch conflicts.
+    el.replaceChildren(...tpl.content.childNodes);
 }
 
 function setVisibility({ hasEvents, hasMultiple, prevBtn, nextBtn, indicatorsEl, emptyEl }) {
@@ -183,43 +210,53 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
     },
 
 
-_setupEditorPreview() {
-    // In Website Builder, avoid background timers/autoplay and only refresh when user clicks.
-    const sectionEl = this.el;
-    const carouselEl = sectionEl.querySelector(".js-bhz-featured-carousel");
-    const innerEl = sectionEl.querySelector(".js-bhz-featured-inner");
-    const indicatorsEl = sectionEl.querySelector(".js-bhz-featured-indicators");
-    const emptyEl = sectionEl.querySelector(".js-bhz-featured-empty");
-    const prevBtn = sectionEl.querySelector(".carousel-control-prev");
-    const nextBtn = sectionEl.querySelector(".carousel-control-next");
-    const refreshBtn = sectionEl.querySelector(".js-bhz-featured-refresh");
+,
+    _setupEditorPreview() {
+        // In Website Builder, avoid background timers/autoplay and only refresh when user clicks.
+        const sectionEl = this.el;
+        const carouselEl = sectionEl.querySelector(".js-bhz-featured-carousel");
+        const innerEl = sectionEl.querySelector(".js-bhz-featured-inner");
+        const indicatorsEl = sectionEl.querySelector(".js-bhz-featured-indicators");
+        const emptyEl = sectionEl.querySelector(".js-bhz-featured-empty");
+        const prevBtn = sectionEl.querySelector(".carousel-control-prev");
+        const nextBtn = sectionEl.querySelector(".carousel-control-next");
+        const refreshBtn = sectionEl.querySelector(".js-bhz-featured-refresh");
 
-    if (!carouselEl || !innerEl) return;
+        if (!carouselEl || !innerEl) return;
 
-    const limit = _toInt(sectionEl.dataset.limit, 12);
-    const intervalMs = _toInt(sectionEl.dataset.interval, 5000);
-    const refreshMs = _toInt(sectionEl.dataset.bhzRefreshMs, 0);
-    // IMPORTANT: disable autoplay inside builder (prevents DOM churn / Owl issues)
-    const autoplay = false;
-
-    this._dom = { sectionEl, carouselEl, innerEl, indicatorsEl, emptyEl, prevBtn, nextBtn, refreshBtn };
-    this._cfg = { limit, intervalMs, refreshMs, autoplay };
-
-    if (refreshBtn) {
-        refreshBtn.addEventListener("click", (ev) => {
-            ev.preventDefault();
-            ev.stopPropagation();
-            refreshBtn.disabled = true;
-            refreshBtn.classList.add("disabled");
-            Promise.resolve(this._refresh({ force: true }))
-                .catch(() => {})
-                .finally(() => {
-                    refreshBtn.disabled = false;
-                    refreshBtn.classList.remove("disabled");
-                });
+        // Prevent browser translate artifacts from being serialized into the page arch.
+        // Do it on next frame so the editor finishes initial patching first.
+        window.requestAnimationFrame(() => {
+            try { cleanupTranslateArtifacts(sectionEl); } catch (e) {}
         });
+
+        const limit = _toInt(sectionEl.dataset.limit, 12);
+        const intervalMs = _toInt(sectionEl.dataset.interval, 5000);
+        const refreshMs = _toInt(sectionEl.dataset.bhzRefreshMs, 0);
+        const autoplay = false; // always false in builder
+
+        this._dom = { sectionEl, carouselEl, innerEl, indicatorsEl, emptyEl, prevBtn, nextBtn, refreshBtn };
+        this._cfg = { limit, intervalMs, refreshMs, autoplay };
+
+        if (refreshBtn) {
+            refreshBtn.addEventListener("click", (ev) => {
+                ev.preventDefault();
+                ev.stopPropagation();
+
+                // Refresh safely: update DOM in one atomic operation to avoid confusing the editor.
+                refreshBtn.disabled = true;
+                refreshBtn.classList.add("disabled");
+
+                Promise.resolve()
+                    .then(() => this._refresh({ force: true, safe: true }))
+                    .catch(() => {})
+                    .finally(() => {
+                        refreshBtn.disabled = false;
+                        refreshBtn.classList.remove("disabled");
+                    });
+            });
+        }
     }
-},
 
     _setup() {
         const sectionEl = this.el;
@@ -280,8 +317,8 @@ _setupEditorPreview() {
             const hasMultiple = !!(payload && payload.has_multiple);
 
             // Update DOM
-            innerEl.innerHTML = itemsHtml;
-            if (indicatorsEl) indicatorsEl.innerHTML = indicatorsHtml;
+            if (opts.safe) { safeReplaceHtml(innerEl, itemsHtml); } else { innerEl.innerHTML = itemsHtml; }
+            if (indicatorsEl) { if (opts.safe) { safeReplaceHtml(indicatorsEl, indicatorsHtml); } else { indicatorsEl.innerHTML = indicatorsHtml; } }
 
             // Toggle UI
             this._hasMultiple = hasMultiple;
