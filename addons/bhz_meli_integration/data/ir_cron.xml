@@ -1,23 +1,27 @@
 <odoo>
-    <data noupdate="1">
-        <record id="ir_cron_meli_fetch_orders" model="ir.cron">
+    <data noupdate="0">
+
+        <record id="bhz_meli_cron_fetch_orders_v2" model="ir.cron">
             <field name="name">BHZ ML: Buscar pedidos</field>
             <field name="model_id" ref="model_meli_order"/>
             <field name="state">code</field>
             <field name="code">model.cron_fetch_orders()</field>
             <field name="interval_number">10</field>
             <field name="interval_type">minutes</field>
-            <field name="active">True</field>
+            <field name="active" eval="True"/>
+            <field name="user_id" ref="base.user_root"/>
         </record>
 
-        <record id="ir_cron_meli_fetch_items" model="ir.cron">
-            <field name="name">BHZ ML: Buscar produtos</field>
+        <record id="bhz_meli_cron_fetch_items_v2" model="ir.cron">
+            <field name="name">BHZ ML: Buscar anúncios</field>
             <field name="model_id" ref="model_meli_product"/>
             <field name="state">code</field>
             <field name="code">model.cron_fetch_products()</field>
             <field name="interval_number">30</field>
             <field name="interval_type">minutes</field>
-            <field name="active">True</field>
+            <field name="active" eval="True"/>
+            <field name="user_id" ref="base.user_root"/>
         </record>
+
     </data>
 </odoo>

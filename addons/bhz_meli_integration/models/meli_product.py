@@ -1,6 +1,6 @@
-# bhz_meli_integration/models/meli_product.py
 import logging
 import requests
+
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
@@ -21,57 +21,135 @@ class MeliProduct(models.Model):
         store=True,
         readonly=True,
     )
+
     product_id = fields.Many2one("product.product", string="Produto Odoo", required=True)
-    meli_item_id = fields.Char("ID Anúncio ML", help="Ex.: MLB123456789")
+    meli_item_id = fields.Char("ID Anúncio ML", help="Ex.: MLB123456789", index=True)
     meli_permalink = fields.Char("Link do anúncio")
     sale_price = fields.Float("Preço de venda no ML")
-    currency_id = fields.Many2one("res.currency", string="Moeda", default=lambda self: self.env.company.currency_id.id)
+    currency_id = fields.Many2one(
+        "res.currency",
+        string="Moeda",
+        default=lambda self: self.env.company.currency_id.id,
+    )
 
+    # ---------------------------------------------------------
+    # HTTP helpers
+    # ---------------------------------------------------------
+    def _ml_get(self, url, account, params=None, timeout=30):
+        """GET com fallback de refresh_token quando vier 401."""
+        account.ensure_one()
+        headers = {"Authorization": f"Bearer {account.access_token}"}
+
+        resp = requests.get(url, headers=headers, params=params, timeout=timeout)
+        if resp.status_code == 401:
+            _logger.warning("[ML] 401 no GET. Renovando token da conta %s e tentando novamente...", account.name)
+            account.refresh_access_token()
+            headers = {"Authorization": f"Bearer {account.access_token}"}
+            resp = requests.get(url, headers=headers, params=params, timeout=timeout)
+        return resp
+
+    # ---------------------------------------------------------
+    # Produto Odoo (criação compatível com Odoo 19)
+    # ---------------------------------------------------------
+    def _find_product_variant(self, account, seller_sku, fallback_code):
+        Product = self.env["product.product"].sudo().with_company(account.company_id)
+        domain = [("company_id", "=", account.company_id.id)]
+
+        code = seller_sku or fallback_code
+        if code:
+            domain.append(("default_code", "=", code))
+
+        return Product.search(domain, limit=1)
+
+    def _create_product_variant(self, account, item_data):
+        """
+        Cria produto no Odoo de forma compatível com Odoo 19:
+        - NÃO usa product.template.type='product' (dá erro)
+        - Usa detailed_type='product' quando existir
+        - Cria template e pega a variante
+        """
+        company = account.company_id
+        ProductTmpl = self.env["product.template"].sudo().with_company(company)
+
+        seller_sku = item_data.get("seller_sku")
+        item_id = item_data.get("id") or ""
+        title = item_data.get("title") or item_id or "Produto Mercado Livre"
+
+        tmpl_vals = {
+            "name": title,
+            "company_id": company.id,
+        }
+
+        # SKU vai em product.product.default_code (mas pode ser propagado por create se passado no context)
+        # O jeito mais compatível é criar o template e depois escrever no variant.
+        if "detailed_type" in ProductTmpl._fields:
+            tmpl_vals["detailed_type"] = "product"
+        # Se não existir detailed_type, NÃO setar type (pra não quebrar em versões onde 'product' não existe)
+
+        tmpl = ProductTmpl.create(tmpl_vals)
+
+        variant = tmpl.product_variant_id.sudo().with_company(company)
+        # define default_code na variante
+        code = seller_sku or item_id
+        if code:
+            variant.write({"default_code": code})
+
+        return variant
+
+    def _get_or_create_product_variant(self, account, item_data):
+        seller_sku = item_data.get("seller_sku")
+        item_id = item_data.get("id") or ""
+        product = self._find_product_variant(account, seller_sku, item_id)
+        if product:
+            return product
+        return self._create_product_variant(account, item_data)
+
+    # ---------------------------------------------------------
+    # Ações
+    # ---------------------------------------------------------
     def action_fetch_item(self):
         for rec in self:
             if not rec.meli_item_id:
                 raise UserError(_("Informe o ID do anúncio do Mercado Livre."))
-            account = rec.account_id.with_company(rec.company_id)
+
+            account = rec.account_id
             account.ensure_valid_token()
+
             url = f"https://api.mercadolibre.com/items/{rec.meli_item_id}"
-            headers = {"Authorization": f"Bearer {account.access_token}"}
-            resp = requests.get(url, headers=headers, timeout=30)
+            resp = self._ml_get(url, account, timeout=30)
             if resp.status_code != 200:
-                _logger.error(
-                    "[ML] Conta %s: erro ao buscar item manualmente %s: %s",
-                    account.name,
-                    rec.meli_item_id,
-                    resp.text,
-                )
-                raise UserError(_("Erro ao buscar item no ML: %s") % resp.text)
+                raise UserError(_("Erro ao buscar item no ML: %s") % (resp.text or resp.status_code))
+
             data = resp.json()
-            rec.write({
-                "name": data.get("title"),
-                "meli_permalink": data.get("permalink"),
-                "sale_price": data.get("price"),
-            })
+            rec.write(
+                {
+                    "name": data.get("title") or rec.name,
+                    "meli_permalink": data.get("permalink"),
+                    "sale_price": data.get("price") or 0.0,
+                }
+            )
 
     @api.model
-    def cron_fetch_products(self):
-        """Cron que busca anúncios/produtos em todas as contas conectadas."""
+    def cron_fetch_items(self):
+        """
+        Cron que sincroniza anúncios.
+        """
         self = self.sudo()
-        _logger.info("[ML] Iniciando importação de anúncios")
-        accounts = self.env["meli.account"].sudo().search(
-            [("state", "in", ("connected", "authorized"))]
-        )
-        total_imported = 0
+        _logger.warning("[ML] (CRON) Iniciando importação de anúncios")
+
+        accounts = self.env["meli.account"].sudo().search([("state", "=", "authorized")])
         if not accounts:
-            _logger.info("[ML] Nenhuma conta autorizada encontrada para importar anúncios")
+            _logger.warning("[ML] (CRON) Nenhuma conta autorizada encontrada para importar anúncios")
             return
+
+        Currency = self.env["res.currency"].sudo()
+        total_imported = 0
+        total_updated = 0
 
         for account in accounts:
             company = account.company_id or self.env.company
-            product_model = self.with_company(company)
-            account_ctx = account.with_company(company)
-            Product = self.env["product.product"].sudo().with_company(company)
-            Currency = self.env["res.currency"].sudo().with_company(company)
+            account = account.with_company(company)
 
-            account_imported = 0
             try:
                 account_ctx.ensure_valid_token()
             except Exception as exc:
@@ -83,116 +161,98 @@ class MeliProduct(models.Model):
                 _logger.warning("[ML] Conta %s sem ml_user_id. Pulei importação de itens.", account_ctx.name)
                 continue
 
-            headers = {"Authorization": f"Bearer {account_ctx.access_token}"}
+            account_imported = 0
+            account_updated = 0
+
             limit = 50
             offset = 0
-            fatal_error = None
-            try:
-                while True:
-                    params = {
-                        "search_type": "scan",
-                        "offset": offset,
-                        "limit": limit,
-                    }
-                    search_url = f"https://api.mercadolibre.com/users/{account_ctx.ml_user_id}/items/search"
-                    try:
-                        resp = requests.get(search_url, headers=headers, params=params, timeout=30)
-                        resp.raise_for_status()
-                    except requests.RequestException as exc:
-                        error_body = ""
-                        if getattr(exc, "response", None) is not None:
-                            error_body = exc.response.text
+
+            search_url = f"https://api.mercadolibre.com/users/{account.ml_user_id}/items/search"
+            while True:
+                params = {"search_type": "scan", "offset": offset, "limit": limit}
+                resp = self._ml_get(search_url, account, params=params, timeout=30)
+
+                if resp.status_code != 200:
+                    _logger.error(
+                        "[ML] Conta %s: erro HTTP %s ao buscar anúncios: %s",
+                        account.name,
+                        resp.status_code,
+                        (resp.text or "")[:2000],
+                    )
+                    break
+
+                payload = resp.json() if resp.text else {}
+                item_ids = payload.get("results") or []
+                if not item_ids:
+                    break
+
+                for item_id in item_ids:
+                    item_url = f"https://api.mercadolibre.com/items/{item_id}"
+                    item_resp = self._ml_get(item_url, account, timeout=30)
+
+                    if item_resp.status_code != 200:
                         _logger.error(
-                            "[ML] Conta %s: erro ao buscar anúncios offset %s: %s %s",
-                            account_ctx.name,
-                            offset,
-                            exc,
-                            error_body,
+                            "[ML] Conta %s: erro ao buscar item %s: %s",
+                            account.name,
+                            item_id,
+                            (item_resp.text or "")[:2000],
                         )
-                        fatal_error = str(exc)
-                        break
+                        continue
 
-                    payload = resp.json()
-                    item_ids = payload.get("results") or []
-                    if not item_ids:
-                        break
+                    item_data = item_resp.json()
+                    item_data["id"] = item_id  # garante
 
-                    for item_id in item_ids:
-                        item_url = f"https://api.mercadolibre.com/items/{item_id}"
-                        try:
-                            item_resp = requests.get(item_url, headers=headers, timeout=30)
-                            item_resp.raise_for_status()
-                        except requests.RequestException as exc:
-                            error_body = ""
-                            if getattr(exc, "response", None) is not None:
-                                error_body = exc.response.text
-                            _logger.error(
-                                "[ML] Conta %s: erro ao buscar item %s: %s %s",
-                                account_ctx.name,
-                                item_id,
-                                exc,
-                                error_body,
-                            )
-                            continue
+                    # moeda
+                    currency_id = company.currency_id.id
+                    currency_code = item_data.get("currency_id")
+                    if currency_code:
+                        currency = Currency.search([("name", "=", currency_code)], limit=1)
+                        if currency:
+                            currency_id = currency.id
 
-                        item_data = item_resp.json()
-                        currency = None
-                        currency_code = item_data.get("currency_id")
-                        if currency_code:
-                            currency = Currency.search([("name", "=", currency_code)], limit=1)
+                    # produto odoo (VARIANTE)
+                    try:
+                        product_variant = self._get_or_create_product_variant(account, item_data)
+                    except Exception:
+                        _logger.exception("[ML] Conta %s: falha ao criar/obter produto Odoo do item %s", account.name, item_id)
+                        continue
 
-                        # Garante que existe um produto Odoo
-                        seller_sku = item_data.get("seller_sku") or item_id
-                        domain = [("company_id", "=", account_ctx.company_id.id)]
-                        if seller_sku:
-                            domain.append(("default_code", "=", seller_sku))
-                        product = Product.search(domain, limit=1)
-                        if not product:
-                            product = Product.create(
-                                {
-                                    "name": item_data.get("title") or item_id,
-                                    "default_code": item_data.get("seller_sku") or item_id,
-                                    "company_id": account_ctx.company_id.id,
-                                    "type": "product",
-                                }
-                            )
+                    vals = {
+                        "name": item_data.get("title") or item_id,
+                        "account_id": account.id,
+                        "product_id": product_variant.id,
+                        "meli_item_id": item_id,
+                        "meli_permalink": item_data.get("permalink"),
+                        "sale_price": item_data.get("price") or 0.0,
+                        "currency_id": currency_id,
+                    }
 
-                        currency_id = currency.id if currency else account_ctx.company_id.currency_id.id
-                        vals = {
-                            "name": item_data.get("title") or item_id,
-                            "account_id": account_ctx.id,
-                            "product_id": product.id,
-                            "meli_item_id": item_id,
-                            "meli_permalink": item_data.get("permalink"),
-                            "sale_price": item_data.get("price") or 0.0,
-                            "currency_id": currency_id,
-                        }
-                        record = product_model.search(
-                            [("account_id", "=", account_ctx.id), ("meli_item_id", "=", item_id)], limit=1
-                        )
-                        if record:
-                            record.write(vals)
-                        else:
-                            product_model.create(vals)
-                            account_imported += 1
-                            total_imported += 1
+                    record = self.search([("account_id", "=", account.id), ("meli_item_id", "=", item_id)], limit=1)
+                    if record:
+                        record.write(vals)
+                        account_updated += 1
+                        total_updated += 1
+                    else:
+                        self.create(vals)
+                        account_imported += 1
+                        total_imported += 1
 
-                    if len(item_ids) < limit:
-                        break
-                    offset += limit
+                if len(item_ids) < limit:
+                    break
+                offset += limit
 
-                if fatal_error:
-                    account_ctx._record_error(fatal_error)
-                else:
-                    account_ctx.sudo().write({"last_sync_products_at": fields.Datetime.now()})
-                    account_ctx._clear_error()
-                _logger.info("[ML] Conta %s: %s anúncios sincronizados", account_ctx.name, account_imported)
-            except Exception as exc:
-                _logger.exception("[ML] Erro inesperado ao importar anúncios da conta %s", account_ctx.name)
-                account_ctx._record_error(str(exc))
-                continue
+            _logger.warning(
+                "[ML] Conta %s: %s anúncios criados, %s atualizados",
+                account.name,
+                account_imported,
+                account_updated,
+            )
 
-        _logger.info("[ML] Importação de anúncios finalizada. Total sincronizado: %s", total_imported)
+        _logger.warning(
+            "[ML] (CRON) Importação de anúncios finalizada. Criados: %s | Atualizados: %s",
+            total_imported,
+            total_updated,
+        )
 
     @api.model
     def cron_fetch_items(self):
@@ -207,7 +267,7 @@ class MeliProduct(models.Model):
             "tag": "display_notification",
             "params": {
                 "title": "Mercado Livre",
-                "message": "Sincronização de produtos iniciada em segundo plano.",
+                "message": "Sincronização de anúncios executada. Verifique os logs do servidor.",
                 "type": "success",
                 "sticky": False,
             },
