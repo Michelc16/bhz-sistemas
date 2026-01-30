@@ -2,254 +2,178 @@
 
 import publicWidget from "@web/legacy/js/public/public_widget";
 import { rpc } from "@web/core/network/rpc";
-import {
-    Component,
-    mount,
-    useState,
-    onWillStart,
-    onMounted,
-    onPatched,
-    onWillUnmount,
-} from "@odoo/owl";
 
-function _toInt(value, fallback) {
+/**
+ * Featured Carousel (GuiaBH)
+ *
+ * Goals:
+ * - Never run inside website editor iframe (prevents Owl DOM patch crashes).
+ * - Fetch slides/indicators via JSON-RPC and inject HTML (server renders QWeb).
+ * - Start Bootstrap Carousel autoplay reliably.
+ *
+ * This is intentionally NOT an Owl component to avoid template loading issues
+ * and editor lifecycle conflicts.
+ */
+
+function toInt(value, fallback) {
     const n = parseInt(value, 10);
     return Number.isNaN(n) ? fallback : n;
 }
 
-function isEditMode() {
-    const b = document.body;
-    const h = document.documentElement;
-
-    const classMarkers = ["editor_enable", "o_is_editing", "o_we_editing", "o_website_edit_mode"];
-    const hasMarker = (el) =>
-        !!el && classMarkers.some((c) => el.classList && el.classList.contains(c));
-
-    if (hasMarker(b) || hasMarker(h)) return true;
-
-    return !!document.querySelector(
-        ".o_we_toolbar, .o_we_sidebar, .o_website_editor, .o_we_customize_panel, .o_we_dialog"
-    );
-}
-
-class GuiabhFeaturedCarouselRoot extends Component {
-    static template = "bhz_event_promo.GuiabhFeaturedCarouselOwl";
-    static props = [
-        "carouselEl",
-        "sectionEl",
-        "innerEl",
-        "indicatorsEl",
-        "emptyEl",
-        "prevBtn",
-        "nextBtn",
-        "carouselTarget",
-    ];
-
-    setup() {
-        this.state = useState({
-            events: [],
-            has_events: false,
-            has_multiple: false,
-        });
-
-        this._timer = null;
-
-        onWillStart(async () => {
-            await this._refresh();
-        });
-
-        onMounted(() => {
-            this._ensureCarousel();
-            this._applyVisibility();
-            this._setupAutoRefresh();
-        });
-
-        onPatched(() => {
-            // When Owl patches the carousel items, re-init bootstrap safely.
-            this._ensureCarousel();
-            this._applyVisibility();
-        });
-
-        onWillUnmount(() => {
-            if (this._timer) clearInterval(this._timer);
-            this._timer = null;
-            this._disposeCarousel();
-        });
+function isInWebsiteEditor() {
+    // Editor iframe URLs
+    const path = window.location.pathname || "";
+    if (path.startsWith("/website/iframe") || path.startsWith("/website/iframefallback")) {
+        return true;
     }
-
-    _getInterval() {
-        const el = this.props.carouselEl;
-        const sectionEl = this.props.sectionEl;
-        const raw =
-            el?.dataset?.bsInterval ||
-            el?.dataset?.interval ||
-            sectionEl?.dataset?.interval ||
-            sectionEl?.getAttribute?.("data-interval") ||
-            "5000";
-        const val = _toInt(raw, 5000);
-        return Math.min(Math.max(val, 1000), 20000);
+    // Body classes usually present when editing
+    const body = document.body;
+    if (!body) return false;
+    if (body.classList.contains("editor_enable") || body.classList.contains("o_is_editing")) {
+        return true;
     }
-
-    _getRefreshMs() {
-        const sectionEl = this.props.sectionEl;
-        const raw =
-            sectionEl?.dataset?.bhzRefreshMs ||
-            sectionEl?.getAttribute?.("data-bhz-refresh-ms") ||
-            "0";
-        const val = _toInt(raw, 0);
-        return Math.min(Math.max(val, 0), 600000);
+    // Builder assets often add this
+    if (document.querySelector(".o_we_website_top_actions, .o_we_website_editor, .o_we_toolbar")) {
+        return true;
     }
-
-    _getAutoplay() {
-        const sectionEl = this.props.sectionEl;
-        const raw = sectionEl?.dataset?.bhzAutoplay ?? sectionEl?.getAttribute?.("data-bhz-autoplay");
-        if (raw === undefined || raw === null || raw === "") return true;
-        return String(raw).toLowerCase() !== "false";
-    }
-
-    _applyAutoplayAttrs() {
-        const el = this.props.carouselEl;
-        if (!el) return;
-
-        const autoplay = this._getAutoplay() && !isEditMode();
-        const interval = this._getInterval();
-
-        el.dataset.bsInterval = String(interval);
-        el.dataset.interval = String(interval);
-        el.setAttribute("data-bs-ride", autoplay ? "carousel" : "false");
-    }
-
-    _disposeCarousel() {
-        const el = this.props.carouselEl;
-        try {
-            const inst = window.bootstrap?.Carousel?.getInstance?.(el);
-            inst?.dispose?.();
-        } catch {
-            // ignore
-        }
-    }
-
-    _ensureCarousel() {
-        const el = this.props.carouselEl;
-        if (!el || !window.bootstrap?.Carousel) return;
-
-        this._applyAutoplayAttrs();
-
-        const autoplay = this._getAutoplay() && !isEditMode();
-        const interval = this._getInterval();
-
-        // Reset instance to ensure interval changes apply.
-        this._disposeCarousel();
-        window.bootstrap.Carousel.getOrCreateInstance(el, {
-            interval: autoplay ? interval : false,
-            ride: autoplay ? "carousel" : false,
-            pause: "hover",
-            touch: true,
-            keyboard: true,
-        });
-    }
-
-    _applyVisibility() {
-        // Keep DOM changes minimal and predictable (do NOT re-parent/replace nodes),
-        // otherwise Owl can crash while patching ("removeChild ... is not a child").
-        const { emptyEl, prevBtn, nextBtn, indicatorsEl } = this.props;
-
-        if (emptyEl) emptyEl.classList.toggle("d-none", !!this.state.has_events);
-
-        const showNav = !!this.state.has_multiple;
-        prevBtn?.classList.toggle("d-none", !showNav);
-        nextBtn?.classList.toggle("d-none", !showNav);
-        indicatorsEl?.classList.toggle("d-none", !showNav);
-    }
-
-    _setupAutoRefresh() {
-        const refreshMs = this._getRefreshMs();
-        if (refreshMs <= 0) return;
-
-        // Never auto-refresh while editing
-        if (isEditMode()) return;
-
-        this._timer = setInterval(() => this._refresh(), refreshMs);
-    }
-
-    async _refresh() {
-        const { carouselEl, sectionEl } = this.props;
-
-        const limit = _toInt(
-            sectionEl?.dataset?.limit || sectionEl?.getAttribute?.("data-limit") || "12",
-            12
-        );
-
-        let payload;
-        try {
-            payload = await rpc("/_bhz_event_promo/featured", {
-                limit,
-                carousel_id: carouselEl?.getAttribute("id") || null,
-            });
-        } catch {
-            return;
-        }
-        if (!payload) return;
-
-        this.state.events = Array.isArray(payload.events) ? payload.events : [];
-        
-        this.state.has_events = this.state.events.length > 0;
-        this.state.has_multiple = this.state.events.length > 1;
-    }
+    return false;
 }
 
 publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
     selector: ".js-bhz-featured-carousel",
 
-    async start() {
-        const superStart = this._super?.bind(this);
-        const parentResult = superStart ? superStart(...arguments) : undefined;
+    start() {
+        // Call parent start synchronously first (important in Odoo legacy widgets)
+        const superPromise = this._super.apply(this, arguments);
 
-        const sectionEl = this.el.closest(".s_guiabh_featured_carousel") || this.el;
-        const innerEl = this.el.querySelector(".js-bhz-featured-inner");
-        const indicatorsEl = this.el.querySelector(".js-bhz-featured-indicators");
-        const emptyEl = sectionEl.querySelector(".js-bhz-featured-empty");
-        const prevBtn = this.el.querySelector(".carousel-control-prev");
-        const nextBtn = this.el.querySelector(".carousel-control-next");
+        this._carouselEl = this.el;
+        this._innerEl = this.el.querySelector(".js-bhz-featured-inner");
+        this._indicatorsEl = this.el.querySelector(".js-bhz-featured-indicators");
+        this._emptyEl = this.el.closest("section")?.querySelector(".js-bhz-featured-empty");
 
+        // Read options
+        const section = this.el.closest("section");
+        const dataset = section ? section.dataset : {};
+        this._limit = toInt(dataset.limit, 12);
+        this._refreshMs = toInt(dataset.bhzRefreshMs, 60000);
+        this._autoplay = (dataset.bhzAutoplay || "true") !== "false";
 
-        // Do not run inside the website editor iframe (it will patch/clone DOM and Owl will crash).
-        // The editor loads /website/iframefallback (and other /website/iframe* routes).
-        const path = window.location && window.location.pathname || "";
-        if (isEditMode() || path.startsWith("/website/iframe")) {
-            return parentResult;
+        // Bootstrap interval: prefer data-bs-interval on carousel, fallback to data-interval on section
+        const bsInterval = this.el.getAttribute("data-bs-interval");
+        const sectionInterval = dataset.interval;
+        this._interval = toInt(bsInterval || sectionInterval, 5000);
+
+        this._isEditor = isInWebsiteEditor();
+        if (this._isEditor) {
+            // Do NOT fetch/inject or init bootstrap in editor to avoid Owl crashes.
+            return superPromise;
         }
 
+        // Initial load + optional refresh
+        this._loadAndRender();
+        if (this._refreshMs > 0) {
+            this._refreshTimer = setInterval(() => this._loadAndRender(), this._refreshMs);
+        }
 
-        // Mount a tiny Owl app (no DOM manual changes => avoids Owl removeChild crash).
-        const mountPoint = document.createElement("div");
-        mountPoint.className = "d-none";
-        this.el.appendChild(mountPoint);
-
-        this._owlApp = await mount(GuiabhFeaturedCarouselRoot, mountPoint, {
-            props: {
-                carouselEl: this.el,
-                sectionEl,
-                innerEl,
-                indicatorsEl,
-                emptyEl,
-                prevBtn,
-                nextBtn,
-                carouselTarget: this.el?.getAttribute("id") ? ("#" + this.el.getAttribute("id")) : "",
-            },
-        });
-
-        return parentResult;
+        return superPromise;
     },
 
     destroy() {
-        const superDestroy = this._super?.bind(this);
-        try {
-            this._owlApp?.destroy?.();
-        } catch {
-            // ignore
+        if (this._refreshTimer) {
+            clearInterval(this._refreshTimer);
+            this._refreshTimer = null;
         }
-        this._owlApp = null;
-        return superDestroy ? superDestroy(...arguments) : undefined;
+        this._disposeBootstrap();
+        return this._super.apply(this, arguments);
+    },
+
+    async _loadAndRender() {
+        if (!this._innerEl || !this._indicatorsEl) return;
+
+        const carouselId = this._carouselEl.getAttribute("id");
+        try {
+            const payload = await rpc("/_bhz_event_promo/featured", {
+                limit: this._limit,
+                carousel_id: carouselId,
+            });
+
+            const itemsHtml = (payload && payload.items_html) || "";
+            const indicatorsHtml = (payload && payload.indicators_html) || "";
+
+            // Inject HTML from server-rendered QWeb template
+            this._innerEl.innerHTML = itemsHtml;
+            this._indicatorsEl.innerHTML = indicatorsHtml;
+
+            const hasItems = !!this._innerEl.querySelector(".carousel-item");
+
+            // Toggle empty message + controls
+            this._toggleVisibility(hasItems);
+
+            // (Re)start bootstrap carousel autoplay
+            if (hasItems) {
+                this._restartBootstrap();
+            } else {
+                this._disposeBootstrap();
+            }
+        } catch (err) {
+            // Fail safe: show empty state, don't break page/editor
+            this._toggleVisibility(false);
+            this._disposeBootstrap();
+            // eslint-disable-next-line no-console
+            console.warn("BHZ Featured Carousel: failed to fetch/render", err);
+        }
+    },
+
+    _toggleVisibility(hasItems) {
+        const section = this.el.closest("section");
+
+        // controls and indicators are marked o_not_editable + d-none initially
+        const prevBtn = section?.querySelector(".carousel-control-prev");
+        const nextBtn = section?.querySelector(".carousel-control-next");
+
+        if (prevBtn) prevBtn.classList.toggle("d-none", !hasItems);
+        if (nextBtn) nextBtn.classList.toggle("d-none", !hasItems);
+        if (this._indicatorsEl) this._indicatorsEl.classList.toggle("d-none", !hasItems);
+        if (this._emptyEl) this._emptyEl.classList.toggle("d-none", hasItems);
+    },
+
+    _disposeBootstrap() {
+        if (this._bsInstance) {
+            try {
+                this._bsInstance.dispose();
+            } catch (_) {
+                // ignore
+            }
+            this._bsInstance = null;
+        }
+    },
+
+    _restartBootstrap() {
+        // Bootstrap is loaded in website frontend; guard anyway.
+        const Bootstrap = window.bootstrap;
+        if (!Bootstrap || !Bootstrap.Carousel) {
+            return;
+        }
+        this._disposeBootstrap();
+
+        // Ensure required attributes for autoplay
+        this._carouselEl.setAttribute("data-bs-ride", this._autoplay ? "carousel" : "false");
+        this._carouselEl.setAttribute("data-bs-interval", String(this._interval));
+
+        // Create instance
+        this._bsInstance = new Bootstrap.Carousel(this._carouselEl, {
+            interval: this._autoplay ? this._interval : false,
+            ride: this._autoplay ? "carousel" : false,
+            pause: "hover",
+            touch: true,
+        });
+
+        if (this._autoplay) {
+            try {
+                this._bsInstance.cycle();
+            } catch (_) {
+                // ignore
+            }
+        }
     },
 });
