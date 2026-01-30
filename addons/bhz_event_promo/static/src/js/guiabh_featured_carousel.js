@@ -42,12 +42,12 @@ class GuiabhFeaturedCarouselRoot extends Component {
         "emptyEl",
         "prevBtn",
         "nextBtn",
+        "carouselTarget",
     ];
 
     setup() {
         this.state = useState({
-            items_html: "",
-            indicators_html: "",
+            events: [],
             has_events: false,
             has_multiple: false,
         });
@@ -150,7 +150,8 @@ class GuiabhFeaturedCarouselRoot extends Component {
     }
 
     _applyVisibility() {
-        const { emptyEl, prevBtn, nextBtn, indicatorsEl } = this.props;
+        const { emptyEl, prevBtn, nextBtn,
+                carouselTarget: this.el?.getAttribute("id") ? ("#" + this.el.getAttribute("id")) : "", indicatorsEl } = this.props;
 
         if (emptyEl) emptyEl.classList.toggle("d-none", !!this.state.has_events);
 
@@ -189,10 +190,10 @@ class GuiabhFeaturedCarouselRoot extends Component {
         }
         if (!payload) return;
 
-        this.state.items_html = payload.items_html || payload.slides || "";
-        this.state.indicators_html = payload.indicators_html || payload.indicators || "";
-        this.state.has_events = !!payload.has_events;
-        this.state.has_multiple = !!payload.has_multiple;
+        this.state.events = Array.isArray(payload.events) ? payload.events : [];
+        
+        this.state.has_events = this.state.events.length > 0;
+        this.state.has_multiple = this.state.events.length > 1;
     }
 }
 
@@ -224,6 +225,7 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
                 emptyEl,
                 prevBtn,
                 nextBtn,
+                carouselTarget: this.el?.getAttribute("id") ? ("#" + this.el.getAttribute("id")) : "",
             },
         });
 

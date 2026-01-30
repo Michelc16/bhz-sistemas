@@ -265,6 +265,33 @@ class GuiaBHAgendaController(http.Controller):
             events = event_env.sudo().guiabh_get_featured_events(limit=limit)
         except Exception:
             events = event_env.sudo().browse()
+        # Build structured payload for Owl frontend (avoid raw HTML injection in website pages)
+        event_fields = events._fields if events else request.env["event.event"]._fields
+        has_image_1920 = "image_1920" in event_fields
+        has_image_1024 = "image_1024" in event_fields
+        has_image_512 = "image_512" in event_fields
+
+        def _img_url(ev):
+            if getattr(ev, "promo_cover_image", False):
+                return "/web/image/event.event/%s/promo_cover_image" % ev.id
+            if has_image_1920:
+                return "/web/image/event.event/%s/image_1920" % ev.id
+            if has_image_1024:
+                return "/web/image/event.event/%s/image_1024" % ev.id
+            if has_image_512:
+                return "/web/image/event.event/%s/image_512" % ev.id
+            return "/web/static/img/placeholder.png"
+
+        events_payload = []
+        for idx, ev in enumerate(events):
+            events_payload.append({
+                "id": ev.id,
+                "name": ev.name or "",
+                "url": "/agenda/event/%s" % ev.id,
+                "image_url": _img_url(ev),
+                "_idx": idx,
+            })
+
 
         if events:
             _logger.debug(
@@ -291,6 +318,7 @@ class GuiaBHAgendaController(http.Controller):
         return {
             "items_html": items_html,
             "indicators_html": indicators_html,
+            "events": events_payload,
             # Backward compatibility keys (pre-Odoo19 refactor)
             "slides": items_html,
             "indicators": indicators_html,

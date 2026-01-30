@@ -1,14 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
+    <!--
+        IMPORTANT:
+        Avoid t-raw/innerHTML injections on website pages. Odoo 19 website uses Owl patching
+        and raw HTML injection can trigger removeChild lifecycle errors.
+    -->
     <t t-name="bhz_event_promo.GuiabhFeaturedCarouselOwl" owl="1">
         <t t-if="props.innerEl">
             <t t-portal="props.innerEl">
-                <t t-raw="state.items_html"/>
+                <t t-if="state.events.length">
+                    <t t-foreach="state.events" t-as="ev" t-key="ev.id">
+                        <div t-attf-class="carousel-item #{'active' if ev._idx == 0 else ''}">
+                            <a t-att-href="ev.url">
+                                <img class="d-block w-100 guiabh-featured-img"
+                                     loading="lazy"
+                                     t-att-alt="ev.name || ''"
+                                     t-att-src="ev.image_url"/>
+                            </a>
+                        </div>
+                    </t>
+                </t>
             </t>
         </t>
+
         <t t-if="props.indicatorsEl">
             <t t-portal="props.indicatorsEl">
-                <t t-raw="state.indicators_html"/>
+                <t t-if="state.events.length">
+                    <t t-foreach="state.events" t-as="ev" t-key="ev.id">
+                        <button type="button"
+                                t-att-data-bs-target="props.carouselTarget"
+                                t-attf-data-bs-slide-to="#{ev._idx}"
+                                t-attf-class="#{'active' if ev._idx == 0 else ''}"
+                                t-att-aria-current="ev._idx == 0 and 'true' or false"
+                                t-att-aria-label="'Slide ' + (ev._idx + 1)"/>
+                    </t>
+                </t>
             </t>
         </t>
     </t>
