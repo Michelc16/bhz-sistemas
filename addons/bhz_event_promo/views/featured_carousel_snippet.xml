@@ -9,6 +9,18 @@
                  data-bhz-refresh-ms="60000"
                  data-bhz-autoplay="true">
             <div class="container">
+                <div class="o_edit_only mb-3">
+                    <div class="alert alert-info py-2 mb-0 d-flex flex-column flex-md-row gap-2 justify-content-between align-items-md-center">
+                        <div>
+                            <strong>Prévia do carrossel</strong>
+                            <span class="ms-1">Clique em “Atualizar prévia” para recarregar os eventos em destaque sem precisar remover o bloco.</span>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-primary js-bhz-featured-refresh" data-bhz-refresh="1">
+                            Atualizar prévia
+                        </button>
+                    </div>
+                </div>
+
                 <t t-set="uniq_raw" t-value="request.env.context.get('snippet_key') or request.env.uid or 0"/>
                 <t t-set="uniq" t-value="''.join([c for c in str(uniq_raw) if c.isalnum()]) or '1'"/>
                 <t t-set="interval" t-value="int(request.env.context.get('interval') or request.env.context.get('data_interval') or 5000)"/>
