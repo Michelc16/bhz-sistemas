@@ -379,7 +379,7 @@
                              t-att-data-oe-id="event.id">
                             <t t-set="fallback_text" t-value="event.subtitle or event.promo_short_description"/>
                             <t t-if="event.promo_description_html">
-                                <t t-raw="event.promo_description_html"/>
+                                <t t-out="event.promo_description_html"/>
                             </t>
                             <t t-elif="fallback_text">
                                 <p><t t-esc="fallback_text"/></p>
