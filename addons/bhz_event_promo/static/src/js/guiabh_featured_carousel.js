@@ -206,22 +206,22 @@ _setupEditorPreview() {
     this._cfg = { limit, intervalMs, refreshMs, autoplay };
 
     if (refreshBtn) {
-        refreshBtn.addEventListener("click", async (ev) => {
+        refreshBtn.addEventListener("click", (ev) => {
             ev.preventDefault();
             ev.stopPropagation();
-            try {
-                refreshBtn.disabled = true;
-                refreshBtn.classList.add("disabled");
-                await this._refresh({ force: true });
-            } finally {
-                refreshBtn.disabled = false;
-                refreshBtn.classList.remove("disabled");
-            }
+            refreshBtn.disabled = true;
+            refreshBtn.classList.add("disabled");
+            Promise.resolve(this._refresh({ force: true }))
+                .catch(() => {})
+                .finally(() => {
+                    refreshBtn.disabled = false;
+                    refreshBtn.classList.remove("disabled");
+                });
         });
     }
 }
 
-    async _setup() {
+    _setup() {
         const sectionEl = this.el;
         const carouselEl = sectionEl.querySelector(".js-bhz-featured-carousel");
         const innerEl = sectionEl.querySelector(".js-bhz-featured-inner");
@@ -241,7 +241,8 @@ _setupEditorPreview() {
         this._dom = { sectionEl, carouselEl, innerEl, indicatorsEl, emptyEl, prevBtn, nextBtn };
         this._cfg = { limit, intervalMs, refreshMs, autoplay };
 
-        await this._refresh();
+        return Promise.resolve(this._refresh())
+            .then(() => {
 
         // Auto refresh
         if (refreshMs && refreshMs > 0) {
@@ -258,53 +259,44 @@ _setupEditorPreview() {
                 hasMultiple: !!this._hasMultiple,
             });
         }
+            });
     },
 
-    async _refresh(opts = {}) {
+    _refresh(opts = {}) {
         // Avoid automatic refresh in editor unless explicitly forced (preview button)
-        if (isWebsiteEditor() && !opts.force) return;
+        if (isWebsiteEditor() && !opts.force) return Promise.resolve();
 
-        const { sectionEl, carouselEl, innerEl, indicatorsEl, emptyEl, prevBtn, nextBtn } = this._dom || {};
-        const { limit, intervalMs, autoplay } = this._cfg || {};
-        if (!carouselEl || !innerEl) return;
+        const { carouselEl, innerEl, indicatorsEl, emptyEl, prevBtn, nextBtn } = this._dom || {};
+        const { limit } = this._cfg || {};
+        if (!carouselEl || !innerEl) return Promise.resolve();
 
-        let payload;
-        try {
-            payload = await rpc("/_bhz_event_promo/featured", {
-                limit: limit || 12,
-                carousel_id: carouselEl.getAttribute("id") || null,
-            });
-        } catch (e) {
+        return rpc("/_bhz_event_promo/featured", {
+            limit: limit || 12,
+            carousel_id: carouselEl.getAttribute("id") || null,
+        }).then((payload) => {
+            const itemsHtml = (payload && (payload.items_html || payload.slides)) || "";
+            const indicatorsHtml = (payload && (payload.indicators_html || payload.indicators)) || "";
+            const hasEvents = !!(payload && payload.has_events);
+            const hasMultiple = !!(payload && payload.has_multiple);
+
+            // Update DOM
+            innerEl.innerHTML = itemsHtml;
+            if (indicatorsEl) indicatorsEl.innerHTML = indicatorsHtml;
+
+            // Toggle UI
+            this._hasMultiple = hasMultiple;
+            setVisibility({ hasEvents, hasMultiple, prevBtn, nextBtn, indicatorsEl, emptyEl });
+
+            // Ensure first slide active (Bootstrap requirement)
+            const firstItem = innerEl.querySelector(".carousel-item");
+            if (firstItem && !innerEl.querySelector(".carousel-item.active")) {
+                firstItem.classList.add("active");
+            }
+        }).catch(() => {
             // On failure, show empty
             innerEl.innerHTML = "";
             if (indicatorsEl) indicatorsEl.innerHTML = "";
             setVisibility({ hasEvents: false, hasMultiple: false, prevBtn, nextBtn, indicatorsEl, emptyEl });
-            return;
-        }
-
-        const itemsHtml = payload?.items_html || payload?.slides || "";
-        const indicatorsHtml = payload?.indicators_html || payload?.indicators || "";
-        const hasEvents = !!payload?.has_events;
-        const hasMultiple = !!payload?.has_multiple;
-
-        // IMPORTANT: Only mutate DOM in public mode (we're in public here)
-        innerEl.innerHTML = itemsHtml || "";
-        if (indicatorsEl) indicatorsEl.innerHTML = indicatorsHtml || "";
-
-        ensureActiveSlide(innerEl);
-        setVisibility({ hasEvents, hasMultiple, prevBtn, nextBtn, indicatorsEl, emptyEl });
-
-        this._hasMultiple = hasMultiple;
-
-// Restart autoplay instance to ensure it cycles with new slides
-// NOTE: never autoplay inside Website Builder (avoids DOM churn / Owl crashes)
-this._autoplayHandle?.stop?.();
-if (!isWebsiteEditor() && autoplay) {
-    this._autoplayHandle = startAutoplay({
-        carouselEl,
-        intervalMs: intervalMs || 5000,
-        hasMultiple,
-    });
-}
+        });
     },
 });
