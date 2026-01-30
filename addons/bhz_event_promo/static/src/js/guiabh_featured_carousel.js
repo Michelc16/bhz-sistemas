@@ -1,127 +1,185 @@
 /** @odoo-module **/
 
 import publicWidget from "@web/legacy/js/public/public_widget";
-import { jsonrpc } from "@web/core/network/rpc_service";
+import { rpc } from "@web/core/network/rpc";
 
-/**
- * GuiaBH - Featured Carousel
- *
- * Requirements:
- * - Autoplay: slides must advance automatically (Bootstrap Carousel)
- * - Editor-safe: do nothing in edit mode (prevents Owl patch/removeChild issues)
- *
- * NOTE: This widget intentionally does NOT auto-refresh/remove slides.
- * Removing a featured event will reflect after a normal page reload.
- */
+function _toInt(value, fallback) {
+    const n = parseInt(value, 10);
+    return Number.isNaN(n) ? fallback : n;
+}
+
 publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
     selector: ".js-bhz-featured-carousel",
-    disabledInEditableMode: true,
 
     async start() {
-        // In some builds `_super` can be missing; guard it to avoid runtime errors.
-        if (typeof this._super === "function") {
-            await this._super(...arguments);
+        this.sectionEl = this.el.closest(".s_guiabh_featured_carousel") || this.el;
+        this.carouselId = this.el.getAttribute("id") || null;
+
+        // Disable only in *real* edit mode (avoid false positives like oe_structure).
+        if (this._isEditMode()) {
+            return this._super(...arguments);
         }
 
-        // Load slides (server-rendered list) and then init autoplay.
-        await this._loadSlides();
-        this._initAutoplay();
+        this._applyAutoplayConfig();
+
+        // Always fetch the latest featured events once on load.
+        // This prevents stale slides remaining on the homepage after a featured
+        // flag is toggled (the website page HTML is persisted).
+        await this._refreshContent();
+
+        // Ensure a carousel instance exists even when refresh returns nothing.
+        this._initCarousel();
+
+        const refreshMs = this._getRefreshMs();
+        if (refreshMs > 0) {
+            this._refreshTimer = setInterval(() => this._refreshContent(), refreshMs);
+        }
+
+        return this._super(...arguments);
     },
 
-    _getSection() {
-        return this.el.closest("section.s_guiabh_featured_carousel") || this.el;
+    destroy() {
+        if (this._refreshTimer) {
+            clearInterval(this._refreshTimer);
+            this._refreshTimer = null;
+        }
+        this._disposeCarousel();
+        return this._super(...arguments);
     },
 
-    _getBool(dataValue, fallback = false) {
-        if (dataValue === undefined || dataValue === null || dataValue === "") {
-            return fallback;
-        }
-        return String(dataValue).toLowerCase() === "true";
+    // -------------------------------------------------------------------------
+    // Config
+    // -------------------------------------------------------------------------
+
+    _isEditMode() {
+        const b = document.body;
+        if (!b) return false;
+        // Markers used by Odoo website editor across versions
+        return (
+            b.classList.contains("editor_enable") ||
+            b.classList.contains("o_is_editing") ||
+            b.classList.contains("o_we_editing") ||
+            b.classList.contains("o_website_edit_mode")
+        );
     },
 
-    _getInt(dataValue, fallback) {
-        const n = parseInt(dataValue, 10);
-        return Number.isFinite(n) ? n : fallback;
+    _getInterval() {
+        const raw =
+            this.el.dataset.bsInterval ||
+            this.el.dataset.interval ||
+            this.sectionEl?.dataset?.interval ||
+            this.sectionEl?.getAttribute?.("data-interval") ||
+            "5000";
+        const val = _toInt(raw, 5000);
+        return Math.min(Math.max(val, 1000), 20000);
     },
 
-    _readConfig() {
-        const section = this._getSection();
-        const ds = section.dataset || {};
-
-        return {
-            limit: this._getInt(ds.limit, 12),
-            interval_ms: this._getInt(ds.interval, this._getInt(ds.bsInterval, 5000)),
-            autoplay: this._getBool(ds.bhzAutoplay, true),
-        };
+    _getRefreshMs() {
+        const raw =
+            this.sectionEl?.dataset?.bhzRefreshMs ||
+            this.sectionEl?.getAttribute?.("data-bhz-refresh-ms") ||
+            "0";
+        const val = _toInt(raw, 0);
+        return Math.min(Math.max(val, 0), 600000);
     },
 
-    async _loadSlides() {
-        const section = this._getSection();
-        const cfg = this._readConfig();
-
-        // Fetch slides HTML from server.
-        const res = await jsonrpc("/bhz_event_promo/snippet/featured_events", {
-            limit: cfg.limit,
-        });
-
-        const inner = section.querySelector(".js-bhz-featured-inner");
-        const indicators = section.querySelector(".js-bhz-featured-indicators");
-        const prev = section.querySelector(".carousel-control-prev");
-        const next = section.querySelector(".carousel-control-next");
-        const empty = section.querySelector(".js-bhz-featured-empty");
-
-        if (!inner) {
-            return;
-        }
-
-        if (!res || res.count === 0) {
-            inner.innerHTML = "";
-            indicators && indicators.classList.add("d-none");
-            prev && prev.classList.add("d-none");
-            next && next.classList.add("d-none");
-            empty && empty.classList.remove("d-none");
-            return;
-        }
-
-        // Replace DOM (safe because we don't run in editor).
-        inner.innerHTML = res.html || "";
-        if (indicators) {
-            indicators.outerHTML = res.indicators_html || indicators.outerHTML;
-        }
-
-        // Show controls only if multiple items.
-        const showControls = res.count > 1;
-        prev && prev.classList.toggle("d-none", !showControls);
-        next && next.classList.toggle("d-none", !showControls);
-        empty && empty.classList.add("d-none");
+    _getAutoplay() {
+        const raw =
+            this.sectionEl?.dataset?.bhzAutoplay ??
+            this.sectionEl?.getAttribute?.("data-bhz-autoplay");
+        if (raw === undefined || raw === null || raw === "") return true;
+        return String(raw).toLowerCase() !== "false";
     },
 
-    _initAutoplay() {
-        const section = this._getSection();
-        const cfg = this._readConfig();
+    _applyAutoplayConfig() {
+        const autoplay = this._getAutoplay();
+        const interval = this._getInterval();
 
-        // Bootstrap Carousel instance (Bootstrap is global in website).
-        const Carousel = window.bootstrap && window.bootstrap.Carousel;
-        if (!Carousel) {
-            return;
+        // Normalize attributes for Bootstrap
+        this.el.dataset.bsInterval = String(interval);
+        this.el.dataset.interval = String(interval);
+
+        // Some templates/editor may force data-bs-ride="false".
+        // We override it to guarantee autoplay when enabled.
+        this.el.setAttribute("data-bs-ride", autoplay ? "carousel" : "false");
+    },
+
+    // -------------------------------------------------------------------------
+    // Bootstrap Carousel
+    // -------------------------------------------------------------------------
+
+    _disposeCarousel() {
+        try {
+            const inst = window.bootstrap?.Carousel?.getInstance?.(this.el);
+            inst?.dispose?.();
+        } catch {
+            // ignore
         }
+    },
 
-        // If there is 0/1 item, autoplay is irrelevant.
-        const items = section.querySelectorAll(".carousel-item");
-        if (!items || items.length < 2) {
-            return;
-        }
+    _initCarousel() {
+        if (!window.bootstrap?.Carousel) return;
 
-        const instance = Carousel.getOrCreateInstance(this.el, {
-            interval: cfg.autoplay ? cfg.interval_ms : false,
-            ride: cfg.autoplay ? "carousel" : false,
+        this._disposeCarousel();
+
+        const autoplay = this._getAutoplay();
+        const interval = this._getInterval();
+
+        window.bootstrap.Carousel.getOrCreateInstance(this.el, {
+            interval: autoplay ? interval : false,
+            ride: autoplay ? "carousel" : false,
             pause: "hover",
-            wrap: true,
             touch: true,
+            keyboard: true,
         });
+    },
 
-        if (cfg.autoplay && typeof instance.cycle === "function") {
-            instance.cycle();
+    // -------------------------------------------------------------------------
+    // Auto refresh (remove/add featured events automatically)
+    // -------------------------------------------------------------------------
+
+    async _refreshContent() {
+        // Avoid Owl DOM patch issues in editor
+        if (this._isEditMode()) return;
+
+        const limit = _toInt(
+            this.sectionEl?.dataset?.limit || this.sectionEl?.getAttribute?.("data-limit") || "12",
+            12
+        );
+
+        let payload;
+        try {
+            payload = await rpc("/_bhz_event_promo/featured", {
+                limit,
+                carousel_id: this.carouselId,
+            });
+        } catch {
+            return;
         }
+        if (!payload) return;
+
+        const inner = this.el.querySelector(".js-bhz-featured-inner");
+        const indicators = this.el.querySelector(".js-bhz-featured-indicators");
+        const empty = this.sectionEl?.querySelector(".js-bhz-featured-empty");
+
+        const itemsHtml = payload.items_html || payload.slides || "";
+        const indicatorsHtml = payload.indicators_html || payload.indicators || "";
+
+        if (inner) inner.innerHTML = itemsHtml;
+        if (indicators) indicators.innerHTML = indicatorsHtml;
+
+        const hasEvents = !!payload.has_events;
+        if (empty) empty.classList.toggle("d-none", hasEvents);
+
+        const hasMultiple = !!payload.has_multiple;
+        const prevBtn = this.el.querySelector(".carousel-control-prev");
+        const nextBtn = this.el.querySelector(".carousel-control-next");
+        prevBtn?.classList.toggle("d-none", !hasMultiple);
+        nextBtn?.classList.toggle("d-none", !hasMultiple);
+        indicators?.classList.toggle("d-none", !hasMultiple);
+
+        // Re-init after DOM replacement
+        this._applyAutoplayConfig();
+        this._initCarousel();
     },
 });
