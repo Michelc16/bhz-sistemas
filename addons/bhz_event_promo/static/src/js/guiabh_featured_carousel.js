@@ -182,6 +182,45 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
         }
     },
 
+
+_setupEditorPreview() {
+    // In Website Builder, avoid background timers/autoplay and only refresh when user clicks.
+    const sectionEl = this.el;
+    const carouselEl = sectionEl.querySelector(".js-bhz-featured-carousel");
+    const innerEl = sectionEl.querySelector(".js-bhz-featured-inner");
+    const indicatorsEl = sectionEl.querySelector(".js-bhz-featured-indicators");
+    const emptyEl = sectionEl.querySelector(".js-bhz-featured-empty");
+    const prevBtn = sectionEl.querySelector(".carousel-control-prev");
+    const nextBtn = sectionEl.querySelector(".carousel-control-next");
+    const refreshBtn = sectionEl.querySelector(".js-bhz-featured-refresh");
+
+    if (!carouselEl || !innerEl) return;
+
+    const limit = _toInt(sectionEl.dataset.limit, 12);
+    const intervalMs = _toInt(sectionEl.dataset.interval, 5000);
+    const refreshMs = _toInt(sectionEl.dataset.bhzRefreshMs, 0);
+    // IMPORTANT: disable autoplay inside builder (prevents DOM churn / Owl issues)
+    const autoplay = false;
+
+    this._dom = { sectionEl, carouselEl, innerEl, indicatorsEl, emptyEl, prevBtn, nextBtn, refreshBtn };
+    this._cfg = { limit, intervalMs, refreshMs, autoplay };
+
+    if (refreshBtn) {
+        refreshBtn.addEventListener("click", async (ev) => {
+            ev.preventDefault();
+            ev.stopPropagation();
+            try {
+                refreshBtn.disabled = true;
+                refreshBtn.classList.add("disabled");
+                await this._refresh({ force: true });
+            } finally {
+                refreshBtn.disabled = false;
+                refreshBtn.classList.remove("disabled");
+            }
+        });
+    }
+}
+
     async _setup() {
         const sectionEl = this.el;
         const carouselEl = sectionEl.querySelector(".js-bhz-featured-carousel");
@@ -257,14 +296,15 @@ publicWidget.registry.GuiabhFeaturedCarousel = publicWidget.Widget.extend({
 
         this._hasMultiple = hasMultiple;
 
-        // Restart autoplay instance to ensure it cycles with new slides
-        this._autoplayHandle?.stop?.();
-        if (autoplay) {
-            this._autoplayHandle = startAutoplay({
-                carouselEl,
-                intervalMs: intervalMs || 5000,
-                hasMultiple,
-            });
-        }
+// Restart autoplay instance to ensure it cycles with new slides
+// NOTE: never autoplay inside Website Builder (avoids DOM churn / Owl crashes)
+this._autoplayHandle?.stop?.();
+if (!isWebsiteEditor() && autoplay) {
+    this._autoplayHandle = startAutoplay({
+        carouselEl,
+        intervalMs: intervalMs || 5000,
+        hasMultiple,
+    });
+}
     },
 });
