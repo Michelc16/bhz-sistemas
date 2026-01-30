@@ -22,10 +22,8 @@
     # Frontend assets must live in web.assets_frontend so they load on all public pages
     # (blog, home, landing, etc.). Editor assets remain in website.assets_editor.
     "assets": {
-        "web.assets_qweb": [
-            "bhz_event_promo/static/src/xml/guiabh_featured_carousel.xml",
-        ],
         "web.assets_frontend": [
+            "bhz_event_promo/static/src/xml/guiabh_featured_carousel.xml",
             "bhz_event_promo/static/src/scss/guiabh_event.scss",
             "bhz_event_promo/static/src/js/guiabh_announced_events.js",
             "bhz_event_promo/static/src/js/guiabh_featured_carousel.js",
