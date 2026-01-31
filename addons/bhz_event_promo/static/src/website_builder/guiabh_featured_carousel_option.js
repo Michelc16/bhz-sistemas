@@ -1,76 +1,57 @@
 /** @odoo-module **/
 
-import { BaseOptionComponent } from "@html_builder/core/utils";
-import { Plugin } from "@html_editor/plugin";
-import { SNIPPET_SPECIFIC } from "@html_builder/utils/option_sequence";
-import { withSequence } from "@html_editor/utils/resource";
-import { registry } from "@web/core/registry";
+import { BaseOptionComponent } from "@website/builder/plugins/options";
 
-class GuiabhFeaturedCarouselOption extends BaseOptionComponent {
-    static selector = ".s_guiabh_featured_carousel";
+export class GuiabhFeaturedCarouselOption extends BaseOptionComponent {
     static template = "bhz_event_promo.GuiabhFeaturedCarouselOption";
 
     setup() {
-        super.setup(...arguments);
-        this.interval = this._readInterval();
+        super.setup();
+        this._syncFromTarget();
     }
 
-    _readInterval() {
-        const section = this.el || document.createElement("div");
-        const carousel = section.querySelector?.(".guiabh-featured-carousel");
-        const raw = carousel?.dataset.interval || section.dataset?.interval || "5000";
-        const parsed = parseInt(raw, 10);
-        return Number.isNaN(parsed) ? 5000 : parsed;
+    // In the website builder, the selected snippet node is provided as props.target
+    _targetEl() {
+        return this.props?.target || this.el;
     }
 
-    onIntervalInput(ev) {
-        const value = this._sanitize(ev.target.value);
-        ev.target.value = value;
+    _syncFromTarget() {
+        const el = this._targetEl();
+        this.refreshMs = parseInt(el.getAttribute("data-bhz-refresh-ms") || "0", 10) || 0;
+        this.autoplay = (el.getAttribute("data-bhz-autoplay") || "true") !== "false";
     }
 
-    onIntervalChange(ev) {
-        const value = this._sanitize(ev.target.value);
-        ev.target.value = value;
-        this._applyInterval(value);
+    _sanitizeRefresh(value) {
+        const ms = parseInt(value || "0", 10);
+        if (isNaN(ms) || ms < 0) return 0;
+        if (ms > 600000) return 600000;
+        return ms;
     }
 
-    _sanitize(value) {
-        const parsed = parseInt(value || "0", 10) || 0;
-        const clamped = Math.min(Math.max(parsed, 1000), 20000);
-        return clamped;
+    _applyRefresh(ms) {
+        const el = this._targetEl();
+        el.setAttribute("data-bhz-refresh-ms", String(ms));
+        this.refreshMs = ms;
     }
 
-    _applyInterval(value) {
-        const section = this.el;
-        if (!section) {
-            return;
-        }
-        const carousel = section.querySelector
-            ? section.querySelector(".guiabh-featured-carousel")
-            : null;
-        const valStr = String(value);
-        section.dataset.interval = valStr;
-        if (carousel) {
-            carousel.dataset.interval = valStr;
-            carousel.dataset.bsInterval = valStr;
-        }
-        carousel?.dispatchEvent(
-            new CustomEvent("guiabh-featured-interval-update", {
-                bubbles: true,
-                detail: { interval: value },
-            })
-        );
-        this.requestSave();
+    _applyAutoplay(enabled) {
+        const el = this._targetEl();
+        el.setAttribute("data-bhz-autoplay", enabled ? "true" : "false");
+        this.autoplay = enabled;
+    }
+
+    onRefreshChange(ev) {
+        const ms = this._sanitizeRefresh(ev.target.value);
+        this._applyRefresh(ms);
+        this.env.editorBus.trigger("request_save");
+    }
+
+    onAutoplayChange(ev) {
+        this._applyAutoplay(ev.target.checked);
+        this.env.editorBus.trigger("request_save");
     }
 }
 
-class GuiabhFeaturedCarouselOptionPlugin extends Plugin {
-    static id = "guiabhFeaturedCarouselOption";
-    resources = {
-        builder_options: [withSequence(SNIPPET_SPECIFIC, GuiabhFeaturedCarouselOption)],
-    };
-}
-
-registry
-    .category("website-plugins")
-    .add(GuiabhFeaturedCarouselOptionPlugin.id, GuiabhFeaturedCarouselOptionPlugin);
+export const guiabhFeaturedCarouselOption = {
+    Component: GuiabhFeaturedCarouselOption,
+};

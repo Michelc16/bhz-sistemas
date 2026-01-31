@@ -265,3 +265,12 @@
     padding-right: 1.75rem;
   }
 }
+
+
+/* Website builder: show a small hint instead of running live DOM updates.
+   Running dynamic patching in edit mode can conflict with Owl's virtual DOM. */
+body.editor_enable .s_guiabh_featured_carousel .js-bhz-featured-editor-hint,
+html.o_is_editable .s_guiabh_featured_carousel .js-bhz-featured-editor-hint,
+body.o_is_editable .s_guiabh_featured_carousel .js-bhz-featured-editor-hint {
+    display: block !important;
+}
