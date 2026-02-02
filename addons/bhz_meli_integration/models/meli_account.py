@@ -7,7 +7,6 @@ from odoo.exceptions import UserError
 _logger = logging.getLogger(__name__)
 
 # ================== CONFIGURAÇÃO FIXA BHZ ==================
-# ID que apareceu na sua tela: 3010146478781244
 MELI_CLIENT_ID = "3010146478781244"
 
 # Trocar pelo secret real da sua aplicação Mercado Livre
