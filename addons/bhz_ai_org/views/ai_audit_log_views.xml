@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_bhz_ai_audit_log_tree" model="ir.ui.view">
+    <field name="name">bhz.ai.audit.log.tree</field>
+    <field name="model">bhz.ai.audit.log</field>
+    <field name="arch" type="xml">
+      <list>
+        <field name="finished_at"/>
+        <field name="tool_code"/>
+        <field name="agent_id"/>
+        <field name="run_as_user_id"/>
+        <field name="status"/>
+        <field name="company_id"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="view_bhz_ai_audit_log_form" model="ir.ui.view">
+    <field name="name">bhz.ai.audit.log.form</field>
+    <field name="model">bhz.ai.audit.log</field>
+    <field name="arch" type="xml">
+      <form>
+        <sheet>
+          <group>
+            <field name="company_id"/>
+            <field name="task_id"/>
+            <field name="action_id"/>
+            <field name="agent_id"/>
+          </group>
+          <group>
+            <field name="tool_id"/>
+            <field name="tool_code"/>
+            <field name="run_as_user_id"/>
+            <field name="status"/>
+          </group>
+          <group>
+            <field name="started_at"/>
+            <field name="finished_at"/>
+          </group>
+          <notebook>
+            <page string="Params">
+              <field name="params_json" widget="text"/>
+            </page>
+            <page string="Result">
+              <field name="result_text" widget="text"/>
+            </page>
+            <page string="Error">
+              <field name="error_text" widget="text"/>
+            </page>
+          </notebook>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_bhz_ai_audit_log" model="ir.actions.act_window">
+    <field name="name">Audit Logs</field>
+    <field name="res_model">bhz.ai.audit.log</field>
+    <field name="view_mode">list,form</field>
+    <field name="context">{}</field>
+  </record>
+</odoo>

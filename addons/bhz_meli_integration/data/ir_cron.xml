@@ -16,7 +16,7 @@
             <field name="name">BHZ ML: Buscar anúncios</field>
             <field name="model_id" ref="model_meli_product"/>
             <field name="state">code</field>
-            <field name="code">model.cron_fetch_items()</field>
+            <field name="code">model.cron_fetch_products()</field>
             <field name="interval_number">30</field>
             <field name="interval_type">minutes</field>
             <field name="active" eval="True"/>

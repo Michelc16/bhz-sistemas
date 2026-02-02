@@ -1,0 +1,31 @@
+<odoo>
+  <record id="tool_create_sale_order" model="bhz.ai.tool">
+    <field name="name">Create Sale Order</field>
+    <field name="code">create_sale_order</field>
+    <field name="model_name">sale.order</field>
+    <field name="method_name">bhz_ai_create_order</field>
+    <field name="risk_level">medium</field>
+    <field name="requires_approval">1</field>
+    <field name="sample_params_json">{ "partner_id": 10, "order_lines": [{"product_id": 25, "qty": 2}] }</field>
+  </record>
+
+  <record id="tool_web_search" model="bhz.ai.tool">
+    <field name="name">Web Search (Provider)</field>
+    <field name="code">web_search</field>
+    <field name="model_name">bhz.ai.providers</field>
+    <field name="method_name">web_search</field>
+    <field name="risk_level">low</field>
+    <field name="requires_approval">0</field>
+    <field name="sample_params_json">{ "agent": 1, "query": "eventos em alta MG Sympla", "num_results": 5 }</field>
+  </record>
+
+  <record id="tool_search_memory" model="bhz.ai.tool">
+    <field name="name">Search Memory</field>
+    <field name="code">search_memory</field>
+    <field name="model_name">bhz.ai.memory</field>
+    <field name="method_name">search_memory</field>
+    <field name="risk_level">low</field>
+    <field name="requires_approval">0</field>
+    <field name="sample_params_json">{ "query": "frete", "limit": 5 }</field>
+  </record>
+</odoo>

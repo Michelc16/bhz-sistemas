@@ -1,0 +1,84 @@
+<odoo>
+  <record id="view_bhz_ai_task_tree" model="ir.ui.view">
+    <field name="name">bhz.ai.task.tree</field>
+    <field name="model">bhz.ai.task</field>
+    <field name="arch" type="xml">
+      <list>
+        <field name="name"/>
+        <field name="state"/>
+        <field name="agent_id"/>
+        <field name="requester_user_id"/>
+        <field name="create_date"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="view_bhz_ai_task_form" model="ir.ui.view">
+    <field name="name">bhz.ai.task.form</field>
+    <field name="model">bhz.ai.task</field>
+    <field name="arch" type="xml">
+      <form>
+        <header>
+          <button name="action_plan" type="object" string="Plan" class="btn-primary"/>
+          <button name="action_approve" type="object" string="Approve" class="btn-secondary" groups="bhz_ai_org.group_bhz_ai_approver"/>
+          <button name="action_run_now" type="object" string="Run Now" class="btn-primary"/>
+          <field name="state" widget="statusbar" statusbar_visible="draft,planned,waiting_approval,running,done,failed"/>
+        </header>
+
+        <sheet>
+          <group>
+            <field name="name"/>
+            <field name="agent_id"/>
+            <field name="requester_user_id" readonly="1"/>
+            <field name="approval_required" readonly="1"/>
+            <field name="has_destructive_actions" readonly="1"/>
+            <field name="approved_by_id" readonly="1"/>
+            <field name="approved_on" readonly="1"/>
+          </group>
+          <div class="alert alert-danger">
+            Esta task contém tools destrutivas. Aprovação é obrigatória antes de executar.
+          </div>
+
+          <notebook>
+            <page string="Memory">
+              <field name="memory_context" widget="text" readonly="1"/>
+            </page>
+            <page string="Routing">
+              <group>
+                <field name="router_agent_id"/>
+                <field name="assigned_agent_id" readonly="1"/>
+              </group>
+              <field name="routing_json" widget="text" readonly="1" string="Routing JSON"/>
+            </page>
+            <page string="Input">
+              <field name="user_input" placeholder="Descreva o que a IA deve fazer..."/>
+            </page>
+            <page string="Plan">
+              <field name="plan_json" widget="text"/>
+            </page>
+            <page string="Actions">
+              <field name="action_ids">
+                <list editable="bottom">
+                  <field name="sequence"/>
+                  <field name="tool_id"/>
+                  <field name="state"/>
+                  <field name="params_json"/>
+                </list>
+              </field>
+            </page>
+            <page string="Result">
+              <field name="result_text" widget="text" readonly="1"/>
+              <field name="error_text" widget="text" readonly="1"/>
+            </page>
+          </notebook>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_bhz_ai_task" model="ir.actions.act_window">
+    <field name="name">AI Tasks</field>
+    <field name="res_model">bhz.ai.task</field>
+    <field name="view_mode">list,form</field>
+  </record>
+</odoo>
