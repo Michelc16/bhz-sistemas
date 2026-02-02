@@ -1,7 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_guiabh_event_user,access_guiabh_event_user,model_guiabh_event,base.group_user,1,1,1,1
-access_guiabh_place_user,access_guiabh_place_user,model_guiabh_place,base.group_user,1,1,1,1
-access_guiabh_region_user,access_guiabh_region_user,model_guiabh_region,base.group_user,1,1,1,1
-access_guiabh_event_category_user,access_guiabh_event_category_user,model_guiabh_event_category,base.group_user,1,1,1,1
-access_guiabh_place_type_user,access_guiabh_place_type_user,model_guiabh_place_type,base.group_user,1,1,1,1
-access_guiabh_tag_user,access_guiabh_tag_user,model_guiabh_tag,base.group_user,1,1,1,1

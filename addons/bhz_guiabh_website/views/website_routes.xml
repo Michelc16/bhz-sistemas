@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<odoo>
-  <data>
-    <!-- Rotas definidas em controllers/main.py com sitemap ativo. -->
-  </data>
-</odoo>
