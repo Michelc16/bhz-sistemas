@@ -38,13 +38,6 @@ export class GuiabhAnnouncedEvents extends Interaction {
     }
 
     start() {
-        // Never mutate DOM while the website editor is active.
-        // The editor uses Owl to patch the page; external DOM writes can cause
-        // NotFoundError/removeChild crashes.
-        if (this._isWebsiteEditorActive()) {
-            return;
-        }
-
         if (this.el.isConnected) {
             this.categoryObserver.observe(this.el, {
                 attributes: true,
@@ -105,9 +98,6 @@ export class GuiabhAnnouncedEvents extends Interaction {
     }
 
     async fetchAndRender() {
-        if (this._isWebsiteEditorActive()) {
-            return;
-        }
         if (!this.gridEl) {
             return;
         }
