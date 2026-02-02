@@ -5,7 +5,7 @@
     "summary": "Página no site com agenda de jogos dos times de BH (Cruzeiro, Atlético-MG e América-MG).",
     "author": "BHZ Sistemas",
     "license": "LGPL-3",
-    "depends": ["base", "website"],
+    "depends": ["base", "base_setup", "website"],
     "data": [
         "security/security.xml",
         "security/ir.model.access.csv",
