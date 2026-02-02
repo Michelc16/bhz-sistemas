@@ -58,10 +58,12 @@
                     <div class="guiabh-announced-body">
                         <p class="guiabh-announced-time text-muted small mb-1">
                             <t t-if="event.date_begin">
-                                <t t-esc="event._format_datetime_display(event.date_begin, '%H:%M (%Z)')"/>
-                            </t>
-                            <t t-if="event.date_end">
-                                <t t-esc="' - %s' % event._format_datetime_display(event.date_end, '%H:%M (%Z)')"/>
+                                De
+                                <t t-esc="event._format_datetime_display(event.date_begin, '%d/%m %H:%M')"/>
+                                <t t-if="event.date_end">
+                                    até
+                                    <t t-esc="event._format_datetime_display(event.date_end, '%d/%m %H:%M')"/>
+                                </t>
                             </t>
                         </p>
                         <h5 class="mb-2 text-uppercase">
