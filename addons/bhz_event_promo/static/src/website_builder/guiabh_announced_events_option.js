@@ -61,7 +61,26 @@ class GuiabhAnnouncedEventsOptionPlugin extends Plugin {
     static id = "guiabhAnnouncedEventsOption";
     resources = {
         builder_options: [withSequence(SNIPPET_SPECIFIC, GuiabhAnnouncedEventsOption)],
+        on_snippet_dropped_handlers: (params) => this.onSnippetDropped(params),
     };
+
+    /**
+     * Ensure defaults so the snippet works immediately after being dropped.
+     */
+    onSnippetDropped({ snippetEl }) {
+        if (!snippetEl?.matches?.(GuiabhAnnouncedEventsOption.selector)) {
+            return;
+        }
+        if (!snippetEl.dataset.limit) {
+            snippetEl.dataset.limit = "12";
+        }
+        if (!snippetEl.dataset.orderMode) {
+            snippetEl.dataset.orderMode = "recent";
+        }
+        if (!snippetEl.dataset.categoryIds) {
+            snippetEl.dataset.categoryIds = "[]";
+        }
+    }
 }
 
 if (registry?.category) {
