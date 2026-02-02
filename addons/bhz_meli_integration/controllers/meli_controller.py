@@ -21,8 +21,7 @@ class MeliAuthController(http.Controller):
 
         if account_id:
             account = request.env["meli.account"].sudo().browse(int(account_id))
-        else:
-            # pega a primeira conta em rascunho
+        else:            
             account = request.env["meli.account"].sudo().search([("state", "=", "draft")], limit=1)
 
         if not account:
