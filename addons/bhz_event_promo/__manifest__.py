@@ -18,19 +18,13 @@
         "views/snippets/options.xml",
         "views/res_config_settings_view.xml",
         "views/bhz_event_import_views.xml",
-    ],
-    # Frontend assets must live in web.assets_frontend so they load on all public pages
-    # (blog, home, landing, etc.). Editor assets remain in website.assets_editor.
+    ],    
     "assets": {
         "web.assets_frontend": [
             "bhz_event_promo/static/src/scss/guiabh_event.scss",
             "bhz_event_promo/static/src/js/guiabh_announced_events.js",
             "bhz_event_promo/static/src/js/guiabh_featured_carousel.js",
-        ],
-        # Keep editor bundle clean: custom editor widgets/templates were causing
-        # Owl lifecycle crashes when not all dependencies were present.
-        # The featured carousel is configured via data-* attributes and works
-        # without editor-side JS.
+        ],        
         "website.assets_editor": [],
     },
     "installable": True,
