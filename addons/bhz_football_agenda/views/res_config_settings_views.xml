@@ -3,9 +3,9 @@
     <record id="view_bhz_football_config_settings" model="ir.ui.view">
         <field name="name">bhz.football.config.settings</field>
         <field name="model">res.config.settings</field>
-        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//div[contains(@class,'settings')]" position="inside">
+            <xpath expr="//form//sheet" position="inside">
                 <div class="app_settings_block" data-string="BHZ Futebol" string="BHZ Futebol">
                     <h2>BHZ Futebol</h2>
                     <div class="row mt16 o_settings_container">
