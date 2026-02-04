@@ -112,10 +112,9 @@ class EventEvent(models.Model):
     external_url = fields.Char(string="URL do evento externo")
     external_last_sync = fields.Datetime(string="Última sincronização externa")
 
-    _bhz_event_external_unique = models.Constraint(
-        "UNIQUE(external_source, external_id)",
-        "A combinação de Fonte externa e ID externo deve ser única.",
-    )
+    _sql_constraints = [
+        ("bhz_event_external_unique", "unique(external_source, external_id)", "A combinação de Fonte externa e ID externo deve ser única."),
+    ]
     auto_remove_after_event = fields.Selection(
         [
             ("none", "Não fazer nada"),

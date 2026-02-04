@@ -6,6 +6,24 @@
         <field name="inherit_id" ref="website.res_config_settings_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='website_id']" position="after">
+<div class="app_settings_block" data-string="Agenda de Eventos">
+    <h2>Agenda de Eventos</h2>
+    <div class="row mt16 o_settings_container">
+        <div class="col-12 col-lg-6">
+            <div class="form-group">
+                <label class="col-form-label" for="bhz_agenda_enabled">Ativar Agenda neste site</label>
+                <div class="o_row">
+                    <field name="bhz_agenda_enabled" widget="switch"/>
+                </div>
+                <small class="text-muted">
+                    Quando desativado, o menu "Agenda" é ocultado e /agenda retorna 404 para este site.
+                    Isso evita que a mesma URL apareça em todos os sites (multi-website).
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
                 <div class="app_settings_block" data-string="Carrossel de Destaques">
                     <h2>Carrossel de Destaques</h2>
                     <div class="row mt16 o_settings_container">

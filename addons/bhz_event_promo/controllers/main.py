@@ -10,6 +10,7 @@ from urllib.parse import urlencode as py_urlencode
 
 from odoo import fields, http
 from odoo.http import request
+from werkzeug.exceptions import NotFound
 
 _logger = logging.getLogger(__name__)
 
@@ -21,13 +22,19 @@ class GuiaBHAgendaController(http.Controller):
     WEEK_VIEW = "week"
     VALID_VIEWS = {LIST_VIEW, MONTH_VIEW, WEEK_VIEW}
 
+    def _ensure_agenda_enabled(self):
+        if not request.website.sudo().bhz_agenda_enabled:
+            raise NotFound()
+
     @http.route(["/agenda"], type="http", auth="public", website=True, sitemap=True)
     def guiabh_agenda(self, **kw):
+        self._ensure_agenda_enabled()
         return self._render_agenda_page(category_record=None, **kw)
 
     @http.route("/event", type="http", auth="public", website=True, sitemap=False)
     def redirect_event_root(self, **kwargs):
-        """Keep legacy /event URL working by redirecting to the new agenda."""
+        self._ensure_agenda_enabled()
+        # Keep legacy /event URL working by redirecting to the new agenda.
         return request.redirect("/agenda", code=301)
 
     @http.route(
@@ -38,6 +45,7 @@ class GuiaBHAgendaController(http.Controller):
         sitemap=True,
     )
     def guiabh_agenda_category(self, category_record, **kw):
+        self._ensure_agenda_enabled()
         return self._render_agenda_page(category_record=category_record, **kw)
 
     # Helpers -----------------------------------------------------------------
@@ -99,6 +107,7 @@ class GuiaBHAgendaController(http.Controller):
         sitemap=True,
     )
     def guiabh_event_detail(self, event, **kwargs):
+        self._ensure_agenda_enabled()
         return self._render_event_detail(event)
 
     @http.route(
@@ -204,7 +213,7 @@ class GuiaBHAgendaController(http.Controller):
 
     @http.route(
         "/bhz_event_promo/snippet/announced_events",
-        type="jsonrpc",
+        type="json",
         auth="public",
         website=True,
     )
@@ -225,7 +234,7 @@ class GuiaBHAgendaController(http.Controller):
 
     @http.route(
         "/bhz_event_promo/snippet/featured_events",
-        type="jsonrpc",
+        type="json",
         auth="public",
         website=True,
     )
@@ -235,7 +244,7 @@ class GuiaBHAgendaController(http.Controller):
 
     @http.route(
         "/_bhz_event_promo/featured",
-        type="jsonrpc",
+        type="json",
         auth="public",
         website=True,
     )
@@ -244,7 +253,7 @@ class GuiaBHAgendaController(http.Controller):
 
     @http.route(
         "/bhz_event_promo/featured_carousel_data",
-        type="jsonrpc",
+        type="json",
         auth="public",
         website=True,
     )

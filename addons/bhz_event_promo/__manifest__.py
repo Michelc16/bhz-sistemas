@@ -1,6 +1,6 @@
 {
     "name": "GuiaBH - Eventos (Agenda + Terceiros + Botão custom)",
-    "version": "19.0.1.0.4",
+    "version": "19.0.1.0.2",
     "category": "Website",
     "summary": "Agenda de eventos com suporte a eventos de terceiros, link externo e botão personalizável.",
     "author": "BHZ Sistemas",
@@ -35,6 +35,7 @@
         ],
         "website.assets_editor": [],
     },
+    "post_init_hook": "post_init_hook",
     "installable": True,
     "application": False,
 }
