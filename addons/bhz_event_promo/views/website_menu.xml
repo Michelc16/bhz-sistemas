@@ -5,6 +5,5 @@
         <field name="url">/agenda</field>
         <field name="parent_id" ref="website.main_menu"/>
         <field name="sequence" eval="35"/>
-            <field name="active" eval="False"/>
     </record>
 </odoo>
