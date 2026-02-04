@@ -1,5 +1,5 @@
 {'name': 'BHZ - Guia de Locais (Cidade)',
- 'version': '19.0.1.0.1',
+ 'version': '19.0.1.0.2',
  'category': 'Website',
  'summary': 'Anuncie locais (bares, restaurantes, parques, museus etc.) no site com páginas públicas.',
  'author': 'BHZ Sistemas',

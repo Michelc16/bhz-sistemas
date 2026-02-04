@@ -5,16 +5,19 @@
         <field name="model">res.config.settings</field>
         <field name="inherit_id" ref="website.res_config_settings_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//div[@id='website_settings']" position="inside">
-                <div class="row mt16 o_settings_container">
-                    <div class="col-12 col-lg-6 o_setting_box">
-                        <div class="o_setting_left_pane">
-                            <field name="bhz_city_places_enabled"/>
-                        </div>
-                        <div class="o_setting_right_pane">
-                            <label for="bhz_city_places_enabled"/>
-                            <div class="text-muted">
-                                Cria/remove o menu "Locais" apenas neste website.
+            <xpath expr="//field[@name='website_id']" position="after">
+                <div class="app_settings_block" data-string="Locais">
+                    <h2>Locais</h2>
+                    <div class="row mt16 o_settings_container">
+                        <div class="col-12 col-lg-6">
+                            <div class="form-group">
+                                <label class="col-form-label" for="bhz_city_places_enabled">Ativar Locais neste site</label>
+                                <div class="o_row">
+                                    <field name="bhz_city_places_enabled" widget="switch"/>
+                                </div>
+                                <small class="text-muted">
+                                    Cria/remove o menu "Locais" apenas neste website.
+                                </small>
                             </div>
                         </div>
                     </div>
