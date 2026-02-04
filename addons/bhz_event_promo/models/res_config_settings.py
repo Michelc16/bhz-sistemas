@@ -19,3 +19,10 @@ class ResConfigSettings(models.TransientModel):
         readonly=False,
         string="Atualização do carrossel (ms)",
     )
+
+    # Agenda per website
+    bhz_agenda_enabled = fields.Boolean(
+        related="website_id.bhz_agenda_enabled",
+        readonly=False,
+        string="Ativar Agenda (/agenda) neste site",
+    )
