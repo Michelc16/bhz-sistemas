@@ -6,6 +6,7 @@ from urllib.parse import urlencode
 from odoo import fields, http
 from odoo.http import request
 
+from werkzeug.exceptions import NotFound
 try:
     from odoo.tools.misc import format_datetime as misc_format_datetime
 except Exception:
@@ -18,6 +19,10 @@ class BhzFootballAgendaController(http.Controller):
         "/futebol/agenda/<string:team_slug>",
     ], type="http", auth="public", website=True, sitemap=True)
     def football_agenda(self, team_slug=None, **kwargs):
+        website = request.website
+        if not getattr(website, 'bhz_football_agenda_enabled', False):
+            raise NotFound()
+
         website = request.website
         company = website.company_id
         company_domain = []

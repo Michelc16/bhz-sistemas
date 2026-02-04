@@ -3,6 +3,7 @@ from odoo import http
 from odoo.http import request
 
 
+from werkzeug.exceptions import NotFound
 class BhzPlacesWebsite(http.Controller):
 
     @http.route(
@@ -13,6 +14,10 @@ class BhzPlacesWebsite(http.Controller):
         sitemap=True,
     )
     def places_list(self, page=1, q=None, category=None, city=None, tag=None, **kw):
+        website = request.website
+        if not getattr(website, 'bhz_city_places_enabled', False):
+            raise NotFound()
+
         website = request.website
         company = website.company_id
         Place = request.env["bhz.place"].sudo()
@@ -73,6 +78,10 @@ class BhzPlacesWebsite(http.Controller):
         sitemap=True,
     )
     def place_detail(self, place_id, **kw):
+        website = request.website
+        if not getattr(website, 'bhz_city_places_enabled', False):
+            raise NotFound()
+
         website = request.website
         company = website.company_id
         place = request.env["bhz.place"].sudo().browse(place_id)

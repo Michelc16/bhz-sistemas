@@ -5,6 +5,7 @@ from odoo import http
 from odoo.http import request
 
 
+from werkzeug.exceptions import NotFound
 class GuiaBHCineartController(http.Controller):
 
     _CATEGORY_ALIASES = {
@@ -22,6 +23,10 @@ class GuiaBHCineartController(http.Controller):
 
     @http.route(['/cineart'], type='http', auth='public', website=True, sitemap=True)
     def cineart_page(self, **kw):
+        website = request.website
+        if not getattr(website, 'bhz_cineart_enabled', False):
+            raise NotFound()
+
         company = request.website.company_id
         company_id = company and company.id or False
         Movie = request.env['guiabh.cineart.movie'].sudo()

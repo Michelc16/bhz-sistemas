@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="bhz_football_res_config_settings_website" model="ir.ui.view">
+        <field name="name">bhz.football.res.config.settings.website</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="website.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@id='website_settings']" position="inside">
+                <div class="row mt16 o_settings_container">
+                    <div class="col-12 col-lg-6 o_setting_box">
+                        <div class="o_setting_left_pane">
+                            <field name="bhz_football_agenda_enabled"/>
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="bhz_football_agenda_enabled"/>
+                            <div class="text-muted">
+                                Cria/remove o menu "Agenda de Jogos" apenas neste website.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>
