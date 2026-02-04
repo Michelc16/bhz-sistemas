@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="bhz_city_places_res_config_settings_website" model="ir.ui.view">
+        <field name="name">bhz.city.places.res.config.settings.website</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="website.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='website_id']" position="after">
+                <div class="app_settings_block" data-string="Locais">
+                    <h2>Locais</h2>
+                    <div class="row mt16 o_settings_container">
+                        <div class="col-12 col-lg-6">
+                            <div class="form-group">
+                                <label class="col-form-label" for="bhz_city_places_enabled">Ativar Locais neste site</label>
+                                <div class="o_row">
+                                    <field name="bhz_city_places_enabled" widget="switch"/>
+                                </div>
+                                <small class="text-muted">
+                                    Cria/remove o menu "Locais" apenas neste website.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>
