@@ -45,12 +45,22 @@ class Website(models.Model):
             "website_id": self.id,
         }
 
+    def _bhz_agenda_set_menu_visibility(self, menu, visible):
+        Menu = self.env["website.menu"]
+        for field in ("is_visible", "is_published", "website_published", "active"):
+            if field in Menu._fields:
+                menu.write({field: bool(visible)})
+                return
+        if not visible:
+            menu.unlink()
+
     def _bhz_agenda_ensure_menu(self):
         self.ensure_one()
         Menu = self.env["website.menu"].sudo()
         if self.bhz_agenda_menu_id and self.bhz_agenda_menu_id.exists():
             # Ensure it is linked to this website and active
-            self.bhz_agenda_menu_id.write({"website_id": self.id, "active": True})
+            self.bhz_agenda_menu_id.write({"website_id": self.id, "name": "Agenda"})
+            self._bhz_agenda_set_menu_visibility(self.bhz_agenda_menu_id, True)
             return self.bhz_agenda_menu_id
 
         # Try to reuse an existing per-website menu if it already exists
@@ -63,7 +73,8 @@ class Website(models.Model):
             limit=1,
         )
         if existing:
-            existing.write({"active": True, "name": "Agenda"})
+            existing.write({"name": "Agenda"})
+            self._bhz_agenda_set_menu_visibility(existing, True)
             self.bhz_agenda_menu_id = existing.id
             return existing
 
@@ -75,12 +86,12 @@ class Website(models.Model):
         self.ensure_one()
         if self.bhz_agenda_menu_id and self.bhz_agenda_menu_id.exists():
             # Keep record for potential re-enable, just hide it
-            self.bhz_agenda_menu_id.sudo().write({"active": False})
+            self._bhz_agenda_set_menu_visibility(self.bhz_agenda_menu_id.sudo(), False)
         # Also hide any stray /agenda menus for this website
         Menu = self.env["website.menu"].sudo()
         stray = Menu.search([("website_id", "=", self.id), ("url", "=", "/agenda")])
         if stray:
-            stray.write({"active": False})
+            self._bhz_agenda_set_menu_visibility(stray, False)
 
     # -------------------------------------------------------------------------
     # ORM
