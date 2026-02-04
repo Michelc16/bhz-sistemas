@@ -3,6 +3,8 @@
     "version": "1.0.0",
     "category": "Website",
     "summary": "Esconde data/autor/meta nas páginas de post do blog (website_blog).",
+    "author": "BHZ Sistemas",
+    "license": "LGPL-3",
     "depends": ["website", "website_blog"],
     "assets": {
         "web.assets_frontend": [
