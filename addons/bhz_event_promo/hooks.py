@@ -1,6 +1,3 @@
-from odoo import api, SUPERUSER_ID
-
-
 def _set_menu_visibility(env, menu, visible):
     Menu = env["website.menu"]
     # Odoo 19 removed "active" on website.menu. Prefer supported visibility fields.
@@ -12,14 +9,13 @@ def _set_menu_visibility(env, menu, visible):
         menu.sudo().unlink()
 
 
-def post_init_hook(cr, registry):
+def post_init_hook(env):
     """After install/upgrade, ensure the legacy global 'Agenda' menu is hidden.
 
     Older versions created website.menu without website_id, making it appear in all websites
     (and auto-appear in new websites). We hide that shared menu and keep per-website menus
     controlled by website.bhz_agenda_enabled.
     """
-    env = api.Environment(cr, SUPERUSER_ID, {})
     # Hide the shared menu created by the XML id (if any)
     try:
         legacy_menu = env.ref("bhz_event_promo.website_menu_guiabh_agenda", raise_if_not_found=False)
