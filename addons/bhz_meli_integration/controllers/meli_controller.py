@@ -14,31 +14,23 @@ class MeliAuthController(http.Controller):
         Ela recebe ?code=... e opcionalmente ?state=<id_da_conta>
         """
         code = kwargs.get("code")
-        state = kwargs.get("state")
-        _logger.info("[ML][OAuth] Callback recebido. code? %s | state=%s", bool(code), state)
+        account_id = kwargs.get("state")
 
-        if not code or not state:
-            return "Faltou o code/state do Mercado Livre. Gere a autorização novamente."
+        if not code:
+            return "Faltou o code do Mercado Livre."
 
-        try:
-            account_id = int(state.split(":", 1)[0])
-        except Exception:
-            _logger.warning("[ML][OAuth] State inválido recebido: %s", state)
-            return "State inválido recebido. Gere a autorização novamente."
+        if account_id:
+            account = request.env["meli.account"].sudo().browse(int(account_id))
+        else:            
+            account = request.env["meli.account"].sudo().search([("state", "=", "draft")], limit=1)
 
-        account = request.env["meli.account"].sudo().browse(account_id)
-        if not account or not account.exists():
-            return "Conta do Mercado Livre não encontrada."
+        if not account:
+            return "Nenhuma conta do Mercado Livre encontrada para vincular."
 
         try:
-            account = account.sudo().with_company(account.company_id)
-            account.exchange_code_for_token(code, state=state)
+            account.sudo().exchange_code_for_token(code)
         except Exception as e:
-            _logger.exception("[ML][OAuth] Erro ao autenticar conta Mercado Livre %s", account.display_name)
-            try:
-                account._record_error(str(e))
-            except Exception:
-                _logger.debug("Não foi possível registrar erro na conta ML", exc_info=True)
+            _logger.exception("Erro ao autenticar conta Mercado Livre")
             return "Erro ao autenticar: %s" % str(e)
 
         return "Conta Mercado Livre conectada com sucesso. Você já pode fechar esta aba."
