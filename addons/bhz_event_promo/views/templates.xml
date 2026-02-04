@@ -1,9 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <template id="bhz_schema_organization">
+        <t t-set="base_url" t-value="website.get_base_url()"/>
+        <t t-set="org_name" t-value="website.name"/>
+        <t t-set="logo_url" t-value="'%s/web/image/website/%s/logo' % (base_url, website.id)"/>
+        <script type="application/ld+json">
+            {
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "name": "<t t-esc="org_name"/>",
+              "url": "<t t-esc="base_url"/>",
+              "logo": "<t t-esc="logo_url"/>"
+            }
+        </script>
+    </template>
+
+    <template id="bhz_schema_event">
+        <t t-set="base_url" t-value="website.get_base_url()"/>
+        <t t-set="org_name" t-value="website.name"/>
+        <t t-set="logo_url" t-value="'%s/web/image/website/%s/logo' % (base_url, website.id)"/>
+        <t t-set="event_url" t-value="'%s/agenda/event/%s' % (base_url, event.id)"/>
+        <t t-set="event_description" t-value="event.promo_short_description or event.subtitle"/>
+        <t t-set="event_image" t-value="False"/>
+        <t t-if="'promo_cover_image' in event._fields and event.promo_cover_image">
+            <t t-set="event_image" t-value="'%s/web/image/event.event/%s/promo_cover_image' % (base_url, event.id)"/>
+        </t>
+        <t t-elif="'image_1920' in event._fields and event.image_1920">
+            <t t-set="event_image" t-value="'%s/web/image/event.event/%s/image_1920' % (base_url, event.id)"/>
+        </t>
+        <t t-set="address" t-value="event.address_id"/>
+        <t t-set="place_name" t-value="(event.venue_partner_id and event.venue_partner_id.name) or (address and address.name)"/>
+        <t t-set="has_address" t-value="address and (address.street or address.city or address.state_id or address.zip)"/>
+        <t t-set="has_location" t-value="place_name or has_address"/>
+        <script type="application/ld+json">
+            {
+              "@context": "https://schema.org",
+              "@type": "Event",
+              "name": "<t t-esc="event.name"/>",
+              "url": "<t t-esc="event_url"/>",
+              "organizer": {
+                "@type": "Organization",
+                "name": "<t t-esc="org_name"/>",
+                "url": "<t t-esc="base_url"/>",
+                "logo": "<t t-esc="logo_url"/>"
+              },
+              "publisher": {
+                "@type": "Organization",
+                "name": "<t t-esc="org_name"/>",
+                "url": "<t t-esc="base_url"/>",
+                "logo": "<t t-esc="logo_url"/>"
+              }<t t-if="event.date_begin">
+              , "startDate": "<t t-esc="event.date_begin.isoformat()"/>"
+              </t><t t-if="event.date_end">
+              , "endDate": "<t t-esc="event.date_end.isoformat()"/>"
+              </t><t t-if="event_description">
+              , "description": "<t t-esc="event_description"/>"
+              </t><t t-if="event_image">
+              , "image": "<t t-esc="event_image"/>"
+              </t><t t-if="has_location">
+              , "location": {
+                "@type": "Place"<t t-if="place_name">,
+                "name": "<t t-esc="place_name"/>"
+                </t><t t-if="has_address">,
+                "address": {
+                  "@type": "PostalAddress"<t t-if="address.street">,
+                  "streetAddress": "<t t-esc="address.street"/>"
+                  </t><t t-if="address.city">,
+                  "addressLocality": "<t t-esc="address.city"/>"
+                  </t><t t-if="address.state_id">,
+                  "addressRegion": "<t t-esc="address.state_id.name"/>"
+                  </t><t t-if="address.zip">,
+                  "postalCode": "<t t-esc="address.zip"/>"
+                  </t>
+                }
+                </t>
+              }
+              </t>
+            }
+        </script>
+    </template>
+
     <!-- Página Agenda -->
     <template id="bhz_agenda_page" name="GuiaBH Agenda">
         <t t-call="website.layout">
+            <t t-call="bhz_event_promo.bhz_schema_organization"/>
             <div class="container mt-4 mb-5 guiabh-agenda">
                 <!-- BHZ_EVENT_PROMO_ACTIVE -->
                 <div class="row mb-3 align-items-center">
@@ -397,6 +478,8 @@
     <template id="bhz_event_detail" name="GuiaBH Event Detail">
         <t t-call="website.layout">
             <t t-set="main_object" t-value="event"/>
+            <t t-call="bhz_event_promo.bhz_schema_organization"/>
+            <t t-call="bhz_event_promo.bhz_schema_event"/>
             <div id="wrap"
                  class="oe_structure"
                  data-oe-model="event.event"
