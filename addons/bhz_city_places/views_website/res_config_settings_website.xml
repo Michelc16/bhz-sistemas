@@ -13,7 +13,7 @@
                             <div class="form-group">
                                 <label class="col-form-label" for="bhz_city_places_enabled">Ativar Locais neste site</label>
                                 <div class="o_row">
-                                    <field name="bhz_city_places_enabled" widget="switch"/>
+                                    <field name="bhz_city_places_enabled" widget="boolean_toggle"/>
                                 </div>
                                 <small class="text-muted">
                                     Cria/remove o menu "Locais" apenas neste website.

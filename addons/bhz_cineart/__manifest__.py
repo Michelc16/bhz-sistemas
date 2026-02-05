@@ -1,5 +1,5 @@
 {'name': 'BHZ-Cinema (Cineart)',
- 'version': '1.0.2',
+ 'version': '1.0.5',
  'category': 'Website',
  'summary': 'Página /cineart com Em Cartaz, Em Breve e Estreias da Semana (sincroniza do site do Cineart).',
  'author': 'BHZ Sistemas',
@@ -17,6 +17,6 @@
           'views_website/res_config_settings_website.xml'],
  'assets': {'web.assets_frontend': ['bhz_cineart/static/src/scss/cineart_snippet.scss',
                                     'bhz_cineart/static/src/js/guiabh_cineart_movies.js'],
-            'website.website_builder_assets': ['bhz_cineart/static/src/website_builder/**/*']},
+            'website.assets_wysiwyg': ['bhz_cineart/static/src/website_builder/**/*']},
  'installable': True,
  'application': False}

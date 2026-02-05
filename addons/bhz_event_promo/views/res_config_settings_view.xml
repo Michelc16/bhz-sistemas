@@ -13,7 +13,7 @@
             <div class="form-group">
                 <label class="col-form-label" for="bhz_agenda_enabled">Ativar Agenda neste site</label>
                 <div class="o_row">
-                    <field name="bhz_agenda_enabled" widget="switch"/>
+                    <field name="bhz_agenda_enabled" widget="boolean_toggle"/>
                 </div>
                 <small class="text-muted">
                     Quando desativado, o menu "Agenda" é ocultado e /agenda retorna 404 para este site.
@@ -31,7 +31,7 @@
                             <div class="form-group">
                                 <label class="col-form-label" for="bhz_featured_carousel_autoplay">Autoplay</label>
                                 <div class="o_row">
-                                    <field name="bhz_featured_carousel_autoplay" widget="switch"/>
+                                    <field name="bhz_featured_carousel_autoplay" widget="boolean_toggle"/>
                                 </div>
                             </div>
                             <div class="form-group">

@@ -9,7 +9,7 @@ _logger = logging.getLogger(__name__)
 
 class BhzWaInboxController(http.Controller):
 
-    @http.route('/bhz/wa/inbox/conversations', type='json', auth='user', methods=['POST'])
+    @http.route('/bhz/wa/inbox/conversations', type='jsonrpc', auth='user', methods=['POST'])
     def conversations(self):
         conversations = request.env['bhz.wa.conversation'].sudo().search([], order='is_pinned desc, last_message_date desc', limit=100)
         data = []
@@ -26,7 +26,7 @@ class BhzWaInboxController(http.Controller):
             })
         return {'conversations': data}
 
-    @http.route('/bhz/wa/inbox/messages', type='json', auth='user', methods=['POST'])
+    @http.route('/bhz/wa/inbox/messages', type='jsonrpc', auth='user', methods=['POST'])
     def messages(self, conversation_id, limit=50, offset=0):
         conversation = request.env['bhz.wa.conversation'].sudo().browse(conversation_id)
         if not conversation.exists():
@@ -49,7 +49,7 @@ class BhzWaInboxController(http.Controller):
             })
         return {'messages': data}
 
-    @http.route('/bhz/wa/inbox/send_message', type='json', auth='user', methods=['POST'])
+    @http.route('/bhz/wa/inbox/send_message', type='jsonrpc', auth='user', methods=['POST'])
     def send_message(self, conversation_id, body):
         conversation = request.env['bhz.wa.conversation'].sudo().browse(conversation_id)
         if not conversation.exists():
@@ -80,7 +80,7 @@ class BhzWaInboxController(http.Controller):
             return {'error': 'send_failed'}
         return {'error': 'send_failed'}
 
-    @http.route('/bhz/wa/inbox/mark_read', type='json', auth='user', methods=['POST'])
+    @http.route('/bhz/wa/inbox/mark_read', type='jsonrpc', auth='user', methods=['POST'])
     def mark_read(self, conversation_id):
         conversation = request.env['bhz.wa.conversation'].sudo().browse(conversation_id)
         if conversation.exists():

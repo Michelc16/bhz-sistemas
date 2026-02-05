@@ -1,6 +1,6 @@
 {
     "name": "GuiaBH - Eventos (Agenda + Terceiros + Botão custom)",
-    "version": "19.0.1.0.5",
+    "version": "19.0.1.0.8",
     "category": "Website",
     "summary": "Agenda de eventos com suporte a eventos de terceiros, link externo e botão personalizável.",
     "author": "BHZ Sistemas",
@@ -27,10 +27,8 @@
             "bhz_event_promo/static/src/js/guiabh_announced_events.js",
             "bhz_event_promo/static/src/js/guiabh_featured_carousel.js",
         ],
-        # Editor/builder assets: kept in the new website builder bundle to avoid
-        # loading them on every backend page and to make snippet options available
-        # in the visual editor.
-        "website.website_builder_assets": [
+        # Editor/builder assets: load only in the website editor to avoid backend JS issues.
+        "website.assets_wysiwyg": [
             "bhz_event_promo/static/src/website_builder/**/*",
         ],
         "website.assets_editor": [],
