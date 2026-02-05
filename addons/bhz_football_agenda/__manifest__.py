@@ -1,5 +1,5 @@
 {'name': 'BHZ - Agenda Futebol (Cruzeiro, Atlético-MG, América-MG)',
- 'version': '1.0.3',
+ 'version': '1.0.4',
  'category': 'Website',
  'summary': 'Página no site com agenda de jogos dos times de BH (Cruzeiro, Atlético-MG e América-MG).',
  'author': 'BHZ Sistemas',

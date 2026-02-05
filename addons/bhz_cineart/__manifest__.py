@@ -1,5 +1,5 @@
 {'name': 'BHZ-Cinema (Cineart)',
- 'version': '1.0.2',
+ 'version': '1.0.3',
  'category': 'Website',
  'summary': 'Página /cineart com Em Cartaz, Em Breve e Estreias da Semana (sincroniza do site do Cineart).',
  'author': 'BHZ Sistemas',

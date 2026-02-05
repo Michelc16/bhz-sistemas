@@ -1,7 +1,7 @@
 {
     "name": "BHZ WhatsApp Omni (Starter + Business)",
     "summary": "Atendimento WhatsApp: Starter (QR) + Business (Cloud API) com inbox, IA e anti-abuso",
-    "version": "19.0.1.0.0",
+    "version": "19.0.1.0.1",
     "category": "Tools/Communication",
     "author": "BHZ Sistemas",
     "website": "https://bhzsistemas.com.br",
