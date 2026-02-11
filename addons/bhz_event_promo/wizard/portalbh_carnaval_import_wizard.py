@@ -90,8 +90,17 @@ class PortalBHCarnavalImportWizard(models.TransientModel):
             s=skipped,
             e=errors,
         )
-        self.env.user.notify_success(message=msg)
-        return {"type": "ir.actions.act_window_close"}
+        return {
+    'type': 'ir.actions.client',
+    'tag': 'display_notification',
+    'params': {
+        'title': _('Importação concluída'),
+        'message': msg,
+        'type': 'success',
+        'sticky': False,
+    }
+}
+return {"type": "ir.actions.act_window_close"}
 
     # ---------------------------------------------------------------------
     # Scraper
