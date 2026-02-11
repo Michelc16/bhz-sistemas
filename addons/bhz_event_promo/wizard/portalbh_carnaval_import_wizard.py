@@ -91,16 +91,15 @@ class PortalBHCarnavalImportWizard(models.TransientModel):
             e=errors,
         )
         return {
-    'type': 'ir.actions.client',
-    'tag': 'display_notification',
-    'params': {
-        'title': _('Importação concluída'),
-        'message': msg,
-        'type': 'success',
-        'sticky': False,
-    }
-}
-return {"type": "ir.actions.act_window_close"}
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Importação concluída'),
+                'message': msg,
+                'type': 'success',
+                'sticky': False,
+            },
+        }
 
     # ---------------------------------------------------------------------
     # Scraper
