@@ -35,10 +35,17 @@
         <field name="target">new</field>
     </record>
 
+    <!--
+        IMPORTANT:
+        The user expects this wizard to appear under:
+            Events > Configuration
+        In the standard Events app, that menu is:
+            event.menu_event_configuration
+    -->
     <menuitem
         id="menu_portalbh_carnaval_import_wizard"
         name="Importar Carnaval BH (PortalBH)"
-        parent="base.menu_custom"
+        parent="event.menu_event_configuration"
         action="action_portalbh_carnaval_import_wizard"
         sequence="46"
         groups="event.group_event_manager"/>
