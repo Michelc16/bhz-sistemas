@@ -18,6 +18,7 @@
         "views/snippets/options.xml",
         "views/res_config_settings_view.xml",
         "views/bhz_event_import_views.xml",
+        "views/portalbh_carnaval_import_views.xml",
     ],
     # Frontend assets must live in web.assets_frontend so they load on all public pages
     # (blog, home, landing, etc.). Editor assets remain in website.assets_editor.
