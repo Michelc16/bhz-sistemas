@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Roda importações em background (evita timeout no clique do wizard) -->
+    <record id="ir_cron_portalbh_carnaval_import" model="ir.cron">
+        <field name="name">BHZ Event Promo - PortalBH Carnaval Import</field>
+        <field name="model_id" ref="bhz_event_promo.model_bhz_portalbh_carnaval_import_job"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_run_pending_jobs()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">minutes</field>
+        <field name="active">True</field>
+    </record>
+
+</odoo>
