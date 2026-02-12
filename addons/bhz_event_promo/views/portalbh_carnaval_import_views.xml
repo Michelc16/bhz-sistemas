@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_portalbh_carnaval_import_wizard" model="ir.ui.view">
+        <field name="name">bhz.portalbh.carnaval.import.wizard.form</field>
+        <field name="model">bhz.portalbh.carnaval.import.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Importar Blocos de Rua (Carnaval BH 2026)">
+                <sheet>
+                    <div class="alert alert-info">
+                        Importa todos os blocos da listagem do Portal Belo Horizonte (Carnaval 2026).
+                        Os registros são criados/atualizados no <code>event.event</code> usando
+                        <code>external_source=portalbh_carnaval_2026</code> e o ID numérico do link.
+                    </div>
+                    <group>
+                        <field name="source_url"/>
+                        <field name="max_pages"/>
+                        <field name="update_existing"/>
+                        <field name="default_duration_hours"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button string="Rodar Bot e Importar" type="object" name="action_import_portalbh" class="btn btn-primary"/>
+                    <button string="Cancelar" special="cancel" class="btn btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_portalbh_carnaval_import_wizard" model="ir.actions.act_window">
+        <field name="name">Importar Carnaval BH (PortalBH)</field>
+        <field name="res_model">bhz.portalbh.carnaval.import.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_portalbh_carnaval_import_wizard"/>
+        <field name="target">new</field>
+    </record>
+
+    <!--
+        IMPORTANT:
+        The user expects this wizard to appear under:
+            Events > Configuration
+        In the standard Events app, that menu is:
+            event.menu_event_configuration
+    -->
+    <menuitem
+        id="menu_portalbh_carnaval_import_wizard"
+        name="Importar Carnaval BH (PortalBH)"
+        parent="event.menu_event_configuration"
+        action="action_portalbh_carnaval_import_wizard"
+        sequence="46"
+        groups="event.group_event_manager"/>
+
+</odoo>
