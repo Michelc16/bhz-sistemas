@@ -5,8 +5,10 @@
         <field name="name">bhz.portalbh.carnaval.import.job.tree</field>
         <field name="model">bhz.portalbh.carnaval.import.job</field>
         <field name="arch" type="xml">
-            <list string="Importações PortalBH">
+            <tree string="Importações PortalBH">
                 <field name="name"/>
+                <field name="company_id"/>
+                <field name="website_id"/>
                 <field name="state"/>
                 <field name="current_page"/>
                 <field name="max_pages"/>
@@ -16,7 +18,7 @@
                 <field name="error_count"/>
                 <field name="last_run"/>
                 <field name="create_date"/>
-            </list>
+            </tree>
         </field>
     </record>
 
@@ -27,16 +29,18 @@
             <form string="Importação PortalBH">
                 <header>
                     <button name="action_run_now" type="object" string="Rodar lote agora" class="btn-primary"
-                            invisible="state in ('done','failed','canceled')"/>
+                            attrs="{'invisible': [('state', 'in', ['done','failed','canceled'])]}"/>
                     <button name="action_enqueue" type="object" string="Reagendar" class="btn-secondary"
-                            invisible="state in ('done','failed','canceled')"/>
+                            attrs="{'invisible': [('state', 'in', ['done','failed','canceled'])]}"/>
                     <button name="action_cancel" type="object" string="Cancelar" class="btn-secondary"
-                            invisible="state in ('done','failed','canceled')"/>
+                            attrs="{'invisible': [('state', 'in', ['done','failed','canceled'])]}"/>
                     <field name="state" widget="statusbar" statusbar_visible="pending,running,done,failed,canceled"/>
                 </header>
                 <sheet>
                     <group>
                         <field name="name"/>
+                        <field name="company_id"/>
+                        <field name="website_id"/>
                         <field name="source_url"/>
                         <field name="max_pages"/>
                         <field name="current_page"/>
