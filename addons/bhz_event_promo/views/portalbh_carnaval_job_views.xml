@@ -27,11 +27,11 @@
             <form string="Importação PortalBH">
                 <header>
                     <button name="action_run_now" type="object" string="Rodar lote agora" class="btn-primary"
-                            attrs="{'invisible': [('state', 'in', ['done','failed','canceled'])]}"/>
+                            invisible="state in ('done','failed','canceled')"/>
                     <button name="action_enqueue" type="object" string="Reagendar" class="btn-secondary"
-                            attrs="{'invisible': [('state', 'in', ['done','failed','canceled'])]}"/>
+                            invisible="state in ('done','failed','canceled')"/>
                     <button name="action_cancel" type="object" string="Cancelar" class="btn-secondary"
-                            attrs="{'invisible': [('state', 'in', ['done','failed','canceled'])]}"/>
+                            invisible="state in ('done','failed','canceled')"/>
                     <field name="state" widget="statusbar" statusbar_visible="pending,running,done,failed,canceled"/>
                 </header>
                 <sheet>
