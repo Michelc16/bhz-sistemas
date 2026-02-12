@@ -5,7 +5,7 @@
         <field name="name">bhz.portalbh.carnaval.import.job.tree</field>
         <field name="model">bhz.portalbh.carnaval.import.job</field>
         <field name="arch" type="xml">
-            <tree string="Importações PortalBH">
+            <list string="Importações PortalBH">
                 <field name="name"/>
                 <field name="company_id"/>
                 <field name="website_id"/>
@@ -18,7 +18,7 @@
                 <field name="error_count"/>
                 <field name="last_run"/>
                 <field name="create_date"/>
-            </tree>
+            </list>
         </field>
     </record>
 
