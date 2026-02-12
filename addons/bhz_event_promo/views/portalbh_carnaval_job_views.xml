@@ -29,11 +29,11 @@
             <form string="Importação PortalBH">
                 <header>
                     <button name="action_run_now" type="object" string="Rodar lote agora" class="btn-primary"
-                            attrs="{'invisible': [('state', 'in', ['done','failed','canceled'])]}"/>
+                            invisible="state in ['done','failed','canceled']"/>
                     <button name="action_enqueue" type="object" string="Reagendar" class="btn-secondary"
-                            attrs="{'invisible': [('state', 'in', ['done','failed','canceled'])]}"/>
+                            invisible="state in ['done','failed','canceled']"/>
                     <button name="action_cancel" type="object" string="Cancelar" class="btn-secondary"
-                            attrs="{'invisible': [('state', 'in', ['done','failed','canceled'])]}"/>
+                            invisible="state in ['done','failed','canceled']"/>
                     <field name="state" widget="statusbar" statusbar_visible="pending,running,done,failed,canceled"/>
                 </header>
                 <sheet>
@@ -76,7 +76,7 @@
     <record id="action_portalbh_carnaval_job" model="ir.actions.act_window">
         <field name="name">Importações PortalBH</field>
         <field name="res_model">bhz.portalbh.carnaval.import.job</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Nenhuma importação ainda.
