@@ -79,8 +79,16 @@ def _create_portalbh_carnaval_tables_if_missing(cr):
             )
         """)
 
-def post_init_hook(cr, registry):
-    # Keep this hook extremely defensive and idempotent.
+def post_init_hook(env):
+    """Post-init hook called by Odoo with an *env* (since v19).
+
+    The build was failing with:
+        - Model bhz.portalbh.carnaval.import.wizard has no table.
+        - Model bhz.portalbh.carnaval.import.job has no table.
+
+    This hook is intentionally defensive and idempotent.
+    """
+    cr = env.cr
     try:
         _create_portalbh_carnaval_tables_if_missing(cr)
     except Exception:
