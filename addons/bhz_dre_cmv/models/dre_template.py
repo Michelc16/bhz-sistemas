@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import fields, models
+from odoo import api, fields, models
 
 
 class BhzDreTemplate(models.Model):
@@ -22,12 +22,13 @@ class BhzDreTemplate(models.Model):
         string="Linhas",
     )
 
-    def name_get(self):
-        result = []
+    @api.depends('name', 'company_id', 'company_id.name')
+    def _compute_display_name(self):
         for template in self:
-            display = "%s (%s)" % (template.name, template.company_id.name)
-            result.append((template.id, display))
-        return result
+            if template.company_id:
+                template.display_name = f"{template.name} ({template.company_id.name})"
+            else:
+                template.display_name = template.name
 
 
 class BhzDreTemplateLine(models.Model):
