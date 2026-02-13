@@ -13,6 +13,8 @@
                         <code>external_source=portalbh_carnaval_2026</code> e o ID numérico do link.
                     </div>
                     <group>
+                        <field name="company_id"/>
+                        <field name="website_id" options="{'no_create': False}"/>
                         <field name="source_url"/>
                         <field name="max_pages"/>
                         <field name="update_existing"/>
