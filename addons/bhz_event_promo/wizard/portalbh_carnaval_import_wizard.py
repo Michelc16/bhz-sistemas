@@ -22,6 +22,19 @@ class PortalBHCarnavalImportWizard(models.TransientModel):
     update_existing = fields.Boolean(string="Atualizar existentes", default=True)
     default_duration_hours = fields.Float(string="Duração padrão (h)", default=3.0)
 
+    company_id = fields.Many2one(
+        "res.company",
+        string="Empresa",
+        required=True,
+        default=lambda self: self.env.company,
+    )
+    website_id = fields.Many2one(
+        "website",
+        string="Website",
+        help="Opcional. Se definido, os eventos importados ficam vinculados a este website.",
+        domain="[(\"company_id\", \"=\", company_id)]",
+    )
+
     def action_import_portalbh(self):
         self.ensure_one()
 
@@ -31,6 +44,8 @@ class PortalBHCarnavalImportWizard(models.TransientModel):
                 "max_pages": int(self.max_pages or 1),
                 "update_existing": bool(self.update_existing),
                 "default_duration_hours": float(self.default_duration_hours or 3.0),
+                "company_id": self.company_id.id,
+                "website_id": self.website_id.id if self.website_id else False,
             }
         )
         job.action_enqueue()

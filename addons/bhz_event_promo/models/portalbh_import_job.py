@@ -68,6 +68,24 @@ class PortalBHCarnavalImportJob(models.Model):
     image_max_bytes = fields.Integer(string="Tamanho máximo imagem (bytes)", default=2_000_000)
 
     # ---------------------------------------------------------------------
+    # Multi-company / multi-website
+    # ---------------------------------------------------------------------
+
+    company_id = fields.Many2one(
+        "res.company",
+        string="Empresa",
+        index=True,
+        default=lambda self: self.env.company,
+    )
+
+    website_id = fields.Many2one(
+        "website",
+        string="Website",
+        help="Opcional. Se informado, os eventos importados ficam vinculados a este website.",
+        domain="[('company_id', '=', company_id)]",
+    )
+
+    # ---------------------------------------------------------------------
     # UI actions
     # ---------------------------------------------------------------------
     def action_enqueue(self):
@@ -92,7 +110,8 @@ class PortalBHCarnavalImportJob(models.Model):
     def action_run_now(self):
         """Permite rodar um lote manualmente."""
         self.ensure_one()
-        self._run_batch()
+        # Garante execução isolada por empresa
+        self.with_company(self.company_id)._run_batch()
         return {
             "type": "ir.actions.act_window",
             "res_model": self._name,
@@ -112,7 +131,8 @@ class PortalBHCarnavalImportJob(models.Model):
         jobs = self.search([("state", "in", ("pending", "running"))], limit=limit)
         for job in jobs:
             try:
-                job._run_batch()
+                # Isola execução por empresa (multi-company)
+                job.with_company(job.company_id)._run_batch()
             except Exception as err:
                 _logger.exception("[PortalBH Carnaval] job %s falhou: %s", job.id, err)
                 job._append_log(f"ERRO FATAL: {err}")
@@ -125,6 +145,10 @@ class PortalBHCarnavalImportJob(models.Model):
         self.ensure_one()
         if self.state in ("done", "failed", "canceled"):
             return
+
+        # Garante que todas as buscas/criações abaixo respeitem a empresa do job
+        # (inclusive constraints e campos multi-company como company_id)
+        self = self.with_company(self.company_id)
 
         self.state = "running"
         self.last_run = fields.Datetime.now()
@@ -162,7 +186,8 @@ class PortalBHCarnavalImportJob(models.Model):
             self.state = "done"
 
     def _import_links(self, session, links):
-        Event = self.env["event.event"].sudo()
+        # Respeita empresa para não misturar agenda entre companies
+        Event = self.env["event.event"].with_company(self.company_id).sudo()
 
         for url, card_hint in links:
             try:
@@ -171,13 +196,15 @@ class PortalBHCarnavalImportJob(models.Model):
                     self.skipped_count += 1
                     continue
 
-                existing = Event.search(
-                    [
-                        ("external_source", "=", payload["external_source"]),
-                        ("external_id", "=", payload["external_id"]),
-                    ],
-                    limit=1,
-                )
+                domain = [
+                    ("external_source", "=", payload["external_source"]),
+                    ("external_id", "=", payload["external_id"]),
+                ]
+                # Isola por empresa: mesmo external_id pode existir em outra company
+                if "company_id" in Event._fields:
+                    domain.append(("company_id", "=", self.company_id.id))
+
+                existing = Event.search(domain, limit=1)
                 if existing:
                     if self.update_existing:
                         existing.write(payload["vals"])
@@ -329,6 +356,13 @@ class PortalBHCarnavalImportJob(models.Model):
             "external_last_sync": fields.Datetime.now(),
             "show_on_public_agenda": True,
         }
+
+        # Multi-company: cada job importa para sua empresa/website
+        if "company_id" in self.env["event.event"]._fields:
+            vals["company_id"] = self.company_id.id
+        if self.website_id and "website_id" in self.env["event.event"]._fields:
+            vals["website_id"] = self.website_id.id
+
         if image_b64:
             vals["promo_cover_image"] = image_b64
 

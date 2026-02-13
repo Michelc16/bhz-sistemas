@@ -112,8 +112,13 @@ class EventEvent(models.Model):
     external_url = fields.Char(string="URL do evento externo")
     external_last_sync = fields.Datetime(string="Última sincronização externa")
 
+    # Multi-company: permite importar o mesmo evento externo para empresas diferentes.
     _sql_constraints = [
-        ("bhz_event_external_unique", "unique(external_source, external_id)", "A combinação de Fonte externa e ID externo deve ser única."),
+        (
+            "bhz_event_external_unique",
+            "unique(external_source, external_id, company_id)",
+            "A combinação de Fonte externa, ID externo e Empresa deve ser única.",
+        ),
     ]
     auto_remove_after_event = fields.Selection(
         [
@@ -633,9 +638,13 @@ class EventEvent(models.Model):
         source = payload.get("external_source")
         ext_id = payload.get("external_id")
         vals = self._api_prepare_vals(payload)
-        Event = self.sudo()
+        # Multi-company: isola busca/atualização por empresa
+        company_id = vals.get("company_id") or self.env.company.id
+        if "company_id" in self._fields:
+            vals.setdefault("company_id", company_id)
+        Event = self.with_company(company_id).sudo()
         existing = Event.search(
-            [("external_source", "=", source), ("external_id", "=", ext_id)],
+            [("external_source", "=", source), ("external_id", "=", ext_id), ("company_id", "=", company_id)],
             limit=1,
         )
         if existing:

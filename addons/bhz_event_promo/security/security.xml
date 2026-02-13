@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Campo extra em event.event já segue as regras do próprio evento.
-         Aqui deixamos simples. -->
+    <data>
+        <!-- Multi-company: isola os jobs de importação por empresa -->
+        <record id="rule_portalbh_carnaval_import_job_company" model="ir.rule">
+            <field name="name">PortalBH Import Job - Multi-company</field>
+            <field name="model_id" ref="model_bhz_portalbh_carnaval_import_job"/>
+            <field name="domain_force">['|',('company_id','=',False),('company_id','in',user.company_ids.ids)]</field>
+        </record>
+    </data>
 </odoo>
