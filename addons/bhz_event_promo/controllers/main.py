@@ -204,7 +204,7 @@ class GuiaBHAgendaController(http.Controller):
 
     @http.route(
         "/bhz_event_promo/snippet/announced_events",
-        type='jsonrpc',
+        type="jsonrpc",
         auth="public",
         website=True,
     )
@@ -225,7 +225,7 @@ class GuiaBHAgendaController(http.Controller):
 
     @http.route(
         "/bhz_event_promo/snippet/featured_events",
-        type='jsonrpc',
+        type="jsonrpc",
         auth="public",
         website=True,
     )
@@ -235,7 +235,7 @@ class GuiaBHAgendaController(http.Controller):
 
     @http.route(
         "/_bhz_event_promo/featured",
-        type='jsonrpc',
+        type="jsonrpc",
         auth="public",
         website=True,
     )
@@ -244,7 +244,7 @@ class GuiaBHAgendaController(http.Controller):
 
     @http.route(
         "/bhz_event_promo/featured_carousel_data",
-        type='jsonrpc',
+        type="jsonrpc",
         auth="public",
         website=True,
     )

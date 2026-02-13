@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
             <form string="Importar Blocos de Rua (Carnaval BH 2026)">
                 <sheet>
-                    <div role="alert" class="alert alert-info">
+                    \1 role="alert">
                         Importa todos os blocos da listagem do Portal Belo Horizonte (Carnaval 2026).
                         Os registros são criados/atualizados no <code>event.event</code> usando
                         <code>external_source=portalbh_carnaval_2026</code> e o ID numérico do link.

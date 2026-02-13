@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
             <form string="Importar eventos (Guia BH)">
                 <sheet>
-                    <div role="alert" class="alert alert-info">
+                    \1 role="alert">
                         Os arquivos CSV devem conter as colunas:
                         <code>name,date_begin,date_end,external_url,button_label,category,neighborhood,venue,ticket_kind,age_rating,producer_name,is_accessible_pcd</code>.
                         O ICS deve seguir o padrão iCal com SUMMARY/DTSTART/DTEND/LOCATION.

@@ -13,7 +13,7 @@
                             <div class="form-group">
                                 <label class="col-form-label" for="bhz_featured_carousel_autoplay">Autoplay</label>
                                 <div class="o_row">
-                                    <field name="bhz_featured_carousel_autoplay" widget="boolean_toggle"/>
+                                    <field name="bhz_featured_carousel_autoplay" widget="switch"/>
                                 </div>
                             </div>
                             <div class="form-group">
