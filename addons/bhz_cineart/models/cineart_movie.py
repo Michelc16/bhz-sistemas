@@ -17,6 +17,11 @@ class CineartMovie(models.Model):
     _name = "guiabh.cineart.movie"
     _description = "Cineart - Filmes"
     _order = "category, name"
+    _cineart_url_unique = models.Constraint(
+        'UNIQUE(cineart_url)',
+        'Já existe um filme com este link do Cineart.',
+    )
+
     _check_company_auto = True
 
     BASE_URL = "https://cineart.com.br/"
@@ -58,11 +63,6 @@ class CineartMovie(models.Model):
         default=0,
         help="Controle opcional de popularidade para ordenar os destaques.",
     )
-
-    _sql_constraints = [
-        ("cineart_url_unique", "unique(cineart_url)", "Já existe um filme com este link do Cineart."),
-    ]
-
     def action_open_cineart(self):
         self.ensure_one()
         if not self.cineart_url:

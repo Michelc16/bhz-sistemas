@@ -254,7 +254,7 @@ class BhzFootballAgendaController(http.Controller):
 
     @http.route(
         "/bhz_football/snippet/matches",
-        type="json",
+        type='jsonrpc',
         auth="public",
         website=True,
     )
