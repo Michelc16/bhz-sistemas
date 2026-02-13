@@ -55,7 +55,7 @@ class BhzEventApiController(http.Controller):
         return request.make_json_response({"error": message}, status=500)
 
     # --------------------------- Routes
-    @http.route("/api/events/ping", type="json", auth="public", cors="*", csrf=False)
+    @http.route("/api/events/ping", type='jsonrpc', auth="public", cors="*", csrf=False)
     def ping(self, **kwargs):
         if not self._validate_token():
             return self._unauthorized()
@@ -63,7 +63,7 @@ class BhzEventApiController(http.Controller):
             return request.make_json_response({"error": "rate_limited"}, status=429)
         return {"ok": True, "time": fields.Datetime.now()}
 
-    @http.route("/api/events/by_external/<string:source>/<string:external_id>", type="json", auth="public", cors="*", csrf=False)
+    @http.route("/api/events/by_external/<string:source>/<string:external_id>", type='jsonrpc', auth="public", cors="*", csrf=False)
     def by_external(self, source=None, external_id=None, **kwargs):
         if not self._validate_token():
             return self._unauthorized()
@@ -85,7 +85,7 @@ class BhzEventApiController(http.Controller):
             "featured": rec.is_featured,
         }
 
-    @http.route("/api/events/upsert", type="json", auth="public", cors="*", csrf=False)
+    @http.route("/api/events/upsert", type='jsonrpc', auth="public", cors="*", csrf=False)
     def upsert(self, **payload):
         if not self._validate_token():
             return self._unauthorized()
@@ -101,7 +101,7 @@ class BhzEventApiController(http.Controller):
             _logger.exception("API upsert failed")
             return self._server_error(str(err))
 
-    @http.route("/api/events/bulk_upsert", type="json", auth="public", cors="*", csrf=False)
+    @http.route("/api/events/bulk_upsert", type='jsonrpc', auth="public", cors="*", csrf=False)
     def bulk_upsert(self, **payload):
         if not self._validate_token():
             return self._unauthorized()

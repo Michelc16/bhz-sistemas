@@ -1,5 +1,6 @@
 {
-    "name": "BHZ DRE e CMV",
+    'author': 'BHZ Sistemas',
+"name": "BHZ DRE e CMV",
     "version": "19.0.1.0.0",
     "category": "Accounting/Reporting",
     "summary": "Gere relatórios simples da Demonstração do Resultado",
