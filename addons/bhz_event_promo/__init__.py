@@ -3,6 +3,5 @@ from . import controllers
 from . import wizard
 from . import hooks
 
-# Expose the hook at the addon package level.
-# Odoo's module loader calls: getattr(py_module, post_init_hook)(env)
-from .hooks import post_init_hook  # noqa: F401
+# Expose hooks at module level (required by Odoo when referenced in __manifest__.py)
+from .hooks import post_init_hook

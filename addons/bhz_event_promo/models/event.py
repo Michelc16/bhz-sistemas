@@ -113,6 +113,13 @@ class EventEvent(models.Model):
     external_last_sync = fields.Datetime(string="Última sincronização externa")
 
     # Multi-company: permite importar o mesmo evento externo para empresas diferentes.
+    _sql_constraints = [
+        (
+            "bhz_event_external_unique",
+            "unique(external_source, external_id, company_id)",
+            "A combinação de Fonte externa, ID externo e Empresa deve ser única.",
+        ),
+    ]
     auto_remove_after_event = fields.Selection(
         [
             ("none", "Não fazer nada"),
