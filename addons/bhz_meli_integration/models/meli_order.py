@@ -307,9 +307,14 @@ class MeliOrder(models.Model):
         self = self.sudo()
         _logger.warning("[ML] (CRON) Iniciando importação de pedidos")
 
-        accounts = self.env["meli.account"].sudo().search([("state", "=", "authorized")])
+        accounts = self.env["meli.account"].sudo().search(
+            [
+                ("state", "in", ["connected", "authorized"]),
+                ("access_token", "!=", False),
+            ]
+        )
         if not accounts:
-            _logger.warning("[ML] (CRON) Nenhuma conta autorizada encontrada para importar pedidos")
+            _logger.warning("[ML] (CRON) Nenhuma conta conectada encontrada para importar pedidos")
             return
 
         total_imported = 0
@@ -329,7 +334,7 @@ class MeliOrder(models.Model):
                 imported = order_model._import_orders_for_account(account_ctx)
                 total_imported += imported
                 _logger.warning("[ML] Conta %s: %s pedidos importados", account.name, imported)
-            except Exception:
+            except Exception as exc:
                 _logger.exception("[ML] Erro inesperado ao importar pedidos da conta %s", account.name)
                 account_ctx._record_error(str(exc))
 
