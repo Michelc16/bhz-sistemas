@@ -8,6 +8,7 @@
     "license": "LGPL-3",
     "depends": [
         "base",
+        "base_setup",
         "mail",
     ],
     "assets": {
