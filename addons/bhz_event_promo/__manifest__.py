@@ -34,7 +34,7 @@
             "bhz_event_promo/static/src/js/guiabh_announced_events.js",
             "bhz_event_promo/static/src/js/guiabh_featured_carousel.js",
         ],
-        "website.assets_editor": [
+        "website.website_builder_assets": [
             "bhz_event_promo/static/src/website_builder/**/*",
         ],
     },
