@@ -7,6 +7,7 @@
     "license": "LGPL-3",
     "depends": [
         "base",
+        "base_setup",
         "website",
         "event",
         "website_event",
