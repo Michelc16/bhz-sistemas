@@ -3,8 +3,23 @@
 (function () {
     "use strict";
 
+    function shouldSkipBranding() {
+        const path = window.location && window.location.pathname ? window.location.pathname : "";
+        const search = window.location && window.location.search ? window.location.search : "";
+        if (path.startsWith("/web/tests")) {
+            return true;
+        }
+        if (search.includes("test") || search.includes("debug=tests")) {
+            return true;
+        }
+        return false;
+    }
+
     // roda quando o DOM estiver pronto
     function applyBranding() {
+        if (shouldSkipBranding()) {
+            return;
+        }
         try {
             // título da janela
             document.title = 'BHZ SISTEMAS';
@@ -35,6 +50,9 @@
 
     // executar após carregamento (tenta várias vezes porque Odoo carrega dinamicamente)
     function readyLoop(count) {
+        if (shouldSkipBranding()) {
+            return;
+        }
         if (count === undefined) { count = 0; }
         applyBranding();
         if (count < 15) {
