@@ -1,18 +1,12 @@
 # -*- coding: utf-8 -*-
 from odoo import _, api, fields, models
+from odoo.exceptions import ValidationError
 
 
 class BhzWaConversation(models.Model):
     _name = "bhz.wa.conversation"
     _description = "Conversa WhatsApp"
     _order = "is_pinned desc, last_message_date desc, id desc"
-    _sql_constraints = [
-        (
-            "partner_session_account_unique",
-            "unique(partner_id, session_id, account_id)",
-            "Já existe uma conversa para este contato e sessão.",
-        )
-    ]
 
     name = fields.Char(string="Nome")
     partner_id = fields.Many2one("res.partner", string="Contato", ondelete="set null")
@@ -95,3 +89,12 @@ class BhzWaConversation(models.Model):
                 msg.conversation_id = conv.id
             except Exception:
                 continue
+
+    @api.constrains('partner_session_key')
+    def _check_partner_session_key_unique(self):
+        for rec in self:
+            if not rec.partner_session_key:
+                continue
+            domain=[('id','!=',rec.id),('partner_session_key','=',rec.partner_session_key)]
+            if self.search_count(domain):
+                raise ValidationError(_('partner_session_key must be unique'))

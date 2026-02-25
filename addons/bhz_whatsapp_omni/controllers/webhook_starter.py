@@ -31,7 +31,7 @@ class BhzWaWebhookStarter(http.Controller):
             return False
         return True
 
-    @http.route(['/bhz_wa/starter/inbound', '/bhz/wa/inbound'], type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route(['/bhz_wa/starter/inbound', '/bhz/wa/inbound'], type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def inbound(self, **kwargs):
         account = self._get_account_from_headers()
         if not account:

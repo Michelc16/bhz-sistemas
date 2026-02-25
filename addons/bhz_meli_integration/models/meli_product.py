@@ -129,17 +129,19 @@ class MeliProduct(models.Model):
                 }
             )
 
-    @api.model
-    def cron_fetch_items(self):
-        """
-        Cron que sincroniza anúncios.
-        """
+    def _cron_fetch_items_impl(self):
+        """Implementação compartilhada do cron de anúncios."""
         self = self.sudo()
         _logger.warning("[ML] (CRON) Iniciando importação de anúncios")
 
-        accounts = self.env["meli.account"].sudo().search([("state", "=", "authorized")])
+        accounts = self.env["meli.account"].sudo().search(
+            [
+                ("state", "in", ["connected", "authorized"]),
+                ("access_token", "!=", False),
+            ]
+        )
         if not accounts:
-            _logger.warning("[ML] (CRON) Nenhuma conta autorizada encontrada para importar anúncios")
+            _logger.warning("[ML] (CRON) Nenhuma conta conectada encontrada para importar anúncios")
             return
 
         Currency = self.env["res.currency"].sudo()
@@ -148,12 +150,12 @@ class MeliProduct(models.Model):
 
         for account in accounts:
             company = account.company_id or self.env.company
-            account = account.with_company(company)
+            account_ctx = account.with_company(company)
 
             try:
                 account_ctx.ensure_valid_token()
             except Exception as exc:
-                _logger.error("[ML] Conta %s: falha ao validar token (%s)", account.name, exc)
+                _logger.error("[ML] Conta %s: falha ao validar token (%s)", account_ctx.name, exc)
                 account_ctx._record_error(str(exc))
                 continue
 
@@ -167,15 +169,15 @@ class MeliProduct(models.Model):
             limit = 50
             offset = 0
 
-            search_url = f"https://api.mercadolibre.com/users/{account.ml_user_id}/items/search"
+            search_url = f"https://api.mercadolibre.com/users/{account_ctx.ml_user_id}/items/search"
             while True:
                 params = {"search_type": "scan", "offset": offset, "limit": limit}
-                resp = self._ml_get(search_url, account, params=params, timeout=30)
+                resp = self._ml_get(search_url, account_ctx, params=params, timeout=30)
 
                 if resp.status_code != 200:
                     _logger.error(
                         "[ML] Conta %s: erro HTTP %s ao buscar anúncios: %s",
-                        account.name,
+                        account_ctx.name,
                         resp.status_code,
                         (resp.text or "")[:2000],
                     )
@@ -188,12 +190,12 @@ class MeliProduct(models.Model):
 
                 for item_id in item_ids:
                     item_url = f"https://api.mercadolibre.com/items/{item_id}"
-                    item_resp = self._ml_get(item_url, account, timeout=30)
+                    item_resp = self._ml_get(item_url, account_ctx, timeout=30)
 
                     if item_resp.status_code != 200:
                         _logger.error(
                             "[ML] Conta %s: erro ao buscar item %s: %s",
-                            account.name,
+                            account_ctx.name,
                             item_id,
                             (item_resp.text or "")[:2000],
                         )
@@ -212,14 +214,18 @@ class MeliProduct(models.Model):
 
                     # produto odoo (VARIANTE)
                     try:
-                        product_variant = self._get_or_create_product_variant(account, item_data)
+                        product_variant = self._get_or_create_product_variant(account_ctx, item_data)
                     except Exception:
-                        _logger.exception("[ML] Conta %s: falha ao criar/obter produto Odoo do item %s", account.name, item_id)
+                        _logger.exception(
+                            "[ML] Conta %s: falha ao criar/obter produto Odoo do item %s",
+                            account_ctx.name,
+                            item_id,
+                        )
                         continue
 
                     vals = {
                         "name": item_data.get("title") or item_id,
-                        "account_id": account.id,
+                        "account_id": account_ctx.id,
                         "product_id": product_variant.id,
                         "meli_item_id": item_id,
                         "meli_permalink": item_data.get("permalink"),
@@ -227,7 +233,10 @@ class MeliProduct(models.Model):
                         "currency_id": currency_id,
                     }
 
-                    record = self.search([("account_id", "=", account.id), ("meli_item_id", "=", item_id)], limit=1)
+                    record = self.search(
+                        [("account_id", "=", account_ctx.id), ("meli_item_id", "=", item_id)],
+                        limit=1,
+                    )
                     if record:
                         record.write(vals)
                         account_updated += 1
@@ -243,7 +252,7 @@ class MeliProduct(models.Model):
 
             _logger.warning(
                 "[ML] Conta %s: %s anúncios criados, %s atualizados",
-                account.name,
+                account_ctx.name,
                 account_imported,
                 account_updated,
             )
@@ -256,8 +265,13 @@ class MeliProduct(models.Model):
 
     @api.model
     def cron_fetch_items(self):
-        """Compatibilidade com o nome antigo do cron."""
-        return self.cron_fetch_products()
+        """Cron oficial (nome atual)."""
+        return self._cron_fetch_items_impl()
+
+    @api.model
+    def cron_fetch_products(self):
+        """Compatibilidade com ações/cron antigas."""
+        return self._cron_fetch_items_impl()
 
     def action_manual_sync_products(self):
         """Botão manual para sincronizar anúncios do Mercado Livre."""

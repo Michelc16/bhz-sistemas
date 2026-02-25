@@ -1,5 +1,7 @@
 {
-    "name": "GUIA BH - Hide Blog Date/Author",
+    'license': 'LGPL-3',
+'author': 'BHZ Sistemas',
+"name": "GUIA BH - Hide Blog Date/Author",
     "version": "1.0.0",
     "category": "Website",
     "summary": "Esconde data/autor/meta nas páginas de post do blog (website_blog).",

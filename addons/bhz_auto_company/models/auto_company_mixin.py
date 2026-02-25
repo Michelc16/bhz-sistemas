@@ -12,6 +12,8 @@ class AutoCompanyMixin(models.AbstractModel):
         Se não tiver company_id, coloca a empresa atual.
         """
         company_id = self.env.company.id
+        if not self.env.context.get('bhz_force_company_id'):
+            return vals
 
         # caso seja uma lista de dicionários
         if isinstance(vals, list):

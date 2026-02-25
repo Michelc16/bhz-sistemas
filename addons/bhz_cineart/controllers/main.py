@@ -37,7 +37,7 @@ class GuiaBHCineartController(http.Controller):
 
     @http.route(
         "/bhz_cineart/snippet/movies",
-        type="json",
+        type='jsonrpc',
         auth="public",
         website=True,
     )

@@ -30,7 +30,7 @@ class BHZWABusinessWebhook(http.Controller):
             return challenge
         return "forbidden"
 
-    @http.route('/bhz_wa/business/webhook', type='json', auth='public', csrf=False, methods=['POST'])
+    @http.route('/bhz_wa/business/webhook', type='jsonrpc', auth='public', csrf=False, methods=['POST'])
     def inbound(self, **payload):
         payload = payload or request.jsonrequest or {}
         try:

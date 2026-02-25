@@ -6,6 +6,11 @@ class GuiabhCineartCategory(models.Model):
     _name = "guiabh.cineart.category"
     _description = "Categoria (Cineart)"
     _order = "sequence, name"
+    _cineart_category_code_unique = models.Constraint(
+        'UNIQUE(code)',
+        'O código da categoria deve ser único.',
+    )
+
 
     name = fields.Char(required=True)
     code = fields.Char(required=True, index=True)
@@ -17,11 +22,6 @@ class GuiabhCineartCategory(models.Model):
         default=lambda self: self.env.company,
         index=True,
     )
-
-    _sql_constraints = [
-        ("cineart_category_code_unique", "unique(code)", "O código da categoria deve ser único."),
-    ]
-
     @api.model
     def _ensure_company_categories(self, company=False):
         """Garantir que cada empresa tenha os códigos padrão (now/premiere/soon)."""

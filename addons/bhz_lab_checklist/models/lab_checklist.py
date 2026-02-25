@@ -132,9 +132,13 @@ class SaleOrder(models.Model):
     def action_view_lab_checklists(self):
         self.ensure_one()
         action = self.env.ref("bhz_lab_checklist.action_lab_checklist").read()[0]
-        action["domain"] = [("sale_order_id", "=", self.id)]
+        order_id = self._origin.id or self.id
+        if not isinstance(order_id, int) or not order_id:
+            action["domain"] = [("id", "=", 0)]
+        else:
+            action["domain"] = [("sale_order_id", "=", order_id)]
         action["context"] = {
-            "default_sale_order_id": self.id,
+            "default_sale_order_id": self._origin.id or self.id,
         }
         return action
 
