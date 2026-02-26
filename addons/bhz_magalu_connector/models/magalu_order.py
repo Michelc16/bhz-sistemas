@@ -1,7 +1,10 @@
 import json
+import logging
 
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
+
+_logger = logging.getLogger(__name__)
 
 
 class BhzMagaluOrder(models.Model):
@@ -18,10 +21,32 @@ class BhzMagaluOrder(models.Model):
     @api.model
     def cron_fetch_orders(self):
         configs = self.env["bhz.magalu.config"].search([])
+        if not configs:
+            _logger.info("Cron Magalu: nenhuma configuração encontrada.")
+            return
         for cfg in configs:
-            self._fetch_for_config(cfg)
+            try:
+                self._fetch_for_config(cfg)
+            except UserError as err:
+                # Cron não deve falhar quando a configuração ainda não foi conectada.
+                _logger.warning(
+                    "Cron Magalu: configuração %s ignorada: %s",
+                    cfg.display_name,
+                    err,
+                )
+            except Exception:
+                _logger.exception(
+                    "Cron Magalu: falha inesperada na configuração %s",
+                    cfg.display_name,
+                )
 
     def _fetch_for_config(self, config):
+        if not config.access_token:
+            _logger.info(
+                "Cron Magalu: configuração %s sem token, ignorando sincronização.",
+                config.display_name,
+            )
+            return
         api = self.env["bhz.magalu.api"]
         data = api.fetch_orders(config)
         orders = data.get("orders") or data.get("items") or []
