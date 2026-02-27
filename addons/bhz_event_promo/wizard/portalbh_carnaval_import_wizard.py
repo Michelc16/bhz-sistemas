@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
+import logging
 
 from odoo import _, fields, models
+
+_logger = logging.getLogger(__name__)
 
 
 class PortalBHCarnavalImportWizard(models.TransientModel):
@@ -12,6 +15,19 @@ class PortalBHCarnavalImportWizard(models.TransientModel):
 
     _name = "bhz.portalbh.carnaval.import.wizard"
     _description = "Importador PortalBH - Carnaval 2026 (Blocos de Rua)"
+
+    def _transient_vacuum(self):
+        """Evita erro de autovacuum quando a tabela transient foi removida no banco."""
+        self.env.cr.execute("SELECT to_regclass(%s)", (self._table,))
+        table_name = self.env.cr.fetchone()[0]
+        if not table_name:
+            _logger.warning(
+                "[BHZ EVENT PROMO] pulando vacuum de %s: tabela %s inexistente",
+                self._name,
+                self._table,
+            )
+            return False
+        return super()._transient_vacuum()
 
     source_url = fields.Char(
         string="URL base",

@@ -8,7 +8,7 @@ import requests
 from lxml import html
 
 from odoo import api, fields, models, _
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 _logger = logging.getLogger(__name__)
 
@@ -17,10 +17,6 @@ class CineartMovie(models.Model):
     _name = "guiabh.cineart.movie"
     _description = "Cineart - Filmes"
     _order = "category, name"
-    _cineart_url_unique = models.Constraint(
-        'UNIQUE(cineart_url)',
-        'Já existe um filme com este link do Cineart.',
-    )
 
     _check_company_auto = True
 
@@ -63,6 +59,21 @@ class CineartMovie(models.Model):
         default=0,
         help="Controle opcional de popularidade para ordenar os destaques.",
     )
+
+    @api.constrains("cineart_url", "company_id")
+    def _check_unique_url_per_company(self):
+        for rec in self:
+            if not rec.cineart_url:
+                continue
+            domain = [
+                ("id", "!=", rec.id),
+                ("cineart_url", "=", rec.cineart_url),
+                ("company_id", "=", rec.company_id.id if rec.company_id else False),
+            ]
+            if self.with_context(active_test=False).search_count(domain):
+                raise ValidationError(
+                    _("Já existe um filme com este link do Cineart nesta empresa.")
+                )
     def action_open_cineart(self):
         self.ensure_one()
         if not self.cineart_url:

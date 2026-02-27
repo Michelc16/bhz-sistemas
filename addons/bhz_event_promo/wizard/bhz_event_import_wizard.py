@@ -2,6 +2,7 @@
 import base64
 import csv
 import io
+import logging
 from collections import defaultdict
 from datetime import datetime
 
@@ -10,10 +11,25 @@ import requests
 from odoo import _, fields, models
 from odoo.exceptions import UserError
 
+_logger = logging.getLogger(__name__)
+
 
 class BhzEventImportWizard(models.TransientModel):
     _name = "bhz.event.import.wizard"
     _description = "Importador Guia BH"
+
+    def _transient_vacuum(self):
+        """Evita erro de autovacuum quando a tabela transient foi removida no banco."""
+        self.env.cr.execute("SELECT to_regclass(%s)", (self._table,))
+        table_name = self.env.cr.fetchone()[0]
+        if not table_name:
+            _logger.warning(
+                "[BHZ EVENT PROMO] pulando vacuum de %s: tabela %s inexistente",
+                self._name,
+                self._table,
+            )
+            return False
+        return super()._transient_vacuum()
 
     csv_file = fields.Binary(string="Arquivo CSV")
     csv_filename = fields.Char()
